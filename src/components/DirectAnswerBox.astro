@@ -1,0 +1,160 @@
+---
+/**
+ * DirectAnswerBox.astro
+ * ─────────────────────────────────────────────────────────────
+ * AEO (AI Engine Optimization) component.
+ * Renders a 40-60 word "direct answer" summary designed to be
+ * picked up by LLM crawlers and AI search engines as a
+ * featured snippet / direct answer.
+ *
+ * Uses semantic HTML attributes:
+ *   - role="doc-abstract"  → signals a document summary
+ *   - itemprop="abstract"  → schema.org abstract property
+ *   - data-answer="true"   → custom hook for AI crawlers
+ *
+ * Props:
+ *   answer     — The 40-60 word direct answer (required)
+ *   question   — Optional question the answer addresses
+ *   author     — Author name (defaults to "Dr. Tim")
+ *   specialty  — Medical specialty context
+ */
+
+interface Props {
+  answer: string;
+  question?: string;
+  author?: string;
+  specialty?: string;
+}
+
+const {
+  answer,
+  question,
+  author = 'Dr. Tim',
+  specialty = 'Functional Medicine',
+} = Astro.props;
+
+// Word count validation (log warning at build time if out of range)
+const wordCount = answer.split(/\s+/).length;
+if (wordCount < 35 || wordCount > 70) {
+  console.warn(
+    `[DirectAnswerBox] Answer is ${wordCount} words (target: 40-60). Consider adjusting.`
+  );
+}
+---
+
+<aside
+  class="direct-answer-box"
+  role="doc-abstract"
+  itemscope
+  itemtype="https://schema.org/Answer"
+  data-answer="true"
+  aria-label="Quick Answer"
+>
+  {question && (
+    <p class="direct-answer-question" itemprop="name">
+      <span class="question-icon" aria-hidden="true">💡</span>
+      {question}
+    </p>
+  )}
+  <div class="direct-answer-content" itemprop="text">
+    <p>{answer}</p>
+  </div>
+  <footer class="direct-answer-meta">
+    <span class="direct-answer-author" itemprop="author">{author}</span>
+    <span class="direct-answer-divider" aria-hidden="true">·</span>
+    <span class="direct-answer-specialty">{specialty}</span>
+  </footer>
+</aside>
+
+<style>
+  .direct-answer-box {
+    position: relative;
+    background: linear-gradient(135deg, var(--color-answer-bg, #f0fdfa) 0%, #ecfdf5 100%);
+    border: 1px solid var(--color-answer-border, #99f6e4);
+    border-left: 4px solid var(--color-primary, #0f766e);
+    border-radius: 0 var(--radius-lg, 0.75rem) var(--radius-lg, 0.75rem) 0;
+    padding: var(--space-6, 1.5rem);
+    margin: var(--space-6, 1.5rem) 0;
+    box-shadow: var(--shadow, 0 1px 3px 0 rgb(0 0 0 / 0.1));
+    transition: box-shadow 150ms ease, transform 150ms ease;
+  }
+
+  .direct-answer-box:hover {
+    box-shadow: var(--shadow-md, 0 4px 6px -1px rgb(0 0 0 / 0.1));
+    transform: translateY(-1px);
+  }
+
+  .direct-answer-question {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2, 0.5rem);
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    font-size: var(--text-lg, 1.25rem);
+    font-weight: 600;
+    color: var(--color-primary-dark, #0d5f58);
+    margin-bottom: var(--space-3, 0.75rem);
+    line-height: 1.4;
+  }
+
+  .question-icon {
+    flex-shrink: 0;
+    font-size: 1.2em;
+  }
+
+  .direct-answer-content {
+    font-family: var(--font-serif, 'Merriweather', serif);
+    font-size: var(--text-base, 1.0625rem);
+    line-height: 1.75;
+    color: var(--color-text, #1a1a2e);
+  }
+
+  .direct-answer-content p {
+    margin: 0;
+  }
+
+  .direct-answer-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2, 0.5rem);
+    margin-top: var(--space-3, 0.75rem);
+    padding-top: var(--space-3, 0.75rem);
+    border-top: 1px solid var(--color-answer-border, #99f6e4);
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    font-size: var(--text-sm, 0.875rem);
+    color: var(--color-text-muted, #6b7280);
+  }
+
+  .direct-answer-author {
+    font-weight: 600;
+    color: var(--color-primary, #0f766e);
+  }
+
+  .direct-answer-divider {
+    opacity: 0.5;
+  }
+
+  /* Dark mode support */
+  @media (prefers-color-scheme: dark) {
+    .direct-answer-box {
+      background: linear-gradient(135deg, #042f2e 0%, #064e3b 100%);
+      border-color: #115e59;
+    }
+
+    .direct-answer-question {
+      color: #5eead4;
+    }
+
+    .direct-answer-content {
+      color: #d1d5db;
+    }
+
+    .direct-answer-meta {
+      border-color: #115e59;
+      color: #9ca3af;
+    }
+
+    .direct-answer-author {
+      color: #5eead4;
+    }
+  }
+</style>

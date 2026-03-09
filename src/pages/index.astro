@@ -1,0 +1,1210 @@
+---
+/**
+ * Homepage — drtim.co
+ * Premium blog homepage with editorial layout.
+ * 
+ * Design patterns from Refero research:
+ * - Hero featured post with image overlay (Typeform/Craft pattern)
+ * - Horizontal category pills (The Leap/Monarch pattern)
+ * - Editorial 1+2 grid for featured posts (Unsplash pattern)
+ * - 3-column card grid for latest (Duolingo/Grammarly pattern)
+ * - Clean typography with Inter font (Craft/Fibery pattern)
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import DirectAnswerBox from '../components/DirectAnswerBox.astro';
+import SearchModal from '../components/SearchModal.astro';
+import { getTranslations } from '../i18n/translations.js';
+import {
+  getAllPosts,
+  getCategories,
+  getPostCount,
+  stripHtml,
+  formatDate,
+  localizeImageUrl,
+  getAuthorName,
+} from '../lib/api.js';
+
+const ui = getTranslations('th');
+
+const allPosts = getAllPosts();
+const categories = getCategories();
+const totalPosts = getPostCount();
+
+// Split posts into sections
+const heroPost = allPosts[0];
+const editorPicks = allPosts.slice(1, 3);
+const latestPosts = allPosts.slice(3, 9);
+const morePosts = allPosts.slice(9, 15);
+---
+
+<BaseLayout
+  title={ui.siteTitle}
+  description={ui.siteDescription}
+  type="website"
+>
+  <!-- ═══ FIXED TOP BAR ═══ -->
+  <header class="top-bar">
+    <div class="top-bar-inner">
+      <a href="/" class="top-bar-brand">
+        <span class="brand-icon">⚕</span>
+        <span class="brand-name">Dr. Tim</span>
+      </a>
+      <nav class="top-bar-nav">
+        <a href="/blog">{ui.blog}</a>
+        <a href="/">{ui.home}</a>
+      </nav>
+      <div class="top-bar-social">
+        <a href="https://www.facebook.com/dr.timdietclinic/" target="_blank" rel="noopener" aria-label="Facebook" class="social-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+        </a>
+        <a href="https://www.youtube.com/@dr.timdietclinic" target="_blank" rel="noopener" aria-label="YouTube" class="social-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+        </a>
+        <a href="https://www.instagram.com/dr.timdietclinic/" target="_blank" rel="noopener" aria-label="Instagram" class="social-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+        </a>
+        <a href="https://lin.ee/LwEtisp" target="_blank" rel="noopener" aria-label="LINE" class="social-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19.365 9.864c.058 0 .104.048.104.108v.86c0 .06-.046.108-.104.108h-1.954v.604h1.954c.058 0 .104.048.104.108v.86c0 .06-.046.108-.104.108h-2.922a.108.108 0 0 1-.108-.108V9.08c0-.06.048-.108.108-.108h2.922c.058 0 .104.048.104.108v.86c0 .06-.046.108-.104.108h-1.954v.604h1.954zm-4.553 2.756a.108.108 0 0 1-.09.048h-.852a.108.108 0 0 1-.092-.052l-1.544-2.088v1.932c0 .06-.048.108-.108.108h-.86a.108.108 0 0 1-.108-.108V9.08c0-.06.048-.108.108-.108h.86a.108.108 0 0 1 .09.048l1.544 2.088V9.08c0-.06.048-.108.108-.108h.86c.06 0 .108.048.108.108v2.844c0 .06-.048.108-.108.108h-.86a.104.104 0 0 1-.016-.004zM9.473 12.62h-.86a.108.108 0 0 1-.108-.108V9.08c0-.06.048-.108.108-.108h.86c.06 0 .108.048.108.108v3.432c0 .06-.048.108-.108.108zm-1.837 0h-2.92a.108.108 0 0 1-.108-.108V9.08c0-.06.048-.108.107-.108h.86c.06 0 .108.048.108.108v2.572h1.953c.058 0 .104.048.104.108v.86c0 .06-.046.108-.104.108zM24 10.5C24 4.701 18.627 0 12 0S0 4.701 0 10.5c0 5.19 4.604 9.537 10.824 10.362.42.092.992.28 1.137.641.13.328.085.84.042 1.17l-.184 1.107c-.056.328-.26 1.284 1.124.7 1.384-.584 7.466-4.396 10.184-7.525C25.18 14.703 24 12.727 24 10.5z"/></svg>
+        </a>
+      </div>
+      <SearchModal />
+    </div>
+  </header>
+
+  <!-- ═══ HERO FEATURED POST ═══ -->
+  <section class="hero-section">
+    <div class="hero-inner">
+      <div class="hero-text">
+        <span class="hero-badge">
+          <span class="badge-dot"></span>
+          {ui.latestArticle}
+        </span>
+        <h1 class="hero-title" set:html={heroPost.title} />
+        <p class="hero-excerpt">
+          {stripHtml(heroPost.excerpt).substring(0, 180)}…
+        </p>
+        <div class="hero-meta">
+          {heroPost.author?.avatar && (
+            <img
+              src={heroPost.author.avatar}
+              alt={heroPost.author.name}
+              class="hero-avatar"
+              width="32"
+              height="32"
+            />
+          )}
+          <span class="hero-author">{getAuthorName(heroPost.author)}</span>
+          <span class="hero-separator">·</span>
+          <time datetime={heroPost.date}>{formatDate(heroPost.date)}</time>
+        </div>
+        <a href={`/blog/${heroPost.slug}`} class="hero-cta">
+          {ui.readArticle}
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M3 8h10m0 0L9 4m4 4L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+      </div>
+      <div class="hero-image-wrapper">
+        {heroPost.featuredImage?.sourceUrl ? (
+          <a href={`/blog/${heroPost.slug}`} class="hero-image-link">
+            <img
+              src={localizeImageUrl(heroPost.featuredImage.sourceUrl)}
+              alt={heroPost.featuredImage.altText || stripHtml(heroPost.title)}
+              class="hero-image"
+              loading="eager"
+            />
+          </a>
+        ) : (
+          <div class="hero-image-placeholder">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" opacity="0.3">
+              <path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z" stroke="currentColor" stroke-width="1.5"/>
+              <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/>
+              <path d="m21 15-5-5L5 21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+        )}
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ CATEGORY PILLS ═══ -->
+  {categories.length > 0 && (
+    <section class="categories-section">
+      <div class="categories-inner">
+        <nav class="category-pills" aria-label="Browse topics">
+          <a href="/blog" class="pill pill-active">{ui.allArticles}</a>
+          {categories.slice(0, 12).map((cat) => (
+            <a href={`/category/${cat.slug}`} class="pill">
+              {cat.name}
+              <span class="pill-count">{cat.count}</span>
+            </a>
+          ))}
+        </nav>
+      </div>
+    </section>
+  )}
+
+  <!-- ═══ AEO DIRECT ANSWER (hidden visually, for crawlers) ═══ -->
+  <section class="container aeo-section">
+    <DirectAnswerBox
+      question={ui.whoIsDrTim}
+      answer={ui.drTimAnswer}
+      author="Dr. Tim"
+      specialty="Functional Medicine"
+    />
+  </section>
+
+  <!-- ═══ EDITOR'S PICKS — 2-col editorial grid ═══ -->
+  {editorPicks.length > 0 && (
+    <section class="container section-picks">
+      <div class="section-header">
+        <h2 class="section-title">{ui.editorsPicks}</h2>
+        <a href="/blog" class="section-link">{ui.viewAll}</a>
+      </div>
+      <div class="picks-grid">
+        {editorPicks.map((post) => (
+          <article class="pick-card">
+            <a href={`/blog/${post.slug}`} class="pick-link">
+              {post.featuredImage?.sourceUrl && (
+                <div class="pick-image">
+                  <img
+                    src={localizeImageUrl(post.featuredImage.sourceUrl)}
+                    alt={post.featuredImage.altText || stripHtml(post.title)}
+                    loading="lazy"
+                  />
+                </div>
+              )}
+              <div class="pick-body">
+                {post.categories?.[0] && (
+                  <span class="pick-category">{post.categories[0].name}</span>
+                )}
+                <h3 set:html={post.title} />
+                <p class="pick-excerpt">
+                  {stripHtml(post.excerpt).substring(0, 100)}…
+                </p>
+                <div class="pick-meta">
+                  <time datetime={post.date}>{formatDate(post.date)}</time>
+                </div>
+              </div>
+            </a>
+          </article>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <!-- ═══ LATEST ARTICLES — 3-col card grid ═══ -->
+  <section class="container section-latest">
+    <div class="section-header">
+      <h2 class="section-title">{ui.latestArticles}</h2>
+      <a href="/blog" class="section-link">{ui.browseAll}</a>
+    </div>
+    <div class="articles-grid">
+      {latestPosts.map((post, i) => (
+        <article class="article-card">
+          <a href={`/blog/${post.slug}`} class="article-link">
+            {post.featuredImage?.sourceUrl && (
+              <div class="article-image">
+                <img
+                  src={localizeImageUrl(post.featuredImage.sourceUrl)}
+                  alt={post.featuredImage.altText || stripHtml(post.title)}
+                  loading="lazy"
+                />
+                {post.categories?.[0] && (
+                  <span class="article-badge">{post.categories[0].name}</span>
+                )}
+              </div>
+            )}
+            <div class="article-body">
+              <h3 set:html={post.title} />
+              <p class="article-excerpt">
+                {stripHtml(post.excerpt).substring(0, 90)}…
+              </p>
+              <div class="article-meta">
+                <time datetime={post.date}>{formatDate(post.date)}</time>
+                <span class="article-read">{ui.read}</span>
+              </div>
+            </div>
+          </a>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <!-- ═══ MORE ARTICLES — Compact list ═══ -->
+  {morePosts.length > 0 && (
+    <section class="container section-more">
+      <div class="section-header">
+        <h2 class="section-title">{ui.moreToExplore}</h2>
+      </div>
+      <div class="more-list">
+        {morePosts.map((post) => (
+          <a href={`/blog/${post.slug}`} class="more-item">
+            <div class="more-content">
+              {post.categories?.[0] && (
+                <span class="more-category">{post.categories[0].name}</span>
+              )}
+              <h3 set:html={post.title} />
+              <time datetime={post.date}>{formatDate(post.date)}</time>
+            </div>
+            {post.featuredImage?.sourceUrl && (
+              <img
+                src={localizeImageUrl(post.featuredImage.sourceUrl)}
+                alt={stripHtml(post.title)}
+                class="more-thumb"
+                loading="lazy"
+              />
+            )}
+          </a>
+        ))}
+      </div>
+      <div class="section-cta">
+        <a href="/blog" class="btn-browse">
+          {ui.viewAllArticles} {totalPosts}+
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M3 8h10m0 0L9 4m4 4L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+      </div>
+    </section>
+  )}
+
+  <!-- ═══ ABOUT DR. TIM — Bento Grid Profile Gallery ═══ -->
+  <!-- Design: Inspired by GlossGenius bento mosaic + Pop Site personal brand (Refero) -->
+  <section class="about-section" id="about">
+    <div class="about-wrapper">
+      <!-- Left: Text Content -->
+      <div class="about-content">
+        <div class="about-badge">
+          <span class="about-badge-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="currentColor"/>
+            </svg>
+          </span>
+          About Dr. Tim
+        </div>
+        <h2 class="about-title">Functional Medicine<br/><span class="about-title-accent">&amp; Metabolic Health</span> Expert</h2>
+        <p class="about-description">
+          A medical doctor (MD) specializing in Functional Medicine at 
+          <strong>Ultramed Clinic, Chonburi, Thailand</strong>. Focused on evidence-based 
+          root-cause treatment for metabolic health, diabetes management, and longevity.
+        </p>
+        <div class="about-highlights">
+          <div class="highlight-item">
+            <div class="highlight-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path d="M22 12h-4l-3 9L9 3l-3 9H2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <span>Metabolic Health</span>
+          </div>
+          <div class="highlight-item">
+            <div class="highlight-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" stroke="currentColor" stroke-width="2"/>
+                <path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <span>Longevity Science</span>
+          </div>
+          <div class="highlight-item">
+            <div class="highlight-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <span>Root-Cause Diagnosis</span>
+          </div>
+        </div>
+        <div class="about-stats">
+          <div class="about-stat">
+            <span class="stat-value">{totalPosts}+</span>
+            <span class="stat-label">Articles Published</span>
+          </div>
+          <div class="about-stat">
+            <span class="stat-value">{categories.length}</span>
+            <span class="stat-label">Health Topics</span>
+          </div>
+          <div class="about-stat">
+            <span class="stat-value">MD</span>
+            <span class="stat-label">Credential</span>
+          </div>
+        </div>
+        <div class="about-social">
+          <span class="about-social-label">Follow</span>
+          <a href="https://www.facebook.com/dr.timdietclinic/" target="_blank" rel="noopener" aria-label="Facebook" class="about-social-link">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          </a>
+          <a href="https://www.youtube.com/@dr.timdietclinic" target="_blank" rel="noopener" aria-label="YouTube" class="about-social-link">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+          </a>
+          <a href="https://www.instagram.com/dr.timdietclinic/" target="_blank" rel="noopener" aria-label="Instagram" class="about-social-link">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+          </a>
+          <a href="https://lin.ee/LwEtisp" target="_blank" rel="noopener" aria-label="LINE" class="about-social-link about-social-line">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19.365 9.864c.058 0 .104.048.104.108v.86c0 .06-.046.108-.104.108h-1.954v.604h1.954c.058 0 .104.048.104.108v.86c0 .06-.046.108-.104.108h-2.922a.108.108 0 0 1-.108-.108V9.08c0-.06.048-.108.108-.108h2.922c.058 0 .104.048.104.108v.86c0 .06-.046.108-.104.108h-1.954v.604h1.954zm-4.553 2.756a.108.108 0 0 1-.09.048h-.852a.108.108 0 0 1-.092-.052l-1.544-2.088v1.932c0 .06-.048.108-.108.108h-.86a.108.108 0 0 1-.108-.108V9.08c0-.06.048-.108.108-.108h.86a.108.108 0 0 1 .09.048l1.544 2.088V9.08c0-.06.048-.108.108-.108h.86c.06 0 .108.048.108.108v2.844c0 .06-.048.108-.108.108h-.86a.104.104 0 0 1-.016-.004zM9.473 12.62h-.86a.108.108 0 0 1-.108-.108V9.08c0-.06.048-.108.108-.108h.86c.06 0 .108.048.108.108v3.432c0 .06-.048.108-.108.108zm-1.837 0h-2.92a.108.108 0 0 1-.108-.108V9.08c0-.06.048-.108.107-.108h.86c.06 0 .108.048.108.108v2.572h1.953c.058 0 .104.048.104.108v.86c0 .06-.046.108-.104.108zM24 10.5C24 4.701 18.627 0 12 0S0 4.701 0 10.5c0 5.19 4.604 9.537 10.824 10.362.42.092.992.28 1.137.641.13.328.085.84.042 1.17l-.184 1.107c-.056.328-.26 1.284 1.124.7 1.384-.584 7.466-4.396 10.184-7.525C25.18 14.703 24 12.727 24 10.5z"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Right: Profile Photo -->
+      <div class="about-photo">
+        <img src="/images/about/drtim.png" alt="Dr. Tim — Functional Medicine Specialist" loading="lazy" />
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* ─── Design Tokens ─── */
+  :root {
+    --font-serif: 'Georgia', 'Times New Roman', serif;
+  }
+
+  /* ─── FIXED TOP BAR ─── */
+  .top-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+  }
+
+  .top-bar-inner {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 10px var(--space-4);
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  .top-bar-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--color-text);
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+  }
+
+  .brand-icon {
+    font-size: 20px;
+  }
+
+  .top-bar-nav {
+    display: flex;
+    gap: var(--space-4);
+    margin-right: auto;
+  }
+
+  .top-bar-nav a {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    transition: color 200ms;
+  }
+
+  .top-bar-nav a:hover {
+    color: var(--color-primary);
+  }
+
+  /* Top bar social icons */
+  .top-bar-social {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .social-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    color: var(--color-text-muted);
+    transition: all 200ms;
+  }
+
+  .social-icon:hover {
+    background: #f0fdfa;
+  }
+
+  .social-icon:nth-child(1):hover { color: #1877f2; }
+  .social-icon:nth-child(2):hover { color: #ff0000; }
+  .social-icon:nth-child(3):hover { color: #e4405f; }
+  .social-icon:nth-child(4):hover { color: #06c755; }
+
+  /* About section social links */
+  .about-social {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: var(--space-6);
+  }
+
+  .about-social-label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: rgba(255,255,255,0.4);
+    margin-right: 4px;
+  }
+
+  .about-social-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.6);
+    transition: all 250ms ease;
+  }
+
+  .about-social-link:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255,255,255,0.2);
+  }
+
+  .about-social-link:nth-child(2):hover { background: rgba(24, 119, 242, 0.2); color: #60a5fa; }
+  .about-social-link:nth-child(3):hover { background: rgba(255, 0, 0, 0.2); color: #f87171; }
+  .about-social-link:nth-child(4):hover { background: rgba(228, 64, 95, 0.2); color: #fb7185; }
+  .about-social-link.about-social-line:hover { background: rgba(6, 199, 85, 0.2); color: #4ade80; }
+
+  /* ─── HERO SECTION ─── */
+  .hero-section {
+    background: linear-gradient(135deg, #f8faf9 0%, #ecf5f3 100%);
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    padding-top: 52px; /* offset for fixed top bar */
+  }
+
+  .hero-inner {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: var(--space-8) var(--space-4);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-8);
+    align-items: center;
+    min-height: 420px;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 6px var(--space-3);
+    background: white;
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    color: var(--color-primary);
+    margin-bottom: var(--space-4);
+  }
+
+  .badge-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #10b981;
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.3); }
+  }
+
+  .hero-title {
+    font-size: clamp(1.75rem, 3vw + 0.5rem, 2.75rem);
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--color-text);
+    margin-bottom: var(--space-4);
+    letter-spacing: -0.02em;
+  }
+
+  .hero-excerpt {
+    font-size: var(--text-base);
+    color: var(--color-text-muted);
+    line-height: 1.7;
+    margin-bottom: var(--space-4);
+    max-width: 480px;
+  }
+
+  .hero-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-6);
+  }
+
+  .hero-avatar {
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+
+  .hero-author { font-weight: 600; color: var(--color-text); }
+  .hero-separator { color: var(--color-border); }
+
+  .hero-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 12px 24px;
+    background: var(--color-text);
+    color: white;
+    font-weight: 600;
+    font-size: var(--text-sm);
+    border-radius: var(--radius);
+    transition: all 200ms ease;
+    letter-spacing: 0.01em;
+  }
+
+  .hero-cta:hover {
+    background: var(--color-primary);
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(15, 118, 110, 0.3);
+  }
+
+  .hero-image-wrapper {
+    position: relative;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+  }
+
+  .hero-image-link { display: block; }
+
+  .hero-image {
+    width: 100%;
+    height: 380px;
+    object-fit: cover;
+    transition: transform 500ms ease;
+  }
+
+  .hero-image-link:hover .hero-image {
+    transform: scale(1.03);
+  }
+
+  .hero-image-placeholder {
+    width: 100%;
+    height: 380px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #e0f2f1, #b2dfdb);
+    color: var(--color-primary);
+  }
+
+  /* ─── CATEGORIES PILLS ─── */
+  .categories-section {
+    background: white;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+  }
+
+  .categories-inner {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: var(--space-3) var(--space-4);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .category-pills {
+    display: flex;
+    gap: var(--space-2);
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding: var(--space-1) 0;
+  }
+
+  .category-pills::-webkit-scrollbar { display: none; }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 16px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    border: 1px solid var(--color-border);
+    background: white;
+    color: var(--color-text-muted);
+    transition: all 200ms ease;
+  }
+
+  .pill:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    background: #f0fdfa;
+  }
+
+  .pill-active {
+    background: var(--color-text);
+    color: white;
+    border-color: var(--color-text);
+  }
+
+  .pill-active:hover {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: white;
+  }
+
+  .pill-count {
+    font-size: 11px;
+    padding: 1px 6px;
+    background: rgba(0,0,0,0.06);
+    border-radius: 999px;
+    font-weight: 600;
+  }
+
+  .pill-active .pill-count {
+    background: rgba(255,255,255,0.2);
+  }
+
+  /* ─── SHARED SECTION STYLES ─── */
+  .container {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: var(--space-12) var(--space-4);
+  }
+
+  .aeo-section {
+    padding-top: var(--space-8);
+    padding-bottom: 0;
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: var(--space-6);
+  }
+
+  .section-title {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--color-text);
+  }
+
+  .section-link {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-primary);
+    transition: color 200ms;
+  }
+
+  .section-link:hover { color: var(--color-primary-dark); }
+
+  /* ─── EDITOR'S PICKS ─── */
+  .picks-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-6);
+  }
+
+  .pick-card {
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: white;
+    border: 1px solid rgba(0,0,0,0.06);
+    transition: box-shadow 300ms ease, transform 300ms ease;
+  }
+
+  .pick-card:hover {
+    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+    transform: translateY(-3px);
+  }
+
+  .pick-link {
+    display: block;
+    color: var(--color-text);
+  }
+
+  .pick-image {
+    overflow: hidden;
+    aspect-ratio: 16/10;
+  }
+
+  .pick-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 500ms ease;
+  }
+
+  .pick-card:hover .pick-image img {
+    transform: scale(1.04);
+  }
+
+  .pick-body {
+    padding: var(--space-3) var(--space-4) var(--space-4);
+  }
+
+  .pick-category {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-primary);
+    margin-bottom: var(--space-2);
+  }
+
+  .pick-body h3 {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    line-height: 1.35;
+    margin-bottom: var(--space-2);
+    letter-spacing: -0.01em;
+  }
+
+  .pick-excerpt {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    line-height: 1.6;
+    margin-bottom: var(--space-3);
+  }
+
+  .pick-meta {
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+
+  /* ─── LATEST ARTICLES 3-COL GRID ─── */
+  .articles-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-6);
+  }
+
+  .article-card {
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: white;
+    border: 1px solid rgba(0,0,0,0.06);
+    transition: box-shadow 300ms ease, transform 300ms ease;
+  }
+
+  .article-card:hover {
+    box-shadow: 0 6px 24px rgba(0,0,0,0.08);
+    transform: translateY(-2px);
+  }
+
+  .article-link {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    color: var(--color-text);
+  }
+
+  .article-image {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 16/10;
+  }
+
+  .article-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 500ms ease;
+  }
+
+  .article-card:hover .article-image img {
+    transform: scale(1.04);
+  }
+
+  .article-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    padding: 3px 10px;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(8px);
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-primary);
+    letter-spacing: 0.02em;
+  }
+
+  .article-body {
+    padding: var(--space-3) var(--space-4) var(--space-4);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .article-body h3 {
+    font-size: var(--text-base);
+    font-weight: 600;
+    line-height: 1.4;
+    margin-bottom: var(--space-2);
+    letter-spacing: -0.01em;
+  }
+
+  .article-excerpt {
+    font-size: 13px;
+    color: var(--color-text-muted);
+    line-height: 1.55;
+    margin-bottom: var(--space-3);
+    flex: 1;
+  }
+
+  .article-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: var(--color-text-muted);
+    padding-top: var(--space-3);
+    border-top: 1px solid rgba(0,0,0,0.05);
+  }
+
+  .article-read {
+    font-weight: 600;
+    color: var(--color-primary);
+    transition: color 200ms;
+  }
+
+  .article-card:hover .article-read {
+    color: var(--color-primary-dark);
+  }
+
+  /* ─── MORE ARTICLES — Compact list ─── */
+  .section-more {
+    padding-bottom: var(--space-8);
+  }
+
+  .more-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .more-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: var(--space-4) 0;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    color: var(--color-text);
+    transition: background 200ms;
+  }
+
+  .more-item:first-child {
+    border-top: 1px solid rgba(0,0,0,0.06);
+  }
+
+  .more-item:hover {
+    background: #fafbfa;
+  }
+
+  .more-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .more-category {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-primary);
+    margin-bottom: 4px;
+    display: block;
+  }
+
+  .more-content h3 {
+    font-size: var(--text-base);
+    font-weight: 600;
+    line-height: 1.4;
+    margin-bottom: 4px;
+  }
+
+  .more-content time {
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+
+  .more-thumb {
+    width: 80px;
+    height: 60px;
+    border-radius: var(--radius);
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  .section-cta {
+    text-align: center;
+    margin-top: var(--space-8);
+  }
+
+  .btn-browse {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 12px 28px;
+    border: 2px solid var(--color-text);
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    transition: all 200ms ease;
+  }
+
+  .btn-browse:hover {
+    background: var(--color-text);
+    color: white;
+    transform: translateY(-1px);
+  }
+
+  /* ─── ABOUT SECTION — Bento Grid Profile ─── */
+  .about-section {
+    background: linear-gradient(135deg, #042f2e 0%, #134e4a 40%, #0f766e 100%);
+    color: white;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .about-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(94, 234, 212, 0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .about-wrapper {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: var(--space-16) var(--space-4);
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    gap: var(--space-10);
+    align-items: center;
+    position: relative;
+  }
+
+  .about-content {
+    padding-right: var(--space-4);
+  }
+
+  .about-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 6px 16px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    margin-bottom: var(--space-6);
+    backdrop-filter: blur(8px);
+    color: #5eead4;
+  }
+
+  .about-badge-icon {
+    display: flex;
+    color: #fbbf24;
+  }
+
+  .about-title {
+    font-size: clamp(1.5rem, 2.5vw + 0.5rem, 2.25rem);
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: var(--space-4);
+    letter-spacing: -0.02em;
+  }
+
+  .about-title-accent {
+    color: #5eead4;
+  }
+
+  .about-description {
+    font-size: var(--text-base);
+    color: rgba(255,255,255,0.72);
+    line-height: 1.7;
+    margin-bottom: var(--space-6);
+  }
+
+  .about-description strong {
+    color: rgba(255,255,255,0.92);
+    font-weight: 600;
+  }
+
+  /* Highlight items */
+  .about-highlights {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: var(--space-8);
+  }
+
+  .highlight-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: rgba(255,255,255,0.85);
+  }
+
+  .highlight-icon {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    color: #5eead4;
+    flex-shrink: 0;
+  }
+
+  .about-stats {
+    display: flex;
+    gap: var(--space-8);
+    padding-top: var(--space-6);
+    border-top: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .stat-value {
+    display: block;
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    color: #5eead4;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: rgba(255,255,255,0.45);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 500;
+  }
+
+  /* ─── PROFILE PHOTO ─── */
+  .about-photo {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .about-photo img {
+    width: 100%;
+    max-width: 400px;
+    border-radius: 20px;
+    object-fit: cover;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    border: 3px solid rgba(255,255,255,0.1);
+    transition: transform 500ms ease;
+  }
+
+  .about-photo:hover img {
+    transform: scale(1.02);
+  }
+
+  .about-photo::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    height: 80%;
+    background: radial-gradient(circle, rgba(94, 234, 212, 0.1) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 900px) {
+    .hero-inner {
+      grid-template-columns: 1fr;
+      min-height: auto;
+      padding: var(--space-6) var(--space-4);
+    }
+
+    .hero-image-wrapper { order: -1; }
+
+    .hero-image {
+      height: 240px;
+    }
+
+    .picks-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .articles-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .about-wrapper {
+      grid-template-columns: 1fr;
+      gap: var(--space-8);
+      padding: var(--space-10) var(--space-4);
+    }
+
+    .about-content {
+      padding-right: 0;
+      text-align: center;
+    }
+
+    .about-highlights {
+      align-items: center;
+    }
+
+    .about-stats {
+      justify-content: center;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .articles-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .about-stats {
+      gap: var(--space-6);
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .hero-title {
+      font-size: 1.5rem;
+    }
+  }
+</style>

@@ -1,0 +1,54 @@
+# Dr. Tim — Functional Medicine & Metabolic Health
+
+> Dr. Tim is a medical doctor (MD) specializing in Functional Medicine at Ultramed Clinic, Chonburi, Thailand. This website contains evidence-based Thai-language medical articles on metabolic health, diabetes management, longevity, and functional medicine.
+
+## About the Author
+
+- **Name:** Dr. Tim (หมอทิม)
+- **Credentials:** MD (Medical Doctor)
+- **Specialty:** Functional Medicine
+- **Affiliation:** Ultramed Clinic, Chonburi, Thailand
+- **Focus Areas:** Metabolic health, diabetes management, longevity science, root-cause diagnosis
+- **Languages:** Thai (primary), English
+
+## Content Overview
+
+This site publishes medical health articles in Thai covering:
+
+- Functional Medicine approaches to chronic disease
+- Metabolic health and insulin resistance
+- Diabetes management and blood sugar optimization
+- Longevity and healthspan science
+- Nutrition and dietary interventions
+- Lab result interpretation and biomarkers
+- Thyroid health and hormone optimization
+- Cardiovascular health markers (triglycerides, cholesterol)
+
+## Content Policies
+
+- All articles are written or reviewed by Dr. Tim (MD)
+- Content is evidence-based and references peer-reviewed research
+- Articles are intended for educational purposes (patient audience)
+- Medical content follows Functional Medicine principles
+- Primary language: Thai (ภาษาไทย)
+
+## Site Structure
+
+- `/` — Homepage with featured and latest articles
+- `/blog` — All articles index
+- `/blog/[slug]` — Individual article pages
+- `/category/[slug]` — Category-filtered article listings
+
+## Contact & Social
+
+- Website: https://drtim.co
+- Facebook: https://www.facebook.com/dr.timdietclinic/
+- YouTube: https://www.youtube.com/@dr.timdietclinic
+- Instagram: https://www.instagram.com/dr.timdietclinic/
+- LINE: https://lin.ee/LwEtisp
+
+## Technical Details
+
+- Built with Astro (static site generator)
+- Structured data: JSON-LD with MedicalWebPage, Person, BreadcrumbList, FAQPage, SpeakableSpecification
+- Sitemap: https://drtim.co/sitemap-index.xml

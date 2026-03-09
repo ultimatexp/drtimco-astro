@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://drtim.co/sitemap-index.xml
+
+# AI Crawler Info
+LLMs: https://drtim.co/llms.txt
+
+# Crawl-delay (optional, for politeness)
+Crawl-delay: 1
+
+# Block admin/scripts paths
+Disallow: /scripts/

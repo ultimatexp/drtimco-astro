@@ -1,0 +1,480 @@
+---
+/**
+ * SearchModal — Client-side instant search
+ * 
+ * Builds a lightweight search index from all posts.
+ * Opens as a modal overlay with keyboard shortcuts (Cmd+K / Ctrl+K).
+ * Zero server dependencies — works fully client-side.
+ */
+import { getAllPosts, stripHtml, formatDate, localizeImageUrl, getAuthorName } from '../lib/api.js';
+import { getTranslations } from '../i18n/translations.js';
+
+const ui = getTranslations('th');
+
+const posts = getAllPosts();
+
+// Build a minimal search index (title + excerpt only, no full content)
+const searchIndex = posts.map(p => ({
+  slug: p.slug,
+  title: stripHtml(p.title),
+  excerpt: stripHtml(p.excerpt).substring(0, 200),
+  date: formatDate(p.date),
+  category: p.categories?.[0]?.name || '',
+  image: localizeImageUrl(p.featuredImage?.sourceUrl || ''),
+}));
+---
+
+<!-- Search Trigger Button -->
+<button class="search-trigger" id="searchTrigger" aria-label="Search articles">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="11" cy="11" r="8"/>
+    <path d="m21 21-4.35-4.35"/>
+  </svg>
+  <span class="search-trigger-text">{ui.searchArticles}</span>
+  <kbd class="search-kbd">⌘K</kbd>
+</button>
+
+<!-- Search Modal -->
+<div class="search-overlay" id="searchOverlay" role="dialog" aria-modal="true" aria-label="Search articles">
+  <div class="search-modal">
+    <!-- Search Input -->
+    <div class="search-input-wrapper">
+      <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/>
+        <path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input
+        type="text"
+        class="search-input"
+        id="searchInput"
+        placeholder={ui.searchPlaceholder}
+        autocomplete="off"
+        autofocus
+      />
+      <button class="search-close" id="searchClose" aria-label="Close search">
+        <kbd>ESC</kbd>
+      </button>
+    </div>
+
+    <!-- Results -->
+    <div class="search-results" id="searchResults">
+      <div class="search-empty" id="searchEmpty">
+        <p class="search-hint">{ui.startTyping}</p>
+        <div class="search-shortcuts">
+          <span><kbd>↑↓</kbd> {ui.navigate}</span>
+          <span><kbd>↵</kbd> {ui.open}</span>
+          <span><kbd>ESC</kbd> {ui.close}</span>
+        </div>
+      </div>
+      <div class="search-list" id="searchList"></div>
+      <div class="search-no-results" id="searchNoResults" style="display:none">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.3">
+          <circle cx="11" cy="11" r="8"/>
+          <path d="m21 21-4.35-4.35"/>
+          <path d="M8 8l6 6M14 8l-6 6"/>
+        </svg>
+        <p>{ui.noResults}</p>
+        <p class="search-no-sub">{ui.tryDifferent}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Search Index Data -->
+<script define:vars={{ searchIndex }}>
+  window.__SEARCH_INDEX__ = searchIndex;
+</script>
+
+<!-- Client-side search logic -->
+<script>
+  const overlay = document.getElementById('searchOverlay');
+  const input = document.getElementById('searchInput');
+  const list = document.getElementById('searchList');
+  const empty = document.getElementById('searchEmpty');
+  const noResults = document.getElementById('searchNoResults');
+  const triggers = document.querySelectorAll('#searchTrigger, .search-trigger-nav');
+
+  let activeIndex = -1;
+
+  function openSearch() {
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => input.focus(), 50);
+  }
+
+  function closeSearch() {
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+    input.value = '';
+    list.innerHTML = '';
+    empty.style.display = '';
+    noResults.style.display = 'none';
+    activeIndex = -1;
+  }
+
+  // Open triggers
+  triggers.forEach(t => t.addEventListener('click', openSearch));
+
+  // Close on overlay click
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) closeSearch();
+  });
+
+  document.getElementById('searchClose').addEventListener('click', closeSearch);
+
+  // Keyboard shortcuts
+  document.addEventListener('keydown', (e) => {
+    // Cmd+K or Ctrl+K to open
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      e.preventDefault();
+      overlay.classList.contains('active') ? closeSearch() : openSearch();
+    }
+    // ESC to close
+    if (e.key === 'Escape' && overlay.classList.contains('active')) {
+      closeSearch();
+    }
+  });
+
+  // Search logic
+  function search(query) {
+    const q = query.toLowerCase().trim();
+    if (!q) {
+      list.innerHTML = '';
+      empty.style.display = '';
+      noResults.style.display = 'none';
+      activeIndex = -1;
+      return;
+    }
+
+    empty.style.display = 'none';
+    const index = window.__SEARCH_INDEX__;
+    
+    const results = index.filter(post => {
+      return post.title.toLowerCase().includes(q)
+        || post.excerpt.toLowerCase().includes(q)
+        || post.category.toLowerCase().includes(q);
+    }).slice(0, 8);
+
+    activeIndex = -1;
+
+    if (results.length === 0) {
+      list.innerHTML = '';
+      noResults.style.display = '';
+      return;
+    }
+
+    noResults.style.display = 'none';
+    list.innerHTML = results.map((r, i) => `
+      <a href="/blog/${r.slug}" class="search-result" data-index="${i}">
+        ${r.image ? `<img src="${r.image}" alt="" class="search-result-img" loading="lazy" />` : ''}
+        <div class="search-result-body">
+          <span class="search-result-category">${r.category}</span>
+          <h4>${highlight(r.title, q)}</h4>
+          <p>${highlight(r.excerpt.substring(0, 80), q)}…</p>
+        </div>
+        <span class="search-result-date">${r.date}</span>
+      </a>
+    `).join('');
+  }
+
+  function highlight(text, query) {
+    if (!query) return text;
+    const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+    return text.replace(regex, '<mark>$1</mark>');
+  }
+
+  // Keyboard navigation in results
+  input.addEventListener('keydown', (e) => {
+    const items = list.querySelectorAll('.search-result');
+    if (!items.length) return;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      activeIndex = Math.min(activeIndex + 1, items.length - 1);
+      updateActive(items);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      activeIndex = Math.max(activeIndex - 1, 0);
+      updateActive(items);
+    } else if (e.key === 'Enter' && activeIndex >= 0) {
+      e.preventDefault();
+      items[activeIndex].click();
+    }
+  });
+
+  function updateActive(items) {
+    items.forEach((el, i) => {
+      el.classList.toggle('active', i === activeIndex);
+      if (i === activeIndex) el.scrollIntoView({ block: 'nearest' });
+    });
+  }
+
+  // Debounced input handler
+  let debounce;
+  input.addEventListener('input', () => {
+    clearTimeout(debounce);
+    debounce = setTimeout(() => search(input.value), 100);
+  });
+</script>
+
+<style>
+  /* ─── Search Trigger ─── */
+  .search-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    color: var(--color-text-muted);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 200ms;
+    white-space: nowrap;
+  }
+
+  .search-trigger:hover {
+    border-color: var(--color-primary);
+    color: var(--color-text);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+
+  .search-kbd {
+    padding: 2px 6px;
+    background: rgba(0,0,0,0.05);
+    border-radius: 4px;
+    font-size: 11px;
+    font-family: system-ui;
+    color: var(--color-text-muted);
+    font-weight: 500;
+  }
+
+  /* ─── Search Modal Overlay ─── */
+  .search-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 12vh;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 200ms ease;
+  }
+
+  .search-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .search-modal {
+    width: 100%;
+    max-width: 600px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.2);
+    overflow: hidden;
+    transform: translateY(-8px) scale(0.98);
+    transition: transform 200ms ease;
+  }
+
+  .search-overlay.active .search-modal {
+    transform: translateY(0) scale(1);
+  }
+
+  /* ─── Search Input ─── */
+  .search-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+  }
+
+  .search-icon {
+    flex-shrink: 0;
+    color: var(--color-text-muted);
+  }
+
+  .search-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--color-text);
+    background: none;
+    font-family: inherit;
+  }
+
+  .search-input::placeholder {
+    color: var(--color-text-muted);
+    font-weight: 400;
+  }
+
+  .search-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .search-close kbd {
+    padding: 3px 8px;
+    background: rgba(0,0,0,0.06);
+    border-radius: 5px;
+    font-size: 11px;
+    font-family: system-ui;
+    color: var(--color-text-muted);
+    font-weight: 500;
+  }
+
+  .search-close:hover kbd {
+    background: rgba(0,0,0,0.1);
+  }
+
+  /* ─── Results Container ─── */
+  .search-results {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  /* ─── Empty State ─── */
+  .search-empty {
+    padding: 32px 20px;
+    text-align: center;
+  }
+
+  .search-hint {
+    color: var(--color-text-muted);
+    font-size: 14px;
+    margin-bottom: 16px;
+  }
+
+  .search-shortcuts {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+
+  .search-shortcuts kbd {
+    padding: 2px 5px;
+    background: rgba(0,0,0,0.05);
+    border-radius: 3px;
+    font-size: 11px;
+    font-family: system-ui;
+    margin-right: 4px;
+  }
+
+  /* ─── No Results ─── */
+  .search-no-results {
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--color-text-muted);
+  }
+
+  .search-no-results p { margin-bottom: 4px; font-size: 14px; }
+  .search-no-sub { font-size: 12px; opacity: 0.7; }
+
+  /* ─── Result Items ─── */
+  .search-list {
+    padding: 8px;
+  }
+
+  :global(.search-result) {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    color: var(--color-text);
+    text-decoration: none;
+    transition: background 150ms;
+  }
+
+  :global(.search-result:hover),
+  :global(.search-result.active) {
+    background: #f0fdfa;
+  }
+
+  :global(.search-result-img) {
+    width: 48px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 6px;
+    flex-shrink: 0;
+  }
+
+  :global(.search-result-body) {
+    flex: 1;
+    min-width: 0;
+  }
+
+  :global(.search-result-category) {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-primary);
+  }
+
+  :global(.search-result-body h4) {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.3;
+    margin: 2px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  :global(.search-result-body p) {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    line-height: 1.4;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  :global(.search-result-date) {
+    font-size: 11px;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  :global(.search-result mark) {
+    background: #ccfbf1;
+    color: var(--color-primary);
+    border-radius: 2px;
+    padding: 0 2px;
+  }
+
+  /* ─── Mobile ─── */
+  @media (max-width: 640px) {
+    .search-trigger-text { display: none; }
+    .search-kbd { display: none; }
+
+    .search-overlay {
+      padding-top: 0;
+      align-items: stretch;
+    }
+
+    .search-modal {
+      max-width: 100%;
+      border-radius: 0;
+      height: 100vh;
+    }
+
+    .search-results {
+      max-height: calc(100vh - 60px);
+    }
+  }
+</style>

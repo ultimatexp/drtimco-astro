@@ -1,0 +1,22 @@
+{
+  "name": "&quot;Health Simplified: Your Ultimate Guide to Weight Loss and Diabetes Management&quot;",
+  "description": "&quot;Empowering Your Health Journey with Easy-to-Understand Information, Expert Tips, and Effective Solutions&quot;",
+  "url": "http://drtim.co",
+  "home": "https://drtim.co",
+  "namespaces": [
+    "oembed/1.0",
+    "meow-common/v1",
+    "mwai-ui/v1",
+    "mwai/v1",
+    "code-snippets/v1",
+    "fondue-ai/v1",
+    "wpchill/v1",
+    "quadlayers/tiktok",
+    "wp/v2",
+    "google-site-kit/v1",
+    "facetwp/v1",
+    "wp-site-health/v1",
+    "wp-block-editor/v1",
+    "wp-abilities/v1"
+  ]
+}

@@ -263,9 +263,10 @@ export function getAuthorName(author) {
 }
 
 /**
- * Convert a drtim.co image URL to a local path.
- * https://drtim.co/wp-content/uploads/2025/10/img.png → /wp-content/uploads/2025/10/img.png
- * Non-drtim.co URLs are returned unchanged.
+ * Convert a drtim.co image URL to a local WebP path.
+ * 1. https://drtim.co/wp-content/uploads/2025/10/img.png → /wp-content/uploads/2025/10/img.webp
+ * 2. Non-drtim.co URLs are returned unchanged.
+ * 3. Swaps .png/.jpg/.jpeg → .webp for optimized loading.
  * @param {string} url
  * @returns {string}
  */
@@ -273,7 +274,8 @@ export function localizeImageUrl(url = '') {
     if (!url) return url;
     return url
         .replace(/^https?:\/\/drtim\.co\//, '/')
-        .replace(/^https?:\/\/timdietclinic\.com\//, '/');
+        .replace(/^https?:\/\/timdietclinic\.com\//, '/')
+        .replace(/\.(png|jpe?g)$/i, '.webp');
 }
 
 /**

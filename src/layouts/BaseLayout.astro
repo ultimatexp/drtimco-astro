@@ -221,8 +221,7 @@ const jsonLd = {
     <meta name="description" content={description} />
     <link rel="canonical" href={resolvedCanonical} />
 
-    <!-- Preconnect to WordPress for faster media loading -->
-    <link rel="preconnect" href="https://drtim.co" />
+    <!-- dns-prefetch for WordPress media CDN -->
     <link rel="dns-prefetch" href="https://drtim.co" />
 
     <!-- Open Graph -->
@@ -266,13 +265,21 @@ const jsonLd = {
     <!-- JSON-LD Structured Data -->
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 
-    <!-- Fonts — Inter for premium readability -->
+    <!-- Fonts — Non-render-blocking Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
+      rel="preload"
+      as="style"
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@400;700&display=swap"
-      rel="stylesheet"
+      onload="this.onload=null;this.rel='stylesheet'"
     />
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@400;700&display=swap"
+        rel="stylesheet"
+      />
+    </noscript>
   </head>
 
   <body>

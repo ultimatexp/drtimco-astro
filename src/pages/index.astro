@@ -151,6 +151,9 @@ const faqItems = [
               alt={heroPost.featuredImage.altText || stripHtml(heroPost.title)}
               class="hero-image"
               loading="eager"
+              fetchpriority="high"
+              width="1024"
+              height="683"
             />
           </a>
         ) : (

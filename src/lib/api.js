@@ -314,8 +314,13 @@ export function sanitizeContent(html = '') {
         .replace(/srcset="http:\/\//g, 'srcset="https://')
 
         // ── Image Optimization ──
+        // Swap local .png/.jpg/.jpeg → .webp for all local image src
+        .replace(/src="(\/[^"]*)\.(png|jpe?g)"/gi, 'src="$1.webp"')
+        .replace(/srcset="(\/[^"]*)\.(png|jpe?g)/gi, 'srcset="$1.webp')
         // Add lazy loading to images that don't already have it
         .replace(/<img(?![^>]*loading=)/g, '<img loading="lazy"')
+        // Add decoding=async for non-blocking image decode
+        .replace(/<img(?![^>]*decoding=)/g, '<img decoding="async"')
         // Make images responsive
         .replace(/<img(?![^>]*style="[^"]*max-width)/g, '<img style="max-width:100%;height:auto" ')
 

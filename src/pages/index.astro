@@ -13,6 +13,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import DirectAnswerBox from '../components/DirectAnswerBox.astro';
 import SearchModal from '../components/SearchModal.astro';
+import FAQSection from '../components/FAQSection.astro';
 import { getTranslations } from '../i18n/translations.js';
 import {
   getAllPosts,
@@ -35,12 +36,50 @@ const heroPost = allPosts[0];
 const editorPicks = allPosts.slice(1, 3);
 const latestPosts = allPosts.slice(3, 9);
 const morePosts = allPosts.slice(9, 15);
+
+// ── FAQ items for AEO (Answer Engine Optimization) ──
+// Targets: การรักษาเบาหวาน โดยไม่ใช้ยา, การใช้ CGM, Functional Medicine
+const faqItems = [
+  {
+    question: 'Functional Medicine คืออะไร? ต่างจากการรักษาแบบทั่วไปอย่างไร?',
+    answer: 'Functional Medicine คือแนวทางการแพทย์ที่มุ่งค้นหาสาเหตุรากของโรค (Root-Cause) แทนการรักษาแค่อาการ โดยวิเคราะห์ระบบเมตาบอลิก ฮอร์โมน และสารอาหารอย่างครอบคลุม เพื่อออกแบบแผนการรักษาเฉพาะบุคคล ต่างจากการแพทย์แบบทั่วไปที่เน้นรักษาอาการด้วยยาเป็นหลัก',
+  },
+  {
+    question: 'การรักษาเบาหวานโดยไม่ใช้ยา ทำได้จริงหรือ?',
+    answer: 'การรักษาเบาหวานโดยไม่ใช้ยาสามารถทำได้จริงในผู้ป่วยเบาหวานชนิดที่ 2 ระยะเริ่มต้น ด้วยการปรับอาหาร ออกกำลังกาย ควบคุมน้ำหนัก และติดตามน้ำตาลด้วย CGM อย่างใกล้ชิด หมอทิมใช้แนวทาง Functional Medicine วิเคราะห์สาเหตุของภาวะดื้ออินซูลินและออกแบบแผนรักษาเฉพาะบุคคล ช่วยให้ผู้ป่วยหลายรายลดยาหรือหยุดยาได้สำเร็จ',
+  },
+  {
+    question: 'CGM (Continuous Glucose Monitor) คืออะไร? มีประโยชน์อย่างไร?',
+    answer: 'CGM คือเครื่องวัดน้ำตาลแบบต่อเนื่อง ติดที่ผิวหนังเพื่อวัดระดับน้ำตาลตลอด 24 ชั่วโมง ช่วยให้เห็นผลกระทบของอาหารแต่ละมื้อต่อน้ำตาลในเลือดแบบ real-time ทำให้แพทย์และผู้ป่วยปรับแผนอาหารและการออกกำลังกายได้อย่างแม่นยำ เป็นเครื่องมือสำคัญในการรักษาเบาหวานแบบไม่ใช้ยา',
+  },
+  {
+    question: 'ใครเหมาะกับการใช้ CGM ติดตามน้ำตาล?',
+    answer: 'การใช้ CGM เหมาะกับผู้ป่วยเบาหวานชนิดที่ 2, ผู้ที่มีภาวะ prediabetes หรือดื้ออินซูลิน, ผู้ที่ต้องการลดน้ำหนักอย่างมีประสิทธิภาพ และผู้ที่สนใจ biohacking เพื่อสุขภาพเชิงป้องกัน หมอทิมแนะนำ CGM เป็นส่วนหนึ่งของแผนการรักษาเบาหวานโดยไม่ใช้ยาที่ Ultramed Clinic ชลบุรี',
+  },
+  {
+    question: 'Metabolic Health คืออะไร? ทำไมถึงสำคัญ?',
+    answer: 'Metabolic Health คือสุขภาพเชิงเมตาบอลิก หมายถึงความสามารถของร่างกายในการควบคุมน้ำตาล ไขมัน ความดัน และน้ำหนักให้อยู่ในเกณฑ์ปกติ ผู้ที่มี metabolic health ไม่ดีเสี่ยงต่อเบาหวาน โรคหัวใจ และโรคเรื้อรังอื่นๆ การตรวจเลือดและใช้ CGM ช่วยประเมินและปรับปรุง metabolic health ได้อย่างมีประสิทธิภาพ',
+  },
+  {
+    question: 'ภาวะดื้ออินซูลิน (Insulin Resistance) รักษาได้อย่างไร?',
+    answer: 'ภาวะดื้ออินซูลินรักษาได้ด้วยการปรับอาหารแบบ low-carb หรือ time-restricted eating ร่วมกับการออกกำลังกายแบบ resistance training ติดตามผลด้วย CGM และตรวจเลือดสม่ำเสมอ หมอทิมใช้แนวทาง Functional Medicine วิเคราะห์สาเหตุเชิงลึก ช่วยให้ผู้ป่วยฟื้นฟูความไวต่ออินซูลินโดยไม่ต้องพึ่งยา',
+  },
+  {
+    question: 'Ultramed Clinic อยู่ที่ไหน? นัดพบแพทย์อย่างไร?',
+    answer: 'Ultramed Clinic ตั้งอยู่ที่จังหวัดชลบุรี ประเทศไทย ให้บริการด้าน Functional Medicine โดยหมอทิม สามารถนัดพบแพทย์ผ่านทาง LINE Official (@dr.timdietclinic) หรือ Facebook Page "Dr. Tim Diet Clinic" เปิดให้บริการทั้งนัดพบตัวและปรึกษาออนไลน์ (Telemedicine)',
+  },
+  {
+    question: 'การตรวจเลือดแบบ Functional Medicine ต่างจากตรวจเลือดทั่วไปอย่างไร?',
+    answer: 'การตรวจเลือดแบบ Functional Medicine ครอบคลุมมากกว่าการตรวจทั่วไป โดยวิเคราะห์ biomarkers เชิงลึก เช่น insulin, HbA1c, HOMA-IR, thyroid panel, vitamin D, B12, ferritin และ inflammation markers เพื่อค้นหาความผิดปกติตั้งแต่ระยะเริ่มต้น ก่อนที่จะพัฒนาเป็นโรคเรื้อรัง',
+  },
+];
 ---
 
 <BaseLayout
   title={ui.siteTitle}
   description={ui.siteDescription}
   type="website"
+  faqItems={faqItems}
 >
   <!-- ═══ FIXED TOP BAR ═══ -->
   <header class="top-bar">
@@ -268,6 +307,9 @@ const morePosts = allPosts.slice(9, 15);
       </div>
     </section>
   )}
+
+  <!-- ═══ FAQ SECTION — AEO Optimized ═══ -->
+  <FAQSection items={faqItems} title="คำถามที่พบบ่อย" />
 
   <!-- ═══ ABOUT DR. TIM — Bento Grid Profile Gallery ═══ -->
   <!-- Design: Inspired by GlossGenius bento mosaic + Pop Site personal brand (Refero) -->
@@ -1152,6 +1194,31 @@ const morePosts = allPosts.slice(9, 15);
 
   /* ─── RESPONSIVE ─── */
   @media (max-width: 900px) {
+    /* ── Mobile Top Bar ── */
+    .top-bar-nav {
+      display: none;
+    }
+
+    .top-bar-inner {
+      padding: 8px var(--space-3);
+      gap: var(--space-2);
+    }
+
+    .top-bar-brand {
+      margin-right: auto;
+    }
+
+    .social-icon {
+      width: 28px;
+      height: 28px;
+    }
+
+    .social-icon svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    /* ── Mobile Hero ── */
     .hero-inner {
       grid-template-columns: 1fr;
       min-height: auto;

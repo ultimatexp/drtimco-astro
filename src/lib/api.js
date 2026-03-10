@@ -301,6 +301,9 @@ export function sanitizeContent(html = '') {
         .replace(/href\s*=\s*["']javascript:[^"']*["']/gi, 'href="#"')
 
         // ── URL Rewriting ──
+        // Rewrite TOC anchor links: convert absolute drtim.co/timdietclinic.com URLs
+        // with hash fragments to just the hash fragment (fixes ez-toc 404s)
+        .replace(/href="https?:\/\/drtim\.co\/[^"]*?(#[^"]*)"/gi, 'href="$1"')
         // Rewrite drtim.co image URLs to local paths (for images served from public/)
         .replace(/src="https?:\/\/drtim\.co\//g, 'src="/')
         .replace(/srcset="https?:\/\/drtim\.co\//g, 'srcset="/')

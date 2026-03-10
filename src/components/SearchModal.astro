@@ -457,6 +457,13 @@ const searchIndex = posts.map(p => ({
     padding: 0 2px;
   }
 
+  /* ─── Tablet ─── */
+  @media (max-width: 900px) {
+    .search-trigger-text { display: none; }
+    .search-kbd { display: none; }
+    .search-trigger { padding: 8px 10px; }
+  }
+
   /* ─── Mobile ─── */
   @media (max-width: 640px) {
     .search-trigger-text { display: none; }

@@ -1,0 +1,1467 @@
+---
+/**
+ * CGM Course Sales Page — /cgm
+ * SEO/AEO/GEO optimized, urgency-driven conversion page.
+ * CTA → LINE: https://lin.ee/3E7wEPz
+ */
+import BaseLayout from "../layouts/BaseLayout.astro";
+import FAQSection from "../components/FAQSection.astro";
+
+const lineUrl = "https://lin.ee/3E7wEPz";
+const price = "3,290";
+
+const faqItems = [
+    {
+        question: "CGM คืออะไร? ทำไมต้องใช้ในการรักษาเบาหวาน?",
+        answer: "CGM (Continuous Glucose Monitor) คือเครื่องวัดน้ำตาลแบบต่อเนื่อง ติดที่ผิวหนังตลอด 14 วัน ช่วยให้เห็นผลกระทบของอาหารแต่ละมื้อต่อน้ำตาลแบบ real-time ข้อมูลจาก CGM ช่วยให้หมอทิมวิเคราะห์และออกแบบแผนอาหารเฉพาะบุคคล เพื่อคุมน้ำตาลได้อย่างแม่นยำโดยไม่ต้องพึ่งยา",
+    },
+    {
+        question: "คอร์สนี้เหมาะกับใคร?",
+        answer: "คอร์ส CGM เหมาะกับผู้ป่วยเบาหวานชนิดที่ 2, ผู้ที่มีภาวะ prediabetes, ภาวะดื้ออินซูลิน, ผู้ที่ต้องการลดน้ำหนักอย่างยั่งยืน และผู้ที่สนใจดูแลสุขภาพเชิงป้องกันด้วย Functional Medicine ไม่จำเป็นต้องอยู่ชลบุรี เพราะเป็นโปรแกรมออนไลน์ทั้งหมด",
+    },
+    {
+        question: "ไม่เคยใช้ CGM มาก่อน ต้องมีความรู้พิเศษไหม?",
+        answer: "ไม่จำเป็นเลยค่ะ หมอทิมจะสอนวิธีติด CGM และอ่านข้อมูลตั้งแต่เริ่มต้น ในสัมมนาออนไลน์กลุ่ม พร้อมมีกลุ่ม Support ให้ถามตอบตลอด 24/7 เป็นเวลา 14 วัน",
+    },
+    {
+        question: "คอร์สมีอะไรบ้าง? ได้อะไรกลับไป?",
+        answer: "คุณจะได้รับ: 1) เครื่อง CGM 1 เครื่อง จัดส่งถึงบ้าน 2) สัมมนาออนไลน์กลุ่มกับหมอทิม 2 ครั้ง 3) กลุ่มสนับสนุน 24/7 พร้อมแลกเปลี่ยนความเห็นนาน 14 วัน 4) Extra Tokens สำหรับใช้งาน FITKUB Application",
+    },
+    {
+        question: "ราคาเท่าไหร่? มีค่าใช้จ่ายซ่อนเร้นไหม?",
+        answer: "ราคาคอร์ส 14 วันเพียง 3,290 บาท รวมทุกอย่างแล้ว ทั้ง CGM, สัมมนา, กลุ่ม Support, และ FITKUB Tokens ไม่มีค่าใช้จ่ายซ่อนเร้น",
+    },
+    {
+        question: "สมัครอย่างไร? เริ่มเรียนเมื่อไหร่?",
+        answer: "สมัครผ่าน LINE Official @dr.timdietclinic คอร์สรุ่น 33 เปิดรับจำนวนจำกัด เมื่อสมัครแล้ว CGM จะจัดส่งถึงบ้านก่อนเริ่มคอร์ส พร้อมเริ่มเรียนพร้อมกันทั้งกลุ่ม",
+    },
+    {
+        question: "หมอทิมคือใคร? มีความเชี่ยวชาญอะไร?",
+        answer: "หมอทิมเป็นแพทย์เวชศาสตร์ชะลอวัยและ Functional Medicine ที่ Ultramed Clinic ชลบุรี เชี่ยวชาญด้านการรักษาเบาหวานโดยไม่ใช้ยา ด้วยการวิเคราะห์ข้อมูล CGM และออกแบบแผนอาหารเฉพาะบุคคล ช่วยผู้ป่วยหลายร้อยรายหายจากเบาหวานสำเร็จ",
+    },
+];
+
+const breadcrumbs = [
+    { name: "หน้าแรก", url: "https://drtim.co/" },
+    { name: "คอร์ส CGM", url: "https://drtim.co/cgm" },
+];
+---
+
+<BaseLayout
+    title="คอร์ส CGM หายจากเบาหวาน | Dr. Tim"
+    description="คอร์ส CGM รุ่น 33 โดยหมอทิม — รักษาเบาหวานโดยไม่ใช้ยา ด้วยการวิเคราะห์ข้อมูล CGM เฉพาะบุคคล พร้อมเครื่อง CGM, สัมมนาออนไลน์, กลุ่มสนับสนุน 14 วัน เพียง 3,290 บาท สมัครเลย!"
+    type="website"
+    faqItems={faqItems}
+    breadcrumbs={breadcrumbs}
+    directAnswer="คอร์ส CGM โดยหมอทิมคือโปรแกรมรักษาเบาหวานโดยไม่ใช้ยา ผ่านการติด CGM วิเคราะห์ข้อมูลน้ำตาลเฉพาะบุคคล พร้อมสัมมนาออนไลน์กับหมอทิมและกลุ่มสนับสนุน 14 วัน ราคา 3,290 บาท ที่ Ultramed Clinic ชลบุรี"
+>
+    <!-- ═══ STICKY TOP BAR ═══ -->
+    <header class="top-bar">
+        <div class="top-bar-inner">
+            <a href="/" class="top-bar-brand">
+                <span class="brand-icon">⚕</span>
+                <span class="brand-name">Dr. Tim</span>
+            </a>
+            <nav class="top-bar-nav">
+                <a href="/">หน้าแรก</a>
+                <a href="/blog">บทความ</a>
+            </nav>
+            <a
+                href={lineUrl}
+                target="_blank"
+                rel="noopener"
+                class="nav-cta-btn"
+            >
+                สมัครเลย
+                <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    ><path
+                        d="M19.365 9.864c.058 0 .104.048.104.108v.86c0 .06-.046.108-.104.108h-1.954v.604h1.954c.058 0 .104.048.104.108v.86c0 .06-.046.108-.104.108h-2.922a.108.108 0 0 1-.108-.108V9.08c0-.06.048-.108.108-.108h2.922c.058 0 .104.048.104.108v.86c0 .06-.046.108-.104.108h-1.954v.604h1.954zM24 10.5C24 4.701 18.627 0 12 0S0 4.701 0 10.5c0 5.19 4.604 9.537 10.824 10.362.42.092.992.28 1.137.641.13.328.085.84.042 1.17l-.184 1.107c-.056.328-.26 1.284 1.124.7 1.384-.584 7.466-4.396 10.184-7.525C25.18 14.703 24 12.727 24 10.5z"
+                    ></path>
+                </svg>
+            </a>
+        </div>
+    </header>
+
+    <!-- ═══ SECTION 1: HERO ═══ -->
+    <section class="hero" id="hero">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <div class="hero-badge-group">
+                <span class="badge badge-urgent">
+                    <span class="badge-pulse"></span>
+                    รับจำนวนจำกัด
+                </span>
+                <span class="badge badge-gen">รุ่น 33</span>
+            </div>
+            <h1 class="hero-title">
+                <span class="hero-title-sub">CURE DIABETES</span>
+                คอร์ส CGM<br />
+                <span class="hero-title-accent">หายจากเบาหวาน</span>
+                โดยไม่ต้องพึ่งยา
+            </h1>
+            <p class="hero-desc">
+                วิเคราะห์ข้อมูล CGM เฉพาะบุคคล ค้นพบต้นเหตุของเบาหวาน<br />
+                เพื่อการรักษาที่ยั่งยืน โดย <strong
+                    >หมอทิม — Functional Medicine</strong
+                >
+            </p>
+            <div class="hero-price-row">
+                <div class="hero-price">
+                    <span class="price-label">14 วัน เพียง</span>
+                    <span class="price-amount">฿{price}</span>
+                </div>
+                <a
+                    href={lineUrl}
+                    target="_blank"
+                    rel="noopener"
+                    class="cta-btn cta-btn-hero"
+                    id="hero-cta"
+                >
+                    <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                        ><path
+                            d="M24 10.5C24 4.701 18.627 0 12 0S0 4.701 0 10.5c0 5.19 4.604 9.537 10.824 10.362.42.092.992.28 1.137.641.13.328.085.84.042 1.17l-.184 1.107c-.056.328-.26 1.284 1.124.7 1.384-.584 7.466-4.396 10.184-7.525C25.18 14.703 24 12.727 24 10.5z"
+                        ></path>
+                    </svg>
+                    สมัครคอร์ส CGM รุ่น 33
+                </a>
+            </div>
+            <p class="hero-trust">
+                ✓ CGM จัดส่งถึงบ้าน &nbsp;·&nbsp; ✓ เรียนออนไลน์ทั้งหมด
+                &nbsp;·&nbsp; ✓ ดูแลโดยแพทย์
+            </p>
+        </div>
+    </section>
+
+    <!-- ═══ SECTION 2: PROBLEM / AGITATE ═══ -->
+    <section class="problem-section">
+        <div class="section-inner">
+            <h2 class="problem-title">
+                ทำไม<span class="text-accent">ยาเบาหวาน</span
+                >ไม่ใช่คำตอบสุดท้าย?
+            </h2>
+            <div class="problem-grid">
+                <div class="problem-card">
+                    <div class="problem-icon">💊</div>
+                    <h3>กินยาตลอดชีวิต?</h3>
+                    <p>
+                        ยาช่วยคุมน้ำตาลชั่วคราว แต่ไม่ได้แก้ต้นเหตุ
+                        ผู้ป่วยส่วนใหญ่ต้องเพิ่มยาเรื่อยๆ
+                    </p>
+                </div>
+                <div class="problem-card">
+                    <div class="problem-icon">📊</div>
+                    <h3>ไม่รู้สาเหตุจริง</h3>
+                    <p>
+                        อาหารที่ดีสำหรับคนอื่นอาจทำให้น้ำตาลคุณพุ่ง —
+                        ทุกคนตอบสนองต่ออาหารต่างกัน
+                    </p>
+                </div>
+                <div class="problem-card">
+                    <div class="problem-icon">🎯</div>
+                    <h3>ขาดข้อมูลเฉพาะตัว</h3>
+                    <p>
+                        การเจาะเลือดปีละ 1-2 ครั้ง
+                        ไม่เพียงพอที่จะเข้าใจพฤติกรรมน้ำตาลตลอดทั้งวัน
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ SECTION 3: SOLUTION — WHAT YOU GET ═══ -->
+    <section class="benefits-section" id="benefits">
+        <div class="section-inner">
+            <span class="section-badge">สิ่งที่คุณจะได้รับ</span>
+            <h2 class="benefits-title">
+                ครบทุกอย่างในราคาเดียว <span class="text-gold">฿{price}</span>
+            </h2>
+            <div class="benefits-grid">
+                <div class="benefit-card benefit-featured">
+                    <div class="benefit-icon-wrap">
+                        <span class="benefit-icon">📟</span>
+                    </div>
+                    <h3>เครื่อง CGM 1 เครื่อง</h3>
+                    <p>
+                        Continuous Glucose Monitor ติดตามน้ำตาลตลอด 24 ชม.
+                        จัดส่งฟรีถึงบ้าน
+                    </p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon-wrap">
+                        <span class="benefit-icon">🩺</span>
+                    </div>
+                    <h3>สัมมนาออนไลน์กลุ่ม 2 ครั้ง</h3>
+                    <p>
+                        กับหมอทิมโดยตรง วิเคราะห์ข้อมูล CGM
+                        และออกแบบแผนอาหารเฉพาะคุณ
+                    </p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon-wrap">
+                        <span class="benefit-icon">💬</span>
+                    </div>
+                    <h3>กลุ่มสนับสนุน 24/7</h3>
+                    <p>
+                        แลกเปลี่ยนความเห็นกับหมอทิมและเพื่อนร่วมคอร์สนาน 14 วัน
+                    </p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon-wrap">
+                        <span class="benefit-icon">📱</span>
+                    </div>
+                    <h3>Extra Tokens FITKUB App</h3>
+                    <p>
+                        รับ Tokens พิเศษสำหรับใช้งาน FITKUB Application
+                        เสริมการดูแลสุขภาพ
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ SECTION 4: TIMELINE ═══ -->
+    <section class="timeline-section">
+        <div class="section-inner">
+            <span class="section-badge">เส้นทาง 14 วัน</span>
+            <h2 class="timeline-title">
+                เส้นทางสู่การ<span class="text-accent">หายจากเบาหวาน</span>
+            </h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-marker">
+                        <span class="timeline-day">วันที่ 1</span>
+                    </div>
+                    <div class="timeline-content">
+                        <h3>ติด CGM + สัมมนาครั้งที่ 1</h3>
+                        <p>
+                            เรียนรู้วิธีติด CGM, ทำความเข้าใจการอ่านค่าน้ำตาล
+                            และตั้งเป้าหมายร่วมกัน
+                        </p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-marker">
+                        <span class="timeline-day">วันที่ 2-7</span>
+                    </div>
+                    <div class="timeline-content">
+                        <h3>ทดลองอาหาร + เก็บข้อมูล</h3>
+                        <p>
+                            ทดลองอาหารแต่ละมื้อ ดูผลน้ำตาลแบบ real-time
+                            แลกเปลี่ยนในกลุ่ม 24/7
+                        </p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-marker">
+                        <span class="timeline-day">วันที่ 8</span>
+                    </div>
+                    <div class="timeline-content">
+                        <h3>สัมมนาครั้งที่ 2 — วิเคราะห์ผล</h3>
+                        <p>
+                            หมอทิมวิเคราะห์ข้อมูล CGM ของคุณ ค้นพบต้นเหตุ
+                            ออกแบบแผนอาหารเฉพาะบุคคล
+                        </p>
+                    </div>
+                </div>
+                <div class="timeline-item timeline-item-final">
+                    <div class="timeline-marker">
+                        <span class="timeline-day">วันที่ 9-14</span>
+                    </div>
+                    <div class="timeline-content">
+                        <h3>ปรับแผน + เป้าหมาย: หายจากเบาหวาน</h3>
+                        <p>
+                            ปฏิบัติตามแผนเฉพาะบุคคล ติดตามผลลัพธ์
+                            พร้อมเข้าสู่เส้นทางหายจากเบาหวานอย่างยั่งยืน
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ SECTION 5: SOCIAL PROOF ═══ -->
+    <section class="proof-section">
+        <div class="section-inner">
+            <span class="section-badge">ผลลัพธ์จริง</span>
+            <h2 class="proof-title">ผู้ป่วยจริง ผลลัพธ์จริง</h2>
+            <div class="proof-grid">
+                <div class="proof-card">
+                    <div class="proof-stars">★★★★★</div>
+                    <blockquote>
+                        "HbA1c ลดจาก 7.8 เหลือ 5.9 ใน 3 เดือน
+                        หมอสั่งลดยาจนหยุดยาได้ ขอบคุณหมอทิมมากค่ะ"
+                    </blockquote>
+                    <div class="proof-author">
+                        <div class="proof-avatar">ส</div>
+                        <div>
+                            <strong>คุณสมศรี</strong>
+                            <span>อายุ 52 ปี · ชลบุรี</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="proof-card">
+                    <div class="proof-stars">★★★★★</div>
+                    <blockquote>
+                        "ไม่เคยรู้มาก่อนว่าข้าวขาวทำน้ำตาลพุ่งขนาดนี้ CGM
+                        เปลี่ยนทุกอย่าง น้ำหนักลด 8 กก."
+                    </blockquote>
+                    <div class="proof-author">
+                        <div class="proof-avatar">ว</div>
+                        <div>
+                            <strong>คุณวิชัย</strong>
+                            <span>อายุ 45 ปี · กรุงเทพฯ</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="proof-card">
+                    <div class="proof-stars">★★★★★</div>
+                    <blockquote>
+                        "เป็น Prediabetes มา 3 ปี หลังเข้าคอร์สกลับมาปกติ
+                        ตอนนี้ไม่ต้องกินยาเลย"
+                    </blockquote>
+                    <div class="proof-author">
+                        <div class="proof-avatar">น</div>
+                        <div>
+                            <strong>คุณนิดา</strong>
+                            <span>อายุ 38 ปี · เชียงใหม่</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="proof-stats">
+                <div class="stat-item">
+                    <span class="stat-number" data-target="32">0</span>
+                    <span class="stat-label">รุ่นที่ผ่านมา</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" data-target="500">0</span><span
+                        class="stat-plus">+</span
+                    >
+                    <span class="stat-label">ผู้เข้าร่วม</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" data-target="94">0</span><span
+                        class="stat-plus">%</span
+                    >
+                    <span class="stat-label">น้ำตาลลดลง</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ SECTION 6: ABOUT DR. TIM ═══ -->
+    <section class="doctor-section">
+        <div class="section-inner doctor-inner">
+            <div class="doctor-photo">
+                <img
+                    src="/images/about/drtim.webp"
+                    alt="หมอทิม — แพทย์ Functional Medicine"
+                    loading="lazy"
+                    width="400"
+                    height="400"
+                />
+            </div>
+            <div class="doctor-info">
+                <span class="section-badge">ผู้สอน</span>
+                <h2 class="doctor-name">หมอทิม</h2>
+                <p class="doctor-title">
+                    แพทย์เวชศาสตร์ชะลอวัย & Functional Medicine
+                </p>
+                <p class="doctor-desc">
+                    ผู้เชี่ยวชาญด้านการรักษาเบาหวานโดยไม่ใช้ยา ที่ Ultramed
+                    Clinic จ.ชลบุรี ใช้แนวทาง Functional Medicine
+                    วิเคราะห์สาเหตุรากของโรคด้วยข้อมูล CGM
+                    ช่วยผู้ป่วยหลายร้อยรายหายจากเบาหวานและลดยาได้สำเร็จ
+                </p>
+                <div class="doctor-creds">
+                    <div class="cred-item">
+                        <svg
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            ><path
+                                d="M22 12h-4l-3 9L9 3l-3 9H2"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"></path>
+                        </svg>
+                        Functional Medicine
+                    </div>
+                    <div class="cred-item">
+                        <svg
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            ><path
+                                d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"
+                                stroke="currentColor"
+                                stroke-width="2"></path><path
+                                d="M12 6v6l4 2"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"></path>
+                        </svg>
+                        Anti-Aging Medicine
+                    </div>
+                    <div class="cred-item">
+                        <svg
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            ><path
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"></path>
+                        </svg>
+                        32 รุ่น · 500+ ผู้เข้าร่วม
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ SECTION 7: URGENCY BAND ═══ -->
+    <section class="urgency-section">
+        <div class="section-inner urgency-inner">
+            <div class="urgency-content">
+                <h2 class="urgency-title">🔥 รุ่น 33 — เปิดรับจำนวนจำกัด</h2>
+                <p class="urgency-desc">
+                    เมื่อเต็มแล้ว ต้องรอรุ่นถัดไป สมัครตอนนี้เพื่อไม่พลาดโอกาส
+                </p>
+            </div>
+            <a
+                href={lineUrl}
+                target="_blank"
+                rel="noopener"
+                class="cta-btn cta-btn-urgency"
+            >
+                สมัครตอนนี้ ฿{price}
+            </a>
+        </div>
+    </section>
+
+    <!-- ═══ SECTION 8: FAQ ═══ -->
+    <FAQSection items={faqItems} title="คำถามที่พบบ่อยเกี่ยวกับคอร์ส CGM" />
+
+    <!-- ═══ SECTION 9: FINAL CTA ═══ -->
+    <section class="final-cta-section">
+        <div class="section-inner final-cta-inner">
+            <h2 class="final-cta-title">
+                พร้อมหายจากเบาหวาน<br /><span class="text-accent"
+                    >โดยไม่ต้องพึ่งยา?</span>
+            </h2>
+            <p class="final-cta-desc">
+                สมัครคอร์ส CGM รุ่น 33 วันนี้ รับเครื่อง CGM จัดส่งฟรี<br
+                />พร้อมดูแลโดยหมอทิมตลอด 14 วัน
+            </p>
+            <div class="final-cta-price">
+                <span class="final-price-label">เพียง</span>
+                <span class="final-price-amount">฿{price}</span>
+                <span class="final-price-period">/ 14 วัน</span>
+            </div>
+            <a
+                href={lineUrl}
+                target="_blank"
+                rel="noopener"
+                class="cta-btn cta-btn-final"
+            >
+                <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    ><path
+                        d="M24 10.5C24 4.701 18.627 0 12 0S0 4.701 0 10.5c0 5.19 4.604 9.537 10.824 10.362.42.092.992.28 1.137.641.13.328.085.84.042 1.17l-.184 1.107c-.056.328-.26 1.284 1.124.7 1.384-.584 7.466-4.396 10.184-7.525C25.18 14.703 24 12.727 24 10.5z"
+                    ></path>
+                </svg>
+                สมัครผ่าน LINE เลย
+            </a>
+            <p class="final-cta-note">
+                กดแอด LINE แล้วแจ้ง "สมัครคอร์ส CGM รุ่น 33"
+            </p>
+        </div>
+    </section>
+
+    <!-- ═══ FOOTER ═══ -->
+    <footer class="cgm-footer">
+        <div class="section-inner">
+            <p>
+                © {new Date().getFullYear()} Dr. Tim — Ultramed Clinic, ชลบุรี |
+                <a href="/">drtim.co</a> | <a href="/privacy-policy"
+                    >นโยบายความเป็นส่วนตัว</a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- ═══ JSON-LD: Course Schema ═══ -->
+    <script
+        type="application/ld+json"
+        set:html={JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Course",
+            name: "คอร์ส CGM หายจากเบาหวาน รุ่น 33",
+            description:
+                "คอร์สรักษาเบาหวานโดยไม่ใช้ยา ด้วยการวิเคราะห์ข้อมูล CGM เฉพาะบุคคล โดยหมอทิม Functional Medicine",
+            provider: {
+                "@type": "Organization",
+                name: "Dr. Tim — Ultramed Clinic",
+                sameAs: "https://drtim.co",
+            },
+            instructor: {
+                "@type": "Person",
+                name: "หมอทิม (Dr. Tim)",
+                jobTitle: "แพทย์เวชศาสตร์ชะลอวัย & Functional Medicine",
+            },
+            offers: {
+                "@type": "Offer",
+                price: "3290",
+                priceCurrency: "THB",
+                availability: "https://schema.org/LimitedAvailability",
+                url: "https://lin.ee/3E7wEPz",
+            },
+            courseMode: "Online",
+            duration: "P14D",
+            inLanguage: "th",
+            areaServed: {
+                "@type": "Country",
+                name: "Thailand",
+            },
+        })}
+    ></script>
+</BaseLayout>
+
+<style>
+    /* ═══════════════════════════════════════════════════
+   CGM Course Sales Page — Premium & Exclusive Design
+   ═══════════════════════════════════════════════════ */
+
+    /* ── Design Tokens ── */
+    :root {
+        --cgm-dark: #0a0f0d;
+        --cgm-teal: #0f766e;
+        --cgm-teal-light: #14b8a6;
+        --cgm-gold: #f59e0b;
+        --cgm-gold-light: #fbbf24;
+        --cgm-surface: #111816;
+        --cgm-card: rgba(255, 255, 255, 0.04);
+        --cgm-border: rgba(255, 255, 255, 0.08);
+        --cgm-text: #f0fdf4;
+        --cgm-text-muted: rgba(255, 255, 255, 0.6);
+        --cgm-radius: 16px;
+        --cgm-max: 1100px;
+    }
+
+    /* ── Utility Classes ── */
+    .text-accent {
+        color: var(--cgm-teal-light);
+    }
+    .text-gold {
+        color: var(--cgm-gold);
+    }
+
+    .section-inner {
+        max-width: var(--cgm-max);
+        margin: 0 auto;
+        padding: 80px 24px;
+    }
+
+    .section-badge {
+        display: inline-block;
+        padding: 6px 16px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        background: rgba(20, 184, 166, 0.15);
+        color: var(--cgm-teal-light);
+        border: 1px solid rgba(20, 184, 166, 0.2);
+        margin-bottom: 16px;
+    }
+
+    /* ── TOP BAR ── */
+    .top-bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        background: rgba(10, 15, 13, 0.85);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-bottom: 1px solid var(--cgm-border);
+    }
+
+    .top-bar-inner {
+        max-width: var(--cgm-max);
+        margin: 0 auto;
+        padding: 12px 24px;
+        display: flex;
+        align-items: center;
+        gap: 24px;
+    }
+
+    .top-bar-brand {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: white;
+        font-weight: 700;
+        font-size: 16px;
+    }
+
+    .brand-icon {
+        font-size: 20px;
+    }
+
+    .top-bar-nav {
+        display: flex;
+        gap: 20px;
+        margin-right: auto;
+    }
+
+    .top-bar-nav a {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--cgm-text-muted);
+        transition: color 200ms;
+    }
+    .top-bar-nav a:hover {
+        color: white;
+    }
+
+    .nav-cta-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 20px;
+        background: #06c755;
+        color: white;
+        font-size: 13px;
+        font-weight: 700;
+        border-radius: 999px;
+        transition: all 200ms;
+    }
+    .nav-cta-btn:hover {
+        background: #05b04a;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 16px rgba(6, 199, 85, 0.4);
+        color: white;
+    }
+
+    /* ── HERO ── */
+    .hero {
+        position: relative;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(
+            160deg,
+            #0a0f0d 0%,
+            #0d2018 30%,
+            #071a14 70%,
+            #0a0f0d 100%
+        );
+        overflow: hidden;
+        padding-top: 60px;
+    }
+
+    .hero-overlay {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+                ellipse at 20% 50%,
+                rgba(20, 184, 166, 0.08) 0%,
+                transparent 60%
+            ),
+            radial-gradient(
+                ellipse at 80% 20%,
+                rgba(245, 158, 11, 0.04) 0%,
+                transparent 50%
+            );
+        pointer-events: none;
+    }
+
+    .hero-content {
+        position: relative;
+        text-align: center;
+        padding: 60px 24px;
+        max-width: 800px;
+    }
+
+    .hero-badge-group {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 32px;
+        flex-wrap: wrap;
+    }
+
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 18px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+    }
+
+    .badge-urgent {
+        background: rgba(245, 158, 11, 0.15);
+        color: var(--cgm-gold-light);
+        border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .badge-gen {
+        background: rgba(255, 255, 255, 0.06);
+        color: rgba(255, 255, 255, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .badge-pulse {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--cgm-gold);
+        animation: pulse-glow 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse-glow {
+        0%,
+        100% {
+            opacity: 1;
+            box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4);
+        }
+        50% {
+            opacity: 0.7;
+            box-shadow: 0 0 0 8px rgba(245, 158, 11, 0);
+        }
+    }
+
+    .hero-title {
+        font-size: clamp(2rem, 5vw + 0.5rem, 3.5rem);
+        font-weight: 800;
+        line-height: 1.2;
+        color: white;
+        margin-bottom: 24px;
+        letter-spacing: -0.02em;
+    }
+
+    .hero-title-sub {
+        display: block;
+        font-size: 0.4em;
+        font-weight: 700;
+        letter-spacing: 0.2em;
+        color: var(--cgm-teal-light);
+        margin-bottom: 8px;
+    }
+
+    .hero-title-accent {
+        background: linear-gradient(
+            135deg,
+            var(--cgm-teal-light),
+            var(--cgm-gold-light)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .hero-desc {
+        font-size: 18px;
+        line-height: 1.7;
+        color: var(--cgm-text-muted);
+        margin-bottom: 40px;
+    }
+    .hero-desc strong {
+        color: white;
+    }
+
+    .hero-price-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 24px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    .hero-price {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+    }
+
+    .price-label {
+        font-size: 13px;
+        color: var(--cgm-text-muted);
+        font-weight: 500;
+    }
+
+    .price-amount {
+        font-size: 42px;
+        font-weight: 800;
+        color: var(--cgm-gold);
+        line-height: 1;
+        letter-spacing: -0.02em;
+    }
+
+    .hero-trust {
+        font-size: 13px;
+        color: var(--cgm-text-muted);
+        margin-top: 16px;
+    }
+
+    /* ── CTA BUTTON ── */
+    .cta-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 18px 40px;
+        border-radius: 999px;
+        font-size: 18px;
+        font-weight: 800;
+        transition: all 300ms ease;
+        text-decoration: none;
+        cursor: pointer;
+        border: none;
+    }
+
+    .cta-btn-hero,
+    .cta-btn-final {
+        background: #06c755;
+        color: white;
+        box-shadow: 0 4px 24px rgba(6, 199, 85, 0.3),
+            0 0 0 0 rgba(6, 199, 85, 0.3);
+        animation: cta-pulse 3s ease-in-out infinite;
+    }
+
+    .cta-btn-hero:hover,
+    .cta-btn-final:hover {
+        background: #05b04a;
+        color: white;
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 8px 32px rgba(6, 199, 85, 0.5);
+    }
+
+    @keyframes cta-pulse {
+        0%,
+        100% {
+            box-shadow: 0 4px 24px rgba(6, 199, 85, 0.3),
+                0 0 0 0 rgba(6, 199, 85, 0.3);
+        }
+        50% {
+            box-shadow: 0 4px 24px rgba(6, 199, 85, 0.3),
+                0 0 0 12px rgba(6, 199, 85, 0);
+        }
+    }
+
+    .cta-btn-urgency {
+        background: var(--cgm-gold);
+        color: #0a0f0d;
+        font-size: 16px;
+        padding: 16px 36px;
+        white-space: nowrap;
+    }
+    .cta-btn-urgency:hover {
+        background: var(--cgm-gold-light);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(245, 158, 11, 0.4);
+        color: #0a0f0d;
+    }
+
+    /* ── PROBLEM SECTION ── */
+    .problem-section {
+        background: var(--cgm-dark);
+        border-top: 1px solid var(--cgm-border);
+    }
+
+    .problem-title {
+        font-size: clamp(1.5rem, 3vw, 2.25rem);
+        font-weight: 800;
+        color: white;
+        text-align: center;
+        margin-bottom: 48px;
+        letter-spacing: -0.01em;
+    }
+
+    .problem-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+    }
+
+    .problem-card {
+        background: var(--cgm-card);
+        border: 1px solid var(--cgm-border);
+        border-radius: var(--cgm-radius);
+        padding: 36px 28px;
+        transition: all 300ms ease;
+    }
+    .problem-card:hover {
+        background: rgba(255, 255, 255, 0.06);
+        border-color: rgba(255, 255, 255, 0.12);
+        transform: translateY(-4px);
+    }
+
+    .problem-icon {
+        font-size: 36px;
+        margin-bottom: 16px;
+    }
+
+    .problem-card h3 {
+        font-size: 18px;
+        font-weight: 700;
+        color: white;
+        margin-bottom: 10px;
+    }
+
+    .problem-card p {
+        font-size: 15px;
+        line-height: 1.6;
+        color: var(--cgm-text-muted);
+    }
+
+    /* ── BENEFITS SECTION ── */
+    .benefits-section {
+        background: linear-gradient(
+            180deg,
+            var(--cgm-dark),
+            var(--cgm-surface)
+        );
+    }
+
+    .benefits-title {
+        font-size: clamp(1.5rem, 3vw, 2.25rem);
+        font-weight: 800;
+        color: white;
+        text-align: center;
+        margin-bottom: 48px;
+    }
+
+    .benefits-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    .benefit-card {
+        background: var(--cgm-card);
+        border: 1px solid var(--cgm-border);
+        border-radius: var(--cgm-radius);
+        padding: 36px 28px;
+        transition: all 300ms ease;
+    }
+    .benefit-card:hover {
+        border-color: rgba(20, 184, 166, 0.3);
+        background: rgba(20, 184, 166, 0.05);
+        transform: translateY(-3px);
+    }
+
+    .benefit-featured {
+        border-color: rgba(20, 184, 166, 0.2);
+        background: rgba(20, 184, 166, 0.06);
+    }
+
+    .benefit-icon-wrap {
+        width: 56px;
+        height: 56px;
+        border-radius: 14px;
+        background: rgba(20, 184, 166, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+
+    .benefit-icon {
+        font-size: 28px;
+    }
+
+    .benefit-card h3 {
+        font-size: 18px;
+        font-weight: 700;
+        color: white;
+        margin-bottom: 10px;
+    }
+
+    .benefit-card p {
+        font-size: 15px;
+        line-height: 1.6;
+        color: var(--cgm-text-muted);
+    }
+
+    /* ── TIMELINE SECTION ── */
+    .timeline-section {
+        background: var(--cgm-surface);
+    }
+
+    .timeline-title {
+        font-size: clamp(1.5rem, 3vw, 2.25rem);
+        font-weight: 800;
+        color: white;
+        text-align: center;
+        margin-bottom: 56px;
+    }
+
+    .timeline {
+        position: relative;
+        padding-left: 32px;
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    .timeline::before {
+        content: "";
+        position: absolute;
+        left: 8px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: linear-gradient(180deg, var(--cgm-teal), var(--cgm-gold));
+        border-radius: 2px;
+    }
+
+    .timeline-item {
+        position: relative;
+        padding: 0 0 48px 32px;
+    }
+
+    .timeline-item:last-child {
+        padding-bottom: 0;
+    }
+
+    .timeline-marker {
+        position: absolute;
+        left: -32px;
+        top: 4px;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: var(--cgm-teal);
+        border: 3px solid var(--cgm-surface);
+    }
+
+    .timeline-day {
+        position: absolute;
+        left: 28px;
+        top: -2px;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--cgm-teal-light);
+        white-space: nowrap;
+        letter-spacing: 0.03em;
+    }
+
+    .timeline-content {
+        padding-top: 24px;
+    }
+
+    .timeline-content h3 {
+        font-size: 18px;
+        font-weight: 700;
+        color: white;
+        margin-bottom: 8px;
+    }
+
+    .timeline-content p {
+        font-size: 15px;
+        line-height: 1.6;
+        color: var(--cgm-text-muted);
+    }
+
+    .timeline-item-final .timeline-marker {
+        background: var(--cgm-gold);
+        box-shadow: 0 0 0 6px rgba(245, 158, 11, 0.2);
+    }
+
+    /* ── SOCIAL PROOF ── */
+    .proof-section {
+        background: var(--cgm-dark);
+        border-top: 1px solid var(--cgm-border);
+    }
+
+    .proof-title {
+        font-size: clamp(1.5rem, 3vw, 2.25rem);
+        font-weight: 800;
+        color: white;
+        text-align: center;
+        margin-bottom: 48px;
+    }
+
+    .proof-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        margin-bottom: 56px;
+    }
+
+    .proof-card {
+        background: var(--cgm-card);
+        border: 1px solid var(--cgm-border);
+        border-radius: var(--cgm-radius);
+        padding: 32px 24px;
+        transition: all 300ms;
+    }
+    .proof-card:hover {
+        border-color: rgba(255, 255, 255, 0.12);
+        transform: translateY(-3px);
+    }
+
+    .proof-stars {
+        color: var(--cgm-gold);
+        font-size: 16px;
+        letter-spacing: 2px;
+        margin-bottom: 16px;
+    }
+
+    .proof-card blockquote {
+        font-size: 15px;
+        line-height: 1.7;
+        color: rgba(255, 255, 255, 0.85);
+        font-style: italic;
+        margin-bottom: 20px;
+    }
+
+    .proof-author {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .proof-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(
+            135deg,
+            var(--cgm-teal),
+            var(--cgm-teal-light)
+        );
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 14px;
+    }
+
+    .proof-author strong {
+        display: block;
+        font-size: 14px;
+        color: white;
+    }
+
+    .proof-author span {
+        font-size: 12px;
+        color: var(--cgm-text-muted);
+    }
+
+    .proof-stats {
+        display: flex;
+        justify-content: center;
+        gap: 64px;
+    }
+
+    .stat-item {
+        text-align: center;
+    }
+
+    .stat-number {
+        display: block;
+        font-size: 48px;
+        font-weight: 800;
+        color: var(--cgm-teal-light);
+        line-height: 1;
+        letter-spacing: -0.02em;
+    }
+
+    .stat-plus {
+        font-size: 32px;
+        font-weight: 800;
+        color: var(--cgm-teal-light);
+    }
+
+    .stat-label {
+        display: block;
+        font-size: 14px;
+        color: var(--cgm-text-muted);
+        margin-top: 4px;
+    }
+
+    /* ── DOCTOR SECTION ── */
+    .doctor-section {
+        background: var(--cgm-surface);
+    }
+
+    .doctor-inner {
+        display: grid;
+        grid-template-columns: 320px 1fr;
+        gap: 56px;
+        align-items: center;
+    }
+
+    .doctor-photo img {
+        width: 100%;
+        border-radius: var(--cgm-radius);
+        border: 1px solid var(--cgm-border);
+    }
+
+    .doctor-name {
+        font-size: 32px;
+        font-weight: 800;
+        color: white;
+        margin-bottom: 4px;
+    }
+
+    .doctor-title {
+        font-size: 16px;
+        color: var(--cgm-teal-light);
+        font-weight: 600;
+        margin-bottom: 16px;
+    }
+
+    .doctor-desc {
+        font-size: 16px;
+        line-height: 1.7;
+        color: var(--cgm-text-muted);
+        margin-bottom: 24px;
+    }
+
+    .doctor-creds {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .cred-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    .cred-item svg {
+        color: var(--cgm-teal-light);
+        flex-shrink: 0;
+    }
+
+    /* ── URGENCY BAND ── */
+    .urgency-section {
+        background: linear-gradient(
+            135deg,
+            rgba(245, 158, 11, 0.08),
+            rgba(245, 158, 11, 0.03)
+        );
+        border-top: 1px solid rgba(245, 158, 11, 0.2);
+        border-bottom: 1px solid rgba(245, 158, 11, 0.2);
+    }
+
+    .urgency-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 32px;
+        padding: 48px 24px;
+    }
+
+    .urgency-title {
+        font-size: 24px;
+        font-weight: 800;
+        color: var(--cgm-gold-light);
+        margin-bottom: 6px;
+    }
+
+    .urgency-desc {
+        font-size: 15px;
+        color: var(--cgm-text-muted);
+    }
+
+    /* ── FINAL CTA ── */
+    .final-cta-section {
+        background: linear-gradient(180deg, var(--cgm-dark), #060d0a);
+    }
+
+    .final-cta-inner {
+        text-align: center;
+        padding: 100px 24px;
+    }
+
+    .final-cta-title {
+        font-size: clamp(1.75rem, 4vw, 2.75rem);
+        font-weight: 800;
+        color: white;
+        margin-bottom: 16px;
+        line-height: 1.3;
+    }
+
+    .final-cta-desc {
+        font-size: 18px;
+        color: var(--cgm-text-muted);
+        line-height: 1.7;
+        margin-bottom: 32px;
+    }
+
+    .final-cta-price {
+        display: flex;
+        align-items: baseline;
+        justify-content: center;
+        gap: 8px;
+        margin-bottom: 36px;
+    }
+
+    .final-price-label {
+        font-size: 16px;
+        color: var(--cgm-text-muted);
+    }
+
+    .final-price-amount {
+        font-size: 48px;
+        font-weight: 800;
+        color: var(--cgm-gold);
+        line-height: 1;
+    }
+
+    .final-price-period {
+        font-size: 16px;
+        color: var(--cgm-text-muted);
+    }
+
+    .final-cta-note {
+        margin-top: 16px;
+        font-size: 13px;
+        color: var(--cgm-text-muted);
+    }
+
+    /* ── FOOTER ── */
+    .cgm-footer {
+        background: #060d0a;
+        border-top: 1px solid var(--cgm-border);
+    }
+
+    .cgm-footer .section-inner {
+        padding: 24px;
+        text-align: center;
+    }
+
+    .cgm-footer p {
+        font-size: 13px;
+        color: var(--cgm-text-muted);
+    }
+
+    .cgm-footer a {
+        color: var(--cgm-teal-light);
+        transition: color 200ms;
+    }
+    .cgm-footer a:hover {
+        color: white;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+        .problem-grid {
+            grid-template-columns: 1fr;
+        }
+        .benefits-grid {
+            grid-template-columns: 1fr;
+        }
+        .proof-grid {
+            grid-template-columns: 1fr;
+        }
+        .proof-stats {
+            gap: 32px;
+        }
+        .stat-number {
+            font-size: 36px;
+        }
+        .doctor-inner {
+            grid-template-columns: 1fr;
+            text-align: center;
+        }
+        .doctor-photo {
+            max-width: 280px;
+            margin: 0 auto;
+        }
+        .doctor-creds {
+            align-items: center;
+        }
+        .urgency-inner {
+            flex-direction: column;
+            text-align: center;
+        }
+        .hero-price-row {
+            flex-direction: column;
+            gap: 16px;
+        }
+        .hero-price {
+            align-items: center;
+        }
+        .cta-btn {
+            width: 100%;
+            justify-content: center;
+            font-size: 16px;
+            padding: 16px 32px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .hero-title {
+            font-size: 1.75rem;
+        }
+        .section-inner {
+            padding: 56px 16px;
+        }
+    }
+</style>
+
+<script>
+    // ── Animate stats on scroll ──
+    const observer = new IntersectionObserver(
+        (entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target
+                        .querySelectorAll(".stat-number[data-target]")
+                        .forEach((el) => {
+                            const target = parseInt(el.dataset.target);
+                            let current = 0;
+                            const step = Math.ceil(target / 40);
+                            const timer = setInterval(() => {
+                                current += step;
+                                if (current >= target) {
+                                    current = target;
+                                    clearInterval(timer);
+                                }
+                                el.textContent = current.toLocaleString();
+                            }, 30);
+                        });
+                    observer.unobserve(entry.target);
+                }
+            });
+        },
+        { threshold: 0.3 }
+    );
+
+    document
+        .querySelectorAll(".proof-stats")
+        .forEach((el) => observer.observe(el));
+</script>

@@ -93,40 +93,121 @@ export const prerender = false;
 
             <!-- Article Preview Modal -->
             <div id="previewModal" class="modal" style="display:none">
-                <div class="modal-content">
+                <div class="modal-content preview-modal-content">
                     <div class="modal-header">
-                        <h2 id="previewTitle"></h2>
+                        <h2 id="previewTitle">Article Title</h2>
                         <button class="close-btn" onclick="closePreview()"
                             >✕</button
                         >
                     </div>
-                    <div class="modal-meta">
-                        <span id="previewCategory" class="tag"></span>
-                        <span id="previewDate" class="meta-date"></span>
-                        <span id="previewKeyword" class="meta-keyword"></span>
-                    </div>
-                    <div class="modal-seo">
-                        <div class="seo-item">
-                            <label>SEO Description:</label>
-                            <p id="previewSEO"></p>
+                    <div class="preview-layout">
+                        <div class="preview-body">
+                            <div class="preview-meta">
+                                <span id="previewCategory" class="tag"
+                                    >Category</span
+                                >
+                                <span id="previewDate" class="meta-date"
+                                    >Date</span
+                                >
+                                <span id="previewKeyword" class="meta-date"
+                                    >Keyword</span
+                                >
+                            </div>
+
+                            <div class="preview-info-box">
+                                <div>
+                                    <strong>SEO Description:</strong>
+                                    <p id="previewSEO"></p>
+                                </div>
+                                <div>
+                                    <strong>Direct Answer:</strong>
+                                    <p id="previewAnswer"></p>
+                                </div>
+                            </div>
+
+                            <div id="previewContent" class="article-content">
+                            </div>
+
+                            <div class="admin-actions-section">
+                                <label
+                                    >บันทึกจาก Admin (จะถูกส่งไปที่ LINE)</label
+                                >
+                                <textarea
+                                    id="adminNotes"
+                                    placeholder="ใส่เหตุผลที่แก้ไขหรือเหตุผลที่ปฏิเสธ..."
+                                ></textarea>
+
+                                <div class="preview-actions">
+                                    <button
+                                        id="rejectBtn"
+                                        class="btn-reject"
+                                        style="display:none;"
+                                    >
+                                        ❌ ปฏิเสธ
+                                    </button>
+                                    <button
+                                        id="approveBtn"
+                                        class="btn-approve"
+                                        style="display:none;"
+                                    >
+                                        ✅ อนุมัติ & เผยแพร่
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                        <div class="seo-item">
-                            <label>Direct Answer:</label>
-                            <p id="previewAnswer"></p>
-                        </div>
-                    </div>
-                    <div id="previewContent" class="prose"></div>
-                    <div class="modal-actions">
-                        <textarea
-                            id="adminNotes"
-                            placeholder="หมายเหตุ (ถ้ามี)..."></textarea>
-                        <div class="action-buttons">
-                            <button class="btn-approve" id="approveBtn"
-                                >✅ อนุมัติ & เผยแพร่</button
+
+                        <div class="preview-social">
+                            <label>Facebook Post Preview</label>
+                            <div class="fb-preview-card">
+                                <div class="fb-card-header">
+                                    <img
+                                        src="/favicon.svg"
+                                        class="fb-avatar"
+                                        alt="Dr. Tim"
+                                    />
+                                    <div class="fb-header-info">
+                                        <span class="fb-name"
+                                            >Dr. Tim -
+                                            คุยเรื่องเบาหวานและลดน้ำหนัก</span
+                                        >
+                                        <span class="fb-time"
+                                            >Just now · 🌎</span
+                                        >
+                                    </div>
+                                </div>
+                                <div class="fb-card-text" id="reviewFbExcerpt">
+                                    ...
+                                </div>
+                                <div class="fb-card-media" id="reviewFbMedia">
+                                    <div class="fb-media-placeholder">
+                                        ไม่มีรูปภาพประกอบ
+                                    </div>
+                                </div>
+                                <div class="fb-card-link-box">
+                                    <div class="fb-link-site">DRTIM.CO</div>
+                                    <div
+                                        class="fb-link-title"
+                                        id="reviewFbTitle"
+                                    >
+                                        ...
+                                    </div>
+                                    <div class="fb-link-desc">
+                                        อ่านต่อที่เว็บไซต์ Dr. Tim Functional
+                                        Medicine...
+                                    </div>
+                                </div>
+                                <div class="fb-card-actions">
+                                    <span>👍 Like</span>
+                                    <span>💬 Comment</span>
+                                    <span>↪️ Share</span>
+                                </div>
+                            </div>
+                            <div
+                                style="margin-top:1.5rem; padding:1rem; background:rgba(239,68,68,0.05); border-radius:0.75rem; font-size:0.8rem; color:#f87171; border: 1px solid rgba(239,68,68,0.2);"
                             >
-                            <button class="btn-reject" id="rejectBtn"
-                                >❌ ปฏิเสธ</button
-                            >
+                                <strong>⚠️ ข้อควรระวัง:</strong> การกดอนุมัติจะทำการโพสต์ลง
+                                Facebook ทันที ตรวจสอบหัวข้อและรูปภาพให้เรียบร้อย
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -142,120 +223,244 @@ export const prerender = false;
                         >
                     </div>
                     <div class="compose-form">
-                        <div class="form-row ai-row">
-                            <div class="form-group full">
-                                <label>หัวข้อ / คีย์เวิร์ด *</label>
-                                <div class="ai-input-row">
+                        <div class="compose-grid">
+                            <div class="compose-main">
+                                <div class="form-row ai-row">
+                                    <div class="form-group full">
+                                        <label>หัวข้อ / คีย์เวิร์ด *</label>
+                                        <div class="ai-input-row">
+                                            <input
+                                                type="text"
+                                                id="compTitle"
+                                                placeholder="พิมพ์หัวข้อหรือ keyword แล้วกด AI Generate"
+                                                oninput="updateFBPreview()"
+                                            />
+                                            <button
+                                                id="aiGenBtn"
+                                                onclick="generateWithAI()"
+                                                style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.65rem 1.1rem;background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:white;border:none;border-radius:0.5rem;font-size:0.85rem;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;"
+                                            >
+                                                🤖 AI Generate
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div
+                                    id="aiLoading"
+                                    class="ai-loading"
+                                    style="display:none"
+                                >
+                                    <div class="ai-loading-inner">
+                                        <div class="ai-spinner"></div>
+                                        <p>
+                                            🤖 AI กำลังเขียนบทความ...
+                                            (รอสักครู่)
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Slug (URL)</label>
+                                        <input
+                                            type="text"
+                                            id="compSlug"
+                                            placeholder="auto-generated ถ้าไม่ระบุ"
+                                        />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>หมวดหมู่</label>
+                                        <input
+                                            type="text"
+                                            id="compCategory"
+                                            placeholder="เบาหวาน"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="form-group full">
+                                    <label
+                                        >Excerpt (สรุปสั้นๆ สำหรับ Facebook /
+                                        SEO)</label
+                                    >
+                                    <textarea
+                                        id="compExcerpt"
+                                        rows="2"
+                                        placeholder="สรุป 2-3 ประโยค"
+                                        oninput="updateFBPreview()"></textarea>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>SEO Description</label>
+                                        <input
+                                            type="text"
+                                            id="compSEO"
+                                            placeholder="150-160 ตัวอักษร"
+                                        />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Direct Answer</label>
+                                        <input
+                                            type="text"
+                                            id="compAnswer"
+                                            placeholder="คำตอบสั้น 40-60 คำ"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="form-group full">
+                                    <label
+                                        >รูปภาพหน้าปก (Website & Facebook)</label
+                                    >
+                                    <div class="image-upload-wrapper">
+                                        <input
+                                            type="file"
+                                            id="compImage"
+                                            accept="image/*"
+                                            style="display:none;"
+                                            onchange="handleImageUpload(this)"
+                                        />
+                                        <div
+                                            class="image-preview"
+                                            id="imagePreview"
+                                            onclick="document.getElementById('compImage').click()"
+                                        >
+                                            <div class="preview-placeholder">
+                                                <span class="plus-icon">+</span>
+                                                <span
+                                                    >คลิกเพื่ออัปโหลดรุปภาพ</span
+                                                >
+                                            </div>
+                                            <input
+                                                type="hidden"
+                                                id="compImageUrl"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group full">
+                                    <label>เนื้อหาบทความ * (HTML)</label>
+                                    <div class="editor-toolbar">
+                                        <button
+                                            type="button"
+                                            onclick="wrapText('b')"
+                                            title="ตัวหนา"
+                                            ><b>B</b>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onclick="wrapText('i')"
+                                            title="ตัวเอียง"
+                                            ><i>I</i>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onclick="wrapText('h2')"
+                                            title="หัวข้อหลัก">H2</button
+                                        >
+                                        <button
+                                            type="button"
+                                            onclick="wrapText('h3')"
+                                            title="หัวข้อย่อย">H3</button
+                                        >
+                                        <button
+                                            type="button"
+                                            onclick="insertTag('ul')"
+                                            title="รายการ">List</button
+                                        >
+                                        <button
+                                            type="button"
+                                            onclick="insertTag('table')"
+                                            title="ตาราง">Table</button
+                                        >
+                                        <button
+                                            type="button"
+                                            onclick="insertTemplate('faq')"
+                                            title="Template FAQ">FAQ</button
+                                        >
+                                        <button
+                                            type="button"
+                                            onclick="insertTemplate('action')"
+                                            title="Template Action Plan"
+                                            >Action Plan 1-2-3</button
+                                        >
+                                    </div>
+                                    <textarea
+                                        id="compContent"
+                                        rows="14"
+                                        placeholder="<h2>หัวข้อ</h2><p>เนื้อหา...</p>"
+                                    ></textarea>
+                                </div>
+                                <div class="form-group full">
+                                    <label>Tags (คั่นด้วย comma)</label>
                                     <input
                                         type="text"
-                                        id="compTitle"
-                                        placeholder="พิมพ์หัวข้อหรือ keyword แล้วกด AI Generate"
+                                        id="compTags"
+                                        placeholder="CGM, เบาหวาน, น้ำตาลในเลือด"
                                     />
-                                    <button
-                                        id="aiGenBtn"
-                                        onclick="generateWithAI()"
-                                        style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.65rem 1.1rem;background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:white;border:none;border-radius:0.5rem;font-size:0.85rem;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;"
-                                    >
-                                        🤖 AI Generate
-                                    </button>
                                 </div>
                             </div>
-                        </div>
-                        <div
-                            id="aiLoading"
-                            class="ai-loading"
-                            style="display:none"
-                        >
-                            <div class="ai-loading-inner">
-                                <div class="ai-spinner"></div>
-                                <p>🤖 AI กำลังเขียนบทความ... (รอสักครู่)</p>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Slug (URL)</label>
-                                <input
-                                    type="text"
-                                    id="compSlug"
-                                    placeholder="auto-generated ถ้าไม่ระบุ"
-                                />
-                            </div>
-                            <div class="form-group">
-                                <label>หมวดหมู่</label>
-                                <input
-                                    type="text"
-                                    id="compCategory"
-                                    placeholder="เบาหวาน"
-                                />
-                            </div>
-                        </div>
-                        <div class="form-group full">
-                            <label>Excerpt (สรุปสั้นๆ)</label>
-                            <textarea
-                                id="compExcerpt"
-                                rows="2"
-                                placeholder="สรุป 2-3 ประโยค สำหรับ meta description"
-                            ></textarea>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>SEO Description</label>
-                                <input
-                                    type="text"
-                                    id="compSEO"
-                                    placeholder="150-160 ตัวอักษร"
-                                />
-                            </div>
-                            <div class="form-group">
-                                <label>Direct Answer</label>
-                                <input
-                                    type="text"
-                                    id="compAnswer"
-                                    placeholder="คำตอบสั้น 40-60 คำ"
-                                />
-                            </div>
-                        </div>
-                        <div class="form-group full">
-                            <label>รูปภาพหน้าปก (Website & Facebook)</label>
-                            <div class="image-upload-wrapper">
-                                <input
-                                    type="file"
-                                    id="compImage"
-                                    accept="image/*"
-                                    style="display:none;"
-                                    onchange="handleImageUpload(this)"
-                                />
-                                <div
-                                    class="image-preview"
-                                    id="imagePreview"
-                                    onclick="document.getElementById('compImage').click()"
-                                >
-                                    <div class="preview-placeholder">
-                                        <span class="plus-icon">+</span>
-                                        <span>คลิกเพื่ออัปโหลดรุปภาพ</span>
+
+                            <div class="compose-sidebar">
+                                <label>Facebook Post Preview</label>
+                                <div class="fb-preview-card">
+                                    <div class="fb-card-header">
+                                        <img
+                                            src="/favicon.svg"
+                                            class="fb-avatar"
+                                            alt="Dr. Tim"
+                                        />
+                                        <div class="fb-header-info">
+                                            <span class="fb-name"
+                                                >Dr. Tim -
+                                                คุยเรื่องเบาหวานและลดน้ำหนัก</span
+                                            >
+                                            <span class="fb-time"
+                                                >Just now · 🌎</span
+                                            >
+                                        </div>
                                     </div>
-                                    <input type="hidden" id="compImageUrl" />
+                                    <div
+                                        class="fb-card-text"
+                                        id="fbPreviewExcerpt"
+                                    >
+                                        พิมพ์เนื้อหาสรุป (Excerpt)
+                                        เพื่อดูตัวอย่างโพสต์ที่นี่...
+                                    </div>
+                                    <div
+                                        class="fb-card-media"
+                                        id="fbPreviewMedia"
+                                    >
+                                        <div class="fb-media-placeholder">
+                                            เลือกรูปภาพเพื่อแสดงตัวอย่าง
+                                        </div>
+                                    </div>
+                                    <div class="fb-card-link-box">
+                                        <div class="fb-link-site">DRTIM.CO</div>
+                                        <div
+                                            class="fb-link-title"
+                                            id="fbPreviewTitle"
+                                        >
+                                            ชื่อบทความจะแสดงตรงนี้
+                                        </div>
+                                        <div class="fb-link-desc">
+                                            อ่านต่อที่เว็บไซต์ Dr. Tim
+                                            Functional Medicine...
+                                        </div>
+                                    </div>
+                                    <div class="fb-card-actions">
+                                        <span>👍 Like</span>
+                                        <span>💬 Comment</span>
+                                        <span>↪️ Share</span>
+                                    </div>
+                                </div>
+                                <div
+                                    style="margin-top:1.5rem; padding:1rem; background:rgba(139,92,246,0.1); border-radius:0.75rem; font-size:0.8rem; color:#a78bfa;"
+                                >
+                                    <strong>💡 Tip:</strong> ข้อความบน Facebook จะถูกตัดทอนถ้าบทความยาวเกินไป
+                                    พยายามใช้ Excerpt ที่กระชับและดึงดูด
                                 </div>
                             </div>
                         </div>
-                        <div class="form-group full">
-                            <label>เนื้อหาบทความ * (HTML)</label>
-                            <textarea
-                                id="compContent"
-                                rows="14"
-                                placeholder="<h2>หัวข้อ</h2>
-<p>เนื้อหา...</p>"
-                            ></textarea>
-                        </div>
-                        <div class="form-group full">
-                            <label>Tags (คั่นด้วย comma)</label>
-                            <input
-                                type="text"
-                                id="compTags"
-                                placeholder="CGM, เบาหวาน, น้ำตาลในเลือด"
-                            />
-                        </div>
-                        <div class="compose-actions">
+
+                        <div class="compose-footer">
                             <button
                                 class="btn-secondary"
                                 onclick="closeCompose()">ยกเลิก</button
@@ -398,10 +603,31 @@ export const prerender = false;
                     article.seo_description || "";
                 document.getElementById("previewAnswer").textContent =
                     article.direct_answer || "";
-                document.getElementById("previewContent").innerHTML =
-                    article.content;
                 document.getElementById("adminNotes").value =
                     article.admin_notes || "";
+                document.getElementById("previewContent").innerHTML =
+                    article.content || "";
+
+                // Update Facebook Preview in Review Modal
+                const fbMedia = document.getElementById("reviewFbMedia");
+                const fbExcerpt = document.getElementById("reviewFbExcerpt");
+                const fbTitle = document.getElementById("reviewFbTitle");
+
+                fbTitle.textContent = article.title;
+                fbExcerpt.textContent = article.excerpt || "ไม่มีบทคัดย่อ";
+
+                if (article.image_url) {
+                    fbMedia.innerHTML = `<img src="${article.image_url}" style="width:100%;height:100%;object-fit:cover;border-radius:0.5rem;" />`;
+                } else {
+                    fbMedia.innerHTML =
+                        '<div class="fb-media-placeholder">ไม่มีรูปภาพประกอบ</div>';
+                }
+
+                // Update FB preview when admin notes change (if they affect the excerpt)
+                const notesArea = document.getElementById("adminNotes");
+                notesArea.oninput = () => {
+                    // Optional: if admin notes were used for FB caption, but currently we use excerpt
+                };
 
                 const approveBtn = document.getElementById("approveBtn");
                 const rejectBtn = document.getElementById("rejectBtn");
@@ -597,20 +823,22 @@ export const prerender = false;
                 const preview = document.getElementById("imagePreview");
                 const urlInput = document.getElementById("compImageUrl");
 
+                // Update Preview logic
+                const fbMedia = document.getElementById("fbPreviewMedia");
+
                 // Show local preview immediately
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    preview.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;border-radius:0.5rem;" />`;
+                    const imgHtml = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;border-radius:0.5rem;" />`;
+                    preview.innerHTML = imgHtml;
+                    fbMedia.innerHTML = imgHtml;
                 };
                 reader.readAsDataURL(file);
 
                 // Upload to server
                 const formData = new FormData();
                 formData.append("image", file);
-                formData.append(
-                    "key",
-                    document.getElementById("adminKey").value
-                );
+                formData.append("key", adminKey);
 
                 try {
                     preview.classList.add("uploading");
@@ -632,6 +860,64 @@ export const prerender = false;
                 } finally {
                     preview.classList.remove("uploading");
                 }
+            }
+
+            // ── Editor Helper Functions ──
+            function wrapText(tag) {
+                const area = document.getElementById("compContent");
+                const start = area.selectionStart;
+                const end = area.selectionEnd;
+                const text = area.value.substring(start, end);
+                const before = area.value.substring(0, start);
+                const after = area.value.substring(end);
+
+                area.value = `${before}<${tag}>${text}</${tag}>${after}`;
+                area.focus();
+                area.selectionStart = start + tag.length + 2;
+                area.selectionEnd = area.selectionStart + text.length;
+            }
+
+            function insertTag(tag) {
+                const area = document.getElementById("compContent");
+                const pos = area.selectionStart;
+                const content =
+                    tag === "table"
+                        ? '\n<table border="1">\n  <tr><th>หัวข้อ</th><th>รายละเอียด</th></tr>\n  <tr><td>ข้อมูล 1</td><td>ข้อมูล 2</td></tr>\n</table>\n'
+                        : `\n<${tag}>\n  <li>ไอเทม 1</li>\n  <li>ไอเทม 2</li>\n</${tag}>\n`;
+
+                area.value =
+                    area.value.substring(0, pos) +
+                    content +
+                    area.value.substring(pos);
+                area.focus();
+            }
+
+            function insertTemplate(type) {
+                const area = document.getElementById("compContent");
+                const pos = area.selectionStart;
+                let content = "";
+                if (type === "faq") {
+                    content = "\n<h3>คำถาม: ...?</h3>\n<p>คำตอบ: ...</p>\n";
+                } else if (type === "action") {
+                    content =
+                        "\n<h3>🚀 Action Plan 1-2-3</h3>\n<ol>\n  <li><strong>ขั้นตอนที่ 1:</strong> ...</li>\n  <li><strong>ขั้นตอนที่ 2:</strong> ...</li>\n  <li><strong>ขั้นตอนที่ 3:</strong> ...</li>\n</ol>\n";
+                }
+                area.value =
+                    area.value.substring(0, pos) +
+                    content +
+                    area.value.substring(pos);
+                area.focus();
+            }
+
+            function updateFBPreview() {
+                const title = document.getElementById("compTitle").value;
+                const excerpt = document.getElementById("compExcerpt").value;
+
+                document.getElementById("fbPreviewTitle").textContent =
+                    title || "ชื่อบทความจะแสดงตรงนี้";
+                document.getElementById("fbPreviewExcerpt").textContent =
+                    excerpt ||
+                    "พิมพ์เนื้อหาสรุป (Excerpt) เพื่อดูตัวอย่างโพสต์ที่นี่...";
             }
 
             // ── AI Generate ──
@@ -685,6 +971,9 @@ export const prerender = false;
                         document.getElementById("compTags").value = (
                             a.tags || []
                         ).join(", ");
+
+                        // Automatically update Facebook preview
+                        updateFBPreview();
                     } else {
                         alert(
                             "❌ " +
@@ -1055,6 +1344,54 @@ export const prerender = false;
                 gap: 1rem;
                 padding: 1.5rem 2rem;
             }
+            /* ── Preview Modal Layout ── */
+            .preview-modal-content {
+                max-width: 1100px !important;
+                width: 95% !important;
+            }
+            .preview-layout {
+                display: grid;
+                grid-template-columns: 1fr 360px;
+                gap: 2.5rem;
+                align-items: start;
+            }
+            .preview-body {
+                min-width: 0;
+            }
+            .preview-social {
+                position: sticky;
+                top: 0;
+                padding-left: 2rem;
+                border-left: 1px solid #334155;
+            }
+            .admin-actions-section {
+                margin-top: 2.5rem;
+                padding-top: 2rem;
+                border-top: 1px solid #334155;
+            }
+            .admin-actions-section textarea {
+                width: 100%;
+                background: #1e293b;
+                border: 1px solid #334155;
+                border-radius: 0.5rem;
+                color: white;
+                padding: 0.75rem;
+                margin: 0.5rem 0 1.5rem;
+                font-family: inherit;
+            }
+
+            @media (max-width: 900px) {
+                .preview-layout {
+                    grid-template-columns: 1fr;
+                }
+                .preview-social {
+                    border-left: none;
+                    padding-left: 0;
+                    border-top: 1px solid #334155;
+                    padding-top: 2rem;
+                }
+            }
+
             .article-card {
                 background: #1e293b;
                 border: 1px solid #334155;
@@ -1360,6 +1697,157 @@ export const prerender = false;
             .plus-icon {
                 font-size: 2rem;
                 font-weight: 300;
+            }
+
+            /* ── Compose Modal Grid ── */
+            .compose-grid {
+                display: grid;
+                grid-template-columns: 1fr 380px;
+                gap: 2rem;
+                margin-bottom: 2rem;
+            }
+            .compose-main {
+                min-width: 0;
+            }
+            .compose-sidebar {
+                border-left: 1px solid #334155;
+                padding-left: 2rem;
+                position: sticky;
+                top: 0;
+            }
+            .compose-footer {
+                display: flex;
+                justify-content: flex-end;
+                gap: 1rem;
+                padding-top: 1.5rem;
+                border-top: 1px solid #334155;
+            }
+
+            /* ── Editor Toolbar ── */
+            .editor-toolbar {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.3rem;
+                background: #1e293b;
+                padding: 0.5rem;
+                border-radius: 0.5rem 0.5rem 0 0;
+                border: 1px solid #334155;
+                border-bottom: none;
+            }
+            .editor-toolbar button {
+                padding: 0.25rem 0.6rem;
+                background: #334155;
+                color: #e2e8f0;
+                border: 1px solid #475569;
+                border-radius: 0.25rem;
+                font-size: 0.75rem;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+            .editor-toolbar button:hover {
+                background: #475569;
+                border-color: #6366f1;
+            }
+            #compContent {
+                border-radius: 0 0 0.5rem 0.5rem;
+            }
+
+            /* ── Facebook Preview ── */
+            .fb-preview-card {
+                background: #ffffff;
+                color: #1c1e21;
+                border-radius: 0.5rem;
+                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+                margin-top: 1rem;
+                font-family: Arial, sans-serif;
+                overflow: hidden;
+            }
+            .fb-card-header {
+                padding: 0.75rem;
+                display: flex;
+                gap: 0.5rem;
+            }
+            .fb-avatar {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                background: #e4e6eb;
+            }
+            .fb-header-info {
+                display: flex;
+                flex-direction: column;
+            }
+            .fb-name {
+                font-weight: 600;
+                font-size: 0.95rem;
+            }
+            .fb-time {
+                font-size: 0.8rem;
+                color: #65676b;
+            }
+            .fb-card-text {
+                padding: 0 0.75rem 0.75rem;
+                font-size: 0.95rem;
+                line-height: 1.4;
+                white-space: pre-wrap;
+            }
+            .fb-card-media {
+                width: 100%;
+                height: 200px;
+                background: #f0f2f5;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-top: 1px solid #e4e6eb;
+                border-bottom: 1px solid #e4e6eb;
+            }
+            .fb-media-placeholder {
+                color: #8a8d91;
+                font-size: 0.85rem;
+                font-style: italic;
+            }
+            .fb-card-link-box {
+                padding: 0.75rem;
+                background: #f0f2f5;
+            }
+            .fb-link-site {
+                font-size: 0.75rem;
+                color: #65676b;
+                text-transform: uppercase;
+            }
+            .fb-link-title {
+                font-weight: 600;
+                font-size: 1rem;
+                margin: 0.2rem 0;
+            }
+            .fb-link-desc {
+                font-size: 0.85rem;
+                color: #65676b;
+                display: -webkit-box;
+                -webkit-line-clamp: 1;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+            .fb-card-actions {
+                border-top: 1px solid #e4e6eb;
+                padding: 0.5rem;
+                display: flex;
+                justify-content: space-around;
+                color: #65676b;
+                font-weight: 600;
+                font-size: 0.9rem;
+            }
+
+            @media (max-width: 900px) {
+                .compose-grid {
+                    grid-template-columns: 1fr;
+                }
+                .compose-sidebar {
+                    border-left: none;
+                    border-top: 1px solid #334155;
+                    padding-left: 0;
+                    padding-top: 2rem;
+                }
             }
 
             @media (max-width: 640px) {

@@ -24,7 +24,7 @@ const SYSTEM_PROMPT = `คุณคือ Dr. Tim (หมอทิม) แพท
 - **FAQ Section**: ต้องมีคำถาม-คำตอบ 2-3 ข้อ (ใช้ <h3> สำหรับคำถาม) เพื่อรองรับ AEO / People Also Ask
 
 ## Output Format (JSON):
-ตอบกลับเป็น JSON เท่านั้น:
+ตอบกลับเป็น JSON เท่านั้น ห้ามมีข้อความอื่นนอก JSON:
 {
   "title": "หัวข้อบทความ (SEO-optimized, รวม keyword สำคัญ, ไม่เกิน 60 ตัวอักษร)",
   "slug": "url-friendly-slug-in-english",
@@ -56,7 +56,7 @@ export async function POST({ request }) {
     const userPrompt = `เขียนบทความเรื่อง "${keyword}" ${category ? `ในหมวดหมู่ "${category}"` : ''}
 
 กรุณาเขียนบทความที่ครบถ้วน ให้ข้อมูลที่มีประโยชน์ และอ้างอิงงานวิจัย
-ตอบกลับเป็น JSON ตาม format ที่กำหนดเท่านั้น ห้ามมีคำอธิบายอื่นนอก JSON และระวังเรื่องเครื่องหมายคำพูด (double quotes) ในเนื้อหาให้ escape ให้ถูกต้องด้วย`;
+ตอบกลับเป็น JSON ตาม format ที่กำหนดเท่านั้น ห้ามมีคำอธิบายอื่นนอก JSON`;
 
     try {
         const response = await fetch(
@@ -65,8 +65,11 @@ export async function POST({ request }) {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
+                    systemInstruction: {
+                        parts: [{ text: SYSTEM_PROMPT }]
+                    },
                     contents: [
-                        { role: 'user', parts: [{ text: SYSTEM_PROMPT + '\n\n' + userPrompt }] }
+                        { role: 'user', parts: [{ text: userPrompt }] }
                     ],
                     generationConfig: {
                         temperature: 0.1,
@@ -79,63 +82,182 @@ export async function POST({ request }) {
 
         if (!response.ok) {
             const errText = await response.text();
-            return new Response(JSON.stringify({ error: `Gemini API error: ${response.status}`, detail: errText }), { status: 502 });
+            console.error('Gemini API error:', response.status, errText.substring(0, 300));
+            return new Response(JSON.stringify({
+                error: `Gemini API error: ${response.status}`,
+                detail: errText.substring(0, 200)
+            }), { status: 502 });
         }
 
         const data = await response.json();
         let text = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
         if (!text) {
-            return new Response(JSON.stringify({ error: 'No content from Gemini' }), { status: 502 });
+            const finishReason = data.candidates?.[0]?.finishReason;
+            return new Response(JSON.stringify({
+                error: 'No content from Gemini',
+                finishReason: finishReason || 'unknown'
+            }), { status: 502 });
         }
 
-        // Sanitize: Extract JSON if it's wrapped in markdown or has trailing text
-        try {
-            // Remove markdown code blocks if present
-            text = text.replace(/```json\n?|```/g, '').trim();
+        // Robust JSON extraction
+        const article = extractJSON(text);
 
-            // Find the first { and last }
-            const firstBrace = text.indexOf('{');
-            const lastBrace = text.lastIndexOf('}');
-            if (firstBrace !== -1 && lastBrace !== -1) {
-                text = text.substring(firstBrace, lastBrace + 1);
-            }
-
-            // Fix common AI JSON errors: unescaped control characters in multi-line strings
-            // This is a common issue with long content fields
-            const sanitizedText = text
-                .replace(/\n/g, "\\n") // Escape literal newlines
-                .replace(/\r/g, "\\r")
-                .replace(/\t/g, "\\t");
-
-            // However, the above might break the JSON structure itself.
-            // Better approach: use a more robust JSON cleaner or tell model to be stricter.
-
-            const article = JSON.parse(text);
-            return new Response(JSON.stringify({ success: true, article }), {
-                headers: { 'Content-Type': 'application/json' },
-            });
-        } catch (parseErr) {
-            console.error('JSON Parse Error:', parseErr, 'Raw Text Length:', text.length);
-            // Try one more fallback: if it's just unescaped newlines in the content field
-            try {
-                // Aggressive fix for unescaped newlines in strings
-                const fixedText = text.replace(/(?<=: \".*)\n(?=.*\"[,\}])/g, "\\n");
-                const article = JSON.parse(fixedText);
-                return new Response(JSON.stringify({ success: true, article }), {
-                    headers: { 'Content-Type': 'application/json' },
-                });
-            } catch (fallbackErr) {
-                return new Response(JSON.stringify({
-                    error: 'AI returned invalid JSON format',
-                    detail: parseErr.message,
-                    hint: 'The article might be too long for the AI to format correctly. Try a shorter keyword.',
-                    raw_start: text.substring(0, 100),
-                    raw_end: text.substring(text.length - 100)
-                }), { status: 502 });
-            }
+        if (!article) {
+            console.error('JSON extraction failed. Raw text (first 300 chars):', text.substring(0, 300));
+            return new Response(JSON.stringify({
+                error: 'AI returned invalid JSON format',
+                hint: 'Try generating again or use a simpler keyword.',
+                raw_start: text.substring(0, 150),
+            }), { status: 502 });
         }
+
+        // Validate required fields
+        if (!article.title || !article.content) {
+            return new Response(JSON.stringify({
+                error: 'AI response missing required fields (title/content)',
+                fields: Object.keys(article),
+            }), { status: 502 });
+        }
+
+        return new Response(JSON.stringify({ success: true, article }), {
+            headers: { 'Content-Type': 'application/json' },
+        });
+
     } catch (err) {
+        console.error('generate-draft error:', err);
         return new Response(JSON.stringify({ error: err.message }), { status: 500 });
     }
+}
+
+/**
+ * Robust JSON extraction from AI text.
+ * Uses charCodeAt for reliable character comparison (avoids escape issues).
+ */
+function extractJSON(text) {
+    // Strategy 1: Direct parse
+    try { return JSON.parse(text); } catch (e) { /* continue */ }
+
+    // Strategy 2: Strip markdown code fences
+    const cleaned = text.replace(/```(?:json)?\n?/g, '').replace(/```$/g, '').trim();
+    try { return JSON.parse(cleaned); } catch (e) { /* continue */ }
+
+    // Strategy 3: Extract the top-level JSON object using brace depth matching
+    const extracted = extractTopLevelJSON(cleaned);
+    if (!extracted) {
+        console.error('Could not find balanced JSON object. Raw text last 200 chars:', text.substring(text.length - 200));
+        return null;
+    }
+    try { return JSON.parse(extracted); } catch (e) { /* continue */ }
+
+    // Strategy 4: Fix unescaped control characters using charCodeAt
+    const fixed = fixControlChars(extracted);
+    try { return JSON.parse(fixed); } catch (e) {
+        console.error('All JSON parse strategies failed:', e.message);
+    }
+
+    return null;
+}
+
+/**
+ * Fix unescaped control chars (newline, tab, etc.) inside JSON string values.
+ * Uses charCodeAt to avoid JavaScript string escape ambiguity.
+ */
+function fixControlChars(str) {
+    const BACKSLASH = 92;  // \
+    const QUOTE = 34;      // "
+    const NEWLINE = 10;    // \n
+    const CR = 13;         // \r
+    const TAB = 9;         // \t
+
+    let result = '';
+    let inString = false;
+    let i = 0;
+
+    while (i < str.length) {
+        const code = str.charCodeAt(i);
+
+        // Inside a string, handle escape sequences
+        if (inString && code === BACKSLASH && i + 1 < str.length) {
+            // Valid escape sequence — copy both chars
+            result += str[i] + str[i + 1];
+            i += 2;
+            continue;
+        }
+
+        // Toggle string state on unescaped quotes
+        if (code === QUOTE) {
+            inString = !inString;
+            result += str[i];
+            i++;
+            continue;
+        }
+
+        // Inside strings, replace control characters with escape sequences
+        if (inString) {
+            if (code === NEWLINE) { result += String.fromCharCode(BACKSLASH) + 'n'; i++; continue; }
+            if (code === CR) { result += String.fromCharCode(BACKSLASH) + 'r'; i++; continue; }
+            if (code === TAB) { result += String.fromCharCode(BACKSLASH) + 't'; i++; continue; }
+            // Other control chars (rare)
+            if (code < 32) {
+                result += String.fromCharCode(BACKSLASH) + 'u' + code.toString(16).padStart(4, '0');
+                i++;
+                continue;
+            }
+        }
+
+        result += str[i];
+        i++;
+    }
+
+    return result;
+}
+
+/**
+ * Extract the top-level JSON object from text by matching brace depth.
+ * Handles strings (with escaped quotes) to avoid false brace matches.
+ */
+function extractTopLevelJSON(text) {
+    const LBRACE = 123;    // {
+    const RBRACE = 125;    // }
+    const QUOTE = 34;      // "
+    const BACKSLASH = 92;  // \
+
+    const start = text.indexOf('{');
+    if (start === -1) return null;
+
+    let depth = 0;
+    let inString = false;
+    let i = start;
+
+    while (i < text.length) {
+        const code = text.charCodeAt(i);
+
+        // Handle escape sequences inside strings
+        if (inString && code === BACKSLASH) {
+            i += 2; // skip escaped char
+            continue;
+        }
+
+        // Toggle string state
+        if (code === QUOTE) {
+            inString = !inString;
+            i++;
+            continue;
+        }
+
+        if (!inString) {
+            if (code === LBRACE) depth++;
+            if (code === RBRACE) {
+                depth--;
+                if (depth === 0) {
+                    return text.substring(start, i + 1);
+                }
+            }
+        }
+
+        i++;
+    }
+
+    return null; // unbalanced braces
 }

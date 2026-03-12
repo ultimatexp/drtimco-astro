@@ -9,11 +9,27 @@
  */
 
 import { neon } from '@neondatabase/serverless';
-import { readFileSync, writeFileSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+
+// Load .env file if it exists (for local builds)
+const envPath = join(__dirname, '..', '.env');
+if (existsSync(envPath)) {
+    const envContent = readFileSync(envPath, 'utf-8');
+    for (const line of envContent.split('\n')) {
+        const trimmed = line.trim();
+        if (!trimmed || trimmed.startsWith('#')) continue;
+        const eqIdx = trimmed.indexOf('=');
+        if (eqIdx === -1) continue;
+        const key = trimmed.substring(0, eqIdx).trim();
+        const val = trimmed.substring(eqIdx + 1).trim();
+        if (!process.env[key]) process.env[key] = val;
+    }
+}
+
 const DATABASE_URL = process.env.NEON_DATABASE_URL;
 
 if (!DATABASE_URL) {

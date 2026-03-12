@@ -142,14 +142,33 @@ export const prerender = false;
                         >
                     </div>
                     <div class="compose-form">
-                        <div class="form-row">
+                        <div class="form-row ai-row">
                             <div class="form-group full">
-                                <label>หัวข้อบทความ *</label>
-                                <input
-                                    type="text"
-                                    id="compTitle"
-                                    placeholder="เช่น CGM คืออะไร ทำไมคนรักสุขภาพต้องรู้"
-                                />
+                                <label>หัวข้อ / คีย์เวิร์ด *</label>
+                                <div class="ai-input-row">
+                                    <input
+                                        type="text"
+                                        id="compTitle"
+                                        placeholder="พิมพ์หัวข้อหรือ keyword แล้วกด AI Generate"
+                                    />
+                                    <button
+                                        class="btn-ai"
+                                        id="aiGenBtn"
+                                        onclick="generateWithAI()"
+                                    >
+                                        <span class="ai-icon">🤖</span> AI Generate
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            id="aiLoading"
+                            class="ai-loading"
+                            style="display:none"
+                        >
+                            <div class="ai-loading-inner">
+                                <div class="ai-spinner"></div>
+                                <p>🤖 AI กำลังเขียนบทความ... (รอสักครู่)</p>
                             </div>
                         </div>
                         <div class="form-row">
@@ -544,6 +563,72 @@ export const prerender = false;
                 btn.disabled = false;
                 btn.textContent = "💾 บันทึกบทความ";
             }
+
+            // ── AI Generate ──
+            async function generateWithAI() {
+                const keyword = document
+                    .getElementById("compTitle")
+                    .value.trim();
+                if (!keyword) {
+                    alert("กรุณาพิมพ์หัวข้อหรือ keyword ก่อนกด AI Generate");
+                    document.getElementById("compTitle").focus();
+                    return;
+                }
+
+                const btn = document.getElementById("aiGenBtn");
+                const loading = document.getElementById("aiLoading");
+                btn.disabled = true;
+                btn.innerHTML = '<span class="ai-icon">⏳</span> กำลังสร้าง...';
+                loading.style.display = "flex";
+
+                try {
+                    const category = document
+                        .getElementById("compCategory")
+                        .value.trim();
+                    const res = await fetch("/api/generate-draft", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            key: adminKey,
+                            keyword,
+                            category,
+                        }),
+                    });
+                    const result = await res.json();
+
+                    if (result.success && result.article) {
+                        const a = result.article;
+                        document.getElementById("compTitle").value =
+                            a.title || keyword;
+                        document.getElementById("compSlug").value =
+                            a.slug || "";
+                        document.getElementById("compCategory").value =
+                            a.category || "";
+                        document.getElementById("compExcerpt").value =
+                            a.excerpt || "";
+                        document.getElementById("compSEO").value =
+                            a.seo_description || "";
+                        document.getElementById("compAnswer").value =
+                            a.direct_answer || "";
+                        document.getElementById("compContent").value =
+                            a.content || "";
+                        document.getElementById("compTags").value = (
+                            a.tags || []
+                        ).join(", ");
+                    } else {
+                        alert(
+                            "❌ " +
+                                (result.error || "AI ไม่สามารถสร้างบทความได้")
+                        );
+                    }
+                } catch (err) {
+                    alert("❌ เกิดข้อผิดพลาด: " + err.message);
+                }
+
+                btn.disabled = false;
+                btn.innerHTML = '<span class="ai-icon">🤖</span> AI Generate';
+                loading.style.display = "none";
+            }
         </script>
 
         <style is:global>
@@ -707,6 +792,82 @@ export const prerender = false;
                 opacity: 0.5;
                 cursor: not-allowed;
                 transform: none;
+            }
+
+            /* AI Button */
+            .ai-input-row {
+                display: flex !important;
+                gap: 0.5rem !important;
+                width: 100%;
+            }
+            .ai-input-row input {
+                flex: 1 !important;
+                min-width: 0;
+            }
+            .btn-ai {
+                display: inline-flex !important;
+                align-items: center !important;
+                gap: 0.4rem !important;
+                padding: 0.65rem 1.1rem !important;
+                background: linear-gradient(
+                    135deg,
+                    #8b5cf6,
+                    #6d28d9
+                ) !important;
+                color: white !important;
+                border: none !important;
+                border-radius: 0.5rem !important;
+                font-size: 0.85rem !important;
+                font-weight: 600 !important;
+                cursor: pointer !important;
+                white-space: nowrap !important;
+                transition: transform 0.15s, opacity 0.15s !important;
+                flex-shrink: 0;
+            }
+            .btn-ai:hover {
+                transform: scale(1.03) !important;
+            }
+            .btn-ai:disabled {
+                opacity: 0.5 !important;
+                cursor: not-allowed !important;
+                transform: none !important;
+            }
+            .ai-icon {
+                font-size: 1rem;
+            }
+
+            /* AI Loading */
+            .ai-loading {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 2rem 1rem;
+                background: #0f172a;
+                border: 1px dashed #6d28d9;
+                border-radius: 0.75rem;
+            }
+            .ai-loading-inner {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 0.75rem;
+            }
+            .ai-loading-inner p {
+                color: #a78bfa;
+                font-size: 0.9rem;
+            }
+            .ai-spinner {
+                width: 32px;
+                height: 32px;
+                border: 3px solid #334155;
+                border-top: 3px solid #8b5cf6;
+                border-radius: 50%;
+                animation: ai-spin 0.8s linear infinite;
+            }
+            @keyframes ai-spin {
+                to {
+                    transform: rotate(360deg);
+                }
             }
 
             /* Compose Form — use high-specificity selectors to override login-card */

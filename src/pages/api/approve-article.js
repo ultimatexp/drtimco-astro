@@ -63,7 +63,7 @@ export async function POST({ request }) {
     if (fbToken && fbPageId) {
         try {
             const articleUrl = `${siteUrl}/blog/${article.slug}`;
-            const message = `📝 บทความใหม่!\n\n${article.title}\n\n${article.excerpt}\n\n👉 อ่านเพิ่มเติม: ${articleUrl}`;
+            const message = `📝 บทความใหม่!\n\n${article.title}\n\n${article.excerpt}`;
 
             let fbEndpoint = `https://graph.facebook.com/v19.0/${fbPageId}/feed`;
             let fbPayload = {

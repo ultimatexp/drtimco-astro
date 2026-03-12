@@ -7,7 +7,7 @@ import { neon } from '@neondatabase/serverless';
 
 export async function POST({ request }) {
   const body = await request.json();
-  const { key, title, slug, content, excerpt, seo_description, direct_answer, category, tags } = body;
+  const { id, key, title, slug, content, excerpt, seo_description, direct_answer, category, tags, image_url } = body;
 
   if (key !== (import.meta.env.ADMIN_PASSWORD || process.env.ADMIN_PASSWORD)) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
@@ -27,27 +27,63 @@ export async function POST({ request }) {
     .replace(/-+/g, '-')
     .substring(0, 80);
 
-  const result = await sql`
-    INSERT INTO article_drafts (
-      title, slug, content, excerpt, seo_description,
-      direct_answer, category, tags, status, keyword, image_url
-    ) VALUES (
-      ${title},
-      ${finalSlug},
-      ${content},
-      ${excerpt || ''},
-      ${seo_description || ''},
-      ${direct_answer || ''},
-      ${category || ''},
-      ${tags || []},
-      'review',
-      'manual',
-      ${body.image_url || ''}
-    )
-    RETURNING id, title, slug
-  `;
+  let article;
 
-  return new Response(JSON.stringify({ success: true, article: result[0] }), {
-    headers: { 'Content-Type': 'application/json' },
-  });
+  try {
+    if (id) {
+      // Update existing article
+      const result = await sql`
+      UPDATE article_drafts SET
+        title = ${title},
+        slug = ${finalSlug},
+        content = ${content},
+        excerpt = ${excerpt || ''},
+        seo_description = ${seo_description || ''},
+        direct_answer = ${direct_answer || ''},
+        category = ${category || ''},
+        tags = ${tags || []},
+        image_url = ${image_url || ''},
+        updated_at = NOW()
+      WHERE id = ${id}
+      RETURNING id, title, slug
+    `;
+      article = result[0];
+    } else {
+      // Insert new article
+      const result = await sql`
+      INSERT INTO article_drafts (
+        title, slug, content, excerpt, seo_description,
+        direct_answer, category, tags, status, keyword, image_url
+      ) VALUES (
+        ${title},
+        ${finalSlug},
+        ${content},
+        ${excerpt || ''},
+        ${seo_description || ''},
+        ${direct_answer || ''},
+        ${category || ''},
+        ${tags || []},
+        'review',
+        'manual',
+        ${image_url || ''}
+      )
+      RETURNING id, title, slug
+    `;
+      article = result[0];
+    }
+
+    if (!article) {
+      return new Response(JSON.stringify({ error: 'Article not found or update failed' }), { status: 404 });
+    }
+
+    return new Response(JSON.stringify({ success: true, article }), {
+      headers: { 'Content-Type': 'application/json' },
+    });
+  } catch (err) {
+    console.error('create-article error:', err);
+    return new Response(JSON.stringify({ error: 'Database error: ' + err.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
 }

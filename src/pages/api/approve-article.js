@@ -63,29 +63,49 @@ export async function POST({ request }) {
     if (fbToken && fbPageId) {
         try {
             const articleUrl = `${siteUrl}/blog/${article.slug}`;
-            const fbResponse = await fetch(
-                `https://graph.facebook.com/v19.0/${fbPageId}/feed`,
-                {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        message: `📝 บทความใหม่!\n\n${article.title}\n\n${article.excerpt}\n\n👉 อ่านเพิ่มเติม: ${articleUrl}`,
-                        link: articleUrl,
-                        access_token: fbToken,
-                    }),
+            const message = `📝 บทความใหม่!\n\n${article.title}\n\n${article.excerpt}\n\n👉 อ่านเพิ่มเติม: ${articleUrl}`;
+
+            let fbEndpoint = `https://graph.facebook.com/v19.0/${fbPageId}/feed`;
+            let fbPayload = {
+                message: message,
+                link: articleUrl,
+                access_token: fbToken,
+            };
+
+            // Use /photos endpoint if we have an image
+            if (article.image_url) {
+                fbEndpoint = `https://graph.facebook.com/v19.0/${fbPageId}/photos`;
+
+                // Ensure image URL is absolute
+                let absoluteImageUrl = article.image_url;
+                if (!absoluteImageUrl.startsWith('http')) {
+                    absoluteImageUrl = `${siteUrl}${article.image_url.startsWith('/') ? '' : '/'}${article.image_url}`;
                 }
-            );
+
+                fbPayload = {
+                    url: absoluteImageUrl,
+                    caption: message,
+                    access_token: fbToken,
+                };
+            }
+
+            const fbResponse = await fetch(fbEndpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(fbPayload),
+            });
 
             const fbData = await fbResponse.json();
 
-            if (fbData.id) {
+            if (fbData.id || fbData.post_id) {
+                const postId = fbData.post_id || fbData.id;
                 // Save Facebook post ID
                 await sql`
           UPDATE article_drafts 
-          SET facebook_post_id = ${fbData.id}, status = 'published'
+          SET facebook_post_id = ${postId}, status = 'published'
           WHERE id = ${id}
         `;
-                results.facebook = { success: true, postId: fbData.id };
+                results.facebook = { success: true, postId: postId };
             } else {
                 results.facebook = { success: false, error: fbData.error?.message };
             }

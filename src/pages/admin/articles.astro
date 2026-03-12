@@ -216,6 +216,29 @@ export const prerender = false;
                             </div>
                         </div>
                         <div class="form-group full">
+                            <label>รูปภาพหน้าปก (Website & Facebook)</label>
+                            <div class="image-upload-wrapper">
+                                <input
+                                    type="file"
+                                    id="compImage"
+                                    accept="image/*"
+                                    style="display:none;"
+                                    onchange="handleImageUpload(this)"
+                                />
+                                <div
+                                    class="image-preview"
+                                    id="imagePreview"
+                                    onclick="document.getElementById('compImage').click()"
+                                >
+                                    <div class="preview-placeholder">
+                                        <span class="plus-icon">+</span>
+                                        <span>คลิกเพื่ออัปโหลดรุปภาพ</span>
+                                    </div>
+                                    <input type="hidden" id="compImageUrl" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group full">
                             <label>เนื้อหาบทความ * (HTML)</label>
                             <textarea
                                 id="compContent"
@@ -541,6 +564,8 @@ export const prerender = false;
                                 .getElementById("compCategory")
                                 .value.trim(),
                             tags,
+                            image_url:
+                                document.getElementById("compImageUrl").value,
                         }),
                     });
                     const result = await res.json();
@@ -562,6 +587,51 @@ export const prerender = false;
 
                 btn.disabled = false;
                 btn.textContent = "💾 บันทึกบทความ";
+            }
+
+            // ── Image Upload Handling ──
+            async function handleImageUpload(input) {
+                const file = input.files[0];
+                if (!file) return;
+
+                const preview = document.getElementById("imagePreview");
+                const urlInput = document.getElementById("compImageUrl");
+
+                // Show local preview immediately
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    preview.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;border-radius:0.5rem;" />`;
+                };
+                reader.readAsDataURL(file);
+
+                // Upload to server
+                const formData = new FormData();
+                formData.append("image", file);
+                formData.append(
+                    "key",
+                    document.getElementById("adminKey").value
+                );
+
+                try {
+                    preview.classList.add("uploading");
+                    const res = await fetch("/api/upload-image", {
+                        method: "POST",
+                        body: formData,
+                    });
+                    const result = await res.json();
+                    if (result.success) {
+                        urlInput.value = result.url;
+                        console.log("Image uploaded:", result.url);
+                    } else {
+                        alert("❌ Upload failed: " + result.error);
+                        preview.innerHTML =
+                            '<div class="preview-placeholder"><span class="plus-icon">+</span><span>อัปโหลดล้มเหลว</span></div>';
+                    }
+                } catch (err) {
+                    alert("❌ Upload error: " + err.message);
+                } finally {
+                    preview.classList.remove("uploading");
+                }
             }
 
             // ── AI Generate ──
@@ -1242,6 +1312,54 @@ export const prerender = false;
                 opacity: 0.5;
                 cursor: not-allowed;
                 transform: none;
+            }
+            .ai-row {
+                padding-bottom: 0.5rem;
+            }
+
+            .image-upload-wrapper {
+                margin-top: 0.5rem;
+            }
+            .image-preview {
+                width: 100%;
+                height: 200px;
+                background: #0f172a;
+                border: 2px dashed #334155;
+                border-radius: 0.75rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                overflow: hidden;
+                transition: all 0.2s;
+                position: relative;
+            }
+            .image-preview:hover {
+                border-color: #6366f1;
+                background: #1e293b;
+            }
+            .image-preview.uploading::after {
+                content: "Uploading...";
+                position: absolute;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.6);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-size: 0.85rem;
+                z-index: 2;
+            }
+            .preview-placeholder {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 0.5rem;
+                color: #64748b;
+            }
+            .plus-icon {
+                font-size: 2rem;
+                font-weight: 300;
             }
 
             @media (max-width: 640px) {

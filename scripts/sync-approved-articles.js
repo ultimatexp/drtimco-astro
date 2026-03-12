@@ -67,8 +67,8 @@ async function syncArticles() {
             description: 'Functional Medicine physician specializing in metabolic health',
             avatar: '',
         },
-        featuredImage: a.featured_image_url ? {
-            sourceUrl: a.featured_image_url,
+        featuredImage: (a.image_url || a.featured_image_url) ? {
+            sourceUrl: a.image_url || a.featured_image_url,
             altText: a.title,
             width: 1200,
             height: 630,

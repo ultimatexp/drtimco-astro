@@ -16,7 +16,7 @@ const SYSTEM_PROMPT = `คุณคือ Dr. Tim (หมอทิม) แพท
 5. **Information Gain**: นำเสนอแนวทาง Root Cause (Functional Medicine) ที่แตกต่างจากคำแนะนำทั่วไป เพื่อให้ AI Search (GEO) เห็นคุณค่าของเนื้อหา
 
 ## โครงสร้างบทความที่ต้องมี:
-- **ความยาว**: 1,500-2,500 คำ
+- **ความยาว**: 1,000-1,500 คำ (เน้นความกระชับและข้อมูลที่แน่น)
 - **Formatting**: ใช้ HTML (<h2>, <h3>, <p>, <ul>, <ol>, <blockquote>, <strong>, <table>)
 - **Data Visualization (MANDATORY)**: ต้องมี **ตาราง (<table>)** อย่างน้อย 1 ตาราง เพื่อสรุปข้อมูลหรือเปรียบเทียบ (เช่น อาหารที่ควรกิน vs ควรเลี่ยง)
 - **Action Plan (MANDATORY)**: ต้องมีส่วน "Action Plan 1-2-3" หรือ "Checklist" ที่ผู้อ่านทำตามได้ทันที เพื่อดึงดูด Featured Snippet
@@ -56,7 +56,7 @@ export async function POST({ request }) {
     const userPrompt = `เขียนบทความเรื่อง "${keyword}" ${category ? `ในหมวดหมู่ "${category}"` : ''}
 
 กรุณาเขียนบทความที่ครบถ้วน ให้ข้อมูลที่มีประโยชน์ และอ้างอิงงานวิจัย
-ตอบกลับเป็น JSON ตาม format ที่กำหนดเท่านั้น`;
+ตอบกลับเป็น JSON ตาม format ที่กำหนดเท่านั้น ห้ามมีคำอธิบายอื่นนอก JSON และระวังเรื่องเครื่องหมายคำพูด (double quotes) ในเนื้อหาให้ escape ให้ถูกต้องด้วย`;
 
     try {
         const response = await fetch(
@@ -69,7 +69,7 @@ export async function POST({ request }) {
                         { role: 'user', parts: [{ text: SYSTEM_PROMPT + '\n\n' + userPrompt }] }
                     ],
                     generationConfig: {
-                        temperature: 0.7,
+                        temperature: 0.1,
                         maxOutputTokens: 8192,
                         responseMimeType: 'application/json',
                     },
@@ -91,6 +91,9 @@ export async function POST({ request }) {
 
         // Sanitize: Extract JSON if it's wrapped in markdown or has trailing text
         try {
+            // Remove markdown code blocks if present
+            text = text.replace(/```json\n?|```/g, '').trim();
+
             // Find the first { and last }
             const firstBrace = text.indexOf('{');
             const lastBrace = text.lastIndexOf('}');
@@ -98,17 +101,39 @@ export async function POST({ request }) {
                 text = text.substring(firstBrace, lastBrace + 1);
             }
 
+            // Fix common AI JSON errors: unescaped control characters in multi-line strings
+            // This is a common issue with long content fields
+            const sanitizedText = text
+                .replace(/\n/g, "\\n") // Escape literal newlines
+                .replace(/\r/g, "\\r")
+                .replace(/\t/g, "\\t");
+
+            // However, the above might break the JSON structure itself.
+            // Better approach: use a more robust JSON cleaner or tell model to be stricter.
+
             const article = JSON.parse(text);
             return new Response(JSON.stringify({ success: true, article }), {
                 headers: { 'Content-Type': 'application/json' },
             });
         } catch (parseErr) {
-            console.error('JSON Parse Error:', parseErr, 'Raw Text:', text);
-            return new Response(JSON.stringify({
-                error: 'AI returned invalid JSON format',
-                detail: parseErr.message,
-                raw: text.substring(0, 100) + '...'
-            }), { status: 502 });
+            console.error('JSON Parse Error:', parseErr, 'Raw Text Length:', text.length);
+            // Try one more fallback: if it's just unescaped newlines in the content field
+            try {
+                // Aggressive fix for unescaped newlines in strings
+                const fixedText = text.replace(/(?<=: \".*)\n(?=.*\"[,\}])/g, "\\n");
+                const article = JSON.parse(fixedText);
+                return new Response(JSON.stringify({ success: true, article }), {
+                    headers: { 'Content-Type': 'application/json' },
+                });
+            } catch (fallbackErr) {
+                return new Response(JSON.stringify({
+                    error: 'AI returned invalid JSON format',
+                    detail: parseErr.message,
+                    hint: 'The article might be too long for the AI to format correctly. Try a shorter keyword.',
+                    raw_start: text.substring(0, 100),
+                    raw_end: text.substring(text.length - 100)
+                }), { status: 502 });
+            }
         }
     } catch (err) {
         return new Response(JSON.stringify({ error: err.message }), { status: 500 });

@@ -54,6 +54,9 @@ export const prerender = false;
                         <option value="published">เผยแพร่แล้ว</option>
                         <option value="rejected">ปฏิเสธ</option>
                     </select>
+                    <button class="btn-primary" onclick="openCompose()"
+                        >✍️ เขียนบทความ</button
+                    >
                     <button class="btn-secondary" onclick="loadArticles()"
                         >🔄 รีเฟรช</button
                     >
@@ -123,6 +126,103 @@ export const prerender = false;
                             >
                             <button class="btn-reject" id="rejectBtn"
                                 >❌ ปฏิเสธ</button
+                            >
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Compose Article Modal -->
+            <div id="composeModal" class="modal" style="display:none">
+                <div class="modal-content compose-modal">
+                    <div class="modal-header">
+                        <h2>✍️ เขียนบทความใหม่</h2>
+                        <button class="close-btn" onclick="closeCompose()"
+                            >✕</button
+                        >
+                    </div>
+                    <div class="compose-form">
+                        <div class="form-row">
+                            <div class="form-group full">
+                                <label>หัวข้อบทความ *</label>
+                                <input
+                                    type="text"
+                                    id="compTitle"
+                                    placeholder="เช่น CGM คืออะไร ทำไมคนรักสุขภาพต้องรู้"
+                                />
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Slug (URL)</label>
+                                <input
+                                    type="text"
+                                    id="compSlug"
+                                    placeholder="auto-generated ถ้าไม่ระบุ"
+                                />
+                            </div>
+                            <div class="form-group">
+                                <label>หมวดหมู่</label>
+                                <input
+                                    type="text"
+                                    id="compCategory"
+                                    placeholder="เบาหวาน"
+                                />
+                            </div>
+                        </div>
+                        <div class="form-group full">
+                            <label>Excerpt (สรุปสั้นๆ)</label>
+                            <textarea
+                                id="compExcerpt"
+                                rows="2"
+                                placeholder="สรุป 2-3 ประโยค สำหรับ meta description"
+                            ></textarea>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>SEO Description</label>
+                                <input
+                                    type="text"
+                                    id="compSEO"
+                                    placeholder="150-160 ตัวอักษร"
+                                />
+                            </div>
+                            <div class="form-group">
+                                <label>Direct Answer</label>
+                                <input
+                                    type="text"
+                                    id="compAnswer"
+                                    placeholder="คำตอบสั้น 40-60 คำ"
+                                />
+                            </div>
+                        </div>
+                        <div class="form-group full">
+                            <label>เนื้อหาบทความ * (HTML)</label>
+                            <textarea
+                                id="compContent"
+                                rows="14"
+                                placeholder="<h2>หัวข้อ</h2>
+<p>เนื้อหา...</p>"
+                            ></textarea>
+                        </div>
+                        <div class="form-group full">
+                            <label>Tags (คั่นด้วย comma)</label>
+                            <input
+                                type="text"
+                                id="compTags"
+                                placeholder="CGM, เบาหวาน, น้ำตาลในเลือด"
+                            />
+                        </div>
+                        <div class="compose-actions">
+                            <button
+                                class="btn-secondary"
+                                onclick="closeCompose()">ยกเลิก</button
+                            >
+                            <button
+                                class="btn-primary"
+                                id="compSubmitBtn"
+                                onclick="createArticle()"
+                                >💾 บันทึกบทความ</button
                             >
                         </div>
                     </div>
@@ -349,6 +449,101 @@ export const prerender = false;
                 if (!keyword) return;
                 alert(`Keyword "${keyword}" จะถูกเพิ่มเมื่อ API พร้อมใช้งาน`);
             }
+
+            // ── Compose Article ──
+            function openCompose() {
+                document.getElementById("composeModal").style.display = "flex";
+                document.body.style.overflow = "hidden";
+                document.getElementById("compTitle").focus();
+            }
+
+            function closeCompose() {
+                document.getElementById("composeModal").style.display = "none";
+                document.body.style.overflow = "";
+                // Reset form
+                [
+                    "compTitle",
+                    "compSlug",
+                    "compCategory",
+                    "compExcerpt",
+                    "compSEO",
+                    "compAnswer",
+                    "compContent",
+                    "compTags",
+                ].forEach((id) => {
+                    document.getElementById(id).value = "";
+                });
+            }
+
+            async function createArticle() {
+                const title = document.getElementById("compTitle").value.trim();
+                const content = document
+                    .getElementById("compContent")
+                    .value.trim();
+
+                if (!title || !content) {
+                    alert("กรุณากรอกหัวข้อและเนื้อหาบทความ");
+                    return;
+                }
+
+                const btn = document.getElementById("compSubmitBtn");
+                btn.disabled = true;
+                btn.textContent = "⏳ กำลังบันทึก...";
+
+                const tagsStr = document.getElementById("compTags").value;
+                const tags = tagsStr
+                    ? tagsStr
+                          .split(",")
+                          .map((t) => t.trim())
+                          .filter(Boolean)
+                    : [];
+
+                try {
+                    const res = await fetch("/api/create-article", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            key: adminKey,
+                            title,
+                            slug: document
+                                .getElementById("compSlug")
+                                .value.trim(),
+                            content,
+                            excerpt: document
+                                .getElementById("compExcerpt")
+                                .value.trim(),
+                            seo_description: document
+                                .getElementById("compSEO")
+                                .value.trim(),
+                            direct_answer: document
+                                .getElementById("compAnswer")
+                                .value.trim(),
+                            category: document
+                                .getElementById("compCategory")
+                                .value.trim(),
+                            tags,
+                        }),
+                    });
+                    const result = await res.json();
+
+                    if (result.success) {
+                        alert(
+                            `✅ บทความ "${result.article.title}" ถูกบันทึกแล้ว!`
+                        );
+                        closeCompose();
+                        document.getElementById("statusFilter").value =
+                            "review";
+                        loadArticles();
+                    } else {
+                        alert("❌ " + (result.error || "เกิดข้อผิดพลาด"));
+                    }
+                } catch (err) {
+                    alert("❌ เกิดข้อผิดพลาด: " + err.message);
+                }
+
+                btn.disabled = false;
+                btn.textContent = "💾 บันทึกบทความ";
+            }
         </script>
 
         <style is:global>
@@ -493,6 +688,88 @@ export const prerender = false;
             }
             .btn-danger-sm:hover {
                 background: #ef44441a;
+            }
+            .btn-primary {
+                padding: 0.5rem 1rem;
+                background: linear-gradient(135deg, #0ea5e9, #0284c7);
+                color: white;
+                border: none;
+                border-radius: 0.375rem;
+                font-size: 0.85rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: transform 0.15s;
+            }
+            .btn-primary:hover {
+                transform: scale(1.02);
+            }
+            .btn-primary:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+                transform: none;
+            }
+
+            /* Compose Form */
+            .compose-modal {
+                max-width: 900px;
+            }
+            .compose-form {
+                display: flex;
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+            .form-row {
+                display: flex;
+                gap: 0.75rem;
+            }
+            .form-group {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                gap: 0.25rem;
+            }
+            .form-group.full {
+                width: 100%;
+            }
+            .compose-form label {
+                font-size: 0.75rem;
+                font-weight: 600;
+                color: #94a3b8;
+                text-transform: uppercase;
+                letter-spacing: 0.03em;
+            }
+            .compose-form input,
+            .compose-form textarea {
+                width: 100%;
+                padding: 0.6rem 0.75rem;
+                background: #0f172a;
+                border: 1px solid #334155;
+                border-radius: 0.375rem;
+                color: #e2e8f0;
+                font-size: 0.9rem;
+                font-family: inherit;
+                outline: none;
+                transition: border-color 0.15s;
+            }
+            .compose-form input:focus,
+            .compose-form textarea:focus {
+                border-color: #0ea5e9;
+            }
+            .compose-form textarea {
+                resize: vertical;
+            }
+            .compose-actions {
+                display: flex;
+                justify-content: flex-end;
+                gap: 0.75rem;
+                margin-top: 0.5rem;
+                padding-top: 1rem;
+                border-top: 1px solid #334155;
+            }
+            @media (max-width: 640px) {
+                .form-row {
+                    flex-direction: column;
+                }
             }
 
             /* Keywords Panel */

@@ -83,16 +83,33 @@ export async function POST({ request }) {
         }
 
         const data = await response.json();
-        const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        let text = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
         if (!text) {
             return new Response(JSON.stringify({ error: 'No content from Gemini' }), { status: 502 });
         }
 
-        const article = JSON.parse(text);
-        return new Response(JSON.stringify({ success: true, article }), {
-            headers: { 'Content-Type': 'application/json' },
-        });
+        // Sanitize: Extract JSON if it's wrapped in markdown or has trailing text
+        try {
+            // Find the first { and last }
+            const firstBrace = text.indexOf('{');
+            const lastBrace = text.lastIndexOf('}');
+            if (firstBrace !== -1 && lastBrace !== -1) {
+                text = text.substring(firstBrace, lastBrace + 1);
+            }
+
+            const article = JSON.parse(text);
+            return new Response(JSON.stringify({ success: true, article }), {
+                headers: { 'Content-Type': 'application/json' },
+            });
+        } catch (parseErr) {
+            console.error('JSON Parse Error:', parseErr, 'Raw Text:', text);
+            return new Response(JSON.stringify({
+                error: 'AI returned invalid JSON format',
+                detail: parseErr.message,
+                raw: text.substring(0, 100) + '...'
+            }), { status: 502 });
+        }
     } catch (err) {
         return new Response(JSON.stringify({ error: err.message }), { status: 500 });
     }

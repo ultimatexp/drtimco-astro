@@ -64,24 +64,8 @@ const breadcrumbs = [
             <nav class="top-bar-nav">
                 <a href="/">หน้าแรก</a>
                 <a href="/cgm">คอร์ส CGM</a>
+                <a href="#hero">VIP Coaching</a>
             </nav>
-            <a
-                href={lineUrl}
-                target="_blank"
-                rel="noopener"
-                class="nav-cta-btn"
-            >
-                สมัคร VIP
-                <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    ><path
-                        d="M24 10.5C24 4.701 18.627 0 12 0S0 4.701 0 10.5c0 5.19 4.604 9.537 10.824 10.362.42.092.992.28 1.137.641.13.328.085.84.042 1.17l-.184 1.107c-.056.328-.26 1.284 1.124.7 1.384-.584 7.466-4.396 10.184-7.525C25.18 14.703 24 12.727 24 10.5z"
-                    ></path>
-                </svg>
-            </a>
         </div>
     </header>
 
@@ -623,6 +607,18 @@ const breadcrumbs = [
             </p>
         </div>
     </section>
+
+    <!-- ═══ FIXED MOBILE CTA ═══ -->
+    <div class="mobile-cta-bar">
+        <a href={lineUrl} target="_blank" rel="noopener" class="mobile-cta-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"
+                ><path
+                    d="M24 10.5C24 4.701 18.627 0 12 0S0 4.701 0 10.5c0 5.19 4.604 9.537 10.824 10.362.42.092.992.28 1.137.641.13.328.085.84.042 1.17l-.184 1.107c-.056.328-.26 1.284 1.124.7 1.384-.584 7.466-4.396 10.184-7.525C25.18 14.703 24 12.727 24 10.5z"
+                ></path>
+            </svg>
+            สมัครคัดกรอง VIP — เหลือ 3 ที่นั่ง
+        </a>
+    </div>
 
     <!-- ═══ FOOTER ═══ -->
     <footer class="cgm-footer">
@@ -1496,7 +1492,51 @@ const breadcrumbs = [
         font-size: 26px;
     }
     /* RESPONSIVE */
+    /* MOBILE CTA BAR */
+    .mobile-cta-bar {
+        display: none;
+    }
     @media (max-width: 768px) {
+        .header-cta {
+            display: none;
+        }
+        .mobile-cta-bar {
+            display: block;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 12px 16px;
+            background: rgba(10, 15, 13, 0.95);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-top: 1px solid rgba(20, 184, 166, 0.2);
+            padding-bottom: max(12px, env(safe-area-inset-bottom));
+        }
+        .mobile-cta-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 16px 24px;
+            background: #06c755;
+            color: white;
+            font-size: 16px;
+            font-weight: 800;
+            border-radius: 999px;
+            text-decoration: none;
+            box-shadow: 0 -4px 24px rgba(6, 199, 85, 0.3);
+            animation: cta-pulse 3s ease-in-out infinite;
+        }
+        .mobile-cta-btn:hover {
+            background: #05b04a;
+            color: white;
+        }
+        .cgm-footer .section-inner {
+            padding-bottom: 80px;
+        }
         .problem-grid {
             grid-template-columns: 1fr;
         }

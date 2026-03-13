@@ -2,7 +2,7 @@
 /**
  * Homepage — drtim.co
  * Premium blog homepage with editorial layout.
- * 
+ *
  * Design patterns from Refero research:
  * - Hero featured post with image overlay (Typeform/Craft pattern)
  * - Horizontal category pills (The Leap/Monarch pattern)
@@ -10,11 +10,11 @@
  * - 3-column card grid for latest (Duolingo/Grammarly pattern)
  * - Clean typography with Inter font (Craft/Fibery pattern)
  */
-import BaseLayout from '../layouts/BaseLayout.astro';
-import DirectAnswerBox from '../components/DirectAnswerBox.astro';
-import SearchModal from '../components/SearchModal.astro';
-import FAQSection from '../components/FAQSection.astro';
-import { getTranslations } from '../i18n/translations.js';
+import BaseLayout from "../layouts/BaseLayout.astro";
+import DirectAnswerBox from "../components/DirectAnswerBox.astro";
+import SearchModal from "../components/SearchModal.astro";
+import FAQSection from "../components/FAQSection.astro";
+import { getTranslations } from "../i18n/translations.js";
 import {
   getAllPosts,
   getCategories,
@@ -23,9 +23,9 @@ import {
   formatDate,
   localizeImageUrl,
   getAuthorName,
-} from '../lib/api.js';
+} from "../lib/api.js";
 
-const ui = getTranslations('th');
+const ui = getTranslations("th");
 
 const allPosts = getAllPosts();
 const categories = getCategories();
@@ -41,36 +41,45 @@ const morePosts = allPosts.slice(9, 15);
 // Targets: การรักษาเบาหวาน โดยไม่ใช้ยา, การใช้ CGM, Functional Medicine
 const faqItems = [
   {
-    question: 'Functional Medicine คืออะไร? ต่างจากการรักษาแบบทั่วไปอย่างไร?',
-    answer: 'Functional Medicine คือแนวทางการแพทย์ที่มุ่งค้นหาสาเหตุรากของโรค (Root-Cause) แทนการรักษาแค่อาการ โดยวิเคราะห์ระบบเมตาบอลิก ฮอร์โมน และสารอาหารอย่างครอบคลุม เพื่อออกแบบแผนการรักษาเฉพาะบุคคล ต่างจากการแพทย์แบบทั่วไปที่เน้นรักษาอาการด้วยยาเป็นหลัก',
+    question: "Functional Medicine คืออะไร? ต่างจากการรักษาแบบทั่วไปอย่างไร?",
+    answer:
+      "Functional Medicine คือแนวทางการแพทย์ที่มุ่งค้นหาสาเหตุรากของโรค (Root-Cause) แทนการรักษาแค่อาการ โดยวิเคราะห์ระบบเมตาบอลิก ฮอร์โมน และสารอาหารอย่างครอบคลุม เพื่อออกแบบแผนการรักษาเฉพาะบุคคล ต่างจากการแพทย์แบบทั่วไปที่เน้นรักษาอาการด้วยยาเป็นหลัก",
   },
   {
-    question: 'การรักษาเบาหวานโดยไม่ใช้ยา ทำได้จริงหรือ?',
-    answer: 'การรักษาเบาหวานโดยไม่ใช้ยาสามารถทำได้จริงในผู้ป่วยเบาหวานชนิดที่ 2 ระยะเริ่มต้น ด้วยการปรับอาหาร ออกกำลังกาย ควบคุมน้ำหนัก และติดตามน้ำตาลด้วย CGM อย่างใกล้ชิด หมอทิมใช้แนวทาง Functional Medicine วิเคราะห์สาเหตุของภาวะดื้ออินซูลินและออกแบบแผนรักษาเฉพาะบุคคล ช่วยให้ผู้ป่วยหลายรายลดยาหรือหยุดยาได้สำเร็จ',
+    question: "การรักษาเบาหวานโดยไม่ใช้ยา ทำได้จริงหรือ?",
+    answer:
+      "การรักษาเบาหวานโดยไม่ใช้ยาสามารถทำได้จริงในผู้ป่วยเบาหวานชนิดที่ 2 ระยะเริ่มต้น ด้วยการปรับอาหาร ออกกำลังกาย ควบคุมน้ำหนัก และติดตามน้ำตาลด้วย CGM อย่างใกล้ชิด หมอทิมใช้แนวทาง Functional Medicine วิเคราะห์สาเหตุของภาวะดื้ออินซูลินและออกแบบแผนรักษาเฉพาะบุคคล ช่วยให้ผู้ป่วยหลายรายลดยาหรือหยุดยาได้สำเร็จ",
   },
   {
-    question: 'CGM (Continuous Glucose Monitor) คืออะไร? มีประโยชน์อย่างไร?',
-    answer: 'CGM คือเครื่องวัดน้ำตาลแบบต่อเนื่อง ติดที่ผิวหนังเพื่อวัดระดับน้ำตาลตลอด 24 ชั่วโมง ช่วยให้เห็นผลกระทบของอาหารแต่ละมื้อต่อน้ำตาลในเลือดแบบ real-time ทำให้แพทย์และผู้ป่วยปรับแผนอาหารและการออกกำลังกายได้อย่างแม่นยำ เป็นเครื่องมือสำคัญในการรักษาเบาหวานแบบไม่ใช้ยา',
+    question: "CGM (Continuous Glucose Monitor) คืออะไร? มีประโยชน์อย่างไร?",
+    answer:
+      "CGM คือเครื่องวัดน้ำตาลแบบต่อเนื่อง ติดที่ผิวหนังเพื่อวัดระดับน้ำตาลตลอด 24 ชั่วโมง ช่วยให้เห็นผลกระทบของอาหารแต่ละมื้อต่อน้ำตาลในเลือดแบบ real-time ทำให้แพทย์และผู้ป่วยปรับแผนอาหารและการออกกำลังกายได้อย่างแม่นยำ เป็นเครื่องมือสำคัญในการรักษาเบาหวานแบบไม่ใช้ยา",
   },
   {
-    question: 'ใครเหมาะกับการใช้ CGM ติดตามน้ำตาล?',
-    answer: 'การใช้ CGM เหมาะกับผู้ป่วยเบาหวานชนิดที่ 2, ผู้ที่มีภาวะ prediabetes หรือดื้ออินซูลิน, ผู้ที่ต้องการลดน้ำหนักอย่างมีประสิทธิภาพ และผู้ที่สนใจ biohacking เพื่อสุขภาพเชิงป้องกัน หมอทิมแนะนำ CGM เป็นส่วนหนึ่งของแผนการรักษาเบาหวานโดยไม่ใช้ยาที่ Ultramed Clinic ชลบุรี',
+    question: "ใครเหมาะกับการใช้ CGM ติดตามน้ำตาล?",
+    answer:
+      "การใช้ CGM เหมาะกับผู้ป่วยเบาหวานชนิดที่ 2, ผู้ที่มีภาวะ prediabetes หรือดื้ออินซูลิน, ผู้ที่ต้องการลดน้ำหนักอย่างมีประสิทธิภาพ และผู้ที่สนใจ biohacking เพื่อสุขภาพเชิงป้องกัน หมอทิมแนะนำ CGM เป็นส่วนหนึ่งของแผนการรักษาเบาหวานโดยไม่ใช้ยาที่ Ultramed Clinic ชลบุรี",
   },
   {
-    question: 'Metabolic Health คืออะไร? ทำไมถึงสำคัญ?',
-    answer: 'Metabolic Health คือสุขภาพเชิงเมตาบอลิก หมายถึงความสามารถของร่างกายในการควบคุมน้ำตาล ไขมัน ความดัน และน้ำหนักให้อยู่ในเกณฑ์ปกติ ผู้ที่มี metabolic health ไม่ดีเสี่ยงต่อเบาหวาน โรคหัวใจ และโรคเรื้อรังอื่นๆ การตรวจเลือดและใช้ CGM ช่วยประเมินและปรับปรุง metabolic health ได้อย่างมีประสิทธิภาพ',
+    question: "Metabolic Health คืออะไร? ทำไมถึงสำคัญ?",
+    answer:
+      "Metabolic Health คือสุขภาพเชิงเมตาบอลิก หมายถึงความสามารถของร่างกายในการควบคุมน้ำตาล ไขมัน ความดัน และน้ำหนักให้อยู่ในเกณฑ์ปกติ ผู้ที่มี metabolic health ไม่ดีเสี่ยงต่อเบาหวาน โรคหัวใจ และโรคเรื้อรังอื่นๆ การตรวจเลือดและใช้ CGM ช่วยประเมินและปรับปรุง metabolic health ได้อย่างมีประสิทธิภาพ",
   },
   {
-    question: 'ภาวะดื้ออินซูลิน (Insulin Resistance) รักษาได้อย่างไร?',
-    answer: 'ภาวะดื้ออินซูลินรักษาได้ด้วยการปรับอาหารแบบ low-carb หรือ time-restricted eating ร่วมกับการออกกำลังกายแบบ resistance training ติดตามผลด้วย CGM และตรวจเลือดสม่ำเสมอ หมอทิมใช้แนวทาง Functional Medicine วิเคราะห์สาเหตุเชิงลึก ช่วยให้ผู้ป่วยฟื้นฟูความไวต่ออินซูลินโดยไม่ต้องพึ่งยา',
+    question: "ภาวะดื้ออินซูลิน (Insulin Resistance) รักษาได้อย่างไร?",
+    answer:
+      "ภาวะดื้ออินซูลินรักษาได้ด้วยการปรับอาหารแบบ low-carb หรือ time-restricted eating ร่วมกับการออกกำลังกายแบบ resistance training ติดตามผลด้วย CGM และตรวจเลือดสม่ำเสมอ หมอทิมใช้แนวทาง Functional Medicine วิเคราะห์สาเหตุเชิงลึก ช่วยให้ผู้ป่วยฟื้นฟูความไวต่ออินซูลินโดยไม่ต้องพึ่งยา",
   },
   {
-    question: 'Ultramed Clinic อยู่ที่ไหน? นัดพบแพทย์อย่างไร?',
-    answer: 'Ultramed Clinic ตั้งอยู่ที่จังหวัดชลบุรี ประเทศไทย ให้บริการด้าน Functional Medicine โดยหมอทิม สามารถนัดพบแพทย์ผ่านทาง LINE Official (@dr.timdietclinic) หรือ Facebook Page "Dr. Tim Diet Clinic" เปิดให้บริการทั้งนัดพบตัวและปรึกษาออนไลน์ (Telemedicine)',
+    question: "Ultramed Clinic อยู่ที่ไหน? นัดพบแพทย์อย่างไร?",
+    answer:
+      'Ultramed Clinic ตั้งอยู่ที่จังหวัดชลบุรี ประเทศไทย ให้บริการด้าน Functional Medicine โดยหมอทิม สามารถนัดพบแพทย์ผ่านทาง LINE Official (@dr.timdietclinic) หรือ Facebook Page "Dr. Tim Diet Clinic" เปิดให้บริการทั้งนัดพบตัวและปรึกษาออนไลน์ (Telemedicine)',
   },
   {
-    question: 'การตรวจเลือดแบบ Functional Medicine ต่างจากตรวจเลือดทั่วไปอย่างไร?',
-    answer: 'การตรวจเลือดแบบ Functional Medicine ครอบคลุมมากกว่าการตรวจทั่วไป โดยวิเคราะห์ biomarkers เชิงลึก เช่น insulin, HbA1c, HOMA-IR, thyroid panel, vitamin D, B12, ferritin และ inflammation markers เพื่อค้นหาความผิดปกติตั้งแต่ระยะเริ่มต้น ก่อนที่จะพัฒนาเป็นโรคเรื้อรัง',
+    question:
+      "การตรวจเลือดแบบ Functional Medicine ต่างจากตรวจเลือดทั่วไปอย่างไร?",
+    answer:
+      "การตรวจเลือดแบบ Functional Medicine ครอบคลุมมากกว่าการตรวจทั่วไป โดยวิเคราะห์ biomarkers เชิงลึก เช่น insulin, HbA1c, HOMA-IR, thyroid panel, vitamin D, B12, ferritin และ inflammation markers เพื่อค้นหาความผิดปกติตั้งแต่ระยะเริ่มต้น ก่อนที่จะพัฒนาเป็นโรคเรื้อรัง",
   },
 ];
 ---
@@ -91,19 +100,93 @@ const faqItems = [
       <nav class="top-bar-nav">
         <a href="/blog">{ui.blog}</a>
         <a href="/">{ui.home}</a>
+        <div class="nav-dropdown">
+          <button class="nav-dropdown-trigger" type="button">
+            บริการ
+            <svg
+              class="nav-dropdown-arrow"
+              width="10"
+              height="10"
+              viewBox="0 0 24 24"
+              fill="none"
+              ><path
+                d="M6 9l6 6 6-6"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"></path>
+            </svg>
+          </button>
+          <div class="nav-dropdown-menu">
+            <a href="/cgm" class="dropdown-item">
+              <span class="dropdown-icon">📟</span>
+              <div>
+                <strong>คอร์ส CGM</strong>
+                <span>รักษาเบาหวานด้วย CGM · 14 วัน</span>
+              </div>
+            </a>
+            <a href="/vip-coaching" class="dropdown-item dropdown-item-vip">
+              <span class="dropdown-icon">💎</span>
+              <div>
+                <strong>VIP 1:1 Coaching</strong>
+                <span>ดูแลตัวต่อตัว 12 สัปดาห์</span>
+              </div>
+            </a>
+          </div>
+        </div>
       </nav>
       <div class="top-bar-social">
-        <a href="https://www.facebook.com/dr.timdietclinic/" target="_blank" rel="noopener" aria-label="Facebook" class="social-icon">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+        <a
+          href="https://www.facebook.com/dr.timdietclinic/"
+          target="_blank"
+          rel="noopener"
+          aria-label="Facebook"
+          class="social-icon"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"
+            ><path
+              d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"
+            ></path>
+          </svg>
         </a>
-        <a href="https://www.youtube.com/@dr.timdietclinic" target="_blank" rel="noopener" aria-label="YouTube" class="social-icon">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+        <a
+          href="https://www.youtube.com/@dr.timdietclinic"
+          target="_blank"
+          rel="noopener"
+          aria-label="YouTube"
+          class="social-icon"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"
+            ><path
+              d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"
+            ></path>
+          </svg>
         </a>
-        <a href="https://www.instagram.com/dr.timdietclinic/" target="_blank" rel="noopener" aria-label="Instagram" class="social-icon">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+        <a
+          href="https://www.instagram.com/dr.timdietclinic/"
+          target="_blank"
+          rel="noopener"
+          aria-label="Instagram"
+          class="social-icon"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"
+            ><path
+              d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"
+            ></path>
+          </svg>
         </a>
-        <a href="https://lin.ee/LwEtisp" target="_blank" rel="noopener" aria-label="LINE" class="social-icon">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19.365 9.864c.058 0 .104.048.104.108v.86c0 .06-.046.108-.104.108h-1.954v.604h1.954c.058 0 .104.048.104.108v.86c0 .06-.046.108-.104.108h-2.922a.108.108 0 0 1-.108-.108V9.08c0-.06.048-.108.108-.108h2.922c.058 0 .104.048.104.108v.86c0 .06-.046.108-.104.108h-1.954v.604h1.954zm-4.553 2.756a.108.108 0 0 1-.09.048h-.852a.108.108 0 0 1-.092-.052l-1.544-2.088v1.932c0 .06-.048.108-.108.108h-.86a.108.108 0 0 1-.108-.108V9.08c0-.06.048-.108.108-.108h.86a.108.108 0 0 1 .09.048l1.544 2.088V9.08c0-.06.048-.108.108-.108h.86c.06 0 .108.048.108.108v2.844c0 .06-.048.108-.108.108h-.86a.104.104 0 0 1-.016-.004zM9.473 12.62h-.86a.108.108 0 0 1-.108-.108V9.08c0-.06.048-.108.108-.108h.86c.06 0 .108.048.108.108v3.432c0 .06-.048.108-.108.108zm-1.837 0h-2.92a.108.108 0 0 1-.108-.108V9.08c0-.06.048-.108.107-.108h.86c.06 0 .108.048.108.108v2.572h1.953c.058 0 .104.048.104.108v.86c0 .06-.046.108-.104.108zM24 10.5C24 4.701 18.627 0 12 0S0 4.701 0 10.5c0 5.19 4.604 9.537 10.824 10.362.42.092.992.28 1.137.641.13.328.085.84.042 1.17l-.184 1.107c-.056.328-.26 1.284 1.124.7 1.384-.584 7.466-4.396 10.184-7.525C25.18 14.703 24 12.727 24 10.5z"/></svg>
+        <a
+          href="https://lin.ee/LwEtisp"
+          target="_blank"
+          rel="noopener"
+          aria-label="LINE"
+          class="social-icon"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"
+            ><path
+              d="M19.365 9.864c.058 0 .104.048.104.108v.86c0 .06-.046.108-.104.108h-1.954v.604h1.954c.058 0 .104.048.104.108v.86c0 .06-.046.108-.104.108h-2.922a.108.108 0 0 1-.108-.108V9.08c0-.06.048-.108.108-.108h2.922c.058 0 .104.048.104.108v.86c0 .06-.046.108-.104.108h-1.954v.604h1.954zm-4.553 2.756a.108.108 0 0 1-.09.048h-.852a.108.108 0 0 1-.092-.052l-1.544-2.088v1.932c0 .06-.048.108-.108.108h-.86a.108.108 0 0 1-.108-.108V9.08c0-.06.048-.108.108-.108h.86a.108.108 0 0 1 .09.048l1.544 2.088V9.08c0-.06.048-.108.108-.108h.86c.06 0 .108.048.108.108v2.844c0 .06-.048.108-.108.108h-.86a.104.104 0 0 1-.016-.004zM9.473 12.62h-.86a.108.108 0 0 1-.108-.108V9.08c0-.06.048-.108.108-.108h.86c.06 0 .108.048.108.108v3.432c0 .06-.048.108-.108.108zm-1.837 0h-2.92a.108.108 0 0 1-.108-.108V9.08c0-.06.048-.108.107-.108h.86c.06 0 .108.048.108.108v2.572h1.953c.058 0 .104.048.104.108v.86c0 .06-.046.108-.104.108zM24 10.5C24 4.701 18.627 0 12 0S0 4.701 0 10.5c0 5.19 4.604 9.537 10.824 10.362.42.092.992.28 1.137.641.13.328.085.84.042 1.17l-.184 1.107c-.056.328-.26 1.284 1.124.7 1.384-.584 7.466-4.396 10.184-7.525C25.18 14.703 24 12.727 24 10.5z"
+            ></path>
+          </svg>
         </a>
       </div>
       <SearchModal />
@@ -118,20 +201,22 @@ const faqItems = [
           <span class="badge-dot"></span>
           {ui.latestArticle}
         </span>
-        <h1 class="hero-title" set:html={heroPost.title} />
+        <h1 class="hero-title" set:html={heroPost.title}></h1>
         <p class="hero-excerpt">
           {stripHtml(heroPost.excerpt).substring(0, 180)}…
         </p>
         <div class="hero-meta">
-          {heroPost.author?.avatar && (
-            <img
-              src={heroPost.author.avatar}
-              alt={heroPost.author.name}
-              class="hero-avatar"
-              width="32"
-              height="32"
-            />
-          )}
+          {
+            heroPost.author?.avatar && (
+              <img
+                src={heroPost.author.avatar}
+                alt={heroPost.author.name}
+                class="hero-avatar"
+                width="32"
+                height="32"
+              />
+            )
+          }
           <span class="hero-author">{getAuthorName(heroPost.author)}</span>
           <span class="hero-separator">·</span>
           <time datetime={heroPost.date}>{formatDate(heroPost.date)}</time>
@@ -139,52 +224,80 @@ const faqItems = [
         <a href={`/blog/${heroPost.slug}`} class="hero-cta">
           {ui.readArticle}
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M3 8h10m0 0L9 4m4 4L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path
+              d="M3 8h10m0 0L9 4m4 4L9 12"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"></path>
           </svg>
         </a>
       </div>
       <div class="hero-image-wrapper">
-        {heroPost.featuredImage?.sourceUrl ? (
-          <a href={`/blog/${heroPost.slug}`} class="hero-image-link">
-            <img
-              src={localizeImageUrl(heroPost.featuredImage.sourceUrl)}
-              alt={heroPost.featuredImage.altText || stripHtml(heroPost.title)}
-              class="hero-image"
-              loading="eager"
-              fetchpriority="high"
-              width="1024"
-              height="683"
-            />
-          </a>
-        ) : (
-          <div class="hero-image-placeholder">
-            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" opacity="0.3">
-              <path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z" stroke="currentColor" stroke-width="1.5"/>
-              <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/>
-              <path d="m21 15-5-5L5 21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-            </svg>
-          </div>
-        )}
+        {
+          heroPost.featuredImage?.sourceUrl ? (
+            <a href={`/blog/${heroPost.slug}`} class="hero-image-link">
+              <img
+                src={localizeImageUrl(heroPost.featuredImage.sourceUrl)}
+                alt={
+                  heroPost.featuredImage.altText || stripHtml(heroPost.title)
+                }
+                class="hero-image"
+                loading="eager"
+                fetchpriority="high"
+                width="1024"
+                height="683"
+              />
+            </a>
+          ) : (
+            <div class="hero-image-placeholder">
+              <svg
+                width="64"
+                height="64"
+                viewBox="0 0 24 24"
+                fill="none"
+                opacity="0.3"
+              >
+                <path
+                  d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                />
+                <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor" />
+                <path
+                  d="m21 15-5-5L5 21"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </div>
+          )
+        }
       </div>
     </div>
   </section>
 
   <!-- ═══ CATEGORY PILLS ═══ -->
-  {categories.length > 0 && (
-    <section class="categories-section">
-      <div class="categories-inner">
-        <nav class="category-pills" aria-label="Browse topics">
-          <a href="/blog" class="pill pill-active">{ui.allArticles}</a>
-          {categories.slice(0, 12).map((cat) => (
-            <a href={`/category/${cat.slug}`} class="pill">
-              {cat.name}
-              <span class="pill-count">{cat.count}</span>
+  {
+    categories.length > 0 && (
+      <section class="categories-section">
+        <div class="categories-inner">
+          <nav class="category-pills" aria-label="Browse topics">
+            <a href="/blog" class="pill pill-active">
+              {ui.allArticles}
             </a>
-          ))}
-        </nav>
-      </div>
-    </section>
-  )}
+            {categories.slice(0, 12).map((cat) => (
+              <a href={`/category/${cat.slug}`} class="pill">
+                {cat.name}
+                <span class="pill-count">{cat.count}</span>
+              </a>
+            ))}
+          </nav>
+        </div>
+      </section>
+    )
+  }
 
   <!-- ═══ AEO DIRECT ANSWER (hidden visually, for crawlers) ═══ -->
   <section class="container aeo-section">
@@ -197,43 +310,47 @@ const faqItems = [
   </section>
 
   <!-- ═══ EDITOR'S PICKS — 2-col editorial grid ═══ -->
-  {editorPicks.length > 0 && (
-    <section class="container section-picks">
-      <div class="section-header">
-        <h2 class="section-title">{ui.editorsPicks}</h2>
-        <a href="/blog" class="section-link">{ui.viewAll}</a>
-      </div>
-      <div class="picks-grid">
-        {editorPicks.map((post) => (
-          <article class="pick-card">
-            <a href={`/blog/${post.slug}`} class="pick-link">
-              {post.featuredImage?.sourceUrl && (
-                <div class="pick-image">
-                  <img
-                    src={localizeImageUrl(post.featuredImage.sourceUrl)}
-                    alt={post.featuredImage.altText || stripHtml(post.title)}
-                    loading="lazy"
-                  />
-                </div>
-              )}
-              <div class="pick-body">
-                {post.categories?.[0] && (
-                  <span class="pick-category">{post.categories[0].name}</span>
+  {
+    editorPicks.length > 0 && (
+      <section class="container section-picks">
+        <div class="section-header">
+          <h2 class="section-title">{ui.editorsPicks}</h2>
+          <a href="/blog" class="section-link">
+            {ui.viewAll}
+          </a>
+        </div>
+        <div class="picks-grid">
+          {editorPicks.map((post) => (
+            <article class="pick-card">
+              <a href={`/blog/${post.slug}`} class="pick-link">
+                {post.featuredImage?.sourceUrl && (
+                  <div class="pick-image">
+                    <img
+                      src={localizeImageUrl(post.featuredImage.sourceUrl)}
+                      alt={post.featuredImage.altText || stripHtml(post.title)}
+                      loading="lazy"
+                    />
+                  </div>
                 )}
-                <h3 set:html={post.title} />
-                <p class="pick-excerpt">
-                  {stripHtml(post.excerpt).substring(0, 100)}…
-                </p>
-                <div class="pick-meta">
-                  <time datetime={post.date}>{formatDate(post.date)}</time>
+                <div class="pick-body">
+                  {post.categories?.[0] && (
+                    <span class="pick-category">{post.categories[0].name}</span>
+                  )}
+                  <h3 set:html={post.title} />
+                  <p class="pick-excerpt">
+                    {stripHtml(post.excerpt).substring(0, 100)}…
+                  </p>
+                  <div class="pick-meta">
+                    <time datetime={post.date}>{formatDate(post.date)}</time>
+                  </div>
                 </div>
-              </div>
-            </a>
-          </article>
-        ))}
-      </div>
-    </section>
-  )}
+              </a>
+            </article>
+          ))}
+        </div>
+      </section>
+    )
+  }
 
   <!-- ═══ LATEST ARTICLES — 3-col card grid ═══ -->
   <section class="container section-latest">
@@ -242,74 +359,84 @@ const faqItems = [
       <a href="/blog" class="section-link">{ui.browseAll}</a>
     </div>
     <div class="articles-grid">
-      {latestPosts.map((post, i) => (
-        <article class="article-card">
-          <a href={`/blog/${post.slug}`} class="article-link">
-            {post.featuredImage?.sourceUrl && (
-              <div class="article-image">
-                <img
-                  src={localizeImageUrl(post.featuredImage.sourceUrl)}
-                  alt={post.featuredImage.altText || stripHtml(post.title)}
-                  loading="lazy"
-                />
-                {post.categories?.[0] && (
-                  <span class="article-badge">{post.categories[0].name}</span>
-                )}
+      {
+        latestPosts.map((post, i) => (
+          <article class="article-card">
+            <a href={`/blog/${post.slug}`} class="article-link">
+              {post.featuredImage?.sourceUrl && (
+                <div class="article-image">
+                  <img
+                    src={localizeImageUrl(post.featuredImage.sourceUrl)}
+                    alt={post.featuredImage.altText || stripHtml(post.title)}
+                    loading="lazy"
+                  />
+                  {post.categories?.[0] && (
+                    <span class="article-badge">{post.categories[0].name}</span>
+                  )}
+                </div>
+              )}
+              <div class="article-body">
+                <h3 set:html={post.title} />
+                <p class="article-excerpt">
+                  {stripHtml(post.excerpt).substring(0, 90)}…
+                </p>
+                <div class="article-meta">
+                  <time datetime={post.date}>{formatDate(post.date)}</time>
+                  <span class="article-read">{ui.read}</span>
+                </div>
               </div>
-            )}
-            <div class="article-body">
-              <h3 set:html={post.title} />
-              <p class="article-excerpt">
-                {stripHtml(post.excerpt).substring(0, 90)}…
-              </p>
-              <div class="article-meta">
-                <time datetime={post.date}>{formatDate(post.date)}</time>
-                <span class="article-read">{ui.read}</span>
-              </div>
-            </div>
-          </a>
-        </article>
-      ))}
+            </a>
+          </article>
+        ))
+      }
     </div>
   </section>
 
   <!-- ═══ MORE ARTICLES — Compact list ═══ -->
-  {morePosts.length > 0 && (
-    <section class="container section-more">
-      <div class="section-header">
-        <h2 class="section-title">{ui.moreToExplore}</h2>
-      </div>
-      <div class="more-list">
-        {morePosts.map((post) => (
-          <a href={`/blog/${post.slug}`} class="more-item">
-            <div class="more-content">
-              {post.categories?.[0] && (
-                <span class="more-category">{post.categories[0].name}</span>
+  {
+    morePosts.length > 0 && (
+      <section class="container section-more">
+        <div class="section-header">
+          <h2 class="section-title">{ui.moreToExplore}</h2>
+        </div>
+        <div class="more-list">
+          {morePosts.map((post) => (
+            <a href={`/blog/${post.slug}`} class="more-item">
+              <div class="more-content">
+                {post.categories?.[0] && (
+                  <span class="more-category">{post.categories[0].name}</span>
+                )}
+                <h3 set:html={post.title} />
+                <time datetime={post.date}>{formatDate(post.date)}</time>
+              </div>
+              {post.featuredImage?.sourceUrl && (
+                <img
+                  src={localizeImageUrl(post.featuredImage.sourceUrl)}
+                  alt={stripHtml(post.title)}
+                  class="more-thumb"
+                  loading="lazy"
+                />
               )}
-              <h3 set:html={post.title} />
-              <time datetime={post.date}>{formatDate(post.date)}</time>
-            </div>
-            {post.featuredImage?.sourceUrl && (
-              <img
-                src={localizeImageUrl(post.featuredImage.sourceUrl)}
-                alt={stripHtml(post.title)}
-                class="more-thumb"
-                loading="lazy"
+            </a>
+          ))}
+        </div>
+        <div class="section-cta">
+          <a href="/blog" class="btn-browse">
+            {ui.viewAllArticles} {totalPosts}+
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path
+                d="M3 8h10m0 0L9 4m4 4L9 12"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
               />
-            )}
+            </svg>
           </a>
-        ))}
-      </div>
-      <div class="section-cta">
-        <a href="/blog" class="btn-browse">
-          {ui.viewAllArticles} {totalPosts}+
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M3 8h10m0 0L9 4m4 4L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </a>
-      </div>
-    </section>
-  )}
+        </div>
+      </section>
+    )
+  }
 
   <!-- ═══ FAQ SECTION — AEO Optimized ═══ -->
   <FAQSection items={faqItems} title="คำถามที่พบบ่อย" />
@@ -323,22 +450,34 @@ const faqItems = [
         <div class="about-badge">
           <span class="about-badge-icon">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="currentColor"/>
+              <path
+                d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
+                fill="currentColor"></path>
             </svg>
           </span>
           About Dr. Tim
         </div>
-        <h2 class="about-title">Functional Medicine<br/><span class="about-title-accent">&amp; Metabolic Health</span> Expert</h2>
+        <h2 class="about-title">
+          Functional Medicine<br /><span class="about-title-accent"
+            >&amp; Metabolic Health</span
+          > Expert
+        </h2>
         <p class="about-description">
-          A medical doctor (MD) specializing in Functional Medicine at 
-          <strong>Ultramed Clinic, Chonburi, Thailand</strong>. Focused on evidence-based 
-          root-cause treatment for metabolic health, diabetes management, and longevity.
+          A medical doctor (MD) specializing in Functional Medicine at
+          <strong>Ultramed Clinic, Chonburi, Thailand</strong>. Focused on
+          evidence-based root-cause treatment for metabolic health, diabetes
+          management, and longevity.
         </p>
         <div class="about-highlights">
           <div class="highlight-item">
             <div class="highlight-icon">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <path d="M22 12h-4l-3 9L9 3l-3 9H2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path
+                  d="M22 12h-4l-3 9L9 3l-3 9H2"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"></path>
               </svg>
             </div>
             <span>Metabolic Health</span>
@@ -346,8 +485,15 @@ const faqItems = [
           <div class="highlight-item">
             <div class="highlight-icon">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" stroke="currentColor" stroke-width="2"/>
-                <path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path
+                  d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"
+                  stroke="currentColor"
+                  stroke-width="2"></path>
+                <path
+                  d="M12 6v6l4 2"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"></path>
               </svg>
             </div>
             <span>Longevity Science</span>
@@ -355,7 +501,12 @@ const faqItems = [
           <div class="highlight-item">
             <div class="highlight-icon">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"></path>
               </svg>
             </div>
             <span>Root-Cause Diagnosis</span>
@@ -377,24 +528,68 @@ const faqItems = [
         </div>
         <div class="about-social">
           <span class="about-social-label">Follow</span>
-          <a href="https://www.facebook.com/dr.timdietclinic/" target="_blank" rel="noopener" aria-label="Facebook" class="about-social-link">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          <a
+            href="https://www.facebook.com/dr.timdietclinic/"
+            target="_blank"
+            rel="noopener"
+            aria-label="Facebook"
+            class="about-social-link"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"
+              ><path
+                d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"
+              ></path>
+            </svg>
           </a>
-          <a href="https://www.youtube.com/@dr.timdietclinic" target="_blank" rel="noopener" aria-label="YouTube" class="about-social-link">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+          <a
+            href="https://www.youtube.com/@dr.timdietclinic"
+            target="_blank"
+            rel="noopener"
+            aria-label="YouTube"
+            class="about-social-link"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"
+              ><path
+                d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"
+              ></path>
+            </svg>
           </a>
-          <a href="https://www.instagram.com/dr.timdietclinic/" target="_blank" rel="noopener" aria-label="Instagram" class="about-social-link">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+          <a
+            href="https://www.instagram.com/dr.timdietclinic/"
+            target="_blank"
+            rel="noopener"
+            aria-label="Instagram"
+            class="about-social-link"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"
+              ><path
+                d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"
+              ></path>
+            </svg>
           </a>
-          <a href="https://lin.ee/LwEtisp" target="_blank" rel="noopener" aria-label="LINE" class="about-social-link about-social-line">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19.365 9.864c.058 0 .104.048.104.108v.86c0 .06-.046.108-.104.108h-1.954v.604h1.954c.058 0 .104.048.104.108v.86c0 .06-.046.108-.104.108h-2.922a.108.108 0 0 1-.108-.108V9.08c0-.06.048-.108.108-.108h2.922c.058 0 .104.048.104.108v.86c0 .06-.046.108-.104.108h-1.954v.604h1.954zm-4.553 2.756a.108.108 0 0 1-.09.048h-.852a.108.108 0 0 1-.092-.052l-1.544-2.088v1.932c0 .06-.048.108-.108.108h-.86a.108.108 0 0 1-.108-.108V9.08c0-.06.048-.108.108-.108h.86a.108.108 0 0 1 .09.048l1.544 2.088V9.08c0-.06.048-.108.108-.108h.86c.06 0 .108.048.108.108v2.844c0 .06-.048.108-.108.108h-.86a.104.104 0 0 1-.016-.004zM9.473 12.62h-.86a.108.108 0 0 1-.108-.108V9.08c0-.06.048-.108.108-.108h.86c.06 0 .108.048.108.108v3.432c0 .06-.048.108-.108.108zm-1.837 0h-2.92a.108.108 0 0 1-.108-.108V9.08c0-.06.048-.108.107-.108h.86c.06 0 .108.048.108.108v2.572h1.953c.058 0 .104.048.104.108v.86c0 .06-.046.108-.104.108zM24 10.5C24 4.701 18.627 0 12 0S0 4.701 0 10.5c0 5.19 4.604 9.537 10.824 10.362.42.092.992.28 1.137.641.13.328.085.84.042 1.17l-.184 1.107c-.056.328-.26 1.284 1.124.7 1.384-.584 7.466-4.396 10.184-7.525C25.18 14.703 24 12.727 24 10.5z"/></svg>
+          <a
+            href="https://lin.ee/LwEtisp"
+            target="_blank"
+            rel="noopener"
+            aria-label="LINE"
+            class="about-social-link about-social-line"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"
+              ><path
+                d="M19.365 9.864c.058 0 .104.048.104.108v.86c0 .06-.046.108-.104.108h-1.954v.604h1.954c.058 0 .104.048.104.108v.86c0 .06-.046.108-.104.108h-2.922a.108.108 0 0 1-.108-.108V9.08c0-.06.048-.108.108-.108h2.922c.058 0 .104.048.104.108v.86c0 .06-.046.108-.104.108h-1.954v.604h1.954zm-4.553 2.756a.108.108 0 0 1-.09.048h-.852a.108.108 0 0 1-.092-.052l-1.544-2.088v1.932c0 .06-.048.108-.108.108h-.86a.108.108 0 0 1-.108-.108V9.08c0-.06.048-.108.108-.108h.86a.108.108 0 0 1 .09.048l1.544 2.088V9.08c0-.06.048-.108.108-.108h.86c.06 0 .108.048.108.108v2.844c0 .06-.048.108-.108.108h-.86a.104.104 0 0 1-.016-.004zM9.473 12.62h-.86a.108.108 0 0 1-.108-.108V9.08c0-.06.048-.108.108-.108h.86c.06 0 .108.048.108.108v3.432c0 .06-.048.108-.108.108zm-1.837 0h-2.92a.108.108 0 0 1-.108-.108V9.08c0-.06.048-.108.107-.108h.86c.06 0 .108.048.108.108v2.572h1.953c.058 0 .104.048.104.108v.86c0 .06-.046.108-.104.108zM24 10.5C24 4.701 18.627 0 12 0S0 4.701 0 10.5c0 5.19 4.604 9.537 10.824 10.362.42.092.992.28 1.137.641.13.328.085.84.042 1.17l-.184 1.107c-.056.328-.26 1.284 1.124.7 1.384-.584 7.466-4.396 10.184-7.525C25.18 14.703 24 12.727 24 10.5z"
+              ></path>
+            </svg>
           </a>
         </div>
       </div>
 
       <!-- Right: Profile Photo -->
       <div class="about-photo">
-        <img src="/images/about/drtim.webp" alt="Dr. Tim — Functional Medicine Specialist" loading="lazy" />
+        <img
+          src="/images/about/drtim.webp"
+          alt="Dr. Tim — Functional Medicine Specialist"
+          loading="lazy"
+        />
       </div>
     </div>
   </section>
@@ -403,7 +598,7 @@ const faqItems = [
 <style>
   /* ─── Design Tokens ─── */
   :root {
-    --font-serif: 'Georgia', 'Times New Roman', serif;
+    --font-serif: "Georgia", "Times New Roman", serif;
   }
 
   /* ─── FIXED TOP BAR ─── */
@@ -413,10 +608,10 @@ const faqItems = [
     left: 0;
     right: 0;
     z-index: 50;
-    background: rgba(255,255,255,0.85);
+    background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(0,0,0,0.06);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
   }
 
   .top-bar-inner {
@@ -460,6 +655,87 @@ const faqItems = [
     color: var(--color-primary);
   }
 
+  /* Dropdown */
+  .nav-dropdown {
+    position: relative;
+  }
+  .nav-dropdown-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 0;
+    transition: color 200ms;
+  }
+  .nav-dropdown-trigger:hover {
+    color: var(--color-primary);
+  }
+  .nav-dropdown-arrow {
+    transition: transform 200ms;
+  }
+  .nav-dropdown:hover .nav-dropdown-arrow,
+  .nav-dropdown:focus-within .nav-dropdown-arrow {
+    transform: rotate(180deg);
+  }
+
+  .nav-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    min-width: 240px;
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+    padding: 6px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 200ms, transform 200ms;
+  }
+  .nav-dropdown:hover .nav-dropdown-menu,
+  .nav-dropdown:focus-within .nav-dropdown-menu {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    transition: background 150ms;
+    text-decoration: none;
+    color: inherit;
+  }
+  .dropdown-item:hover {
+    background: rgba(15, 118, 110, 0.06);
+  }
+  .dropdown-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .dropdown-item strong {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text, #1a1a2e);
+  }
+  .dropdown-item span {
+    font-size: 11px;
+    color: var(--color-text-muted, #6b7280);
+  }
+  .dropdown-item-vip strong {
+    color: #b45309;
+  }
+
   /* Top bar social icons */
   .top-bar-social {
     display: flex;
@@ -482,10 +758,18 @@ const faqItems = [
     background: #f0fdfa;
   }
 
-  .social-icon:nth-child(1):hover { color: #1877f2; }
-  .social-icon:nth-child(2):hover { color: #ff0000; }
-  .social-icon:nth-child(3):hover { color: #e4405f; }
-  .social-icon:nth-child(4):hover { color: #06c755; }
+  .social-icon:nth-child(1):hover {
+    color: #1877f2;
+  }
+  .social-icon:nth-child(2):hover {
+    color: #ff0000;
+  }
+  .social-icon:nth-child(3):hover {
+    color: #e4405f;
+  }
+  .social-icon:nth-child(4):hover {
+    color: #06c755;
+  }
 
   /* About section social links */
   .about-social {
@@ -500,7 +784,7 @@ const faqItems = [
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: rgba(255,255,255,0.4);
+    color: rgba(255, 255, 255, 0.4);
     margin-right: 4px;
   }
 
@@ -511,26 +795,38 @@ const faqItems = [
     width: 40px;
     height: 40px;
     border-radius: 10px;
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.1);
-    color: rgba(255,255,255,0.6);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.6);
     transition: all 250ms ease;
   }
 
   .about-social-link:hover {
     transform: translateY(-2px);
-    border-color: rgba(255,255,255,0.2);
+    border-color: rgba(255, 255, 255, 0.2);
   }
 
-  .about-social-link:nth-child(2):hover { background: rgba(24, 119, 242, 0.2); color: #60a5fa; }
-  .about-social-link:nth-child(3):hover { background: rgba(255, 0, 0, 0.2); color: #f87171; }
-  .about-social-link:nth-child(4):hover { background: rgba(228, 64, 95, 0.2); color: #fb7185; }
-  .about-social-link.about-social-line:hover { background: rgba(6, 199, 85, 0.2); color: #4ade80; }
+  .about-social-link:nth-child(2):hover {
+    background: rgba(24, 119, 242, 0.2);
+    color: #60a5fa;
+  }
+  .about-social-link:nth-child(3):hover {
+    background: rgba(255, 0, 0, 0.2);
+    color: #f87171;
+  }
+  .about-social-link:nth-child(4):hover {
+    background: rgba(228, 64, 95, 0.2);
+    color: #fb7185;
+  }
+  .about-social-link.about-social-line:hover {
+    background: rgba(6, 199, 85, 0.2);
+    color: #4ade80;
+  }
 
   /* ─── HERO SECTION ─── */
   .hero-section {
     background: linear-gradient(135deg, #f8faf9 0%, #ecf5f3 100%);
-    border-bottom: 1px solid rgba(0,0,0,0.06);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
     padding-top: 52px; /* offset for fixed top bar */
   }
 
@@ -551,7 +847,7 @@ const faqItems = [
     gap: var(--space-2);
     padding: 6px var(--space-3);
     background: white;
-    border: 1px solid rgba(0,0,0,0.08);
+    border: 1px solid rgba(0, 0, 0, 0.08);
     border-radius: 999px;
     font-size: 12px;
     font-weight: 600;
@@ -569,8 +865,15 @@ const faqItems = [
   }
 
   @keyframes pulse-dot {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.5; transform: scale(1.3); }
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.5;
+      transform: scale(1.3);
+    }
   }
 
   .hero-title {
@@ -602,11 +905,16 @@ const faqItems = [
   .hero-avatar {
     border-radius: 50%;
     border: 2px solid white;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   }
 
-  .hero-author { font-weight: 600; color: var(--color-text); }
-  .hero-separator { color: var(--color-border); }
+  .hero-author {
+    font-weight: 600;
+    color: var(--color-text);
+  }
+  .hero-separator {
+    color: var(--color-border);
+  }
 
   .hero-cta {
     display: inline-flex;
@@ -633,10 +941,12 @@ const faqItems = [
     position: relative;
     border-radius: var(--radius-lg);
     overflow: hidden;
-    box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12);
   }
 
-  .hero-image-link { display: block; }
+  .hero-image-link {
+    display: block;
+  }
 
   .hero-image {
     width: 100%;
@@ -662,7 +972,7 @@ const faqItems = [
   /* ─── CATEGORIES PILLS ─── */
   .categories-section {
     background: white;
-    border-bottom: 1px solid rgba(0,0,0,0.06);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
   }
 
   .categories-inner {
@@ -683,7 +993,9 @@ const faqItems = [
     padding: var(--space-1) 0;
   }
 
-  .category-pills::-webkit-scrollbar { display: none; }
+  .category-pills::-webkit-scrollbar {
+    display: none;
+  }
 
   .pill {
     display: inline-flex;
@@ -721,13 +1033,13 @@ const faqItems = [
   .pill-count {
     font-size: 11px;
     padding: 1px 6px;
-    background: rgba(0,0,0,0.06);
+    background: rgba(0, 0, 0, 0.06);
     border-radius: 999px;
     font-weight: 600;
   }
 
   .pill-active .pill-count {
-    background: rgba(255,255,255,0.2);
+    background: rgba(255, 255, 255, 0.2);
   }
 
   /* ─── SHARED SECTION STYLES ─── */
@@ -763,7 +1075,9 @@ const faqItems = [
     transition: color 200ms;
   }
 
-  .section-link:hover { color: var(--color-primary-dark); }
+  .section-link:hover {
+    color: var(--color-primary-dark);
+  }
 
   /* ─── EDITOR'S PICKS ─── */
   .picks-grid {
@@ -776,12 +1090,12 @@ const faqItems = [
     border-radius: var(--radius-lg);
     overflow: hidden;
     background: white;
-    border: 1px solid rgba(0,0,0,0.06);
+    border: 1px solid rgba(0, 0, 0, 0.06);
     transition: box-shadow 300ms ease, transform 300ms ease;
   }
 
   .pick-card:hover {
-    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
     transform: translateY(-3px);
   }
 
@@ -851,12 +1165,12 @@ const faqItems = [
     border-radius: var(--radius-lg);
     overflow: hidden;
     background: white;
-    border: 1px solid rgba(0,0,0,0.06);
+    border: 1px solid rgba(0, 0, 0, 0.06);
     transition: box-shadow 300ms ease, transform 300ms ease;
   }
 
   .article-card:hover {
-    box-shadow: 0 6px 24px rgba(0,0,0,0.08);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
     transform: translateY(-2px);
   }
 
@@ -889,7 +1203,7 @@ const faqItems = [
     top: 12px;
     left: 12px;
     padding: 3px 10px;
-    background: rgba(255,255,255,0.92);
+    background: rgba(255, 255, 255, 0.92);
     backdrop-filter: blur(8px);
     border-radius: 999px;
     font-size: 11px;
@@ -928,7 +1242,7 @@ const faqItems = [
     font-size: 12px;
     color: var(--color-text-muted);
     padding-top: var(--space-3);
-    border-top: 1px solid rgba(0,0,0,0.05);
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
   }
 
   .article-read {
@@ -957,13 +1271,13 @@ const faqItems = [
     justify-content: space-between;
     gap: var(--space-4);
     padding: var(--space-4) 0;
-    border-bottom: 1px solid rgba(0,0,0,0.06);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
     color: var(--color-text);
     transition: background 200ms;
   }
 
   .more-item:first-child {
-    border-top: 1px solid rgba(0,0,0,0.06);
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
   }
 
   .more-item:hover {
@@ -1038,13 +1352,17 @@ const faqItems = [
   }
 
   .about-section::before {
-    content: '';
+    content: "";
     position: absolute;
     top: -50%;
     right: -20%;
     width: 600px;
     height: 600px;
-    background: radial-gradient(circle, rgba(94, 234, 212, 0.08) 0%, transparent 70%);
+    background: radial-gradient(
+      circle,
+      rgba(94, 234, 212, 0.08) 0%,
+      transparent 70%
+    );
     pointer-events: none;
   }
 
@@ -1068,8 +1386,8 @@ const faqItems = [
     align-items: center;
     gap: var(--space-2);
     padding: 6px 16px;
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 999px;
     font-size: 12px;
     font-weight: 600;
@@ -1098,13 +1416,13 @@ const faqItems = [
 
   .about-description {
     font-size: var(--text-base);
-    color: rgba(255,255,255,0.72);
+    color: rgba(255, 255, 255, 0.72);
     line-height: 1.7;
     margin-bottom: var(--space-6);
   }
 
   .about-description strong {
-    color: rgba(255,255,255,0.92);
+    color: rgba(255, 255, 255, 0.92);
     font-weight: 600;
   }
 
@@ -1122,7 +1440,7 @@ const faqItems = [
     gap: 12px;
     font-size: var(--text-sm);
     font-weight: 500;
-    color: rgba(255,255,255,0.85);
+    color: rgba(255, 255, 255, 0.85);
   }
 
   .highlight-icon {
@@ -1131,8 +1449,8 @@ const faqItems = [
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 10px;
     color: #5eead4;
     flex-shrink: 0;
@@ -1142,7 +1460,7 @@ const faqItems = [
     display: flex;
     gap: var(--space-8);
     padding-top: var(--space-6);
-    border-top: 1px solid rgba(255,255,255,0.1);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
   }
 
   .stat-value {
@@ -1154,7 +1472,7 @@ const faqItems = [
 
   .stat-label {
     font-size: 11px;
-    color: rgba(255,255,255,0.45);
+    color: rgba(255, 255, 255, 0.45);
     text-transform: uppercase;
     letter-spacing: 0.06em;
     font-weight: 500;
@@ -1173,8 +1491,8 @@ const faqItems = [
     max-width: 400px;
     border-radius: 20px;
     object-fit: cover;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-    border: 3px solid rgba(255,255,255,0.1);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    border: 3px solid rgba(255, 255, 255, 0.1);
     transition: transform 500ms ease;
   }
 
@@ -1183,14 +1501,18 @@ const faqItems = [
   }
 
   .about-photo::after {
-    content: '';
+    content: "";
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     width: 80%;
     height: 80%;
-    background: radial-gradient(circle, rgba(94, 234, 212, 0.1) 0%, transparent 70%);
+    background: radial-gradient(
+      circle,
+      rgba(94, 234, 212, 0.1) 0%,
+      transparent 70%
+    );
     pointer-events: none;
     z-index: -1;
   }
@@ -1228,7 +1550,9 @@ const faqItems = [
       padding: var(--space-6) var(--space-4);
     }
 
-    .hero-image-wrapper { order: -1; }
+    .hero-image-wrapper {
+      order: -1;
+    }
 
     .hero-image {
       height: 240px;

@@ -1,0 +1,52 @@
+---
+/**
+ * Catch-All Route — Legacy WordPress URL Redirects
+ * 
+ * This page handles any unmatched URL path and redirects it:
+ * 1. Blog post slugs (e.g., /fast-อย่างไรให้ได้นานๆ/) → /blog/:slug/
+ * 2. Numeric WP post IDs (e.g., /20/) → /blog/
+ * 3. WP admin paths → 410 Gone
+ * 4. Everything else → 404
+ * 
+ * This page is NOT prerendered (runs at request time on Vercel serverless).
+ */
+import { getAllPostSlugs } from '../lib/api.js';
+
+const { slug } = Astro.params;
+const segments = (slug || '').split('/').filter(Boolean);
+const firstSegment = segments[0] || '';
+
+// 1. Block WP admin/plugin paths with 410 Gone
+if (firstSegment === 'farmx' || firstSegment === 'wp-admin') {
+  return new Response('Gone', { status: 410, headers: { 'Content-Type': 'text/plain' } });
+}
+if (firstSegment === 'wp-content' && segments[1] === 'plugins') {
+  return new Response('Gone', { status: 410, headers: { 'Content-Type': 'text/plain' } });
+}
+
+// 2. Redirect numeric-only paths (old WP post IDs)
+if (/^\d+$/.test(firstSegment)) {
+  return Astro.redirect('/blog/', 301);
+}
+
+// 3. Single-segment slugs → check if it matches a blog post and redirect
+if (segments.length === 1 && firstSegment.length > 0) {
+  const allSlugs = getAllPostSlugs();
+  // Check both raw and decoded versions
+  const decoded = decodeURIComponent(firstSegment);
+  const isPost = allSlugs.some(s => {
+    try {
+      return s === firstSegment || decodeURIComponent(s) === decoded;
+    } catch {
+      return s === firstSegment;
+    }
+  });
+  
+  if (isPost) {
+    return Astro.redirect(`/blog/${firstSegment}/`, 301);
+  }
+}
+
+// 4. Return 404 for everything else
+return new Response('Not Found', { status: 404, headers: { 'Content-Type': 'text/plain' } });
+---

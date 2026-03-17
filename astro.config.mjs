@@ -7,7 +7,7 @@ import vercel from '@astrojs/vercel';
 export default defineConfig({
   site: 'https://drtim.co',
   output: 'static',
-  adapter: vercel(),
+  adapter: vercel({ edgeMiddleware: true }),
   integrations: [sitemap()],
   vite: {
     ssr: {

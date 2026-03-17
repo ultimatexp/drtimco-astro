@@ -1,13 +1,9 @@
 // ============================================================
-// Vercel Edge Middleware — Legacy WordPress URL Redirects
+// Astro Middleware — Legacy WordPress URL Redirects
 // ============================================================
-// Handles redirects for old WordPress URLs that Google has cached:
-//   1. Blog post slugs without /blog/ prefix → /blog/:slug/
-//   2. Numeric WP post IDs → /blog/
-//   3. WP admin/plugin paths → 410 Gone
+// Deployed as Vercel Edge Function via edgeMiddleware: true
+// Handles redirects for old WordPress URLs that Google has cached.
 // ============================================================
-
-import { next } from '@vercel/edge';
 
 // Known top-level routes in the Astro site (should NOT be redirected)
 const KNOWN_ROUTES = new Set([
@@ -17,9 +13,14 @@ const KNOWN_ROUTES = new Set([
   '_astro', 'images', 'wp-content',
 ]);
 
-export default function middleware(request) {
+export function onRequest({ request, redirect }, next) {
   const url = new URL(request.url);
-  const pathname = decodeURIComponent(url.pathname);
+  let pathname;
+  try {
+    pathname = decodeURIComponent(url.pathname);
+  } catch {
+    pathname = url.pathname;
+  }
 
   // Strip leading/trailing slashes to get the first path segment
   const segments = pathname.replace(/^\/|\/$/g, '').split('/');
@@ -35,7 +36,7 @@ export default function middleware(request) {
 
   // 2. Redirect numeric-only paths (old WP post IDs like /20/, /36/)
   if (/^\d+$/.test(firstSegment)) {
-    return Response.redirect(new URL('/blog/', request.url), 301);
+    return redirect('/blog/', 301);
   }
 
   // 3. Skip known routes — let them serve normally
@@ -51,16 +52,8 @@ export default function middleware(request) {
   // 5. Any other top-level slug → redirect to /blog/:slug/
   //    This catches old WordPress post URLs like /fast-อย่างไรให้ได้นานๆ/
   if (segments.length === 1 && firstSegment.length > 0) {
-    const destination = new URL(`/blog/${firstSegment}/`, request.url);
-    return Response.redirect(destination, 301);
+    return redirect(`/blog/${encodeURIComponent(firstSegment)}/`, 301);
   }
 
   return next();
 }
-
-export const config = {
-  matcher: [
-    // Match all paths except static assets (_astro, images, wp-content/uploads)
-    '/((?!_astro|images|wp-content/uploads).*)',
-  ],
-};

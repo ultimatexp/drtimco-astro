@@ -12,3 +12,6 @@ Crawl-delay: 1
 
 # Block admin/scripts paths
 Disallow: /scripts/
+Disallow: /farmx/
+Disallow: /wp-admin/
+Disallow: /wp-content/plugins/

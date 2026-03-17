@@ -6,7 +6,7 @@ import vercel from '@astrojs/vercel';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://drtim.co',
-  output: 'static',
+  output: 'server',
   adapter: vercel({ edgeMiddleware: true }),
   integrations: [sitemap()],
   vite: {

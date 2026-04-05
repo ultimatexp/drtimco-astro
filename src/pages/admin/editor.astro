@@ -1,0 +1,1047 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { neon } from '@neondatabase/serverless';
+
+const DATABASE_URL = import.meta.env.NEON_DATABASE_URL;
+
+// Parse ID from URL
+let articleId = Astro.url.searchParams.get('id');
+let article = {
+    title: '',
+    content: '',
+    status: 'draft',
+    category: '',
+    tags: [],
+    seo_description: '',
+    direct_answer: '',
+    focus_keyword: '',
+    featured_image_url: ''
+};
+
+let categories = [];
+
+// Fetch categories and existing article
+if (DATABASE_URL) {
+    try {
+        const sql = neon(DATABASE_URL);
+        
+        // Load categories
+        categories = await sql`SELECT id, name, slug FROM categories ORDER BY name ASC`;
+        
+        // Load existing article if ID provided
+        if (articleId) {
+            const [existing] = await sql`SELECT * FROM article_drafts WHERE id = ${articleId}`;
+            if (existing) {
+                article = {
+                    ...existing,
+                    tags: existing.tags || []
+                };
+            } else {
+                articleId = null;
+            }
+        }
+    } catch (e) {
+        console.error("Error fetching data:", e);
+    }
+}
+---
+
+<AdminLayout title={articleId ? "Edit Article" : "New Article"}>
+    <div class="editor-container">
+        <!-- Editor Main Area -->
+        <div class="editor-main">
+            <!-- Toolbar -->
+            <div class="editor-toolbar" id="toolbar">
+                <div class="toolbar-group">
+                    <button class="toolbar-btn" data-command="bold" title="Bold"><b>B</b></button>
+                    <button class="toolbar-btn" data-command="italic" title="Italic"><i>I</i></button>
+                    <button class="toolbar-btn" data-command="underline" title="Underline"><u>U</u></button>
+                    <button class="toolbar-btn" data-command="strike" title="Strikethrough"><s>S</s></button>
+                </div>
+                <div class="toolbar-divider"></div>
+                <div class="toolbar-group">
+                    <button class="toolbar-btn" data-command="h2" title="Heading 2">H2</button>
+                    <button class="toolbar-btn" data-command="h3" title="Heading 3">H3</button>
+                    <button class="toolbar-btn" data-command="paragraph" title="Paragraph">P</button>
+                </div>
+                <div class="toolbar-divider"></div>
+                <div class="toolbar-group">
+                    <button class="toolbar-btn" data-command="bulletList" title="Bullet List">• List</button>
+                    <button class="toolbar-btn" data-command="orderedList" title="Numbered List">1. List</button>
+                    <button class="toolbar-btn" data-command="blockquote" title="Quote">""</button>
+                </div>
+                <div class="toolbar-divider"></div>
+                <div class="toolbar-group">
+                    <button class="toolbar-btn" data-command="link" title="Insert Link">🔗 Link</button>
+                    <button class="toolbar-btn" data-command="image" title="Insert Image">🖼️ Image</button>
+                </div>
+            </div>
+
+            <!-- Title Input -->
+            <input type="text" id="articleTitle" class="article-title-input" placeholder="Enter article title here..." value={article.title} />
+
+            <!-- The Editor Content -->
+            <div class="editor-content-wrapper">
+                <div id="editorContent" class="tiptap-editor-container"></div>
+            </div>
+            
+            <!-- Hidden Raw Content for initial load -->
+            <textarea id="initialContent" style="display:none;">{article.content}</textarea>
+        </div>
+
+        <!-- SEO & Settings Sidebar -->
+        <aside class="editor-sidebar">
+            <div class="sidebar-header">
+                <h3>Publish Settings</h3>
+                <div class="action-buttons">
+                    <button id="btnSaveDraft" class="btn-secondary">Save Draft</button>
+                    <button id="btnPublish" class="btn-primary">Publish</button>
+                </div>
+                <div id="saveStatus" class="save-status"></div>
+            </div>
+
+            <div class="sidebar-section">
+                <label>Status</label>
+                <select id="articleStatus" class="form-select">
+                    <option value="draft" selected={article.status === 'draft'}>Draft</option>
+                    <option value="review" selected={article.status === 'review'}>Pending Review</option>
+                    <option value="approved" selected={article.status === 'approved'}>Approved</option>
+                    <option value="published" selected={article.status === 'published'}>Published</option>
+                </select>
+            </div>
+
+            <div class="sidebar-section">
+                <label>Category</label>
+                <div class="category-combo" id="categoryCombo">
+                    <input type="text" id="articleCategory" class="form-input" value={article.category} placeholder="Select or type new category..." autocomplete="off" />
+                    <div class="category-dropdown" id="categoryDropdown">
+                        {categories.map(cat => (
+                            <div class="category-option" data-value={cat.name}>{cat.name}</div>
+                        ))}
+                        <div class="category-new-hint" id="categoryNewHint" style="display:none;">
+                            <span class="hint-icon">+</span> Press Enter to add "<span id="newCatName"></span>"
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <label>Featured Image URL</label>
+                <div class="image-upload-row">
+                    <input type="text" id="featuredImage" class="form-input" value={article.featured_image_url} placeholder="https://..." />
+                    <button id="btnUploadFeatured" class="btn-secondary btn-icon" title="Upload Image">⬆️</button>
+                </div>
+                <!-- Hidden file input for featured image -->
+                <input type="file" id="featuredFileInput" accept="image/*" style="display:none;" />
+                {article.featured_image_url && (
+                    <img id="featuredImagePreview" src={article.featured_image_url} alt="Preview" class="featured-preview" />
+                )}
+            </div>
+
+            <div class="sidebar-section ai-autofill-section">
+                <button id="btnAiAutofill" class="btn-ai-autofill" type="button">
+                    <span class="ai-icon">✨</span> AI Autofill SEO
+                </button>
+                <div id="aiAutofillStatus" class="ai-status"></div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="section-title-with-badge">
+                    <label>SEO Description</label>
+                    <span class="char-count" id="seoDescCount">0/160</span>
+                </div>
+                <textarea id="seoDescription" class="form-textarea" rows="3" placeholder="Meta description for search engines...">{article.seo_description}</textarea>
+            </div>
+
+            <div class="sidebar-section">
+                <label>Direct Answer (AI snippet)</label>
+                <textarea id="directAnswer" class="form-textarea" rows="2" placeholder="Short answer for top-of-article snippet...">{article.direct_answer}</textarea>
+            </div>
+            
+            <div class="sidebar-section">
+                <label>Focus Keyword</label>
+                <input type="text" id="focusKeyword" class="form-input" value={article.focus_keyword} placeholder="Primary SEO keyword" />
+            </div>
+            
+            <input type="hidden" id="articleId" value={articleId || ''} />
+        </aside>
+    </div>
+</AdminLayout>
+
+<style is:global>
+    .editor-container {
+        display: flex;
+        gap: 24px;
+        height: calc(100vh - 140px); /* Fill remaining space minus topbar and padding */
+    }
+
+    /* Main Editor */
+    .editor-main {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        background-color: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .editor-toolbar {
+        display: flex;
+        align-items: center;
+        padding: 12px 16px;
+        background-color: var(--bg-surface);
+        border-bottom: 1px solid var(--border);
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .toolbar-group {
+        display: flex;
+        gap: 4px;
+    }
+
+    .toolbar-divider {
+        width: 1px;
+        height: 24px;
+        background-color: var(--border);
+        margin: 0 4px;
+    }
+
+    .toolbar-btn {
+        background: transparent;
+        border: 1px solid transparent;
+        color: var(--text-main);
+        padding: 6px 10px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+    }
+
+    .toolbar-btn:hover {
+        background-color: var(--bg-surface-hover);
+    }
+    
+    .toolbar-btn.is-active {
+        background-color: rgba(59, 130, 246, 0.2);
+        color: var(--primary);
+    }
+
+    .article-title-input {
+        width: 100%;
+        font-size: 2rem;
+        font-weight: 700;
+        padding: 24px 32px 12px;
+        background: transparent;
+        border: none;
+        color: var(--text-main);
+        outline: none;
+        font-family: inherit;
+    }
+
+    .article-title-input::placeholder {
+        color: var(--text-muted);
+    }
+
+    .editor-content-wrapper {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 0 32px 32px;
+    }
+
+    /* Target the automatically generated TipTap element */
+    .tiptap-editor-container .ProseMirror {
+        min-height: 300px;
+        outline: none;
+        font-size: 1.05rem;
+        line-height: 1.8;
+        color: #e2e8f0;
+    }
+
+    .tiptap-editor-container .ProseMirror p.is-editor-empty:first-child::before {
+        color: var(--text-muted);
+        content: attr(data-placeholder);
+        float: left;
+        height: 0;
+        pointer-events: none;
+    }
+    
+    .tiptap-editor-container .ProseMirror h1 { font-size: 2rem; margin-top: 2rem; margin-bottom: 1rem; font-weight: 700; }
+    .tiptap-editor-container .ProseMirror h2 { font-size: 1.6rem; margin-top: 2rem; margin-bottom: 1rem; font-weight: 600; }
+    .tiptap-editor-container .ProseMirror h3 { font-size: 1.3rem; margin-top: 1.5rem; margin-bottom: 0.75rem; font-weight: 600; }
+    .tiptap-editor-container .ProseMirror h4 { font-size: 1.1rem; margin-top: 1.25rem; margin-bottom: 0.5rem; font-weight: 600; }
+    .tiptap-editor-container .ProseMirror p { margin-bottom: 1rem; }
+
+    .tiptap-editor-container .ProseMirror blockquote {
+        border-left: 4px solid var(--primary);
+        padding-left: 1rem;
+        margin: 1rem 0;
+        color: var(--text-muted);
+        font-style: italic;
+    }
+
+    .tiptap-editor-container .ProseMirror img {
+        max-width: 100%;
+        border-radius: 8px;
+        margin: 1.5rem 0;
+        height: auto;
+    }
+
+    .tiptap-editor-container .ProseMirror a {
+        color: var(--primary);
+        text-decoration: underline;
+    }
+
+    /* Lists */
+    .tiptap-editor-container .ProseMirror ul,
+    .tiptap-editor-container .ProseMirror ol {
+        padding-left: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .tiptap-editor-container .ProseMirror ul { list-style: disc; }
+    .tiptap-editor-container .ProseMirror ol { list-style: decimal; }
+
+    .tiptap-editor-container .ProseMirror li {
+        margin-bottom: 0.35rem;
+    }
+
+    .tiptap-editor-container .ProseMirror li p {
+        margin-bottom: 0.25rem;
+    }
+
+    /* Tables */
+    .tiptap-editor-container .ProseMirror table {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 1.5rem 0;
+        font-size: 0.9rem;
+    }
+
+    .tiptap-editor-container .ProseMirror th,
+    .tiptap-editor-container .ProseMirror td {
+        border: 1px solid var(--border);
+        padding: 10px 14px;
+        text-align: left;
+        vertical-align: top;
+    }
+
+    .tiptap-editor-container .ProseMirror th {
+        background-color: rgba(59, 130, 246, 0.1);
+        font-weight: 600;
+        color: var(--text-main);
+    }
+
+    .tiptap-editor-container .ProseMirror td {
+        background-color: var(--bg-surface);
+    }
+
+    /* Code */
+    .tiptap-editor-container .ProseMirror code {
+        background: rgba(99, 102, 241, 0.15);
+        color: #c4b5fd;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 0.9em;
+        font-family: 'Fira Code', monospace;
+    }
+
+    .tiptap-editor-container .ProseMirror pre {
+        background: #0f172a;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 16px;
+        margin: 1rem 0;
+        overflow-x: auto;
+    }
+
+    .tiptap-editor-container .ProseMirror pre code {
+        background: none;
+        padding: 0;
+        color: #e2e8f0;
+    }
+
+    /* Horizontal Rule */
+    .tiptap-editor-container .ProseMirror hr {
+        border: none;
+        border-top: 1px solid var(--border);
+        margin: 2rem 0;
+    }
+
+    /* Strong / Emphasis */
+    .tiptap-editor-container .ProseMirror strong { font-weight: 700; color: #f1f5f9; }
+    .tiptap-editor-container .ProseMirror em { font-style: italic; }
+
+
+    /* Sidebar */
+    .editor-sidebar {
+        width: 320px;
+        flex-shrink: 0;
+        background-color: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        overflow-y: auto;
+    }
+
+    .sidebar-header {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .sidebar-header h3 {
+        font-size: 1.1rem;
+        margin: 0;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+    }
+
+    .action-buttons button {
+        flex: 1;
+        justify-content: center;
+    }
+
+    .save-status {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        text-align: center;
+        min-height: 1.2em;
+    }
+
+    .sidebar-section {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .sidebar-section label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--text-muted);
+    }
+
+    .form-input, .form-select, .form-textarea {
+        width: 100%;
+        background-color: var(--bg-base);
+        border: 1px solid var(--border);
+        color: var(--text-main);
+        padding: 10px;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        outline: none;
+        transition: border-color 0.2s;
+        font-family: inherit;
+    }
+
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+        border-color: var(--primary);
+    }
+
+    .form-textarea {
+        resize: vertical;
+    }
+
+    .section-title-with-badge {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .char-count {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+    }
+
+    .image-upload-row {
+        display: flex;
+        gap: 8px;
+    }
+
+    .featured-preview {
+        width: 100%;
+        height: 160px;
+        object-fit: cover;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        margin-top: 8px;
+    }
+
+    @media (max-width: 1024px) {
+        .editor-container {
+            flex-direction: column;
+            height: auto;
+        }
+        .editor-sidebar {
+            width: 100%;
+        }
+    }
+
+    /* AI Autofill Button */
+    .ai-autofill-section {
+        padding: 16px 0;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .btn-ai-autofill {
+        width: 100%;
+        padding: 12px 16px;
+        background: linear-gradient(135deg, #6366f1, #8b5cf6, #a855f7);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        font-family: inherit;
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+    }
+
+    .btn-ai-autofill:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+    }
+
+    .btn-ai-autofill:disabled {
+        opacity: 0.7;
+        cursor: wait;
+        transform: none;
+    }
+
+    .ai-icon {
+        font-size: 1.1rem;
+    }
+
+    .ai-status {
+        font-size: 0.8rem;
+        text-align: center;
+        margin-top: 8px;
+        min-height: 1.2em;
+        transition: color 0.2s;
+    }
+
+    .ai-spinner {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(255,255,255,0.3);
+        border-top: 2px solid white;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    /* Category Combo Dropdown */
+    .category-combo {
+        position: relative;
+    }
+
+    .category-dropdown {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border);
+        border-top: none;
+        border-radius: 0 0 8px 8px;
+        max-height: 200px;
+        overflow-y: auto;
+        z-index: 100;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
+
+    .category-dropdown.open {
+        display: block;
+    }
+
+    .category-option {
+        padding: 10px 14px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        transition: all 0.15s;
+    }
+
+    .category-option:hover,
+    .category-option.highlighted {
+        background: rgba(99, 102, 241, 0.15);
+        color: var(--text-primary);
+    }
+
+    .category-option.hidden {
+        display: none;
+    }
+
+    .category-new-hint {
+        padding: 10px 14px;
+        font-size: 0.85rem;
+        color: #a78bfa;
+        border-top: 1px solid var(--border);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: background 0.15s;
+    }
+
+    .category-new-hint:hover {
+        background: rgba(167, 139, 250, 0.1);
+    }
+
+    .hint-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: #6366f1;
+        color: white;
+        font-size: 0.8rem;
+        font-weight: 700;
+    }
+</style>
+
+<!-- TipTap Core and Extensions via CDN -->
+<script type="module">
+    import { Editor } from 'https://esm.sh/@tiptap/core';
+    import StarterKit from 'https://esm.sh/@tiptap/starter-kit';
+    import Underline from 'https://esm.sh/@tiptap/extension-underline';
+    import Link from 'https://esm.sh/@tiptap/extension-link';
+    import Image from 'https://esm.sh/@tiptap/extension-image';
+    import Placeholder from 'https://esm.sh/@tiptap/extension-placeholder';
+
+    // Initialize Editor
+    const initialContent = document.getElementById('initialContent').value;
+    
+    // We export editor to window so button clicks can access it
+    window.tiptapEditor = new Editor({
+        element: document.getElementById('editorContent'),
+        extensions: [
+            StarterKit,
+            Underline,
+            Link.configure({
+                openOnClick: false,
+                HTMLAttributes: {
+                    class: 'tiptap-link',
+                },
+            }),
+            Image.configure({
+                inline: true,
+                allowBase64: true,
+            }),
+            Placeholder.configure({
+                placeholder: 'Start writing your article here...',
+            })
+        ],
+        content: initialContent,
+        onUpdate: ({ editor }) => {
+            updateToolbarState(editor);
+            triggerAutosave();
+        },
+        onSelectionUpdate: ({ editor }) => {
+            updateToolbarState(editor);
+        }
+    });
+
+    // Toolbar logic
+    function updateToolbarState(editor) {
+        document.querySelectorAll('.toolbar-btn').forEach(btn => {
+            const command = btn.getAttribute('data-command');
+            
+            // Map simple command names to TipTap isActive checks
+            let isActive = false;
+            switch(command) {
+                case 'bold': isActive = editor.isActive('bold'); break;
+                case 'italic': isActive = editor.isActive('italic'); break;
+                case 'underline': isActive = editor.isActive('underline'); break;
+                case 'strike': isActive = editor.isActive('strike'); break;
+                case 'h2': isActive = editor.isActive('heading', { level: 2 }); break;
+                case 'h3': isActive = editor.isActive('heading', { level: 3 }); break;
+                case 'paragraph': isActive = editor.isActive('paragraph'); break;
+                case 'bulletList': isActive = editor.isActive('bulletList'); break;
+                case 'orderedList': isActive = editor.isActive('orderedList'); break;
+                case 'blockquote': isActive = editor.isActive('blockquote'); break;
+                case 'link': isActive = editor.isActive('link'); break;
+            }
+
+            if (isActive) {
+                btn.classList.add('is-active');
+            } else {
+                btn.classList.remove('is-active');
+            }
+        });
+    }
+
+    document.querySelectorAll('.toolbar-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const command = btn.getAttribute('data-command');
+            const editor = window.tiptapEditor;
+            
+            switch(command) {
+                case 'bold': editor.chain().focus().toggleBold().run(); break;
+                case 'italic': editor.chain().focus().toggleItalic().run(); break;
+                case 'underline': editor.chain().focus().toggleUnderline().run(); break;
+                case 'strike': editor.chain().focus().toggleStrike().run(); break;
+                case 'h2': editor.chain().focus().toggleHeading({ level: 2 }).run(); break;
+                case 'h3': editor.chain().focus().toggleHeading({ level: 3 }).run(); break;
+                case 'paragraph': editor.chain().focus().setParagraph().run(); break;
+                case 'bulletList': editor.chain().focus().toggleBulletList().run(); break;
+                case 'orderedList': editor.chain().focus().toggleOrderedList().run(); break;
+                case 'blockquote': editor.chain().focus().toggleBlockquote().run(); break;
+                case 'link': 
+                    const previousUrl = editor.getAttributes('link').href;
+                    const url = window.prompt('URL', previousUrl);
+                    if (url === null) return;
+                    if (url === '') {
+                        editor.chain().focus().extendMarkRange('link').unsetLink().run();
+                    } else {
+                        editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+                    }
+                    break;
+                case 'image':
+                    const imgUrl = window.prompt('Image URL');
+                    if (imgUrl) {
+                        editor.chain().focus().setImage({ src: imgUrl }).run();
+                    }
+                    break;
+            }
+        });
+    });
+
+    // Meta Description Counter
+    const seoDesc = document.getElementById('seoDescription');
+    const seoDescCount = document.getElementById('seoDescCount');
+    if (seoDesc && seoDescCount) {
+        const updateCount = () => {
+            const len = seoDesc.value.length;
+            seoDescCount.textContent = `${len}/160`;
+            seoDescCount.style.color = len > 160 ? 'var(--danger)' : 'var(--text-muted)';
+        };
+        seoDesc.addEventListener('input', updateCount);
+        updateCount();
+    }
+
+    // Featured Image Upload logic (stubbed to use window.prompt for now, or existing API)
+    const btnUploadFeatured = document.getElementById('btnUploadFeatured');
+    const featuredFileInput = document.getElementById('featuredFileInput');
+    const featuredImageInput = document.getElementById('featuredImage');
+    const featuredImagePreview = document.getElementById('featuredImagePreview');
+
+    if (btnUploadFeatured && featuredFileInput) {
+        // We reuse the existing /api/upload-image endpoint mechanics here
+        btnUploadFeatured.addEventListener('click', () => {
+            featuredFileInput.click();
+        });
+
+        featuredFileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const btnOriginalText = btnUploadFeatured.textContent;
+            btnUploadFeatured.textContent = '⏳';
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('type', 'featured');
+
+            try {
+                const res = await fetch('/api/upload-image', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await res.json();
+                if (data.url) {
+                    featuredImageInput.value = data.url;
+                    if (featuredImagePreview) {
+                        featuredImagePreview.src = data.url;
+                        featuredImagePreview.style.display = 'block';
+                    } else {
+                        // Create preview if it didn't exist
+                        const img = document.createElement('img');
+                        img.id = 'featuredImagePreview';
+                        img.src = data.url;
+                        img.className = 'featured-preview';
+                        featuredImageInput.parentElement.after(img);
+                    }
+                    triggerAutosave();
+                } else {
+                    alert('Upload failed: ' + (data.error || 'Unknown error'));
+                }
+            } catch (err) {
+                alert('Upload error: ' + err.message);
+            } finally {
+                btnUploadFeatured.textContent = btnOriginalText;
+            }
+        });
+    }
+
+    // Save Logic (Draft and Publish)
+    let autosaveTimeout = null;
+    const saveStatus = document.getElementById('saveStatus');
+
+    function triggerAutosave() {
+        if (!document.getElementById('articleId').value) return; // Don't autosave purely new unsaved articles yet
+        saveStatus.textContent = 'Unsaved changes...';
+        clearTimeout(autosaveTimeout);
+        autosaveTimeout = setTimeout(() => {
+            saveArticle(false);
+        }, 30000); // 30 sec autosave debounce
+    }
+
+    // Listen to title changes too
+    document.getElementById('articleTitle').addEventListener('input', triggerAutosave);
+
+    async function saveArticle(isPublishAction = false) {
+        saveStatus.textContent = 'Saving...';
+        
+        // Gather data
+        const id = document.getElementById('articleId').value;
+        const title = document.getElementById('articleTitle').value;
+        const content = window.tiptapEditor.getHTML();
+        
+        let status = document.getElementById('articleStatus').value;
+        if (isPublishAction && status === 'draft') {
+            status = 'published';
+            document.getElementById('articleStatus').value = 'published';
+        }
+
+        const payload = {
+            id: id || null,
+            title,
+            content,
+            status,
+            category: document.getElementById('articleCategory').value,
+            seo_description: document.getElementById('seoDescription').value,
+            direct_answer: document.getElementById('directAnswer').value,
+            focus_keyword: document.getElementById('focusKeyword').value,
+            featured_image_url: document.getElementById('featuredImage').value
+        };
+
+        try {
+            // Using existing create-article endpoint that handles upsert
+            // Or the new autosave endpoint if we build it. We'll use the robust one:
+            const res = await fetch(id ? `/api/admin/article/${id}/autosave` : '/api/create-article', {
+                method: id ? 'PATCH' : 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await res.json();
+            
+            if (data.success) {
+                const now = new Date();
+                saveStatus.textContent = `Saved at ${now.toLocaleTimeString()}`;
+                
+                // If it was new, set the ID
+                if (!id && data.article && data.article.id) {
+                    document.getElementById('articleId').value = data.article.id;
+                    // Update URL without reload
+                    window.history.replaceState({}, '', `/admin/editor?id=${data.article.id}`);
+                }
+            } else {
+                saveStatus.textContent = `Error: ${data.error || 'Failed to save'}`;
+            }
+        } catch (err) {
+            saveStatus.textContent = 'Network error saving draft.';
+        }
+    }
+
+    document.getElementById('btnSaveDraft').addEventListener('click', () => saveArticle(false));
+    document.getElementById('btnPublish').addEventListener('click', () => saveArticle(true));
+
+    // ── AI Autofill SEO ──────────────────────────────────────
+    const btnAiAutofill = document.getElementById('btnAiAutofill');
+    const aiStatus = document.getElementById('aiAutofillStatus');
+
+    btnAiAutofill.addEventListener('click', async () => {
+        const title = document.getElementById('articleTitle').value;
+        const content = window.tiptapEditor ? window.tiptapEditor.getHTML() : '';
+        const category = document.getElementById('articleCategory').value;
+
+        if (!title && !content) {
+            aiStatus.textContent = '⚠️ Write a title or content first';
+            aiStatus.style.color = 'var(--warning)';
+            return;
+        }
+
+        btnAiAutofill.disabled = true;
+        btnAiAutofill.innerHTML = '<span class="ai-spinner"></span> Generating...';
+        aiStatus.textContent = '';
+
+        try {
+            const res = await fetch('/api/admin/ai-seo-autofill', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, content, category })
+            });
+
+            const data = await res.json();
+
+            if (data.success) {
+                // Fill fields with AI-generated content
+                if (data.seo_description) {
+                    document.getElementById('seoDescription').value = data.seo_description;
+                    // Trigger char count update
+                    document.getElementById('seoDescription').dispatchEvent(new Event('input'));
+                }
+                if (data.direct_answer) {
+                    document.getElementById('directAnswer').value = data.direct_answer;
+                }
+                if (data.focus_keyword) {
+                    document.getElementById('focusKeyword').value = data.focus_keyword;
+                }
+
+                aiStatus.textContent = '✅ SEO fields filled!';
+                aiStatus.style.color = 'var(--success)';
+                triggerAutosave();
+            } else {
+                aiStatus.textContent = '❌ ' + (data.error || 'Failed');
+                aiStatus.style.color = 'var(--danger)';
+            }
+        } catch (err) {
+            aiStatus.textContent = '❌ Network error';
+            aiStatus.style.color = 'var(--danger)';
+        } finally {
+            btnAiAutofill.disabled = false;
+            btnAiAutofill.innerHTML = '<span class="ai-icon">✨</span> AI Autofill SEO';
+        }
+    });
+
+    // ───────── Category Combo Dropdown ─────────
+    const catInput = document.getElementById('articleCategory');
+    const catDropdown = document.getElementById('categoryDropdown');
+    const catOptions = catDropdown.querySelectorAll('.category-option');
+    const catNewHint = document.getElementById('categoryNewHint');
+    const newCatName = document.getElementById('newCatName');
+
+    function openDropdown() {
+        catDropdown.classList.add('open');
+        filterOptions();
+    }
+
+    function closeDropdown() {
+        catDropdown.classList.remove('open');
+    }
+
+    function filterOptions() {
+        const val = catInput.value.toLowerCase().trim();
+        let hasExact = false;
+        let visibleCount = 0;
+
+        catOptions.forEach(opt => {
+            const name = opt.dataset.value.toLowerCase();
+            const match = !val || name.includes(val);
+            opt.classList.toggle('hidden', !match);
+            if (match) visibleCount++;
+            if (name === val) hasExact = true;
+        });
+
+        // Show "add new" hint if typed value doesn't match existing
+        if (val && !hasExact) {
+            newCatName.textContent = catInput.value.trim();
+            catNewHint.style.display = 'flex';
+        } else {
+            catNewHint.style.display = 'none';
+        }
+    }
+
+    catInput.addEventListener('focus', openDropdown);
+    catInput.addEventListener('input', () => {
+        openDropdown();
+    });
+
+    // Select existing option
+    catOptions.forEach(opt => {
+        opt.addEventListener('click', () => {
+            catInput.value = opt.dataset.value;
+            closeDropdown();
+            triggerAutosave();
+        });
+    });
+
+    // Click on "add new" hint
+    catNewHint.addEventListener('click', async () => {
+        await createNewCategory(catInput.value.trim());
+    });
+
+    // Enter to add new category
+    catInput.addEventListener('keydown', async (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const val = catInput.value.trim();
+            if (!val) return;
+
+            // Check if it matches an existing option
+            const existing = [...catOptions].find(o => o.dataset.value.toLowerCase() === val.toLowerCase());
+            if (existing) {
+                catInput.value = existing.dataset.value;
+                closeDropdown();
+                triggerAutosave();
+            } else {
+                await createNewCategory(val);
+            }
+        }
+    });
+
+    async function createNewCategory(name) {
+        try {
+            const res = await fetch('/api/admin/categories', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name })
+            });
+
+            if (res.ok) {
+                // Add new option to dropdown
+                const newOpt = document.createElement('div');
+                newOpt.className = 'category-option';
+                newOpt.dataset.value = name;
+                newOpt.textContent = name;
+                newOpt.addEventListener('click', () => {
+                    catInput.value = name;
+                    closeDropdown();
+                    triggerAutosave();
+                });
+                catDropdown.insertBefore(newOpt, catNewHint);
+
+                catInput.value = name;
+                closeDropdown();
+                triggerAutosave();
+            } else {
+                const err = await res.json();
+                console.error('Category create error:', err);
+            }
+        } catch (e) {
+            console.error('Category create failed:', e);
+        }
+    }
+
+    // Close dropdown on outside click
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.category-combo')) {
+            closeDropdown();
+        }
+    });
+
+</script>

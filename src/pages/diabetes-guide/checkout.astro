@@ -1,0 +1,1605 @@
+---
+export const prerender = true;
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const lineUrl = "https://lin.ee/LwEtisp";
+const promptpayNumber = "087-748-4066";
+const productPrice = 499;
+const originalPrice = 990;
+const discountPercent = Math.round((1 - productPrice / originalPrice) * 100);
+
+const breadcrumbs = [
+  { name: "หน้าแรก", url: "https://drtim.co/" },
+  { name: "คู่มือพิชิตเบาหวานผอม", url: "https://drtim.co/diabetes-guide" },
+  { name: "ชำระเงิน", url: "https://drtim.co/diabetes-guide/checkout" },
+];
+---
+
+<BaseLayout
+  title="ชำระเงิน — คู่มือพิชิตเบาหวานผอม | Dr. Tim"
+  description="ชำระเงินสั่งซื้อคู่มือพิชิตเบาหวานสำหรับเบาหวานผอม โดย Dr. Tim ผ่าน PromptPay QR Code"
+  type="website"
+  breadcrumbs={breadcrumbs}
+>
+
+<!-- ═══ CHECKOUT PAGE ═══ -->
+<div class="checkout-page">
+  <!-- HEADER -->
+  <header class="ck-header">
+    <div class="ck-header-inner">
+      <a href="/diabetes-guide" class="ck-back">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
+        <span>กลับ</span>
+      </a>
+      <div class="ck-logo">
+        <span class="ck-logo-icon">⚕</span>
+        <span class="ck-logo-text">Dr. Tim</span>
+      </div>
+      <div class="ck-secure">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+        <span>ปลอดภัย</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- PROGRESS STEPS -->
+  <div class="ck-progress">
+    <div class="ck-progress-inner">
+      <div class="ck-step done" id="step-ind-1">
+        <div class="ck-step-circle">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <span>เลือกสินค้า</span>
+      </div>
+      <div class="ck-step-line done-line" id="step-line-1"></div>
+      <div class="ck-step active" id="step-ind-2">
+        <div class="ck-step-circle">2</div>
+        <span>ข้อมูลจัดส่ง</span>
+      </div>
+      <div class="ck-step-line" id="step-line-2"></div>
+      <div class="ck-step" id="step-ind-3">
+        <div class="ck-step-circle">3</div>
+        <span>ชำระเงิน</span>
+      </div>
+      <div class="ck-step-line" id="step-line-3"></div>
+      <div class="ck-step" id="step-ind-4">
+        <div class="ck-step-circle">4</div>
+        <span>ยืนยันสลิป</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <main class="ck-main">
+    <div class="ck-grid">
+
+      <!-- LEFT: ORDER SUMMARY -->
+      <div class="ck-left">
+        <div class="ck-card ck-order-card">
+          <h2 class="ck-card-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+            สรุปคำสั่งซื้อ
+          </h2>
+
+          <!-- Product Item -->
+          <div class="ck-product">
+            <div class="ck-product-img">
+              <img src="/images/about/drtim.webp" alt="คู่มือพิชิตเบาหวานผอม" width="90" height="120" loading="eager"/>
+              <span class="ck-product-badge">E-Book + App</span>
+            </div>
+            <div class="ck-product-info">
+              <h3>คู่มือพิชิตเบาหวาน:<br/>สำหรับ "เบาหวานผอม"</h3>
+              <p class="ck-product-author">โดย หมอทิม — Functional Medicine</p>
+              <div class="ck-product-includes">
+                <span>📕 คู่มือ PDF 120+ หน้า</span>
+                <span>📱 FITKUB AI Coach Access</span>
+                <span>🎁 Bonus: Food Sequencing Guide</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pricing -->
+          <div class="ck-pricing">
+            <div class="ck-price-row">
+              <span>ราคาปกติ</span>
+              <span class="ck-price-original">฿{originalPrice.toLocaleString()}</span>
+            </div>
+            <div class="ck-price-row ck-discount-row">
+              <span>🎉 ส่วนลด Early Bird (-{discountPercent}%)</span>
+              <span class="ck-price-discount">-฿{(originalPrice - productPrice).toLocaleString()}</span>
+            </div>
+            <div class="ck-price-divider"></div>
+            <div class="ck-price-row ck-total-row">
+              <span>ยอดชำระทั้งหมด</span>
+              <span class="ck-price-total">฿{productPrice.toLocaleString()}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- WHAT YOU GET -->
+        <div class="ck-card ck-includes-card">
+          <h3 class="ck-card-title-sm">✨ สิ่งที่คุณจะได้รับ</h3>
+          <ul class="ck-includes-list">
+            <li>
+              <span class="ck-check">✓</span>
+              <div>
+                <strong>คู่มือ PDF ฉบับสมบูรณ์</strong>
+                <span>120+ หน้า พร้อม Checklist ทำตามได้ทันที</span>
+              </div>
+            </li>
+            <li>
+              <span class="ck-check">✓</span>
+              <div>
+                <strong>FITKUB AI Coach 30 วัน</strong>
+                <span>ผู้ช่วย AI วิเคราะห์อาหาร + ผลเลือด</span>
+              </div>
+            </li>
+            <li>
+              <span class="ck-check">✓</span>
+              <div>
+                <strong>Food Sequencing Guide</strong>
+                <span>เคล็ดลับกินถูกลำดับ ลดน้ำตาลพุ่ง</span>
+              </div>
+            </li>
+            <li>
+              <span class="ck-check">✓</span>
+              <div>
+                <strong>อัพเดทเนื้อหาฟรีตลอดชีพ</strong>
+                <span>รับ Version ใหม่โดยไม่ต้องจ่ายเพิ่ม</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- TRUST SIGNALS -->
+        <div class="ck-trust-row">
+          <div class="ck-trust-item">
+            <span class="ck-trust-icon">🔒</span>
+            <span>ชำระเงินปลอดภัย</span>
+          </div>
+          <div class="ck-trust-item">
+            <span class="ck-trust-icon">⚡</span>
+            <span>ได้รับทันทีหลังยืนยัน</span>
+          </div>
+          <div class="ck-trust-item">
+            <span class="ck-trust-icon">🛡️</span>
+            <span>รับประกันคืนเงิน 7 วัน</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CENTER: CUSTOMER INFO FORM (Step 2) -->
+      <div class="ck-right" id="ck-step-info">
+        <div class="ck-card ck-form-card">
+          <h2 class="ck-card-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            ข้อมูลสำหรับจัดส่ง
+          </h2>
+
+          <form id="ck-customer-form" novalidate>
+            <!-- Full Name -->
+            <div class="ck-field">
+              <label class="ck-label" for="ck-name">
+                <span class="ck-label-text">ชื่อ-นามสกุล</span>
+                <span class="ck-required">*</span>
+              </label>
+              <div class="ck-input-wrap">
+                <svg class="ck-input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <input type="text" id="ck-name" name="name" placeholder="เช่น สมชาย ใจดี" required autocomplete="name" />
+              </div>
+              <span class="ck-error" id="err-name">กรุณากรอกชื่อ-นามสกุล</span>
+            </div>
+
+            <!-- Phone -->
+            <div class="ck-field">
+              <label class="ck-label" for="ck-phone">
+                <span class="ck-label-text">เบอร์โทรศัพท์</span>
+                <span class="ck-required">*</span>
+              </label>
+              <div class="ck-input-wrap">
+                <svg class="ck-input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+                <input type="tel" id="ck-phone" name="phone" placeholder="08x-xxx-xxxx" required autocomplete="tel" />
+              </div>
+              <span class="ck-error" id="err-phone">กรุณากรอกเบอร์โทรศัพท์</span>
+            </div>
+
+            <!-- LINE ID (optional) -->
+            <div class="ck-field">
+              <label class="ck-label" for="ck-line">
+                <span class="ck-label-text">LINE ID</span>
+                <span class="ck-optional">(ถ้ามี)</span>
+              </label>
+              <div class="ck-input-wrap">
+                <svg class="ck-input-icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 10.5C24 4.701 18.627 0 12 0S0 4.701 0 10.5c0 5.19 4.604 9.537 10.824 10.362.42.092.992.28 1.137.641.13.328.085.84.042 1.17l-.184 1.107c-.056.328-.26 1.284 1.124.7 1.384-.584 7.466-4.396 10.184-7.525C25.18 14.703 24 12.727 24 10.5z"></path></svg>
+                <input type="text" id="ck-line" name="line_id" placeholder="@line_id" autocomplete="off" />
+              </div>
+            </div>
+
+            <!-- Email (optional) -->
+            <div class="ck-field">
+              <label class="ck-label" for="ck-email">
+                <span class="ck-label-text">อีเมล</span>
+                <span class="ck-optional">(สำหรับส่งคู่มือ PDF)</span>
+              </label>
+              <div class="ck-input-wrap">
+                <svg class="ck-input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                <input type="email" id="ck-email" name="email" placeholder="your@email.com" autocomplete="email" />
+              </div>
+            </div>
+
+            <!-- Address -->
+            <div class="ck-field">
+              <label class="ck-label" for="ck-address">
+                <span class="ck-label-text">ที่อยู่จัดส่ง</span>
+                <span class="ck-required">*</span>
+              </label>
+              <div class="ck-input-wrap ck-input-wrap-textarea">
+                <svg class="ck-input-icon ck-input-icon-top" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <textarea id="ck-address" name="address" rows="3" placeholder="บ้านเลขที่ ซอย ถนน ตำบล อำเภอ จังหวัด รหัสไปรษณีย์" required></textarea>
+              </div>
+              <span class="ck-error" id="err-address">กรุณากรอกที่อยู่จัดส่ง</span>
+            </div>
+
+            <!-- Note -->
+            <div class="ck-field">
+              <label class="ck-label" for="ck-note">
+                <span class="ck-label-text">หมายเหตุเพิ่มเติม</span>
+                <span class="ck-optional">(ถ้ามี)</span>
+              </label>
+              <div class="ck-input-wrap ck-input-wrap-textarea">
+                <svg class="ck-input-icon ck-input-icon-top" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                <textarea id="ck-note" name="note" rows="2" placeholder="เช่น ต้องการใบเสร็จ / ฝากถึงคนรับ"></textarea>
+              </div>
+            </div>
+
+            <!-- Submit to next step -->
+            <button type="submit" class="ck-next-btn" id="ck-next-step">
+              ดำเนินการชำระเงิน →
+            </button>
+            <p class="ck-form-privacy">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+              ข้อมูลของคุณปลอดภัย เราใช้เพื่อการจัดส่งเท่านั้น
+            </p>
+          </form>
+        </div>
+      </div>
+
+      <!-- RIGHT: PAYMENT (Step 3 — hidden initially) -->
+      <div class="ck-right ck-step-hidden" id="ck-step-payment">
+        <div class="ck-card ck-payment-card">
+          <h2 class="ck-card-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+            ช่องทางชำระเงิน
+          </h2>
+
+          <!-- Payment Tab -->
+          <div class="ck-payment-tabs">
+            <button class="ck-tab active" id="tab-qr">
+              <span class="ck-tab-icon">📱</span>
+              QR PromptPay
+            </button>
+            <button class="ck-tab" id="tab-transfer">
+              <span class="ck-tab-icon">🏦</span>
+              โอนเงิน
+            </button>
+          </div>
+
+          <!-- QR Content -->
+          <div class="ck-tab-content active" id="content-qr">
+            <div class="ck-qr-wrapper">
+              <div class="ck-qr-amount">
+                <span class="ck-qr-amount-label">ยอดชำระ</span>
+                <span class="ck-qr-amount-value">฿{productPrice.toLocaleString()}</span>
+              </div>
+              <div class="ck-qr-code">
+                <img src="/images/checkout/promptpay-qr.png" alt="PromptPay QR Code — สแกนเพื่อชำระเงิน" width="280" height="280" loading="eager"/>
+                <div class="ck-qr-glow"></div>
+              </div>
+              <div class="ck-qr-info">
+                <div class="ck-promptpay-badge">
+                  <span class="ck-pp-logo">พร้อมเพย์</span>
+                  <span class="ck-pp-text">PromptPay</span>
+                </div>
+                <p class="ck-qr-number">เบอร์: <strong>{promptpayNumber}</strong></p>
+                <p class="ck-qr-name">ชื่อบัญชี: <strong>Dr. Tim Clinic</strong></p>
+              </div>
+            </div>
+
+            <div class="ck-qr-steps">
+              <div class="ck-qr-step">
+                <div class="ck-qr-step-num">1</div>
+                <div>
+                  <strong>เปิดแอปธนาคาร</strong>
+                  <span>เลือก "สแกน QR" หรือ "จ่ายเงิน"</span>
+                </div>
+              </div>
+              <div class="ck-qr-step">
+                <div class="ck-qr-step-num">2</div>
+                <div>
+                  <strong>สแกน QR Code ด้านบน</strong>
+                  <span>ระบุจำนวน ฿{productPrice.toLocaleString()} แล้วยืนยัน</span>
+                </div>
+              </div>
+              <div class="ck-qr-step">
+                <div class="ck-qr-step-num">3</div>
+                <div>
+                  <strong>ส่งสลิปยืนยันผ่าน LINE</strong>
+                  <span>รับคู่มือ + สิทธิ์เข้าถึง App ภายใน 5 นาที</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Transfer Content -->
+          <div class="ck-tab-content" id="content-transfer">
+            <div class="ck-transfer-info">
+              <div class="ck-bank-card">
+                <div class="ck-bank-logo">🟣</div>
+                <div class="ck-bank-details">
+                  <span class="ck-bank-name">ธนาคารไทยพาณิชย์ (SCB)</span>
+                  <span class="ck-bank-account">xxx-x-xxxxx-x</span>
+                  <span class="ck-bank-holder">ชื่อบัญชี: Dr. Tim Clinic</span>
+                </div>
+                <button class="ck-copy-btn" id="copy-account" aria-label="คัดลอกเลขบัญชี">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                  คัดลอก
+                </button>
+              </div>
+
+              <div class="ck-transfer-amount">
+                <span>กรุณาโอนจำนวน</span>
+                <span class="ck-transfer-total">฿{productPrice.toLocaleString()}</span>
+              </div>
+
+              <div class="ck-transfer-note">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                <span>หลังโอนเสร็จ ส่งสลิปผ่าน LINE เพื่อรับคู่มือทันที</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- CTA: Send Slip -->
+          <a href={lineUrl} target="_blank" rel="noopener" class="ck-submit-btn" id="ck-submit">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M24 10.5C24 4.701 18.627 0 12 0S0 4.701 0 10.5c0 5.19 4.604 9.537 10.824 10.362.42.092.992.28 1.137.641.13.328.085.84.042 1.17l-.184 1.107c-.056.328-.26 1.284 1.124.7 1.384-.584 7.466-4.396 10.184-7.525C25.18 14.703 24 12.727 24 10.5z"></path></svg>
+            📤 ส่งสลิปยืนยันผ่าน LINE
+          </a>
+          <p class="ck-submit-note">แอด LINE <strong>@drtim</strong> แล้วส่งรูปสลิป — รับคู่มือภายใน 5 นาที</p>
+        </div>
+
+        <!-- GUARANTEE -->
+        <div class="ck-card ck-guarantee-card">
+          <div class="ck-guarantee-icon">🛡️</div>
+          <h3 class="ck-guarantee-title">รับประกันคืนเงิน 7 วัน</h3>
+          <p class="ck-guarantee-desc">หากอ่านแล้วไม่พึงพอใจ สามารถขอคืนเงินเต็มจำนวนภายใน 7 วันหลังซื้อ โดยไม่ต้องระบุเหตุผล</p>
+        </div>
+
+        <!-- SOCIAL PROOF MINI -->
+        <div class="ck-card ck-social-card">
+          <div class="ck-social-row">
+            <div class="ck-avatars">
+              <span class="ck-mini-avatar" style="background:#14b8a6">ก</span>
+              <span class="ck-mini-avatar" style="background:#f59e0b">ว</span>
+              <span class="ck-mini-avatar" style="background:#8b5cf6">ส</span>
+              <span class="ck-mini-avatar" style="background:#ec4899">น</span>
+            </div>
+            <div class="ck-social-text">
+              <strong>1,200+ คน</strong> ลงทะเบียนรอแล้ว
+              <span class="ck-social-live">
+                <span class="ck-pulse"></span>
+                <span id="ck-live-count">3</span> คนกำลังดูหน้านี้
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- MOBILE STICKY CTA -->
+  <div class="ck-mobile-sticky">
+    <div class="ck-mobile-sticky-price">
+      <span class="ck-ms-original">฿{originalPrice.toLocaleString()}</span>
+      <span class="ck-ms-total">฿{productPrice.toLocaleString()}</span>
+    </div>
+    <a href={lineUrl} target="_blank" rel="noopener" class="ck-mobile-sticky-btn">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 10.5C24 4.701 18.627 0 12 0S0 4.701 0 10.5c0 5.19 4.604 9.537 10.824 10.362.42.092.992.28 1.137.641.13.328.085.84.042 1.17l-.184 1.107c-.056.328-.26 1.284 1.124.7 1.384-.584 7.466-4.396 10.184-7.525C25.18 14.703 24 12.727 24 10.5z"></path></svg>
+      ส่งสลิปผ่าน LINE
+    </a>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="ck-footer">
+    <p>© {new Date().getFullYear()} Dr. Tim — Ultramed Clinic, ชลบุรี | <a href="/">drtim.co</a> | <a href="/privacy-policy">นโยบายความเป็นส่วนตัว</a></p>
+  </footer>
+</div>
+
+</BaseLayout>
+
+<style>
+/* ═══════════════════════════════════════════════
+   CHECKOUT PAGE — THAI QR PROMPTPAY
+   ═══════════════════════════════════════════════ */
+:root {
+  --ck-bg: #060b09;
+  --ck-surface: #0d1512;
+  --ck-card: rgba(255,255,255,.035);
+  --ck-card-hover: rgba(255,255,255,.06);
+  --ck-brd: rgba(255,255,255,.08);
+  --ck-teal: #0f766e;
+  --ck-teal-l: #14b8a6;
+  --ck-gold: #f59e0b;
+  --ck-gold-l: #fbbf24;
+  --ck-green: #06c755;
+  --ck-green-h: #05b04a;
+  --ck-red: #ef4444;
+  --ck-txt: #f0fdf4;
+  --ck-muted: rgba(255,255,255,.55);
+  --ck-rad: 16px;
+  --ck-mx: 1080px;
+}
+
+.checkout-page {
+  min-height: 100vh;
+  background: var(--ck-bg);
+  color: var(--ck-txt);
+  font-family: 'Noto Sans Thai', 'Inter', system-ui, sans-serif;
+}
+
+/* ═══ HEADER ═══ */
+.ck-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(6,11,9,.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--ck-brd);
+}
+.ck-header-inner {
+  max-width: var(--ck-mx);
+  margin: 0 auto;
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.ck-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ck-muted);
+  font-size: 14px;
+  font-weight: 500;
+  transition: color .2s;
+  text-decoration: none;
+}
+.ck-back:hover { color: #fff; }
+.ck-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ck-logo-icon { font-size: 22px; }
+.ck-logo-text { font-size: 16px; font-weight: 700; color: #fff; }
+.ck-secure {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ck-teal-l);
+  background: rgba(20,184,166,.1);
+  border: 1px solid rgba(20,184,166,.2);
+  padding: 5px 12px;
+  border-radius: 999px;
+}
+
+/* ═══ PROGRESS ═══ */
+.ck-progress {
+  background: var(--ck-surface);
+  border-bottom: 1px solid var(--ck-brd);
+  padding: 20px 24px;
+}
+.ck-progress-inner {
+  max-width: 580px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+}
+.ck-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.ck-step span {
+  font-size: 11px;
+  color: var(--ck-muted);
+  font-weight: 500;
+  letter-spacing: .02em;
+}
+.ck-step.active span { color: var(--ck-teal-l); font-weight: 700; }
+.ck-step.done span { color: var(--ck-teal-l); }
+.ck-step-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.06);
+  border: 2px solid var(--ck-brd);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ck-muted);
+}
+.ck-step.active .ck-step-circle {
+  background: rgba(20,184,166,.2);
+  border-color: var(--ck-teal-l);
+  color: var(--ck-teal-l);
+  box-shadow: 0 0 12px rgba(20,184,166,.3);
+}
+.ck-step.done .ck-step-circle {
+  background: var(--ck-teal);
+  border-color: var(--ck-teal-l);
+  color: #fff;
+}
+.ck-step-line {
+  height: 2px;
+  width: 48px;
+  background: var(--ck-brd);
+  margin: 0 6px;
+  margin-bottom: 22px;
+  border-radius: 2px;
+}
+.ck-step-line.done-line {
+  background: linear-gradient(90deg, var(--ck-teal-l), var(--ck-teal));
+}
+
+/* STEP VISIBILITY */
+.ck-step-hidden {
+  display: none;
+}
+
+/* ═══ CUSTOMER FORM ═══ */
+.ck-form-card {
+  border-color: rgba(20,184,166,.2);
+  background: rgba(20,184,166,.03);
+}
+.ck-field {
+  margin-bottom: 20px;
+}
+.ck-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.ck-label-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+}
+.ck-required {
+  color: var(--ck-red);
+  font-weight: 700;
+  font-size: 14px;
+}
+.ck-optional {
+  font-size: 12px;
+  color: var(--ck-muted);
+  font-weight: 400;
+}
+.ck-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.ck-input-wrap-textarea {
+  align-items: flex-start;
+}
+.ck-input-icon {
+  position: absolute;
+  left: 14px;
+  color: var(--ck-muted);
+  pointer-events: none;
+  flex-shrink: 0;
+}
+.ck-input-icon-top {
+  top: 14px;
+}
+.ck-input-wrap input,
+.ck-input-wrap textarea {
+  width: 100%;
+  padding: 14px 14px 14px 44px;
+  background: rgba(255,255,255,.05);
+  border: 2px solid var(--ck-brd);
+  border-radius: 12px;
+  color: #fff;
+  font-size: 15px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color .2s, background .2s, box-shadow .2s;
+  -webkit-appearance: none;
+}
+.ck-input-wrap input::placeholder,
+.ck-input-wrap textarea::placeholder {
+  color: rgba(255,255,255,.25);
+}
+.ck-input-wrap input:focus,
+.ck-input-wrap textarea:focus {
+  border-color: var(--ck-teal-l);
+  background: rgba(20,184,166,.05);
+  box-shadow: 0 0 0 3px rgba(20,184,166,.12);
+}
+.ck-input-wrap textarea {
+  resize: vertical;
+  min-height: 70px;
+}
+.ck-input-wrap input.ck-input-error,
+.ck-input-wrap textarea.ck-input-error {
+  border-color: var(--ck-red);
+  background: rgba(239,68,68,.05);
+  box-shadow: 0 0 0 3px rgba(239,68,68,.1);
+}
+.ck-input-wrap input.ck-input-valid,
+.ck-input-wrap textarea.ck-input-valid {
+  border-color: var(--ck-teal-l);
+}
+.ck-error {
+  display: none;
+  font-size: 12px;
+  color: var(--ck-red);
+  margin-top: 6px;
+  padding-left: 4px;
+}
+.ck-error.visible {
+  display: block;
+}
+
+/* Next Step Button */
+.ck-next-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 18px 24px;
+  background: linear-gradient(135deg, var(--ck-teal), var(--ck-teal-l));
+  color: #fff;
+  font-size: 18px;
+  font-weight: 800;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  transition: all .3s;
+  margin-top: 8px;
+  box-shadow: 0 4px 20px rgba(20,184,166,.3);
+}
+.ck-next-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(20,184,166,.4);
+}
+.ck-next-btn:active {
+  transform: translateY(0);
+}
+.ck-form-privacy {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--ck-muted);
+  margin-top: 14px;
+}
+.ck-form-privacy svg {
+  color: var(--ck-teal-l);
+  flex-shrink: 0;
+}
+
+/* Customer summary in payment step */
+.ck-customer-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.ck-cust-row {
+  display: flex;
+  gap: 10px;
+  font-size: 13px;
+  padding: 8px 12px;
+  background: rgba(255,255,255,.03);
+  border-radius: 8px;
+}
+.ck-cust-label {
+  color: var(--ck-muted);
+  white-space: nowrap;
+  min-width: 80px;
+}
+.ck-cust-value {
+  color: #fff;
+  font-weight: 500;
+  word-break: break-word;
+}
+.ck-edit-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--ck-teal-l);
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 6px 0;
+  margin-top: 4px;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ═══ MAIN GRID ═══ */
+.ck-main {
+  max-width: var(--ck-mx);
+  margin: 0 auto;
+  padding: 32px 24px 80px;
+}
+.ck-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  gap: 28px;
+  align-items: start;
+}
+
+/* ═══ CARDS ═══ */
+.ck-card {
+  background: var(--ck-card);
+  border: 1px solid var(--ck-brd);
+  border-radius: var(--ck-rad);
+  padding: 28px;
+  margin-bottom: 20px;
+}
+.ck-card-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 17px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--ck-brd);
+}
+.ck-card-title svg { color: var(--ck-teal-l); }
+.ck-card-title-sm {
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 16px;
+}
+
+/* ═══ PRODUCT ═══ */
+.ck-product {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 24px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--ck-brd);
+}
+.ck-product-img {
+  position: relative;
+  flex-shrink: 0;
+  width: 90px;
+}
+.ck-product-img img {
+  width: 90px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0,0,0,.3);
+}
+.ck-product-badge {
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--ck-teal);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+  letter-spacing: .03em;
+}
+.ck-product-info h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.4;
+  margin-bottom: 4px;
+}
+.ck-product-author {
+  font-size: 13px;
+  color: var(--ck-muted);
+  margin-bottom: 12px;
+}
+.ck-product-includes {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.ck-product-includes span {
+  font-size: 12px;
+  color: var(--ck-muted);
+}
+
+/* ═══ PRICING ═══ */
+.ck-pricing { }
+.ck-price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  font-size: 14px;
+  color: var(--ck-muted);
+}
+.ck-price-original {
+  text-decoration: line-through;
+  color: rgba(255,255,255,.35);
+}
+.ck-discount-row { color: var(--ck-teal-l); }
+.ck-price-discount { color: var(--ck-teal-l); font-weight: 600; }
+.ck-price-divider {
+  height: 1px;
+  background: var(--ck-brd);
+  margin: 8px 0;
+}
+.ck-total-row {
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  padding: 12px 0 4px;
+}
+.ck-price-total {
+  font-size: 24px;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--ck-teal-l), var(--ck-gold-l));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ═══ INCLUDES ═══ */
+.ck-includes-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.ck-includes-list li {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.ck-check {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(20,184,166,.15);
+  color: var(--ck-teal-l);
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 50%;
+  margin-top: 2px;
+}
+.ck-includes-list strong {
+  display: block;
+  font-size: 14px;
+  color: #fff;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+.ck-includes-list span {
+  font-size: 12px;
+  color: var(--ck-muted);
+  line-height: 1.5;
+}
+
+/* ═══ TRUST ═══ */
+.ck-trust-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.ck-trust-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+  background: var(--ck-card);
+  border: 1px solid var(--ck-brd);
+  border-radius: 12px;
+  padding: 16px 10px;
+  font-size: 11px;
+  color: var(--ck-muted);
+  font-weight: 500;
+}
+.ck-trust-icon { font-size: 20px; }
+
+/* ═══ PAYMENT CARD ═══ */
+.ck-payment-card {
+  border-color: rgba(20,184,166,.2);
+  background: rgba(20,184,166,.03);
+}
+
+/* TABS */
+.ck-payment-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+.ck-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  background: rgba(255,255,255,.04);
+  border: 2px solid var(--ck-brd);
+  border-radius: 12px;
+  color: var(--ck-muted);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .2s;
+}
+.ck-tab:hover {
+  background: rgba(255,255,255,.06);
+  border-color: rgba(255,255,255,.15);
+}
+.ck-tab.active {
+  background: rgba(20,184,166,.1);
+  border-color: var(--ck-teal-l);
+  color: var(--ck-teal-l);
+  box-shadow: 0 0 16px rgba(20,184,166,.15);
+}
+.ck-tab-icon { font-size: 18px; }
+.ck-tab-content { display: none; }
+.ck-tab-content.active { display: block; }
+
+/* QR WRAPPER */
+.ck-qr-wrapper {
+  text-align: center;
+  padding: 16px 0 24px;
+}
+.ck-qr-amount {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.ck-qr-amount-label {
+  font-size: 14px;
+  color: var(--ck-muted);
+}
+.ck-qr-amount-value {
+  font-size: 32px;
+  font-weight: 800;
+  color: #fff;
+}
+.ck-qr-code {
+  position: relative;
+  display: inline-block;
+  background: #fff;
+  padding: 16px;
+  border-radius: 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 40px rgba(0,0,0,.3);
+}
+.ck-qr-code img {
+  display: block;
+  width: 260px;
+  height: 260px;
+  border-radius: 8px;
+}
+.ck-qr-glow {
+  position: absolute;
+  inset: -30px;
+  background: radial-gradient(circle, rgba(20,184,166,.12) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: -1;
+}
+.ck-qr-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.ck-promptpay-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(26,86,219,.1);
+  border: 1px solid rgba(26,86,219,.25);
+  padding: 6px 16px;
+  border-radius: 999px;
+}
+.ck-pp-logo {
+  font-size: 12px;
+  font-weight: 800;
+  color: #3b82f6;
+}
+.ck-pp-text {
+  font-size: 12px;
+  font-weight: 700;
+  color: #60a5fa;
+}
+.ck-qr-number, .ck-qr-name {
+  font-size: 13px;
+  color: var(--ck-muted);
+  margin: 0;
+}
+.ck-qr-number strong, .ck-qr-name strong {
+  color: #fff;
+}
+
+/* QR STEPS */
+.ck-qr-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--ck-brd);
+}
+.ck-qr-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 12px 16px;
+  background: rgba(255,255,255,.03);
+  border-radius: 12px;
+  transition: background .2s;
+}
+.ck-qr-step:hover { background: rgba(255,255,255,.06); }
+.ck-qr-step-num {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(20,184,166,.15);
+  color: var(--ck-teal-l);
+  font-size: 13px;
+  font-weight: 800;
+  border-radius: 50%;
+}
+.ck-qr-step strong {
+  display: block;
+  font-size: 14px;
+  color: #fff;
+  margin-bottom: 2px;
+}
+.ck-qr-step span {
+  font-size: 12px;
+  color: var(--ck-muted);
+}
+
+/* TRANSFER */
+.ck-transfer-info {
+  padding: 16px 0;
+}
+.ck-bank-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid var(--ck-brd);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+.ck-bank-logo { font-size: 28px; }
+.ck-bank-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+.ck-bank-name { font-size: 14px; font-weight: 600; color: #fff; }
+.ck-bank-account {
+  font-size: 18px;
+  font-weight: 800;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .04em;
+}
+.ck-bank-holder { font-size: 12px; color: var(--ck-muted); }
+.ck-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(20,184,166,.1);
+  border: 1px solid rgba(20,184,166,.25);
+  color: var(--ck-teal-l);
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .2s;
+}
+.ck-copy-btn:hover {
+  background: rgba(20,184,166,.2);
+}
+.ck-transfer-amount {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: rgba(245,158,11,.06);
+  border: 1px solid rgba(245,158,11,.15);
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+.ck-transfer-amount span:first-child {
+  font-size: 14px;
+  color: var(--ck-muted);
+}
+.ck-transfer-total {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--ck-gold-l);
+}
+.ck-transfer-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--ck-teal-l);
+  padding: 12px 16px;
+  background: rgba(20,184,166,.06);
+  border-radius: 10px;
+}
+
+/* SUBMIT */
+.ck-submit-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 18px 24px;
+  background: var(--ck-green);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 800;
+  border-radius: 14px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: all .3s;
+  margin-top: 24px;
+  box-shadow: 0 4px 24px rgba(6,199,85,.3);
+  animation: ckPulse 3s ease-in-out infinite;
+}
+.ck-submit-btn:hover {
+  background: var(--ck-green-h);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(6,199,85,.5);
+  color: #fff;
+}
+@keyframes ckPulse {
+  0%,100% { box-shadow: 0 4px 24px rgba(6,199,85,.3), 0 0 0 0 rgba(6,199,85,.3); }
+  50% { box-shadow: 0 4px 24px rgba(6,199,85,.3), 0 0 0 10px rgba(6,199,85,0); }
+}
+.ck-submit-note {
+  text-align: center;
+  font-size: 12px;
+  color: var(--ck-muted);
+  margin-top: 12px;
+}
+.ck-submit-note strong { color: var(--ck-teal-l); }
+
+/* GUARANTEE */
+.ck-guarantee-card {
+  text-align: center;
+  border-color: rgba(245,158,11,.15);
+  background: rgba(245,158,11,.03);
+}
+.ck-guarantee-icon { font-size: 36px; margin-bottom: 8px; }
+.ck-guarantee-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ck-gold-l);
+  margin-bottom: 8px;
+}
+.ck-guarantee-desc {
+  font-size: 13px;
+  color: var(--ck-muted);
+  line-height: 1.7;
+}
+
+/* SOCIAL CARD */
+.ck-social-card { padding: 20px 24px; }
+.ck-social-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.ck-avatars {
+  display: flex;
+}
+.ck-mini-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  margin-right: -8px;
+  border: 2px solid var(--ck-bg);
+}
+.ck-social-text {
+  font-size: 13px;
+  color: var(--ck-muted);
+}
+.ck-social-text strong { color: #fff; }
+.ck-social-live {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--ck-teal-l);
+}
+.ck-pulse {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ck-teal-l);
+  animation: livePulse 2s ease-in-out infinite;
+}
+@keyframes livePulse {
+  0%,100% { opacity: 1; box-shadow: 0 0 0 0 rgba(20,184,166,.5); }
+  50% { opacity: .6; box-shadow: 0 0 0 6px rgba(20,184,166,0); }
+}
+
+/* MOBILE STICKY */
+.ck-mobile-sticky {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 99;
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: rgba(6,11,9,.96);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid var(--ck-brd);
+}
+.ck-ms-original {
+  font-size: 13px;
+  color: rgba(255,255,255,.35);
+  text-decoration: line-through;
+  display: block;
+}
+.ck-ms-total {
+  font-size: 20px;
+  font-weight: 800;
+  color: #fff;
+}
+.ck-mobile-sticky-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: var(--ck-green);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  border-radius: 999px;
+  text-decoration: none;
+  box-shadow: 0 4px 16px rgba(6,199,85,.3);
+}
+
+/* FOOTER */
+.ck-footer {
+  border-top: 1px solid var(--ck-brd);
+  padding: 20px 24px;
+  text-align: center;
+}
+.ck-footer p {
+  font-size: 12px;
+  color: var(--ck-muted);
+  max-width: var(--ck-mx);
+  margin: 0 auto;
+}
+.ck-footer a { color: var(--ck-teal-l); }
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 900px) {
+  .ck-grid {
+    grid-template-columns: 1fr;
+  }
+  .ck-left { order: 2; }
+  .ck-right { order: 1; }
+}
+@media (max-width: 640px) {
+  .ck-main { padding: 20px 12px 100px; }
+  .ck-card { padding: 20px 16px; }
+  .ck-product { flex-direction: column; align-items: center; text-align: center; }
+  .ck-product-info h3 { font-size: 15px; }
+  .ck-product-includes { align-items: center; }
+  .ck-trust-row { flex-direction: row; gap: 8px; }
+  .ck-trust-item { padding: 12px 6px; font-size: 10px; }
+  .ck-trust-icon { font-size: 16px; }
+  .ck-qr-code img { width: 220px; height: 220px; }
+  .ck-qr-amount-value { font-size: 26px; }
+  .ck-submit-btn { font-size: 16px; padding: 16px 20px; }
+  .ck-mobile-sticky { display: flex; }
+  .ck-footer { padding-bottom: 80px; }
+  .ck-step-line { width: 20px; }
+  .ck-step span { font-size: 9px; }
+  .ck-step-circle { width: 26px; height: 26px; font-size: 11px; }
+  .ck-bank-card { flex-wrap: wrap; }
+  .ck-copy-btn { width: 100%; justify-content: center; margin-top: 8px; }
+  .ck-input-wrap input, .ck-input-wrap textarea { font-size: 16px; }
+  .ck-next-btn { font-size: 16px; padding: 16px 20px; }
+}
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+
+    // ═══ STEP MANAGEMENT ═══
+    var stepInfo = document.getElementById('ck-step-info');
+    var stepPayment = document.getElementById('ck-step-payment');
+    var form = document.getElementById('ck-customer-form');
+    var checkSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+
+    function updateProgressBar(currentStep) {
+      for (var i = 1; i <= 4; i++) {
+        var ind = document.getElementById('step-ind-' + i);
+        var line = document.getElementById('step-line-' + i);
+        if (!ind) continue;
+        ind.classList.remove('done', 'active');
+        if (i < currentStep) {
+          ind.classList.add('done');
+          ind.querySelector('.ck-step-circle').innerHTML = checkSvg;
+        } else if (i === currentStep) {
+          ind.classList.add('active');
+          ind.querySelector('.ck-step-circle').textContent = String(i);
+        } else {
+          ind.querySelector('.ck-step-circle').textContent = String(i);
+        }
+        if (line) {
+          if (i < currentStep) {
+            line.classList.add('done-line');
+          } else {
+            line.classList.remove('done-line');
+          }
+        }
+      }
+    }
+
+    // ═══ FORM VALIDATION ═══
+    function validateForm() {
+      var valid = true;
+      var nameVal = document.getElementById('ck-name').value.trim();
+      var phoneVal = document.getElementById('ck-phone').value.trim();
+      var addrVal = document.getElementById('ck-address').value.trim();
+
+      // Name
+      var nameInput = document.getElementById('ck-name');
+      var errName = document.getElementById('err-name');
+      if (!nameVal) {
+        nameInput.classList.add('ck-input-error');
+        nameInput.classList.remove('ck-input-valid');
+        errName.classList.add('visible');
+        valid = false;
+      } else {
+        nameInput.classList.remove('ck-input-error');
+        nameInput.classList.add('ck-input-valid');
+        errName.classList.remove('visible');
+      }
+
+      // Phone
+      var phoneInput = document.getElementById('ck-phone');
+      var errPhone = document.getElementById('err-phone');
+      var phoneClean = phoneVal.replace(/[\s\-]/g, '');
+      if (!phoneClean || phoneClean.length < 9) {
+        phoneInput.classList.add('ck-input-error');
+        phoneInput.classList.remove('ck-input-valid');
+        errPhone.classList.add('visible');
+        if (phoneClean.length > 0 && phoneClean.length < 9) {
+          errPhone.textContent = 'เบอร์โทรศัพท์ต้องมีอย่างน้อย 9 หลัก';
+        } else {
+          errPhone.textContent = 'กรุณากรอกเบอร์โทรศัพท์';
+        }
+        valid = false;
+      } else {
+        phoneInput.classList.remove('ck-input-error');
+        phoneInput.classList.add('ck-input-valid');
+        errPhone.classList.remove('visible');
+      }
+
+      // Address
+      var addrInput = document.getElementById('ck-address');
+      var errAddr = document.getElementById('err-address');
+      if (!addrVal) {
+        addrInput.classList.add('ck-input-error');
+        addrInput.classList.remove('ck-input-valid');
+        errAddr.classList.add('visible');
+        valid = false;
+      } else {
+        addrInput.classList.remove('ck-input-error');
+        addrInput.classList.add('ck-input-valid');
+        errAddr.classList.remove('visible');
+      }
+
+      return valid;
+    }
+
+    // Inline validation on blur
+    ['ck-name', 'ck-phone', 'ck-address'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('blur', function() {
+          if (el.value.trim()) {
+            el.classList.remove('ck-input-error');
+            el.classList.add('ck-input-valid');
+            var errEl = document.getElementById('err-' + id.replace('ck-', ''));
+            if (errEl) errEl.classList.remove('visible');
+          }
+        });
+      }
+    });
+
+    // ═══ FORM SUBMIT → SHOW PAYMENT ═══
+    if (form) {
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        if (!validateForm()) {
+          // Scroll to first error
+          var firstErr = form.querySelector('.ck-input-error');
+          if (firstErr) firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          return;
+        }
+
+        // Build customer summary for payment step
+        var nameVal = document.getElementById('ck-name').value.trim();
+        var phoneVal = document.getElementById('ck-phone').value.trim();
+        var lineVal = document.getElementById('ck-line').value.trim();
+        var emailVal = document.getElementById('ck-email').value.trim();
+        var addrVal = document.getElementById('ck-address').value.trim();
+
+        var summaryHTML = '<div class="ck-customer-summary">';
+        summaryHTML += '<div class="ck-cust-row"><span class="ck-cust-label">👤 ชื่อ</span><span class="ck-cust-value">' + nameVal + '</span></div>';
+        summaryHTML += '<div class="ck-cust-row"><span class="ck-cust-label">📞 เบอร์</span><span class="ck-cust-value">' + phoneVal + '</span></div>';
+        if (lineVal) summaryHTML += '<div class="ck-cust-row"><span class="ck-cust-label">💬 LINE</span><span class="ck-cust-value">' + lineVal + '</span></div>';
+        if (emailVal) summaryHTML += '<div class="ck-cust-row"><span class="ck-cust-label">✉️ อีเมล</span><span class="ck-cust-value">' + emailVal + '</span></div>';
+        summaryHTML += '<div class="ck-cust-row"><span class="ck-cust-label">📍 ที่อยู่</span><span class="ck-cust-value">' + addrVal + '</span></div>';
+        summaryHTML += '</div>';
+        summaryHTML += '<button type="button" class="ck-edit-info" id="ck-edit-info">✏️ แก้ไขข้อมูล</button>';
+
+        // Inject summary before payment card title
+        var paymentCard = stepPayment.querySelector('.ck-payment-card');
+        var existingSummary = paymentCard.querySelector('.ck-customer-summary');
+        var existingEdit = paymentCard.querySelector('.ck-edit-info');
+        if (existingSummary) existingSummary.remove();
+        if (existingEdit) existingEdit.remove();
+        var titleEl = paymentCard.querySelector('.ck-card-title');
+        titleEl.insertAdjacentHTML('afterend', summaryHTML);
+
+        // Edit button handler
+        document.getElementById('ck-edit-info').addEventListener('click', function() {
+          goToStep2();
+        });
+
+        // Transition to step 3
+        stepInfo.classList.add('ck-step-hidden');
+        stepPayment.classList.remove('ck-step-hidden');
+        updateProgressBar(3);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        // Re-run entrance animation on payment cards
+        var payCards = stepPayment.querySelectorAll('.ck-card');
+        payCards.forEach(function(card, i) {
+          card.style.opacity = '0';
+          card.style.transform = 'translateY(20px)';
+          card.style.transition = 'opacity .5s ease, transform .5s ease';
+          setTimeout(function() {
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+          }, 100 + i * 80);
+        });
+      });
+    }
+
+    function goToStep2() {
+      stepPayment.classList.add('ck-step-hidden');
+      stepInfo.classList.remove('ck-step-hidden');
+      updateProgressBar(2);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ═══ TAB SWITCHING ═══
+    var tabQr = document.getElementById('tab-qr');
+    var tabTransfer = document.getElementById('tab-transfer');
+    var contentQr = document.getElementById('content-qr');
+    var contentTransfer = document.getElementById('content-transfer');
+
+    if (tabQr && tabTransfer && contentQr && contentTransfer) {
+      tabQr.addEventListener('click', function() {
+        tabQr.classList.add('active');
+        tabTransfer.classList.remove('active');
+        contentQr.classList.add('active');
+        contentTransfer.classList.remove('active');
+      });
+
+      tabTransfer.addEventListener('click', function() {
+        tabTransfer.classList.add('active');
+        tabQr.classList.remove('active');
+        contentTransfer.classList.add('active');
+        contentQr.classList.remove('active');
+      });
+    }
+
+    // ═══ COPY ACCOUNT NUMBER ═══
+    var copyBtn = document.getElementById('copy-account');
+    if (copyBtn) {
+      copyBtn.addEventListener('click', function() {
+        navigator.clipboard.writeText('xxx-x-xxxxx-x').then(function() {
+          copyBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> คัดลอกแล้ว!';
+          copyBtn.style.background = 'rgba(20,184,166,.25)';
+          setTimeout(function() {
+            copyBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> คัดลอก';
+            copyBtn.style.background = 'rgba(20,184,166,.1)';
+          }, 2000);
+        });
+      });
+    }
+
+    // ═══ LIVE VIEWER COUNT (Social Proof) ═══
+    var liveCount = document.getElementById('ck-live-count');
+    if (liveCount) {
+      setInterval(function() {
+        var n = Math.floor(Math.random() * 5) + 2;
+        liveCount.textContent = String(n);
+      }, 8000);
+    }
+
+    // ═══ ENTRANCE ANIMATIONS ═══
+    var cards = document.querySelectorAll('#ck-step-info .ck-card, .ck-trust-row, .ck-order-card, .ck-includes-card');
+    cards.forEach(function(card, i) {
+      card.style.opacity = '0';
+      card.style.transform = 'translateY(20px)';
+      card.style.transition = 'opacity .5s ease, transform .5s ease';
+      setTimeout(function() {
+        card.style.opacity = '1';
+        card.style.transform = 'translateY(0)';
+      }, 100 + i * 80);
+    });
+  });
+</script>

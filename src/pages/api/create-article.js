@@ -7,9 +7,16 @@ import { neon } from '@neondatabase/serverless';
 
 export async function POST({ request }) {
   const body = await request.json();
-  const { id, key, title, slug, content, excerpt, seo_description, direct_answer, category, tags, image_url } = body;
+  const { id, key, title, slug, content, excerpt, seo_description, direct_answer, category, tags, image_url, status, focus_keyword, featured_image_url } = body;
 
-  if (key !== (import.meta.env.ADMIN_PASSWORD || process.env.ADMIN_PASSWORD)) {
+  const adminPassword = import.meta.env.ADMIN_PASSWORD || process.env.ADMIN_PASSWORD;
+
+  // Accept auth via JSON body key (for scripts) OR via cookie (for CMS dashboard)
+  const cookieString = request.headers.get('cookie') || '';
+  const hasValidCookie = cookieString.includes(`adminSession=${adminPassword}`);
+  const hasValidKey = key === adminPassword;
+
+  if (!hasValidCookie && !hasValidKey) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
   }
 
@@ -53,7 +60,8 @@ export async function POST({ request }) {
       const result = await sql`
       INSERT INTO article_drafts (
         title, slug, content, excerpt, seo_description,
-        direct_answer, category, tags, status, keyword, image_url
+        direct_answer, category, tags, status, keyword, image_url,
+        focus_keyword, featured_image_url
       ) VALUES (
         ${title},
         ${finalSlug},
@@ -63,9 +71,11 @@ export async function POST({ request }) {
         ${direct_answer || ''},
         ${category || ''},
         ${tags || []},
-        'review',
+        ${status || 'draft'},
         'manual',
-        ${image_url || ''}
+        ${image_url || featured_image_url || ''},
+        ${focus_keyword || ''},
+        ${featured_image_url || image_url || ''}
       )
       RETURNING id, title, slug
     `;

@@ -1,2010 +1,428 @@
 ---
-/**
- * Admin Article Dashboard
- * ─────────────────────────────────────────────
- * Review, approve, and reject AI-generated article drafts.
- * Protected by admin password.
- */
-export const prerender = false;
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { neon } from '@neondatabase/serverless';
+
+const DATABASE_URL = import.meta.env.NEON_DATABASE_URL;
+
+const url = Astro.url;
+const statusFilter = url.searchParams.get('status') || '';
+const searchQuery = url.searchParams.get('search') || '';
+
+let articles: any[] = [];
+
+if (DATABASE_URL) {
+    try {
+        const sql = neon(DATABASE_URL);
+        
+        // Build query dynamically
+        const pageNum = Math.max(1, parseInt(url.searchParams.get('page') || '1', 10));
+        const limit = 20;
+        const offset = (pageNum - 1) * limit;
+        
+        if (statusFilter && searchQuery) {
+            articles = await sql`
+                SELECT id, title, slug, category, status, created_at, reviewed_at
+                FROM article_drafts
+                WHERE status = ${statusFilter} 
+                AND title ILIKE ${'%' + searchQuery + '%'}
+                ORDER BY created_at DESC
+                LIMIT ${limit} OFFSET ${offset}
+            `;
+        } else if (statusFilter) {
+            articles = await sql`
+                SELECT id, title, slug, category, status, created_at, reviewed_at
+                FROM article_drafts
+                WHERE status = ${statusFilter}
+                ORDER BY created_at DESC
+                LIMIT ${limit} OFFSET ${offset}
+            `;
+        } else if (searchQuery) {
+            articles = await sql`
+                SELECT id, title, slug, category, status, created_at, reviewed_at
+                FROM article_drafts
+                WHERE title ILIKE ${'%' + searchQuery + '%'}
+                ORDER BY created_at DESC
+                LIMIT ${limit} OFFSET ${offset}
+            `;
+        } else {
+            articles = await sql`
+                SELECT id, title, slug, category, status, created_at, reviewed_at
+                FROM article_drafts
+                ORDER BY created_at DESC
+                LIMIT ${limit} OFFSET ${offset}
+            `;
+        }
+    } catch (e) {
+        console.error("Error fetching articles:", e);
+    }
+}
 ---
 
-<html lang="th">
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="robots" content="noindex, nofollow" />
-        <title>Admin — จัดการบทความ | Dr. Tim</title>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link
-            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-            rel="stylesheet"
-        />
-    </head>
-    <body>
-        <!-- Login Screen -->
-        <div id="loginScreen" class="login-screen">
-            <div class="login-card">
-                <h1>🔐 Admin Access</h1>
-                <p>กรุณาใส่รหัสผ่านเพื่อเข้าสู่ระบบ</p>
-                <input
-                    type="password"
-                    id="passwordInput"
-                    placeholder="Admin Password"
+<AdminLayout title="Articles">
+    <div class="page-header">
+        <div class="header-content">
+            <h1>Article Management</h1>
+            <p class="text-muted">Manage your drafts, pending reviews, and published articles.</p>
+        </div>
+        <div class="header-actions">
+            <a href="/admin/editor" class="btn-primary">✨ New Article</a>
+        </div>
+    </div>
+
+    <!-- Filters & Search -->
+    <div class="filters-card card">
+        <form method="GET" class="filters-form" id="filterForm">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input 
+                    type="text" 
+                    name="search" 
+                    placeholder="Search titles..." 
+                    value={searchQuery}
+                    class="form-input search-input"
                 />
-                <button id="loginBtn" onclick="login()">เข้าสู่ระบบ</button>
-                <p id="loginError" class="error" style="display:none">
-                    รหัสผ่านไม่ถูกต้อง
-                </p>
             </div>
-        </div>
+            <select name="status" class="form-select status-select" onchange="document.getElementById('filterForm').submit()">
+                <option value="">All Statuses</option>
+                <option value="draft" selected={statusFilter === 'draft'}>Drafts</option>
+                <option value="review" selected={statusFilter === 'review'}>Pending Review</option>
+                <option value="approved" selected={statusFilter === 'approved'}>Approved</option>
+                <option value="published" selected={statusFilter === 'published'}>Published</option>
+            </select>
+            {(searchQuery || statusFilter) && (
+                <a href="/admin/articles" class="btn-text clear-filters">Clear</a>
+            )}
+        </form>
+    </div>
 
-        <!-- Dashboard -->
-        <div id="dashboard" style="display:none">
-            <header class="admin-header">
-                <div class="header-left">
-                    <h1>📝 จัดการบทความ</h1>
-                    <span class="badge" id="countBadge">0 บทความ</span>
-                </div>
-                <div class="header-right">
-                    <select id="statusFilter" onchange="loadArticles()">
-                        <option value="">ทั้งหมด</option>
-                        <option value="review" selected>รอตรวจสอบ</option>
-                        <option value="approved">อนุมัติแล้ว</option>
-                        <option value="published">เผยแพร่แล้ว</option>
-                        <option value="rejected">ปฏิเสธ</option>
-                    </select>
-                    <button class="btn-primary" onclick="openCompose()"
-                        >✍️ เขียนบทความ</button
-                    >
-                    <button class="btn-secondary" onclick="loadArticles()"
-                        >🔄 รีเฟรช</button
-                    >
-                    <button class="btn-secondary" onclick="toggleKeywords()"
-                        >🔑 Keywords</button
-                    >
-                    <button class="btn-danger-sm" onclick="logout()"
-                        >ออกจากระบบ</button
-                    >
-                </div>
-            </header>
-
-            <!-- Keywords Panel (hidden by default) -->
-            <div id="keywordsPanel" class="panel" style="display:none">
-                <h2>🔑 Keyword Queue</h2>
-                <div class="keyword-form">
-                    <input
-                        type="text"
-                        id="newKeyword"
-                        placeholder="เพิ่ม keyword ใหม่..."
-                    />
-                    <input
-                        type="text"
-                        id="newCategory"
-                        placeholder="หมวดหมู่"
-                    />
-                    <button onclick="addKeyword()">+ เพิ่ม</button>
-                </div>
-                <div id="keywordList"></div>
+    <!-- Table -->
+    <div class="card table-container">
+        {articles.length > 0 ? (
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Category</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th class="actions-col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {articles.map(article => (
+                        <tr class="article-row" data-id={article.id}>
+                            <td>
+                                <div class="cell-title">
+                                    <a href={`/admin/editor?id=${article.id}`} class="title-link">{article.title}</a>
+                                    {article.slug && <span class="slug-text">/{article.slug}</span>}
+                                </div>
+                            </td>
+                            <td>
+                                <span class="category-tag">{article.category || 'Uncategorized'}</span>
+                            </td>
+                            <td>
+                                <span class={`status-badge status-${article.status}`}>{article.status}</span>
+                            </td>
+                            <td>
+                                <div class="date-text">
+                                    {new Date(article.reviewed_at || article.created_at).toLocaleDateString('en-GB')}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href={`/admin/editor?id=${article.id}`} class="btn-icon" title="Edit">✏️</a>
+                                    
+                                    {article.status === 'review' && (
+                                        <button class="btn-icon approve-btn" data-id={article.id} title="Approve & Publish">✅</button>
+                                    )}
+                                    
+                                    <a href={`/api/preview/${article.id}`} target="_blank" class="btn-icon" title="Preview">👁️</a>
+                                </div>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        ) : (
+            <div class="empty-state">
+                <div class="empty-icon">📝</div>
+                <h3>No articles found</h3>
+                <p>Try adjusting your search or filters, or create a new article.</p>
+                <a href="/admin/editor" class="btn-primary" style="margin-top: 16px;">Create First Article</a>
             </div>
+        )}
+    </div>
 
-            <!-- Article List -->
-            <div id="articleList" class="article-grid"></div>
+</AdminLayout>
 
-            <!-- Article Preview Modal -->
-            <div id="previewModal" class="modal" style="display:none">
-                <div class="modal-content preview-modal-content">
-                    <div class="modal-header">
-                        <h2 id="previewTitle">Article Title</h2>
-                        <button class="close-btn" onclick="closePreview()"
-                            >✕</button
-                        >
-                    </div>
-                    <div class="preview-layout">
-                        <div class="preview-body">
-                            <div class="preview-meta">
-                                <span id="previewCategory" class="tag"
-                                    >Category</span
-                                >
-                                <span id="previewDate" class="meta-date"
-                                    >Date</span
-                                >
-                                <span id="previewKeyword" class="meta-date"
-                                    >Keyword</span
-                                >
-                            </div>
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
 
-                            <div class="preview-info-box">
-                                <div>
-                                    <strong>SEO Description:</strong>
-                                    <p id="previewSEO"></p>
-                                </div>
-                                <div>
-                                    <strong>Direct Answer:</strong>
-                                    <p id="previewAnswer"></p>
-                                </div>
-                            </div>
+    .page-header h1 {
+        font-size: 1.5rem;
+        margin-bottom: 4px;
+    }
 
-                            <div id="previewContent" class="article-content">
-                            </div>
+    .text-muted {
+        color: var(--text-muted);
+        font-size: 0.95rem;
+    }
 
-                            <div class="admin-actions-section">
-                                <label
-                                    >บันทึกจาก Admin (จะถูกส่งไปที่ LINE)</label
-                                >
-                                <textarea
-                                    id="adminNotes"
-                                    placeholder="ใส่เหตุผลที่แก้ไขหรือเหตุผลที่ปฏิเสธ..."
-                                ></textarea>
+    .filters-card {
+        margin-bottom: 24px;
+        padding: 16px 24px;
+    }
 
-                                <div class="preview-actions">
-                                    <button
-                                        id="editBtn"
-                                        class="btn-secondary"
-                                        style="margin-right: auto;"
-                                    >
-                                        ✏️ แก้ไขเนื้อหา
-                                    </button>
-                                    <button
-                                        id="rejectBtn"
-                                        class="btn-reject"
-                                        style="display:none;"
-                                    >
-                                        ❌ ปฏิเสธ
-                                    </button>
-                                    <button
-                                        id="approveBtn"
-                                        class="btn-approve"
-                                        style="display:none;"
-                                    >
-                                        ✅ อนุมัติ & เผยแพร่
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+    .filters-form {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
 
-                        <div class="preview-social">
-                            <label>Facebook Post Preview</label>
-                            <div class="fb-preview-card">
-                                <div class="fb-card-header">
-                                    <img
-                                        src="/favicon.svg"
-                                        class="fb-avatar"
-                                        alt="Dr. Tim"
-                                    />
-                                    <div class="fb-header-info">
-                                        <span class="fb-name"
-                                            >Dr. Tim -
-                                            คุยเรื่องเบาหวานและลดน้ำหนัก</span
-                                        >
-                                        <span class="fb-time"
-                                            >Just now · 🌎</span
-                                        >
-                                    </div>
-                                </div>
-                                <div class="fb-card-text" id="reviewFbExcerpt">
-                                    ...
-                                </div>
-                                <div class="fb-card-media" id="reviewFbMedia">
-                                    <div class="fb-media-placeholder">
-                                        ไม่มีรูปภาพประกอบ
-                                    </div>
-                                </div>
-                                <!-- Link Box Removed for Photo Post Style -->
-                                <div class="fb-card-actions">
-                                    <span>👍 Like</span>
-                                    <span>💬 Comment</span>
-                                    <span>↪️ Share</span>
-                                </div>
-                            </div>
-                            <div
-                                style="margin-top:1.5rem; padding:1rem; background:rgba(239,68,68,0.05); border-radius:0.75rem; font-size:0.8rem; color:#f87171; border: 1px solid rgba(239,68,68,0.2);"
-                            >
-                                <strong>⚠️ ข้อควรระวัง:</strong> การกดอนุมัติจะทำการโพสต์ลง
-                                Facebook ทันที ตรวจสอบหัวข้อและรูปภาพให้เรียบร้อย
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    .search-box {
+        position: relative;
+        flex-grow: 1;
+        min-width: 250px;
+        max-width: 400px;
+    }
 
-            <!-- Compose Article Modal -->
-            <div id="composeModal" class="modal" style="display:none">
-                <div class="modal-content compose-modal">
-                    <div class="modal-header">
-                        <h2>✍️ เขียนบทความใหม่</h2>
-                        <button class="close-btn" onclick="closeCompose()"
-                            >✕</button
-                        >
-                    </div>
-                    <div class="compose-form">
-                        <div class="compose-grid">
-                            <div class="compose-main">
-                                <div class="form-row ai-row">
-                                    <div class="form-group full">
-                                        <label>หัวข้อ / คีย์เวิร์ด *</label>
-                                        <div class="ai-input-row">
-                                            <input
-                                                type="text"
-                                                id="compTitle"
-                                                placeholder="พิมพ์หัวข้อหรือ keyword แล้วกด AI Generate"
-                                                oninput="updateFBPreview()"
-                                            />
-                                            <button
-                                                id="aiGenBtn"
-                                                onclick="generateWithAI()"
-                                                style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.65rem 1.1rem;background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:white;border:none;border-radius:0.5rem;font-size:0.85rem;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;"
-                                            >
-                                                🤖 AI Generate
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div
-                                    id="aiLoading"
-                                    class="ai-loading"
-                                    style="display:none"
-                                >
-                                    <div class="ai-loading-inner">
-                                        <div class="ai-spinner"></div>
-                                        <p>
-                                            🤖 AI กำลังเขียนบทความ...
-                                            (รอสักครู่)
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label>Slug (URL)</label>
-                                        <input
-                                            type="text"
-                                            id="compSlug"
-                                            placeholder="auto-generated ถ้าไม่ระบุ"
-                                        />
-                                    </div>
-                                    <div class="form-group">
-                                        <label>หมวดหมู่</label>
-                                        <input
-                                            type="text"
-                                            id="compCategory"
-                                            placeholder="เบาหวาน"
-                                        />
-                                    </div>
-                                </div>
-                                <div class="form-group full">
-                                    <label
-                                        >Excerpt (สรุปสั้นๆ สำหรับ Facebook /
-                                        SEO)</label
-                                    >
-                                    <textarea
-                                        id="compExcerpt"
-                                        rows="2"
-                                        placeholder="สรุป 2-3 ประโยค"
-                                        oninput="updateFBPreview()"></textarea>
-                                </div>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label>SEO Description</label>
-                                        <input
-                                            type="text"
-                                            id="compSEO"
-                                            placeholder="150-160 ตัวอักษร"
-                                        />
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Direct Answer</label>
-                                        <input
-                                            type="text"
-                                            id="compAnswer"
-                                            placeholder="คำตอบสั้น 40-60 คำ"
-                                        />
-                                    </div>
-                                </div>
-                                <div class="form-group full">
-                                    <label
-                                        >รูปภาพหน้าปก (Website & Facebook)</label
-                                    >
-                                    <div class="image-upload-wrapper">
-                                        <input
-                                            type="file"
-                                            id="compImage"
-                                            accept="image/*"
-                                            style="display:none;"
-                                            onchange="handleImageUpload(this)"
-                                        />
-                                        <div
-                                            class="image-preview"
-                                            id="imagePreview"
-                                            onclick="document.getElementById('compImage').click()"
-                                        >
-                                            <div class="preview-placeholder">
-                                                <span class="plus-icon">+</span>
-                                                <span
-                                                    >คลิกเพื่ออัปโหลดรุปภาพ</span
-                                                >
-                                            </div>
-                                        </div>
-                                        <input
-                                            type="hidden"
-                                            id="compImageUrl"
-                                        />
-                                    </div>
-                                </div>
-                                <div class="form-group full">
-                                    <label>เนื้อหาบทความ * (HTML)</label>
-                                    <div class="editor-toolbar">
-                                        <button
-                                            type="button"
-                                            onclick="wrapText('b')"
-                                            title="ตัวหนา"
-                                            ><b>B</b>
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onclick="wrapText('i')"
-                                            title="ตัวเอียง"
-                                            ><i>I</i>
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onclick="wrapText('h2')"
-                                            title="หัวข้อหลัก">H2</button
-                                        >
-                                        <button
-                                            type="button"
-                                            onclick="wrapText('h3')"
-                                            title="หัวข้อย่อย">H3</button
-                                        >
-                                        <button
-                                            type="button"
-                                            onclick="insertTag('ul')"
-                                            title="รายการ">List</button
-                                        >
-                                        <button
-                                            type="button"
-                                            onclick="insertTag('table')"
-                                            title="ตาราง">Table</button
-                                        >
-                                        <button
-                                            type="button"
-                                            onclick="insertTemplate('faq')"
-                                            title="Template FAQ">FAQ</button
-                                        >
-                                        <button
-                                            type="button"
-                                            onclick="insertTemplate('action')"
-                                            title="Template Action Plan"
-                                            >Action Plan 1-2-3</button
-                                        >
-                                    </div>
-                                    <textarea
-                                        id="compContent"
-                                        rows="14"
-                                        placeholder="<h2>หัวข้อ</h2><p>เนื้อหา...</p>"
-                                    ></textarea>
-                                </div>
-                                <div class="form-group full">
-                                    <label>Tags (คั่นด้วย comma)</label>
-                                    <input
-                                        type="text"
-                                        id="compTags"
-                                        placeholder="CGM, เบาหวาน, น้ำตาลในเลือด"
-                                    />
-                                </div>
-                            </div>
+    .search-icon {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 0.9rem;
+        pointer-events: none;
+    }
 
-                            <div class="compose-sidebar">
-                                <label>Facebook Post Preview</label>
-                                <div class="fb-preview-card">
-                                    <div class="fb-card-header">
-                                        <img
-                                            src="/favicon.svg"
-                                            class="fb-avatar"
-                                            alt="Dr. Tim"
-                                        />
-                                        <div class="fb-header-info">
-                                            <span class="fb-name"
-                                                >Dr. Tim -
-                                                คุยเรื่องเบาหวานและลดน้ำหนัก</span
-                                            >
-                                            <span class="fb-time"
-                                                >Just now · 🌎</span
-                                            >
-                                        </div>
-                                    </div>
-                                    <div
-                                        class="fb-card-text"
-                                        id="fbPreviewExcerpt"
-                                    >
-                                        พิมพ์เนื้อหาสรุป (Excerpt)
-                                        เพื่อดูตัวอย่างโพสต์ที่นี่...
-                                    </div>
-                                    <div
-                                        class="fb-card-media"
-                                        id="fbPreviewMedia"
-                                    >
-                                        <div class="fb-media-placeholder">
-                                            เลือกรูปภาพเพื่อแสดงตัวอย่าง
-                                        </div>
-                                    </div>
-                                    <!-- Link Box Removed for Photo Post Style -->
-                                    <div class="fb-card-actions">
-                                        <span>👍 Like</span>
-                                        <span>💬 Comment</span>
-                                        <span>↪️ Share</span>
-                                    </div>
-                                </div>
-                                <div
-                                    style="margin-top:1.5rem; padding:1rem; background:rgba(139,92,246,0.1); border-radius:0.75rem; font-size:0.8rem; color:#a78bfa;"
-                                >
-                                    <strong>💡 Tip:</strong> ข้อความบน Facebook จะถูกตัดทอนถ้าบทความยาวเกินไป
-                                    พยายามใช้ Excerpt ที่กระชับและดึงดูด
-                                </div>
-                            </div>
-                        </div>
+    .search-input {
+        padding-left: 36px;
+        width: 100%;
+        background-color: var(--bg-base);
+    }
 
-                        <div class="compose-footer">
-                            <button
-                                class="btn-secondary"
-                                onclick="closeCompose()">ยกเลิก</button
-                            >
-                            <button
-                                class="btn-primary"
-                                id="compSubmitBtn"
-                                onclick="createArticle()"
-                                >💾 บันทึกบทความ</button
-                            >
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    .status-select {
+        width: 200px;
+        background-color: var(--bg-base);
+    }
 
-        <script is:inline>
-            let adminKey = "";
-            let editingArticleId = null;
-            let currentArticleData = null;
+    .form-input, .form-select {
+        border: 1px solid var(--border);
+        color: var(--text-main);
+        padding: 10px;
+        border-radius: 6px;
+        outline: none;
+        transition: border-color 0.2s;
+    }
 
-            function login() {
-                adminKey = document.getElementById("passwordInput").value;
-                fetch(
-                    `/api/articles?key=${encodeURIComponent(
-                        adminKey
-                    )}&status=review`
-                ).then((r) => {
-                    if (r.status === 401) {
-                        document.getElementById("loginError").style.display =
-                            "block";
-                        return;
-                    }
-                    sessionStorage.setItem("admin_key", adminKey);
-                    document.getElementById("loginScreen").style.display =
-                        "none";
-                    document.getElementById("dashboard").style.display =
-                        "block";
-                    loadArticles();
+    .form-input:focus, .form-select:focus {
+        border-color: var(--primary);
+    }
+
+    .clear-filters {
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 0.875rem;
+    }
+    
+    .clear-filters:hover {
+        color: var(--text-main);
+        text-decoration: underline;
+    }
+
+    .table-container {
+        padding: 0;
+        overflow-x: auto;
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+    }
+
+    .data-table th, .data-table td {
+        padding: 16px 24px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .data-table th {
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+        background-color: rgba(0,0,0,0.1);
+    }
+
+    .data-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .article-row:hover {
+        background-color: var(--bg-base);
+    }
+
+    .cell-title {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .title-link {
+        color: var(--text-main);
+        font-weight: 500;
+        text-decoration: none;
+        font-size: 0.95rem;
+    }
+
+    .title-link:hover {
+        color: var(--primary);
+    }
+
+    .slug-text {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+    }
+
+    .category-tag {
+        background-color: rgba(148, 163, 184, 0.1);
+        color: var(--text-muted);
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+
+    .status-badge {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: inline-block;
+    }
+
+    .status-published { background: rgba(34, 197, 94, 0.1); color: var(--success); }
+    .status-approved  { background: rgba(59, 130, 246, 0.1); color: var(--primary); }
+    .status-review    { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
+    .status-draft     { background: rgba(148, 163, 184, 0.1); color: var(--text-muted); }
+    .status-rejected  { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+
+    .date-text {
+        font-size: 0.875rem;
+        color: var(--text-muted);
+    }
+
+    .actions-col {
+        width: 120px;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+    }
+
+    .btn-icon {
+        background: transparent;
+        border: none;
+        padding: 6px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 1.1rem;
+        transition: background-color 0.2s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-icon:hover {
+        background-color: var(--bg-surface-hover);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 48px 24px;
+    }
+
+    .empty-icon {
+        font-size: 3rem;
+        margin-bottom: 16px;
+        opacity: 0.5;
+    }
+
+    .empty-state h3 {
+        font-size: 1.25rem;
+        margin-bottom: 8px;
+    }
+
+    .empty-state p {
+        color: var(--text-muted);
+    }
+</style>
+
+<script>
+    // Approve article logic
+    document.querySelectorAll('.approve-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            const currentTarget = e.currentTarget;
+            if (!(currentTarget instanceof HTMLButtonElement)) return;
+            
+            const id = currentTarget.getAttribute('data-id');
+            const row = currentTarget.closest('tr');
+            
+            if (!confirm('Are you sure you want to approve & publish this article? This may trigger a Facebook post.')) {
+                return;
+            }
+
+            currentTarget.textContent = '⏳';
+            currentTarget.disabled = true;
+
+            try {
+                // Fetch the auth token from cookies is tricky out of the box in client JS without an explicit endpoint 
+                // Wait! The endpoint /api/approve-article previously took `key` param:
+                // `if (key !== import.meta.env.ADMIN_PASSWORD) ...`
+                // Let's modify the approve request slightly to read the cookies, or we use a pass-through here.
+                
+                // Read from cookies in the browser: Look for adminSession
+                const getCookie = (name: string) => {
+                    const value = `; ${document.cookie}`;
+                    const parts = value.split(`; ${name}=`);
+                    if (parts.length === 2) return parts.pop().split(';').shift();
+                }
+                const password = getCookie("adminSession");
+
+                const res = await fetch('/api/approve-article', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id, action: 'approve', key: password })
                 });
-            }
 
-            function logout() {
-                sessionStorage.removeItem("admin_key");
-                adminKey = "";
-                document.getElementById("dashboard").style.display = "none";
-                document.getElementById("loginScreen").style.display = "block";
-                document.getElementById("passwordInput").value = "";
-            }
-
-            // Auto-login if session exists
-            window.addEventListener("DOMContentLoaded", () => {
-                const saved = sessionStorage.getItem("admin_key");
-                if (saved) {
-                    adminKey = saved;
-                    document.getElementById("loginScreen").style.display =
-                        "none";
-                    document.getElementById("dashboard").style.display =
-                        "block";
-                    loadArticles();
-                }
-                document
-                    .getElementById("passwordInput")
-                    .addEventListener("keypress", (e) => {
-                        if (e.key === "Enter") login();
-                    });
-            });
-
-            async function loadArticles() {
-                const status = document.getElementById("statusFilter").value;
-                const url = `/api/articles?key=${encodeURIComponent(adminKey)}${
-                    status ? `&status=${status}` : ""
-                }`;
-                const res = await fetch(url);
-                if (res.status === 401) {
-                    logout();
-                    return;
-                }
-                const articles = await res.json();
-
-                document.getElementById(
-                    "countBadge"
-                ).textContent = `${articles.length} บทความ`;
-
-                const container = document.getElementById("articleList");
-                if (articles.length === 0) {
-                    container.innerHTML =
-                        '<div class="empty-state"><p>🎉 ไม่มีบทความในสถานะนี้</p></div>';
-                    return;
-                }
-
-                container.innerHTML = articles
-                    .map(
-                        (a) => `
-        <div class="article-card" onclick="openPreview(${a.id})">
-          <div class="card-status status-${a.status}">${statusLabel(
-                            a.status
-                        )}</div>
-          <h3>${a.title}</h3>
-          <p class="card-excerpt">${a.excerpt || ""}</p>
-          <div class="card-meta">
-            <span class="tag">${a.category || "ไม่ระบุ"}</span>
-            <span class="meta-date">${new Date(a.created_at).toLocaleDateString(
-                "th-TH",
-                { day: "numeric", month: "short", year: "numeric" }
-            )}</span>
-          </div>
-          </div>
-          <button class="btn-edit-inline" onclick="event.stopPropagation(); editArticleById(${
-              a.id
-          })">✏️</button>
-        </div>
-      `
-                    )
-                    .join("");
-            }
-
-            function statusLabel(status) {
-                const labels = {
-                    draft: "📄 Draft",
-                    review: "🔍 รอตรวจสอบ",
-                    approved: "✅ อนุมัติ",
-                    published: "🚀 เผยแพร่แล้ว",
-                    rejected: "❌ ปฏิเสธ",
-                };
-                return labels[status] || status;
-            }
-
-            async function openPreview(id) {
-                const res = await fetch(
-                    `/api/article/${id}?key=${encodeURIComponent(adminKey)}`
-                );
-                const article = await res.json();
-                currentArticleData = article; // Store for edit access
-
-                document.getElementById("previewTitle").textContent =
-                    article.title;
-                document.getElementById("previewCategory").textContent =
-                    article.category || "";
-                document.getElementById("previewDate").textContent = new Date(
-                    article.created_at
-                ).toLocaleDateString("th-TH");
-                document.getElementById("previewKeyword").textContent = `🔑 ${
-                    article.keyword || ""
-                }`;
-                document.getElementById("previewSEO").textContent =
-                    article.seo_description || "";
-                document.getElementById("previewAnswer").textContent =
-                    article.direct_answer || "";
-                document.getElementById("adminNotes").value =
-                    article.admin_notes || "";
-                document.getElementById("previewContent").innerHTML =
-                    article.content || "";
-
-                // Update Facebook Preview in Review Modal
-                const fbMedia = document.getElementById("reviewFbMedia");
-                const fbExcerpt = document.getElementById("reviewFbExcerpt");
-                const fbTitle = document.getElementById("reviewFbTitle");
-
-                // fbTitle (removed for photo post style)
-                fbExcerpt.textContent = article.excerpt || "ไม่มีบทคัดย่อ";
-
-                if (article.image_url) {
-                    fbMedia.innerHTML = `<img src="${article.image_url}" style="width:100%;height:100%;object-fit:cover;border-radius:0.5rem;" />`;
+                const data = await res.json();
+                
+                if (data.success) {
+                    alert('Successfully approved and published!');
+                    window.location.reload();
                 } else {
-                    fbMedia.innerHTML =
-                        '<div class="fb-media-placeholder">ไม่มีรูปภาพประกอบ</div>';
+                    alert('Error: ' + data.error);
+                    currentTarget.textContent = '✅';
+                    currentTarget.disabled = false;
                 }
-
-                // Update FB preview when admin notes change (if they affect the excerpt)
-                const notesArea = document.getElementById("adminNotes");
-                notesArea.oninput = () => {
-                    // Optional: if admin notes were used for FB caption, but currently we use excerpt
-                };
-
-                const approveBtn = document.getElementById("approveBtn");
-                const rejectBtn = document.getElementById("rejectBtn");
-
-                if (article.status === "review") {
-                    approveBtn.style.display = "inline-flex";
-                    rejectBtn.style.display = "inline-flex";
-                    approveBtn.onclick = () => handleAction(id, "approve");
-                    rejectBtn.onclick = () => handleAction(id, "reject");
-                } else {
-                    approveBtn.style.display = "none";
-                    rejectBtn.style.display = "none";
-                }
-
-                const editBtn = document.getElementById("editBtn");
-                editBtn.onclick = () => {
-                    closePreview();
-                    editArticle(article);
-                };
-
-                document.getElementById("previewModal").style.display = "flex";
-                document.body.style.overflow = "hidden";
-            }
-
-            function closePreview() {
-                document.getElementById("previewModal").style.display = "none";
-                document.body.style.overflow = "";
-            }
-
-            async function handleAction(id, action) {
-                const notes = document.getElementById("adminNotes").value;
-                const btn =
-                    action === "approve"
-                        ? document.getElementById("approveBtn")
-                        : document.getElementById("rejectBtn");
-                btn.disabled = true;
-                btn.textContent =
-                    action === "approve"
-                        ? "⏳ กำลังเผยแพร่..."
-                        : "⏳ กำลังปฏิเสธ...";
-
-                try {
-                    const res = await fetch("/api/approve-article", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            id,
-                            action,
-                            notes,
-                            key: adminKey,
-                        }),
-                    });
-                    const result = await res.json();
-
-                    if (result.success) {
-                        let msg =
-                            action === "approve"
-                                ? "✅ บทความถูกอนุมัติแล้ว!"
-                                : "❌ บทความถูกปฏิเสธแล้ว";
-                        if (result.facebook?.success)
-                            msg += "\n📘 โพสต์ลง Facebook แล้ว!";
-                        if (result.deploy?.success)
-                            msg += "\n🔄 กำลังอัปเดตเว็บไซต์...";
-                        alert(msg);
-                        closePreview();
-                        loadArticles();
-                    }
-                } catch (err) {
-                    alert("❌ เกิดข้อผิดพลาด: " + err.message);
-                }
-
-                btn.disabled = false;
-                btn.textContent =
-                    action === "approve" ? "✅ อนุมัติ & เผยแพร่" : "❌ ปฏิเสธ";
-            }
-
-            function toggleKeywords() {
-                const panel = document.getElementById("keywordsPanel");
-                panel.style.display =
-                    panel.style.display === "none" ? "block" : "none";
-                if (panel.style.display === "block") loadKeywords();
-            }
-
-            async function loadKeywords() {
-                // TODO: Add keyword list API endpoint
-                document.getElementById("keywordList").innerHTML =
-                    '<p class="meta-date">กำลังโหลด...</p>';
-            }
-
-            async function addKeyword() {
-                // TODO: Add keyword via API
-                const keyword = document.getElementById("newKeyword").value;
-                if (!keyword) return;
-                alert(`Keyword "${keyword}" จะถูกเพิ่มเมื่อ API พร้อมใช้งาน`);
-            }
-
-            // ── Compose Article ──
-            function openCompose() {
-                editingArticleId = null;
-                document.getElementById("compSubmitBtn").textContent =
-                    "💾 บันทึกบทความ";
-                document.getElementById("composeModal").style.display = "flex";
-                document.body.style.overflow = "hidden";
-                document.getElementById("compTitle").focus();
-            }
-
-            async function editArticleById(id) {
-                const res = await fetch(
-                    `/api/article/${id}?key=${encodeURIComponent(adminKey)}`
-                );
-                const article = await res.json();
-                editArticle(article);
-            }
-
-            function editArticle(article) {
-                editingArticleId = article.id;
-                document.getElementById("compTitle").value =
-                    article.title || "";
-                document.getElementById("compSlug").value = article.slug || "";
-                document.getElementById("compCategory").value =
-                    article.category || "";
-                document.getElementById("compExcerpt").value =
-                    article.excerpt || "";
-                document.getElementById("compSEO").value =
-                    article.seo_description || "";
-                document.getElementById("compAnswer").value =
-                    article.direct_answer || "";
-                document.getElementById("compContent").value =
-                    article.content || "";
-                document.getElementById("compTags").value = (
-                    article.tags || []
-                ).join(", ");
-                document.getElementById("compImageUrl").value =
-                    article.image_url || "";
-
-                // Update Image Preview
-                const preview = document.getElementById("imagePreview");
-                if (article.image_url) {
-                    preview.innerHTML = `<img src="${article.image_url}" style="width:100%;height:100%;object-fit:cover;border-radius:0.5rem;" />`;
-                } else {
-                    preview.innerHTML = `<div class="preview-placeholder"><span class="plus-icon">+</span><span>คลิกเพื่ออัปโหลดรุปภาพ</span></div>`;
-                }
-
-                document.getElementById("compSubmitBtn").textContent =
-                    "🆙 อัปเดตบทความ";
-                document.getElementById("composeModal").style.display = "flex";
-                document.body.style.overflow = "hidden";
-                updateFBPreview();
-            }
-
-            function closeCompose() {
-                document.getElementById("composeModal").style.display = "none";
-                document.body.style.overflow = "";
-                editingArticleId = null;
-                // Reset form
-                [
-                    "compTitle",
-                    "compSlug",
-                    "compCategory",
-                    "compExcerpt",
-                    "compSEO",
-                    "compAnswer",
-                    "compContent",
-                    "compTags",
-                    "compImageUrl",
-                ].forEach((id) => {
-                    document.getElementById(id).value = "";
-                });
-                document.getElementById(
-                    "imagePreview"
-                ).innerHTML = `<div class="preview-placeholder"><span class="plus-icon">+</span><span>คลิกเพื่ออัปโหลดรุปภาพ</span></div>`;
-            }
-
-            async function createArticle() {
-                const title = document.getElementById("compTitle").value.trim();
-                const content = document
-                    .getElementById("compContent")
-                    .value.trim();
-
-                if (!title || !content) {
-                    alert("กรุณากรอกหัวข้อและเนื้อหาบทความ");
-                    return;
-                }
-
-                const btn = document.getElementById("compSubmitBtn");
-                btn.disabled = true;
-                btn.textContent = "⏳ กำลังบันทึก...";
-
-                const tagsStr = document.getElementById("compTags").value;
-                const tags = tagsStr
-                    ? tagsStr
-                          .split(",")
-                          .map((t) => t.trim())
-                          .filter(Boolean)
-                    : [];
-
-                try {
-                    const res = await fetch("/api/create-article", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            id: editingArticleId,
-                            key: adminKey,
-                            title,
-                            slug: document
-                                .getElementById("compSlug")
-                                .value.trim(),
-                            content,
-                            excerpt: document
-                                .getElementById("compExcerpt")
-                                .value.trim(),
-                            seo_description: document
-                                .getElementById("compSEO")
-                                .value.trim(),
-                            direct_answer: document
-                                .getElementById("compAnswer")
-                                .value.trim(),
-                            category: document
-                                .getElementById("compCategory")
-                                .value.trim(),
-                            tags,
-                            image_url:
-                                document.getElementById("compImageUrl").value,
-                        }),
-                    });
-                    const result = await res.json();
-
-                    if (result.success) {
-                        alert(
-                            `✅ บทความ "${result.article.title}" ถูกบันทึกแล้ว!`
-                        );
-                        closeCompose();
-                        document.getElementById("statusFilter").value =
-                            "review";
-                        loadArticles();
-                    } else {
-                        alert("❌ " + (result.error || "เกิดข้อผิดพลาด"));
-                    }
-                } catch (err) {
-                    alert("❌ เกิดข้อผิดพลาด: " + err.message);
-                }
-
-                btn.disabled = false;
-                btn.textContent = "💾 บันทึกบทความ";
-            }
-
-            // ── Image Upload Handling ──
-            async function handleImageUpload(input) {
-                const file = input.files[0];
-                if (!file) return;
-
-                const preview = document.getElementById("imagePreview");
-                const urlInput = document.getElementById("compImageUrl");
-
-                // Update Preview logic
-                const fbMedia = document.getElementById("fbPreviewMedia");
-
-                // Show local preview immediately
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const imgHtml = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;border-radius:0.5rem;" />`;
-                    preview.innerHTML = imgHtml;
-                    if (fbMedia) fbMedia.innerHTML = imgHtml;
-                };
-                reader.readAsDataURL(file);
-
-                // Upload to server
-                const formData = new FormData();
-                formData.append("image", file);
-                formData.append("key", adminKey);
-
-                try {
-                    preview.classList.add("uploading");
-                    const res = await fetch("/api/upload-image", {
-                        method: "POST",
-                        body: formData,
-                    });
-                    const result = await res.json();
-                    if (result.success) {
-                        urlInput.value = result.url;
-                        console.log("Image uploaded:", result.url);
-                    } else {
-                        alert("❌ Upload failed: " + result.error);
-                        preview.innerHTML =
-                            '<div class="preview-placeholder"><span class="plus-icon">+</span><span>อัปโหลดล้มเหลว</span></div>';
-                    }
-                } catch (err) {
-                    alert("❌ Upload error: " + err.message);
-                } finally {
-                    preview.classList.remove("uploading");
-                }
-            }
-
-            // ── Editor Helper Functions ──
-            function wrapText(tag) {
-                const area = document.getElementById("compContent");
-                const start = area.selectionStart;
-                const end = area.selectionEnd;
-                const text = area.value.substring(start, end);
-                const before = area.value.substring(0, start);
-                const after = area.value.substring(end);
-
-                area.value = `${before}<${tag}>${text}</${tag}>${after}`;
-                area.focus();
-                area.selectionStart = start + tag.length + 2;
-                area.selectionEnd = area.selectionStart + text.length;
-            }
-
-            function insertTag(tag) {
-                const area = document.getElementById("compContent");
-                const pos = area.selectionStart;
-                const content =
-                    tag === "table"
-                        ? '\n<table border="1">\n  <tr><th>หัวข้อ</th><th>รายละเอียด</th></tr>\n  <tr><td>ข้อมูล 1</td><td>ข้อมูล 2</td></tr>\n</table>\n'
-                        : `\n<${tag}>\n  <li>ไอเทม 1</li>\n  <li>ไอเทม 2</li>\n</${tag}>\n`;
-
-                area.value =
-                    area.value.substring(0, pos) +
-                    content +
-                    area.value.substring(pos);
-                area.focus();
-            }
-
-            function insertTemplate(type) {
-                const area = document.getElementById("compContent");
-                const pos = area.selectionStart;
-                let content = "";
-                if (type === "faq") {
-                    content = "\n<h3>คำถาม: ...?</h3>\n<p>คำตอบ: ...</p>\n";
-                } else if (type === "action") {
-                    content =
-                        "\n<h3>🚀 Action Plan 1-2-3</h3>\n<ol>\n  <li><strong>ขั้นตอนที่ 1:</strong> ...</li>\n  <li><strong>ขั้นตอนที่ 2:</strong> ...</li>\n  <li><strong>ขั้นตอนที่ 3:</strong> ...</li>\n</ol>\n";
-                }
-                area.value =
-                    area.value.substring(0, pos) +
-                    content +
-                    area.value.substring(pos);
-                area.focus();
-            }
-
-            function updateFBPreview() {
-                const excerpt = document.getElementById("compExcerpt").value;
-
-                document.getElementById("fbPreviewExcerpt").textContent =
-                    excerpt ||
-                    "พิมพ์เนื้อหาสรุป (Excerpt) เพื่อดูตัวอย่างโพสต์ที่นี่...";
-            }
-
-            // ── AI Generate ──
-            async function generateWithAI() {
-                const keyword = document
-                    .getElementById("compTitle")
-                    .value.trim();
-                if (!keyword) {
-                    alert("กรุณาพิมพ์หัวข้อหรือ keyword ก่อนกด AI Generate");
-                    document.getElementById("compTitle").focus();
-                    return;
-                }
-
-                const btn = document.getElementById("aiGenBtn");
-                const loading = document.getElementById("aiLoading");
-                btn.disabled = true;
-                btn.innerHTML = '<span class="ai-icon">⏳</span> กำลังสร้าง...';
-                loading.style.display = "flex";
-
-                try {
-                    const category = document
-                        .getElementById("compCategory")
-                        .value.trim();
-                    const res = await fetch("/api/generate-draft", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            key: adminKey,
-                            keyword,
-                            category,
-                        }),
-                    });
-                    const result = await res.json();
-
-                    if (result.success && result.article) {
-                        const a = result.article;
-                        document.getElementById("compTitle").value =
-                            a.title || keyword;
-                        document.getElementById("compSlug").value =
-                            a.slug || "";
-                        document.getElementById("compCategory").value =
-                            a.category || "";
-                        document.getElementById("compExcerpt").value =
-                            a.excerpt || "";
-                        document.getElementById("compSEO").value =
-                            a.seo_description || "";
-                        document.getElementById("compAnswer").value =
-                            a.direct_answer || "";
-                        document.getElementById("compContent").value =
-                            a.content || "";
-                        document.getElementById("compTags").value = (
-                            a.tags || []
-                        ).join(", ");
-
-                        // Automatically update Facebook preview
-                        updateFBPreview();
-                    } else {
-                        alert(
-                            "❌ " +
-                                (result.error || "AI ไม่สามารถสร้างบทความได้")
-                        );
-                    }
-                } catch (err) {
-                    alert("❌ เกิดข้อผิดพลาด: " + err.message);
-                }
-
-                btn.disabled = false;
-                btn.innerHTML = '<span class="ai-icon">🤖</span> AI Generate';
-                loading.style.display = "none";
-            }
-        </script>
-
-        <style is:global>
-            * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-            }
-            body {
-                font-family: "Inter", system-ui, sans-serif;
-                background: #0f172a;
-                color: #e2e8f0;
-                min-height: 100dvh;
-            }
-
-            /* Login */
-            .login-screen {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                min-height: 100dvh;
-                padding: 1rem;
-            }
-            .login-card {
-                background: #1e293b;
-                border: 1px solid #334155;
-                border-radius: 1rem;
-                padding: 2.5rem;
-                max-width: 400px;
-                width: 100%;
-                text-align: center;
-            }
-            .login-card h1 {
-                font-size: 1.5rem;
-                margin-bottom: 0.5rem;
-            }
-            .login-card p {
-                color: #94a3b8;
-                margin-bottom: 1.5rem;
-                font-size: 0.9rem;
-            }
-            .login-card input {
-                width: 100%;
-                padding: 0.75rem 1rem;
-                background: #0f172a;
-                border: 1px solid #334155;
-                border-radius: 0.5rem;
-                color: #e2e8f0;
-                font-size: 1rem;
-                margin-bottom: 1rem;
-                outline: none;
-            }
-            .login-card input:focus {
-                border-color: #0ea5e9;
-            }
-            .login-card button {
-                width: 100%;
-                padding: 0.75rem;
-                background: linear-gradient(135deg, #0ea5e9, #0284c7);
-                color: white;
-                border: none;
-                border-radius: 0.5rem;
-                font-size: 1rem;
-                font-weight: 600;
-                cursor: pointer;
-                transition: transform 0.15s;
-            }
-            .login-card button:hover {
-                transform: scale(1.02);
-            }
-            .error {
-                color: #f87171;
-                margin-top: 0.75rem;
-                font-size: 0.85rem;
-            }
-
-            /* Header */
-            .admin-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 1.25rem 2rem;
-                background: #1e293b;
-                border-bottom: 1px solid #334155;
-                position: sticky;
-                top: 0;
-                z-index: 100;
-                flex-wrap: wrap;
-                gap: 0.75rem;
-            }
-            .header-left {
-                display: flex;
-                align-items: center;
-                gap: 0.75rem;
-            }
-            .header-left h1 {
-                font-size: 1.25rem;
-            }
-            .header-right {
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-                flex-wrap: wrap;
-            }
-            .badge {
-                background: #0ea5e9;
-                color: white;
-                padding: 0.2rem 0.6rem;
-                border-radius: 999px;
-                font-size: 0.75rem;
-                font-weight: 600;
-            }
-            select {
-                background: #0f172a;
-                color: #e2e8f0;
-                border: 1px solid #334155;
-                padding: 0.5rem 0.75rem;
-                border-radius: 0.375rem;
-                font-size: 0.85rem;
-            }
-            .btn-secondary {
-                padding: 0.5rem 1rem;
-                background: #334155;
-                border: 1px solid #475569;
-                color: #e2e8f0;
-                border-radius: 0.375rem;
-                font-size: 0.85rem;
-                cursor: pointer;
-                transition: background 0.15s;
-            }
-            .btn-secondary:hover {
-                background: #475569;
-            }
-            .btn-danger-sm {
-                padding: 0.5rem 1rem;
-                background: transparent;
-                border: 1px solid #ef4444;
-                color: #ef4444;
-                border-radius: 0.375rem;
-                font-size: 0.85rem;
-                cursor: pointer;
-            }
-            .btn-danger-sm:hover {
-                background: #ef44441a;
-            }
-            .btn-primary {
-                padding: 0.5rem 1rem;
-                background: linear-gradient(135deg, #0ea5e9, #0284c7);
-                color: white;
-                border: none;
-                border-radius: 0.375rem;
-                font-size: 0.85rem;
-                font-weight: 600;
-                cursor: pointer;
-                transition: transform 0.15s;
-            }
-            .btn-primary:hover {
-                transform: scale(1.02);
-            }
-            .btn-primary:disabled {
-                opacity: 0.5;
-                cursor: not-allowed;
-                transform: none;
-            }
-
-            /* AI Button */
-            .ai-input-row {
-                display: flex !important;
-                gap: 0.5rem !important;
-                width: 100%;
-            }
-            .ai-input-row input {
-                flex: 1 !important;
-                min-width: 0;
-            }
-            .btn-ai {
-                display: inline-flex !important;
-                align-items: center !important;
-                gap: 0.4rem !important;
-                padding: 0.65rem 1.1rem !important;
-                background: linear-gradient(
-                    135deg,
-                    #8b5cf6,
-                    #6d28d9
-                ) !important;
-                color: white !important;
-                border: none !important;
-                border-radius: 0.5rem !important;
-                font-size: 0.85rem !important;
-                font-weight: 600 !important;
-                cursor: pointer !important;
-                white-space: nowrap !important;
-                transition: transform 0.15s, opacity 0.15s !important;
-                flex-shrink: 0;
-            }
-            .btn-ai:hover {
-                transform: scale(1.03) !important;
-            }
-            .btn-ai:disabled {
-                opacity: 0.5 !important;
-                cursor: not-allowed !important;
-                transform: none !important;
-            }
-            .ai-icon {
-                font-size: 1rem;
-            }
-
-            /* AI Loading */
-            .ai-loading {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                padding: 2rem 1rem;
-                background: #0f172a;
-                border: 1px dashed #6d28d9;
-                border-radius: 0.75rem;
-            }
-            .ai-loading-inner {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 0.75rem;
-            }
-            .ai-loading-inner p {
-                color: #a78bfa;
-                font-size: 0.9rem;
-            }
-            .ai-spinner {
-                width: 32px;
-                height: 32px;
-                border: 3px solid #334155;
-                border-top: 3px solid #8b5cf6;
-                border-radius: 50%;
-                animation: ai-spin 0.8s linear infinite;
-            }
-            @keyframes ai-spin {
-                to {
-                    transform: rotate(360deg);
-                }
-            }
-
-            /* Compose Form — use high-specificity selectors to override login-card */
-            .compose-modal.modal-content,
-            .modal-content.compose-modal {
-                max-width: 900px;
-            }
-            .compose-form {
-                display: flex !important;
-                flex-direction: column !important;
-                gap: 1rem !important;
-            }
-            .compose-form .form-row {
-                display: flex !important;
-                gap: 0.75rem !important;
-                width: 100%;
-            }
-            .compose-form .form-group {
-                flex: 1;
-                display: flex !important;
-                flex-direction: column !important;
-                gap: 0.35rem !important;
-                min-width: 0;
-            }
-            .compose-form .form-group.full {
-                width: 100% !important;
-            }
-            .compose-form .form-group label {
-                display: block !important;
-                font-size: 0.75rem !important;
-                font-weight: 600 !important;
-                color: #94a3b8 !important;
-                text-transform: uppercase !important;
-                letter-spacing: 0.04em !important;
-                margin-bottom: 0.15rem !important;
-            }
-            .compose-form .form-group input[type="text"],
-            .compose-form .form-group textarea {
-                display: block !important;
-                width: 100% !important;
-                padding: 0.65rem 0.85rem !important;
-                background: #0f172a !important;
-                border: 1px solid #334155 !important;
-                border-radius: 0.5rem !important;
-                color: #e2e8f0 !important;
-                font-size: 0.9rem !important;
-                font-family: inherit !important;
-                outline: none !important;
-                margin: 0 !important;
-                transition: border-color 0.15s !important;
-            }
-            .compose-form .form-group input[type="text"]:focus,
-            .compose-form .form-group textarea:focus {
-                border-color: #0ea5e9 !important;
-                box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.15) !important;
-            }
-            .compose-form .form-group textarea {
-                resize: vertical !important;
-                min-height: 60px;
-            }
-            .compose-form .compose-actions {
-                display: flex !important;
-                justify-content: flex-end !important;
-                gap: 0.75rem !important;
-                margin-top: 0.5rem !important;
-                padding-top: 1rem !important;
-                border-top: 1px solid #334155 !important;
-            }
-            @media (max-width: 640px) {
-                .compose-form .form-row {
-                    flex-direction: column;
-                }
-            }
-
-            /* Keywords Panel */
-            .panel {
-                margin: 1rem 2rem;
-                padding: 1.5rem;
-                background: #1e293b;
-                border: 1px solid #334155;
-                border-radius: 0.75rem;
-            }
-            .panel h2 {
-                font-size: 1.1rem;
-                margin-bottom: 1rem;
-            }
-            .keyword-form {
-                display: flex;
-                gap: 0.5rem;
-                margin-bottom: 1rem;
-            }
-            .keyword-form input {
-                flex: 1;
-                padding: 0.5rem 0.75rem;
-                background: #0f172a;
-                border: 1px solid #334155;
-                border-radius: 0.375rem;
-                color: #e2e8f0;
-                font-size: 0.9rem;
-            }
-            .keyword-form button {
-                padding: 0.5rem 1rem;
-                background: #0ea5e9;
-                color: white;
-                border: none;
-                border-radius: 0.375rem;
-                cursor: pointer;
-                font-weight: 600;
-            }
-
-            /* Article Grid */
-            .article-grid {
-                display: grid;
-                grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-                gap: 1rem;
-                padding: 1.5rem 2rem;
-            }
-            /* ── Preview Modal Layout ── */
-            .preview-modal-content {
-                max-width: 1100px !important;
-                width: 95% !important;
-            }
-            .preview-layout {
-                display: grid;
-                grid-template-columns: 1fr 360px;
-                gap: 2.5rem;
-                align-items: start;
-            }
-            .preview-body {
-                min-width: 0;
-            }
-            .preview-social {
-                position: sticky;
-                top: 0;
-                padding-left: 2rem;
-                border-left: 1px solid #334155;
-            }
-            .admin-actions-section {
-                margin-top: 2.5rem;
-                padding-top: 2rem;
-                border-top: 1px solid #334155;
-            }
-            .admin-actions-section textarea {
-                width: 100%;
-                background: #1e293b;
-                border: 1px solid #334155;
-                border-radius: 0.5rem;
-                color: white;
-                padding: 0.75rem;
-                margin: 0.5rem 0 1.5rem;
-                font-family: inherit;
-            }
-
-            @media (max-width: 900px) {
-                .preview-layout {
-                    grid-template-columns: 1fr;
-                }
-                .preview-social {
-                    border-left: none;
-                    padding-left: 0;
-                    border-top: 1px solid #334155;
-                    padding-top: 2rem;
-                }
-            }
-
-            /* Article Content Styling */
-            .article-content {
-                line-height: 1.8;
-                color: #cbd5e1;
-                font-size: 1.1rem;
-            }
-            .article-content h2 {
-                font-size: 1.5rem;
-                color: #f8fafc;
-                margin: 2.5rem 0 1.25rem;
-                font-weight: 700;
-            }
-            .article-content h3 {
-                font-size: 1.25rem;
-                color: #f1f5f9;
-                margin: 2rem 0 1rem;
-                font-weight: 600;
-            }
-            .article-content p {
-                margin-bottom: 1.5rem;
-            }
-            .article-content ul,
-            .article-content ol {
-                margin: 1.5rem 0;
-                padding-left: 1.5rem;
-            }
-            .article-content li {
-                margin-bottom: 0.75rem;
-            }
-            .article-content table {
-                width: 100%;
-                border-collapse: collapse;
-                margin: 2rem 0;
-                font-size: 0.95rem;
-                display: block;
-                overflow-x: auto;
-                background: rgba(30, 41, 59, 0.5);
-                border-radius: 0.5rem;
-                border: 1px solid #334155;
-            }
-            .article-content th,
-            .article-content td {
-                padding: 1rem;
-                text-align: left;
-                border: 1px solid #334155;
-            }
-            .article-content th {
-                background: #1e293b;
-                color: white;
-                font-weight: 600;
-            }
-            .article-content blockquote {
-                border-left: 4px solid #0ea5e9;
-                padding-left: 1.5rem;
-                margin: 2rem 0;
-                font-style: italic;
-                color: #94a3b8;
-            }
-            /* Clean up images in content */
-            .article-content img {
-                max-width: 100%;
-                height: auto;
-                border-radius: 0.75rem;
-                margin: 2rem 0;
-            }
-            /* Prevent everything from overflowing grid */
-            .article-content * {
-                max-width: 100%;
-                word-wrap: break-word;
-            }
-
-            .article-card {
-                background: #1e293b;
-                border: 1px solid #334155;
-                border-radius: 0.75rem;
-                padding: 1.25rem;
-                cursor: pointer;
-                transition: border-color 0.2s, transform 0.15s;
-                position: relative;
-            }
-            .article-card:hover {
-                border-color: #0ea5e9;
-                transform: translateY(-2px);
-            }
-            .article-card h3 {
-                font-size: 1rem;
-                margin-bottom: 0.5rem;
-                line-height: 1.4;
-                padding-right: 2rem;
-            }
-            .btn-edit-inline {
-                position: absolute;
-                bottom: 1.25rem;
-                right: 1.25rem;
-                background: #334155;
-                color: white;
-                border: none;
-                border-radius: 0.375rem;
-                width: 32px;
-                height: 32px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                cursor: pointer;
-                transition: background 0.2s;
-            }
-            .btn-edit-inline:hover {
-                background: #0ea5e9;
-            }
-            .card-excerpt {
-                font-size: 0.85rem;
-                color: #94a3b8;
-                line-height: 1.5;
-                display: -webkit-box;
-                -webkit-line-clamp: 3;
-                -webkit-box-orient: vertical;
-                overflow: hidden;
-                margin-bottom: 0.75rem;
-            }
-            .card-status {
-                position: absolute;
-                top: 0.75rem;
-                right: 0.75rem;
-                padding: 0.15rem 0.5rem;
-                border-radius: 999px;
-                font-size: 0.7rem;
-                font-weight: 600;
-            }
-            .status-review {
-                background: #f59e0b20;
-                color: #fbbf24;
-            }
-            .status-approved {
-                background: #10b98120;
-                color: #34d399;
-            }
-            .status-published {
-                background: #0ea5e920;
-                color: #38bdf8;
-            }
-            .status-rejected {
-                background: #ef444420;
-                color: #f87171;
-            }
-            .card-meta {
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-            }
-            .tag {
-                background: #0f766e20;
-                color: #14b8a6;
-                padding: 0.125rem 0.5rem;
-                border-radius: 999px;
-                font-size: 0.75rem;
-            }
-            .meta-date {
-                font-size: 0.75rem;
-                color: #64748b;
-            }
-            .meta-keyword {
-                font-size: 0.75rem;
-                color: #818cf8;
-            }
-            .empty-state {
-                grid-column: 1 / -1;
-                text-align: center;
-                padding: 4rem 2rem;
-                color: #64748b;
-                font-size: 1.1rem;
-            }
-
-            /* Modal */
-            .modal {
-                position: fixed;
-                inset: 0;
-                background: rgba(0, 0, 0, 0.7);
-                backdrop-filter: blur(4px);
-                z-index: 1000;
-                display: flex;
-                align-items: flex-start;
-                justify-content: center;
-                padding: 2rem;
-                overflow-y: auto;
-            }
-            .modal-content {
-                background: #1e293b;
-                border: 1px solid #334155;
-                border-radius: 1rem;
-                max-width: 800px;
-                width: 100%;
-                padding: 2rem;
-                margin-top: 2rem;
-            }
-            .modal-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: flex-start;
-                margin-bottom: 1rem;
-            }
-            .modal-header h2 {
-                font-size: 1.25rem;
-                line-height: 1.4;
-                flex: 1;
-            }
-            .close-btn {
-                background: none;
-                border: none;
-                color: #94a3b8;
-                font-size: 1.5rem;
-                cursor: pointer;
-                padding: 0.25rem;
-                line-height: 1;
-            }
-            .close-btn:hover {
-                color: #e2e8f0;
-            }
-            .modal-meta {
-                display: flex;
-                gap: 0.75rem;
-                margin-bottom: 1.25rem;
-                flex-wrap: wrap;
-            }
-            .modal-seo {
-                background: #0f172a;
-                border: 1px solid #334155;
-                border-radius: 0.5rem;
-                padding: 1rem;
-                margin-bottom: 1.5rem;
-            }
-            .seo-item {
-                margin-bottom: 0.75rem;
-            }
-            .seo-item:last-child {
-                margin-bottom: 0;
-            }
-            .seo-item label {
-                font-size: 0.75rem;
-                font-weight: 600;
-                color: #0ea5e9;
-                text-transform: uppercase;
-                letter-spacing: 0.05em;
-            }
-            .seo-item p {
-                font-size: 0.85rem;
-                color: #94a3b8;
-                margin-top: 0.25rem;
-            }
-
-            /* Prose */
-            .prose {
-                font-size: 0.95rem;
-                line-height: 1.8;
-                color: #cbd5e1;
-                max-height: 50vh;
-                overflow-y: auto;
-                padding-right: 0.5rem;
-            }
-            .prose h2 {
-                font-size: 1.15rem;
-                font-weight: 700;
-                margin: 1.5rem 0 0.75rem;
-                color: #e2e8f0;
-            }
-            .prose h3 {
-                font-size: 1rem;
-                font-weight: 600;
-                margin: 1.25rem 0 0.5rem;
-                color: #e2e8f0;
-            }
-            .prose p {
-                margin-bottom: 0.75rem;
-            }
-            .prose ul,
-            .prose ol {
-                padding-left: 1.5rem;
-                margin-bottom: 0.75rem;
-            }
-            .prose li {
-                margin-bottom: 0.25rem;
-            }
-            .prose blockquote {
-                border-left: 3px solid #0ea5e9;
-                padding: 0.5rem 1rem;
-                margin: 1rem 0;
-                background: #0f172a;
-                border-radius: 0 0.375rem 0.375rem 0;
-                color: #94a3b8;
-            }
-            .prose strong {
-                color: #e2e8f0;
-            }
-
-            /* Actions */
-            .modal-actions {
-                margin-top: 1.5rem;
-                border-top: 1px solid #334155;
-                padding-top: 1.25rem;
-            }
-            .modal-actions textarea {
-                width: 100%;
-                padding: 0.75rem;
-                background: #0f172a;
-                border: 1px solid #334155;
-                border-radius: 0.5rem;
-                color: #e2e8f0;
-                font-size: 0.9rem;
-                font-family: inherit;
-                resize: vertical;
-                min-height: 60px;
-                margin-bottom: 1rem;
-            }
-            .action-buttons {
-                display: flex;
-                gap: 0.75rem;
-            }
-            .btn-approve,
-            .btn-reject {
-                flex: 1;
-                padding: 0.75rem;
-                border: none;
-                border-radius: 0.5rem;
-                font-size: 0.95rem;
-                font-weight: 600;
-                cursor: pointer;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                gap: 0.5rem;
-                transition: transform 0.15s;
-            }
-            .btn-approve {
-                background: linear-gradient(135deg, #10b981, #059669);
-                color: white;
-            }
-            .btn-reject {
-                background: linear-gradient(135deg, #ef4444, #dc2626);
-                color: white;
-            }
-            .btn-approve:hover,
-            .btn-reject:hover {
-                transform: scale(1.02);
-            }
-            .btn-approve:disabled,
-            .btn-reject:disabled {
-                opacity: 0.5;
-                cursor: not-allowed;
-                transform: none;
-            }
-            .ai-row {
-                padding-bottom: 0.5rem;
-            }
-
-            .image-upload-wrapper {
-                margin-top: 0.5rem;
-            }
-            .image-preview {
-                width: 100%;
-                height: 200px;
-                background: #0f172a;
-                border: 2px dashed #334155;
-                border-radius: 0.75rem;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                cursor: pointer;
-                overflow: hidden;
-                transition: all 0.2s;
-                position: relative;
-            }
-            .image-preview:hover {
-                border-color: #6366f1;
-                background: #1e293b;
-            }
-            .image-preview.uploading::after {
-                content: "Uploading...";
-                position: absolute;
-                inset: 0;
-                background: rgba(0, 0, 0, 0.6);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: white;
-                font-size: 0.85rem;
-                z-index: 2;
-            }
-            .preview-placeholder {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 0.5rem;
-                color: #64748b;
-            }
-            .plus-icon {
-                font-size: 2rem;
-                font-weight: 300;
-            }
-
-            /* ── Compose Modal Grid ── */
-            .compose-grid {
-                display: grid;
-                grid-template-columns: 1fr 380px;
-                gap: 2rem;
-                margin-bottom: 2rem;
-            }
-            .compose-main {
-                min-width: 0;
-            }
-            .compose-sidebar {
-                border-left: 1px solid #334155;
-                padding-left: 2rem;
-                position: sticky;
-                top: 0;
-            }
-            .compose-footer {
-                display: flex;
-                justify-content: flex-end;
-                gap: 1rem;
-                padding-top: 1.5rem;
-                border-top: 1px solid #334155;
-            }
-
-            /* ── Editor Toolbar ── */
-            .editor-toolbar {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 0.3rem;
-                background: #1e293b;
-                padding: 0.5rem;
-                border-radius: 0.5rem 0.5rem 0 0;
-                border: 1px solid #334155;
-                border-bottom: none;
-            }
-            .editor-toolbar button {
-                padding: 0.25rem 0.6rem;
-                background: #334155;
-                color: #e2e8f0;
-                border: 1px solid #475569;
-                border-radius: 0.25rem;
-                font-size: 0.75rem;
-                cursor: pointer;
-                transition: all 0.2s;
-            }
-            .editor-toolbar button:hover {
-                background: #475569;
-                border-color: #6366f1;
-            }
-            #compContent {
-                border-radius: 0 0 0.5rem 0.5rem;
-            }
-
-            /* ── Facebook Preview ── */
-            .fb-preview-card {
-                background: #ffffff;
-                color: #1c1e21;
-                border-radius: 0.5rem;
-                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-                margin-top: 1rem;
-                font-family: Arial, sans-serif;
-                overflow: hidden;
-            }
-            .fb-card-header {
-                padding: 0.75rem;
-                display: flex;
-                gap: 0.5rem;
-            }
-            .fb-avatar {
-                width: 40px;
-                height: 40px;
-                border-radius: 50%;
-                background: #e4e6eb;
-            }
-            .fb-header-info {
-                display: flex;
-                flex-direction: column;
-            }
-            .fb-name {
-                font-weight: 600;
-                font-size: 0.95rem;
-            }
-            .fb-time {
-                font-size: 0.8rem;
-                color: #65676b;
-            }
-            .fb-card-text {
-                padding: 0 0.75rem 0.75rem;
-                font-size: 0.95rem;
-                line-height: 1.4;
-                white-space: pre-wrap;
-            }
-            .fb-card-media {
-                width: 100%;
-                height: 200px;
-                background: #f0f2f5;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                border-top: 1px solid #e4e6eb;
-                border-bottom: 1px solid #e4e6eb;
-            }
-            .fb-media-placeholder {
-                color: #8a8d91;
-                font-size: 0.85rem;
-                font-style: italic;
-            }
-            .fb-card-link-box {
-                padding: 0.75rem;
-                background: #f0f2f5;
-            }
-            .fb-link-site {
-                font-size: 0.75rem;
-                color: #65676b;
-                text-transform: uppercase;
-            }
-            .fb-link-title {
-                font-weight: 600;
-                font-size: 1rem;
-                margin: 0.2rem 0;
-            }
-            .fb-link-desc {
-                font-size: 0.85rem;
-                color: #65676b;
-                display: -webkit-box;
-                -webkit-line-clamp: 1;
-                -webkit-box-orient: vertical;
-                overflow: hidden;
-            }
-            .fb-card-actions {
-                border-top: 1px solid #e4e6eb;
-                padding: 0.5rem;
-                display: flex;
-                justify-content: space-around;
-                color: #65676b;
-                font-weight: 600;
-                font-size: 0.9rem;
-            }
-
-            @media (max-width: 900px) {
-                .compose-grid {
-                    grid-template-columns: 1fr;
-                }
-                .compose-sidebar {
-                    border-left: none;
-                    border-top: 1px solid #334155;
-                    padding-left: 0;
-                    padding-top: 2rem;
-                }
-            }
-
-            @media (max-width: 640px) {
-                .admin-header {
-                    padding: 1rem;
-                }
-                .article-grid {
-                    padding: 1rem;
-                    grid-template-columns: 1fr;
-                }
-                .modal {
-                    padding: 0.5rem;
-                }
-                .modal-content {
-                    padding: 1.25rem;
-                }
-                .action-buttons {
-                    flex-direction: column;
-                }
-            }
-        </style>
-    </body>
-</html>
+            } catch (err) {
+                alert('Network error during approval.');
+                currentTarget.textContent = '✅';
+                currentTarget.disabled = false;
+            }
+        });
+    });
+</script>

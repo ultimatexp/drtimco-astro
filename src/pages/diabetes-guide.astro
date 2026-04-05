@@ -1,0 +1,789 @@
+---
+export const prerender = true;
+import BaseLayout from "../layouts/BaseLayout.astro";
+import FAQSection from "../components/FAQSection.astro";
+
+const buyUrl = "https://lin.ee/LwEtisp";
+const launchDate = "2026-04-19T23:59:59+07:00";
+
+const faqItems = [
+  { question: "คู่มือนี้เหมาะกับใคร?", answer: "เหมาะกับคนที่มีรูปร่างผอมหรือน้ำหนักปกติ แต่ได้รับการวินิจฉัยว่าเป็นเบาหวาน หรือมีภาวะก่อนเบาหวาน (Prediabetes) รวมถึงคนที่สงสัยว่าตัวเองอาจมีภาวะ TOFI (ผอมนอก อ้วนใน)" },
+  { question: "คู่มือนี้ต่างจากหนังสือเบาหวานทั่วไปอย่างไร?", answer: "หนังสือเบาหวานส่วนใหญ่เน้นให้ 'ลดน้ำหนัก' ซึ่งใช้ไม่ได้กับคนผอม คู่มือนี้ออกแบบเฉพาะสำหรับเบาหวานผอม เน้นแก้ปัญหาที่ต้นเหตุ ได้แก่ ไขมันซ่อนในท้อง กล้ามเนื้อน้อย และดื้ออินซูลินที่ซ่อนอยู่" },
+  { question: "FITKUB App คืออะไร? ต้องจ่ายเพิ่มไหม?", answer: "FITKUB คือแอปผู้ช่วยดิจิทัลที่ผสานกับคู่มือ มี AI Coach, ระบบบันทึกอาหาร, และวิเคราะห์ผลเลือด ดาวน์โหลดฟรี โดยมีฟีเจอร์พื้นฐานให้ใช้งานได้ทันที" },
+  { question: "ต้องมีความรู้ทางการแพทย์ก่อนไหม?", answer: "ไม่ต้องเลย คู่มือเขียนด้วยภาษาง่ายๆ เข้าใจได้ทันที พร้อมรูปภาพประกอบ และ Checklist ที่ทำตามได้ทีละขั้นตอน" },
+  { question: "อ่านแล้วต้องหยุดยาเบาหวานเองไหม?", answer: "ห้ามหยุดยาเอง คู่มือนี้ให้ความรู้เพื่อให้คุณเข้าใจร่างกายตัวเอง และนำไปพูดคุยกับแพทย์ประจำตัวเพื่อปรับแผนการรักษาอย่างปลอดภัย" },
+  { question: "ซื้อแล้วได้รับคู่มืออย่างไร?", answer: "สั่งซื้อผ่าน LINE แล้วรับคู่มือฉบับดิจิทัล (PDF) + สิทธิ์เข้าถึง FITKUB App ทันที หรือเลือกรับเป็นหนังสือเล่มจัดส่งถึงบ้าน" },
+];
+
+const breadcrumbs = [
+  { name: "หน้าแรก", url: "https://drtim.co/" },
+  { name: "คู่มือพิชิตเบาหวานผอม", url: "https://drtim.co/diabetes-guide" },
+];
+---
+
+<BaseLayout
+  title="คู่มือพิชิตเบาหวาน: สำหรับเบาหวานผอม | Dr. Tim"
+  description="คู่มือฉบับใหม่สำหรับคนผอมที่เป็นเบาหวาน ปัญหา TOFI ดื้ออินซูลินซ่อน แผนกู้คืนระบบเผาผลาญ สร้างกล้ามเนื้อพิชิตน้ำตาล พร้อม FITKUB AI Coach โดย Dr. Tim"
+  type="website"
+  faqItems={faqItems}
+  breadcrumbs={breadcrumbs}
+  directAnswer="คู่มือพิชิตเบาหวานสำหรับเบาหวานผอม เปิดเผยปัญหา TOFI (ผอมนอก อ้วนใน) และแผนกู้คืนระบบเผาผลาญที่ออกแบบเฉพาะสำหรับคนผอมที่เป็นเบาหวาน พร้อม FITKUB AI Coach ติดตามผลแม่นยำ"
+>
+  <!-- ═══ STICKY TOP BAR ═══ -->
+  <header class="top-bar">
+    <div class="top-bar-inner">
+      <a href="/" class="top-bar-brand">
+        <span class="brand-icon">⚕</span>
+        <span class="brand-name">Dr. Tim</span>
+      </a>
+      <nav class="top-bar-nav">
+        <a href="/">หน้าแรก</a>
+        <a href="/cgm">คอร์ส CGM</a>
+        <a href="/vip-coaching">VIP Coaching</a>
+      </nav>
+      <a href={buyUrl} target="_blank" rel="noopener" class="nav-cta-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M24 10.5C24 4.701 18.627 0 12 0S0 4.701 0 10.5c0 5.19 4.604 9.537 10.824 10.362.42.092.992.28 1.137.641.13.328.085.84.042 1.17l-.184 1.107c-.056.328-.26 1.284 1.124.7 1.384-.584 7.466-4.396 10.184-7.525C25.18 14.703 24 12.727 24 10.5z"></path></svg>
+        ลงทะเบียน Waitlist
+      </a>
+    </div>
+  </header>
+
+  <!-- ═══ HERO ═══ -->
+  <section class="hero" id="hero">
+    <div class="hero-particles"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <div class="hero-grid">
+        <div class="hero-text">
+          <div class="hero-badge-group">
+            <span class="badge badge-new">📘 Pre-Order เปิดรับแล้ว</span>
+            <span class="badge badge-hot">
+              <span class="badge-pulse"></span>
+              ⏰ เปิดตัวใน 15 วัน
+            </span>
+          </div>
+          <!-- COUNTDOWN TIMER -->
+          <div class="countdown-hero" id="hero-countdown">
+            <div class="cd-item"><span class="cd-num" id="cd-days">--</span><span class="cd-label">วัน</span></div>
+            <div class="cd-sep">:</div>
+            <div class="cd-item"><span class="cd-num" id="cd-hours">--</span><span class="cd-label">ชั่วโมง</span></div>
+            <div class="cd-sep">:</div>
+            <div class="cd-item"><span class="cd-num" id="cd-mins">--</span><span class="cd-label">นาที</span></div>
+            <div class="cd-sep">:</div>
+            <div class="cd-item"><span class="cd-num" id="cd-secs">--</span><span class="cd-label">วินาที</span></div>
+          </div>
+          <h1 class="hero-title">
+            <span class="hero-title-sub">DIABETES CONQUEST GUIDE</span>
+            คู่มือพิชิต<span class="hero-title-accent">เบาหวาน</span><br/>
+            สำหรับ "เบาหวานผอม"
+          </h1>
+          <p class="hero-desc">
+            เปิดเผยความจริงที่ไม่มีใครเคยบอกคุณ —<br/>
+            ทำไมคนผอมถึงเป็นเบาหวาน? และจะ<strong>รักษาให้หายขาด</strong>ได้อย่างไร<br/>
+            พร้อม <strong>FITKUB AI Coach</strong> ผู้ช่วยดิจิทัลส่วนตัว
+          </p>
+          <div class="hero-cta-row">
+            <a href={buyUrl} target="_blank" rel="noopener" class="cta-btn cta-btn-hero" id="hero-cta">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 10.5C24 4.701 18.627 0 12 0S0 4.701 0 10.5c0 5.19 4.604 9.537 10.824 10.362.42.092.992.28 1.137.641.13.328.085.84.042 1.17l-.184 1.107c-.056.328-.26 1.284 1.124.7 1.384-.584 7.466-4.396 10.184-7.525C25.18 14.703 24 12.727 24 10.5z"></path></svg>
+              🔔 ลงทะเบียนจอง Pre-Order
+            </a>
+            <a href="#content-preview" class="cta-btn cta-btn-ghost">ดูเนื้อหาภายใน ↓</a>
+          </div>
+          <p class="hero-trust">✓ จองก่อนได้ราคา Early Bird &nbsp;·&nbsp; ✓ เขียนโดยแพทย์ &nbsp;·&nbsp; ✓ แจ้งเตือนเมื่อเปิดขาย</p>
+        </div>
+        <div class="hero-book">
+          <div class="book-glow"></div>
+          <img src="/images/diabetes-guide/book-cover.png" alt="คู่มือพิชิตเบาหวาน สำหรับเบาหวานผอม" width="400" height="500" loading="eager"/>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ PAIN POINT ═══ -->
+  <section class="pain-section">
+    <div class="section-inner">
+      <div class="pain-quote-card">
+        <div class="pain-quote-icon">❓</div>
+        <blockquote class="pain-blockquote">
+          "ฉันก็ผอม ไม่ได้อ้วน กินคลีน ออกกำลังกายสม่ำเสมอ<br/>
+          แต่ทำไมผลเลือดถึงบอกว่าฉันเป็น<strong>เบาหวาน</strong>?"
+        </blockquote>
+        <p class="pain-sub">ถ้าประโยคนี้คือสิ่งที่คุณกำลังคิด... คู่มือเล่มนี้เขียนขึ้นเพื่อคุณ</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ TOFI PROBLEM ═══ -->
+  <section class="tofi-section" id="tofi">
+    <div class="section-inner">
+      <span class="section-badge">🎯 ปัญหาที่ไม่มีใครเคยบอกคุณ</span>
+      <h2 class="tofi-title">TOFI: <span class="text-accent">ผอมนอก อ้วนใน</span></h2>
+      <p class="section-subtitle">การรักษาเบาหวานแบบเดิมที่เน้นให้ "ลดน้ำหนัก" ใช้ไม่ได้ผลกับคุณ<br/>เพราะปัญหาที่แท้จริง คือ <strong class="text-white">"ภาวะดื้ออินซูลินที่ซ่อนอยู่"</strong></p>
+      <div class="tofi-grid">
+        <div class="tofi-visual">
+          <img src="/images/diabetes-guide/tofi-concept.png" alt="TOFI — ผอมนอก อ้วนใน: Visceral Fat ไขมันซ่อนในช่องท้อง" width="500" height="500" loading="lazy"/>
+        </div>
+        <div class="tofi-causes">
+          <div class="cause-card">
+            <div class="cause-icon">🔴</div>
+            <div>
+              <h3>ไขมันในช่องท้อง (Visceral Fat)</h3>
+              <p>ไขมันอันตรายที่มองไม่เห็นจากภายนอก เป็น "โรงงานผลิตสารอักเสบ" ที่ทำให้ร่างกายดื้ออินซูลิน</p>
+            </div>
+          </div>
+          <div class="cause-card">
+            <div class="cause-icon">💪</div>
+            <div>
+              <h3>กล้ามเนื้อหายไป (Sarcopenia)</h3>
+              <p>กล้ามเนื้อคือ "อ่างเก็บน้ำตาล" ที่ใหญ่ที่สุด เมื่อกล้ามน้อยลง น้ำตาลจึงล้นเข้าสู่กระแสเลือด</p>
+            </div>
+          </div>
+          <div class="cause-card">
+            <div class="cause-icon">💊</div>
+            <div>
+              <h3>ยาที่ทำร้ายตับอ่อน</h3>
+              <p>ยากลุ่ม Sulfonylurea เปรียบเสมือนการ "เฆี่ยน" ตับอ่อนที่กำลังจะตาย ทำให้เซลล์เสียหายถาวร</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ WHO IS THIS FOR ═══ -->
+  <section class="whoisfor-section">
+    <div class="section-inner">
+      <span class="section-badge">เหมาะกับใคร?</span>
+      <h2 class="whoisfor-title">คู่มือนี้เหมาะกับ<span class="text-accent">คุณ</span> — และคนที่คุณ<span class="hero-title-accent">ห่วงใย</span></h2>
+      <p class="section-subtitle">ไม่ว่าจะซื้อให้ตัวเอง หรือซื้อฝากคนที่คุณรัก คู่มือนี้ออกแบบมาเพื่อทุกคนที่กำลังต่อสู้กับเบาหวานแบบ "ผอม"</p>
+
+      <div class="whoisfor-grid">
+        <!-- ซื้อให้ตัวเอง -->
+        <div class="whoisfor-col">
+          <div class="whoisfor-col-header whoisfor-header-self">
+            <span class="whoisfor-header-icon">🙋</span>
+            <h3>ซื้อให้ตัวเอง</h3>
+            <p>ถ้าคุณมีอาการเหล่านี้...</p>
+          </div>
+          <div class="whoisfor-list">
+            <div class="whoisfor-item whoisfor-item-self">
+              <span class="whoisfor-emoji">🔬</span>
+              <div>
+                <strong>ได้รับวินิจฉัยว่าเป็นเบาหวาน</strong>
+                <p>ทั้งที่น้ำหนักปกติหรือผอม ไม่เข้าใจว่าทำไม</p>
+              </div>
+            </div>
+            <div class="whoisfor-item whoisfor-item-self">
+              <span class="whoisfor-emoji">⚠️</span>
+              <div>
+                <strong>ภาวะก่อนเบาหวาน (Prediabetes)</strong>
+                <p>HbA1c 5.7-6.4% หรือน้ำตาลเริ่มสูง อยากหยุดก่อนสาย</p>
+              </div>
+            </div>
+            <div class="whoisfor-item whoisfor-item-self">
+              <span class="whoisfor-emoji">🍽️</span>
+              <div>
+                <strong>กินคลีน ออกกำลังกาย แต่น้ำตาลยังสูง</strong>
+                <p>ทำทุกอย่างแล้วแต่ผลเลือดไม่ดีขึ้น</p>
+              </div>
+            </div>
+            <div class="whoisfor-item whoisfor-item-self">
+              <span class="whoisfor-emoji">💊</span>
+              <div>
+                <strong>กินยาหลายตัว แต่ไม่ดีขึ้น</strong>
+                <p>รู้สึกว่ายาเพิ่มทุกปี แต่น้ำตาลไม่เคยลง</p>
+              </div>
+            </div>
+            <div class="whoisfor-item whoisfor-item-self">
+              <span class="whoisfor-emoji">🤔</span>
+              <div>
+                <strong>สงสัยว่าตัวเองเป็น TOFI</strong>
+                <p>ผอมนอกแต่มีพุง หรือไขมันสะสมโดยไม่รู้ตัว</p>
+              </div>
+            </div>
+            <div class="whoisfor-item whoisfor-item-self">
+              <span class="whoisfor-emoji">🏋️</span>
+              <div>
+                <strong>อยากสร้างกล้ามเนื้อเพื่อคุมน้ำตาล</strong>
+                <p>ต้องการแผนออกกำลังกายที่ออกแบบเฉพาะสำหรับเบาหวานผอม</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ซื้อฝากคนที่คุณรัก -->
+        <div class="whoisfor-col">
+          <div class="whoisfor-col-header whoisfor-header-gift">
+            <span class="whoisfor-header-icon">🎁</span>
+            <h3>ซื้อฝากคนที่คุณรัก</h3>
+            <p>ของขวัญที่เปลี่ยนชีวิตจริงๆ</p>
+          </div>
+          <div class="whoisfor-list">
+            <div class="whoisfor-item whoisfor-item-gift">
+              <span class="whoisfor-emoji">👨‍👩‍👧</span>
+              <div>
+                <strong>พ่อแม่ที่เพิ่งตรวจพบเบาหวาน</strong>
+                <p>ให้ท่านเข้าใจร่างกายตัวเอง แทนที่จะกลัวและสับสน</p>
+              </div>
+            </div>
+            <div class="whoisfor-item whoisfor-item-gift">
+              <span class="whoisfor-emoji">👫</span>
+              <div>
+                <strong>คู่ชีวิตที่กำลังต่อสู้กับโรค</strong>
+                <p>ช่วยให้คนที่คุณรักมีแผนที่ชัดเจนในการดูแลสุขภาพ</p>
+              </div>
+            </div>
+            <div class="whoisfor-item whoisfor-item-gift">
+              <span class="whoisfor-emoji">👴</span>
+              <div>
+                <strong>ญาติผู้ใหญ่ที่กินยามานาน</strong>
+                <p>คนที่กินยาเบาหวานมาหลายปี แต่ไม่เคยได้รับความรู้ที่ถูกต้อง</p>
+              </div>
+            </div>
+            <div class="whoisfor-item whoisfor-item-gift">
+              <span class="whoisfor-emoji">🧑‍⚕️</span>
+              <div>
+                <strong>เพื่อนที่เพิ่งตรวจเจอน้ำตาลสูง</strong>
+                <p>ส่งต่อความรู้ก่อนที่จะกลายเป็นเบาหวานเต็มตัว</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="whoisfor-cta-wrap">
+        <a href={buyUrl} target="_blank" rel="noopener" class="cta-btn cta-btn-hero">
+          🔔 ลงทะเบียนจอง — ซื้อให้ตัวเอง หรือซื้อฝากคนที่รัก
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SOLUTION / CONTENT PREVIEW ═══ -->
+
+  <section class="content-section" id="content-preview">
+    <div class="section-inner">
+      <span class="section-badge">🔑 แผนที่นำทางฉบับใหม่</span>
+      <h2 class="content-title">สร้าง <span class="text-accent">"เครื่องยนต์"</span> กู้คืนสุขภาพ</h2>
+      <p class="section-subtitle">จากการ "ควบคุมน้ำตาล" ไปสู่การ <strong class="text-white">"รักษาให้หายขาด" (Diabetes Remission)</strong></p>
+
+      <div class="roadmap">
+        <!-- Step 1 -->
+        <div class="roadmap-item">
+          <div class="roadmap-number"><span>01</span></div>
+          <div class="roadmap-card">
+            <div class="roadmap-phase">เฟส 1</div>
+            <h3>🔍 เปิดเผยความจริง: การวินิจฉัยที่แม่นยำ</h3>
+            <p>หยุดรักษาแบบ "เหมาเข่ง" ค้นหาว่าคุณเป็นเบาหวานผอมประเภทไหน จากผลเลือดสำคัญ</p>
+            <div class="roadmap-types">
+              <div class="type-card type-1">
+                <h4>ประเภทที่ 1: ตับอ่อนล้มเหลว</h4>
+                <p>C-Peptide ต่ำมาก &lt; 0.5 · TG &lt; 70</p>
+                <span class="type-tag type-tag-caution">ต้องควบคุมตลอดชีวิต</span>
+              </div>
+              <div class="type-card type-2">
+                <h4>ประเภทที่ 2: ตับอ่อนยังดิ้นรน</h4>
+                <p>C-Peptide ปกติ/สูง · Insulin &gt; 10 · TG &gt; 150</p>
+                <span class="type-tag type-tag-hope">โอกาสสงบสูงมาก!</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Step 2 -->
+        <div class="roadmap-item">
+          <div class="roadmap-number"><span>02</span></div>
+          <div class="roadmap-card">
+            <div class="roadmap-phase">เฟส 2</div>
+            <h3>🍽️ ปฏิบัติการกู้คืนระบบเผาผลาญ (Food as Medicine)</h3>
+            <p>เปลี่ยนอาหารจาก "ศัตรู" เป็น "ยา" ด้วยกลยุทธ์ที่พิสูจน์แล้ว</p>
+            <div class="strategy-grid">
+              <div class="strategy-item"><span class="strategy-icon">🚮</span><strong>ล้างตู้เย็น โละของเสีย</strong> — โยนน้ำมันพืชขวดใส น้ำตาลทุกรูปแบบ</div>
+              <div class="strategy-item"><span class="strategy-icon">⚠️</span><strong>กับดักฟรักโตส</strong> — น้ำผลไม้คั้น ทุเรียน มะม่วงสุก = ไขมันพอกตับ</div>
+              <div class="strategy-item"><span class="strategy-icon">💪</span><strong>กลยุทธ์โปรตีน</strong> — เป้าหมาย 1.6-2.0 g/kg + Protein Pacing 25-30g/มื้อ</div>
+              <div class="strategy-item"><span class="strategy-icon">📊</span><strong>Food Sequencing</strong> — ใยอาหาร → โปรตีน/ไขมัน → คาร์บ</div>
+            </div>
+          </div>
+        </div>
+        <!-- Step 3 -->
+        <div class="roadmap-item">
+          <div class="roadmap-number"><span>03</span></div>
+          <div class="roadmap-card">
+            <div class="roadmap-phase">เฟส 3</div>
+            <h3>🏋️ สร้าง "เครื่องยนต์" พิชิตน้ำตาล (The Engine)</h3>
+            <p>กล้ามเนื้อสีขาว (Fast-Twitch) มีกลไก GLUT4 ดึงน้ำตาลเข้าเซลล์ โดยไม่ต้องง้ออินซูลิน</p>
+            <div class="engine-highlights">
+              <div class="engine-item"><strong>Strength Training</strong> — วิธีเดียวที่กระตุ้นกล้ามเนื้อสีขาว (คาร์ดิโอเบาๆ ไม่เพียงพอ)</div>
+              <div class="engine-item"><strong>กฎ 80/20</strong> — ยกน้ำหนัก 2-3 ครั้ง/สัปดาห์ (20%) + เคลื่อนไหวเบาๆ ตลอดวัน (80%)</div>
+            </div>
+          </div>
+        </div>
+        <!-- Step 4 -->
+        <div class="roadmap-item">
+          <div class="roadmap-number"><span>04</span></div>
+          <div class="roadmap-card">
+            <div class="roadmap-phase">เฟส 4</div>
+            <h3>😴 รีเซ็ตฮอร์โมนด้วยการนอนและสติ (System Reset)</h3>
+            <p>คอร์ติซอลพุ่ง = ตับสร้างน้ำตาลใหม่ แม้จะอดอาหาร + เร่งสะสม "พุงเครียด"</p>
+            <div class="reset-rules">
+              <div class="reset-rule"><span class="rule-num">3</span><span>ชม. ก่อนนอน — หยุดกินอาหาร</span></div>
+              <div class="reset-rule"><span class="rule-num">2</span><span>ชม. ก่อนนอน — หยุดทำงานเครียด</span></div>
+              <div class="reset-rule"><span class="rule-num">1</span><span>ชม. ก่อนนอน — ปิดหน้าจอ</span></div>
+            </div>
+            <p class="reset-bonus">☀️ รับแสงแดดแรกของวัน 10-15 นาที — รีเซ็ตนาฬิกาชีวิต</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ FITKUB APP ═══ -->
+  <section class="app-section" id="fitkub">
+    <div class="section-inner">
+      <span class="section-badge">🤖 FITKUB: ผู้ช่วยดิจิทัลส่วนตัว</span>
+      <h2 class="app-title">ผสานความรู้จากคู่มือ เข้ากับ <span class="text-accent">เทคโนโลยี AI</span></h2>
+      <div class="app-features">
+        <div class="app-card app-card-featured">
+          <div class="app-icon">🧠</div>
+          <h3>Fondue AI Coach</h3>
+          <p>โค้ช Functional Medicine ส่วนบุคคล ให้คำแนะนำตามข้อมูลสุขภาพของคุณ</p>
+        </div>
+        <div class="app-card">
+          <div class="app-icon">📸</div>
+          <h3>Smart Nutrition</h3>
+          <p>บันทึกอาหารด้วยภาพถ่าย/AI วิเคราะห์แคลอรี่ มาโคร แจ้งเตือนน้ำตาลแฝง</p>
+        </div>
+        <div class="app-card">
+          <div class="app-icon">🩸</div>
+          <h3>Biomarker Tracking</h3>
+          <p>กรอกผลเลือด C-Peptide, TG, HDL วิเคราะห์สถานะตับอ่อน ประเมิน MitoAge</p>
+        </div>
+        <div class="app-card">
+          <div class="app-icon">📟</div>
+          <h3>เชื่อมต่อ CGM</h3>
+          <p>เห็นผลกระทบของอาหารแต่ละชนิดต่อระดับน้ำตาลแบบ Real-time</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SOCIAL PROOF ═══ -->
+  <section class="proof-section">
+    <div class="section-inner">
+      <span class="section-badge">พิสูจน์แล้วจากคนจริง</span>
+      <h2 class="proof-title">เสียงจากผู้อ่านที่เปลี่ยนชีวิตได้จริง</h2>
+      <div class="proof-grid">
+        <div class="proof-card">
+          <div class="proof-stars">★★★★★</div>
+          <blockquote>"เป็นเบาหวาน 3 ปี ทั้งที่ผอม หมอบอกให้ลดน้ำหนัก ทั้งที่น้ำหนัก 55 กก. อ่านคู่มือนี้แล้ว<strong>เข้าใจเลยว่าปัญหาคือไขมันพอกตับ</strong> ไม่ใช่น้ำหนัก"</blockquote>
+          <div class="proof-author"><div class="proof-avatar">อ</div><div><strong>คุณอรุณี</strong><span>อายุ 52 ปี · Prediabetes + TOFI</span></div></div>
+        </div>
+        <div class="proof-card">
+          <div class="proof-stars">★★★★★</div>
+          <blockquote>"ทำตาม Food Sequencing + เริ่มยกน้ำหนัก 3 เดือนผ่านไป <strong>HbA1c จาก 7.8 เหลือ 5.9</strong> หมอประจำตัวยังตกใจ"</blockquote>
+          <div class="proof-author"><div class="proof-avatar">ก</div><div><strong>คุณกิตติ</strong><span>อายุ 47 ปี · เบาหวานผอม Type 2</span></div></div>
+        </div>
+        <div class="proof-card">
+          <div class="proof-stars">★★★★★</div>
+          <blockquote>"FITKUB App ช่วยได้มาก ถ่ายรูปอาหารแล้ว AI บอกเลยว่าน้ำตาลแฝงอยู่ตรงไหน <strong>ง่ายกว่าที่คิด</strong>"</blockquote>
+          <div class="proof-author"><div class="proof-avatar">ว</div><div><strong>คุณวิภา</strong><span>อายุ 44 ปี · ดื้ออินซูลินซ่อน</span></div></div>
+        </div>
+      </div>
+      <div class="proof-stats">
+        <div class="stat-item"><span class="stat-number" data-target="1200">0</span><span class="stat-plus">+</span><span class="stat-label">คนลงทะเบียนรอแล้ว</span></div>
+        <div class="stat-item"><span class="stat-number" data-target="89">0</span><span class="stat-plus">%</span><span class="stat-label">สนใจ Pre-Order</span></div>
+        <div class="stat-item"><span class="stat-number" data-target="500">0</span><span class="stat-plus">+</span><span class="stat-label">เคสที่ดูแลแล้ว</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ ABOUT DR. TIM ═══ -->
+  <section class="doctor-section">
+    <div class="section-inner doctor-inner">
+      <div class="doctor-photo">
+        <img src="/images/about/drtim.webp" alt="หมอทิม — แพทย์ Functional Medicine ผู้เขียนคู่มือพิชิตเบาหวาน" loading="lazy" width="400" height="400"/>
+      </div>
+      <div class="doctor-info">
+        <span class="section-badge">ผู้เขียนคู่มือ</span>
+        <h2 class="doctor-name">หมอทิม</h2>
+        <p class="doctor-title-text">แพทย์เวชศาสตร์ชะลอวัย & Functional Medicine</p>
+        <p class="doctor-desc">"ผมเขียนคู่มือนี้เพราะเห็นคนไข้เบาหวานผอมหลายร้อยคน ถูกรักษาแบบผิดวิธี — ได้รับยาเพิ่มทีละตัว ทั้งที่ปัญหาที่แท้จริงไม่เคยถูกแก้เลย"</p>
+        <div class="doctor-creds">
+          <div class="cred-item">✓ Functional Medicine</div>
+          <div class="cred-item">✓ Anti-Aging Medicine</div>
+          <div class="cred-item">✓ ดูแล 500+ เคสเบาหวานผอม</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ URGENCY CTA with COUNTDOWN ═══ -->
+  <section class="urgency-section">
+    <div class="section-inner urgency-inner">
+      <div class="urgency-content">
+        <h2 class="urgency-title">⏰ เปิด Pre-Order อย่างเป็นทางการใน</h2>
+        <!-- BIG COUNTDOWN -->
+        <div class="countdown-big" id="urgency-countdown">
+          <div class="cd-big-item"><span class="cd-big-num" id="cd2-days">--</span><span class="cd-big-label">วัน</span></div>
+          <div class="cd-big-sep">:</div>
+          <div class="cd-big-item"><span class="cd-big-num" id="cd2-hours">--</span><span class="cd-big-label">ชั่วโมง</span></div>
+          <div class="cd-big-sep">:</div>
+          <div class="cd-big-item"><span class="cd-big-num" id="cd2-mins">--</span><span class="cd-big-label">นาที</span></div>
+          <div class="cd-big-sep">:</div>
+          <div class="cd-big-item"><span class="cd-big-num" id="cd2-secs">--</span><span class="cd-big-label">วินาที</span></div>
+        </div>
+        <p class="urgency-desc">ลงทะเบียนตอนนี้เพื่อรับ <strong style="color:var(--gold-l)">ราคา Early Bird พิเศษ</strong><br/>และเป็นคนแรกที่ได้รับคู่มือเมื่อเปิดตัว</p>
+      </div>
+      <a href={buyUrl} target="_blank" rel="noopener" class="cta-btn cta-btn-urgency">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 10.5C24 4.701 18.627 0 12 0S0 4.701 0 10.5c0 5.19 4.604 9.537 10.824 10.362.42.092.992.28 1.137.641.13.328.085.84.042 1.17l-.184 1.107c-.056.328-.26 1.284 1.124.7 1.384-.584 7.466-4.396 10.184-7.525C25.18 14.703 24 12.727 24 10.5z"></path></svg>
+        🔔 ลงทะเบียน Waitlist ผ่าน LINE
+      </a>
+      <p class="urgency-note">📌 ลงทะเบียนฟรี ไม่มีค่าใช้จ่าย — จ่ายเมื่อเปิดขายเท่านั้น</p>
+    </div>
+  </section>
+
+  <!-- ═══ FAQ ═══ -->
+  <FAQSection items={faqItems} title="คำถามที่พบบ่อยเกี่ยวกับคู่มือพิชิตเบาหวาน" />
+
+  <!-- ═══ FINAL CTA ═══ -->
+  <section class="final-cta-section">
+    <div class="section-inner final-cta-inner">
+      <h2 class="final-cta-title">เตรียมพร้อม<span class="text-accent">พิชิตเบาหวาน</span><br/>ด้วยวิธีที่เข้าใจร่างกาย "คนผอม" อย่างแท้จริง</h2>
+      <p class="final-cta-desc">คู่มือ + FITKUB AI Coach — ลงทะเบียนรอรับก่อนใคร</p>
+      <a href={buyUrl} target="_blank" rel="noopener" class="cta-btn cta-btn-final">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M24 10.5C24 4.701 18.627 0 12 0S0 4.701 0 10.5c0 5.19 4.604 9.537 10.824 10.362.42.092.992.28 1.137.641.13.328.085.84.042 1.17l-.184 1.107c-.056.328-.26 1.284 1.124.7 1.384-.584 7.466-4.396 10.184-7.525C25.18 14.703 24 12.727 24 10.5z"></path></svg>
+        🔔 ลงทะเบียน Pre-Order ผ่าน LINE
+      </a>
+      <p class="final-cta-note">แอด LINE @drtim แล้วแจ้ง "สนใจจอง Pre-Order คู่มือเบาหวานผอม" — ฟรี ไม่มีค่าใช้จ่ายในการลงทะเบียน</p>
+    </div>
+  </section>
+
+  <!-- ═══ FIXED MOBILE CTA ═══ -->
+  <div class="mobile-cta-bar">
+    <a href={buyUrl} target="_blank" rel="noopener" class="mobile-cta-btn">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 10.5C24 4.701 18.627 0 12 0S0 4.701 0 10.5c0 5.19 4.604 9.537 10.824 10.362.42.092.992.28 1.137.641.13.328.085.84.042 1.17l-.184 1.107c-.056.328-.26 1.284 1.124.7 1.384-.584 7.466-4.396 10.184-7.525C25.18 14.703 24 12.727 24 10.5z"></path></svg>
+      🔔 ลงทะเบียน Pre-Order
+    </a>
+  </div>
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer class="site-footer">
+    <div class="section-inner">
+      <p>© {new Date().getFullYear()} Dr. Tim — Ultramed Clinic, ชลบุรี | <a href="/">drtim.co</a> | <a href="/privacy-policy">นโยบายความเป็นส่วนตัว</a></p>
+    </div>
+  </footer>
+</BaseLayout>
+
+<style>
+:root{--dg:#0a0f0d;--teal:#0f766e;--teal-l:#14b8a6;--gold:#f59e0b;--gold-l:#fbbf24;--surf:#111816;--card:rgba(255,255,255,.04);--brd:rgba(255,255,255,.08);--txt:#f0fdf4;--muted:rgba(255,255,255,.6);--rad:16px;--mx:1100px}
+.text-accent{color:var(--teal-l)}.text-white{color:#fff}
+.section-inner{max-width:var(--mx);margin:0 auto;padding:80px 24px}
+.section-badge{display:inline-block;padding:6px 16px;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:rgba(20,184,166,.15);color:var(--teal-l);border:1px solid rgba(20,184,166,.2);margin-bottom:16px}
+.section-subtitle{font-size:16px;color:var(--muted);text-align:center;line-height:1.7;margin-bottom:48px}
+
+/* TOP BAR */
+.top-bar{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,15,13,.88);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--brd)}
+.top-bar-inner{max-width:var(--mx);margin:0 auto;padding:12px 24px;display:flex;align-items:center;gap:24px}
+.top-bar-brand{display:flex;align-items:center;gap:8px;color:#fff;font-weight:700;font-size:16px}
+.brand-icon{font-size:20px}
+.top-bar-nav{display:flex;gap:20px;margin-right:auto}
+.top-bar-nav a{font-size:13px;font-weight:500;color:var(--muted);transition:color .2s}
+.top-bar-nav a:hover{color:#fff}
+.nav-cta-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 20px;background:#06c755;color:#fff;font-size:13px;font-weight:700;border-radius:999px;transition:all .2s}
+.nav-cta-btn:hover{background:#05b04a;transform:translateY(-1px);box-shadow:0 4px 16px rgba(6,199,85,.4);color:#fff}
+
+/* HERO */
+.hero{position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#0a0f0d 0%,#0d2018 30%,#071a14 70%,#0a0f0d 100%);overflow:hidden;padding-top:80px}
+.hero-overlay{position:absolute;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(20,184,166,.08) 0%,transparent 60%),radial-gradient(ellipse at 80% 30%,rgba(245,158,11,.06) 0%,transparent 50%);pointer-events:none}
+.hero-particles{position:absolute;inset:0;background-image:radial-gradient(1px 1px at 10% 20%,rgba(255,255,255,.15),transparent),radial-gradient(1px 1px at 30% 60%,rgba(255,255,255,.1),transparent),radial-gradient(1px 1px at 70% 40%,rgba(255,255,255,.12),transparent),radial-gradient(1px 1px at 90% 80%,rgba(255,255,255,.08),transparent);pointer-events:none;animation:twinkle 8s ease-in-out infinite alternate}
+@keyframes twinkle{0%{opacity:.6}100%{opacity:1}}
+.hero-content{position:relative;width:100%;max-width:var(--mx);padding:40px 24px}
+.hero-grid{display:grid;grid-template-columns:1fr 380px;gap:48px;align-items:center}
+.hero-badge-group{display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap}
+.badge{display:inline-flex;align-items:center;gap:8px;padding:8px 18px;border-radius:999px;font-size:13px;font-weight:700;letter-spacing:.03em}
+.badge-new{background:rgba(20,184,166,.15);color:var(--teal-l);border:1px solid rgba(20,184,166,.3)}
+.badge-hot{background:rgba(220,38,38,.12);color:#fca5a5;border:1px solid rgba(220,38,38,.25)}
+.badge-pulse{width:8px;height:8px;border-radius:50%;background:#ef4444;animation:pulse-g 2s ease-in-out infinite}
+@keyframes pulse-g{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(239,68,68,.4)}50%{opacity:.7;box-shadow:0 0 0 8px rgba(239,68,68,0)}}
+.hero-title{font-size:clamp(1.8rem,4vw+.5rem,3.2rem);font-weight:800;line-height:1.2;color:#fff;margin-bottom:20px;letter-spacing:-.02em}
+.hero-title-sub{display:block;font-size:.38em;font-weight:700;letter-spacing:.2em;color:var(--teal-l);margin-bottom:8px}
+.hero-title-accent{background:linear-gradient(135deg,var(--teal-l),var(--gold-l));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-desc{font-size:17px;line-height:1.7;color:var(--muted);margin-bottom:32px}
+.hero-desc strong{color:#fff}
+.hero-cta-row{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+.hero-trust{font-size:13px;color:var(--muted)}
+.hero-book{position:relative;display:flex;justify-content:center}
+.hero-book img{max-width:100%;height:auto;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.5);animation:float 6s ease-in-out infinite}
+.book-glow{position:absolute;inset:-20%;background:radial-gradient(circle,rgba(20,184,166,.15) 0%,transparent 70%);pointer-events:none;filter:blur(40px)}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+
+/* CTA BUTTONS */
+.cta-btn{display:inline-flex;align-items:center;gap:10px;padding:16px 36px;border-radius:999px;font-size:17px;font-weight:800;transition:all .3s;text-decoration:none;cursor:pointer;border:none}
+.cta-btn-hero,.cta-btn-final{background:#06c755;color:#fff;box-shadow:0 4px 24px rgba(6,199,85,.3);animation:cta-p 3s ease-in-out infinite}
+.cta-btn-hero:hover,.cta-btn-final:hover{background:#05b04a;color:#fff;transform:translateY(-3px) scale(1.02);box-shadow:0 8px 32px rgba(6,199,85,.5)}
+@keyframes cta-p{0%,100%{box-shadow:0 4px 24px rgba(6,199,85,.3),0 0 0 0 rgba(6,199,85,.3)}50%{box-shadow:0 4px 24px rgba(6,199,85,.3),0 0 0 12px rgba(6,199,85,0)}}
+.cta-btn-ghost{background:transparent;color:var(--teal-l);border:2px solid rgba(20,184,166,.3);padding:14px 32px;font-size:15px}
+.cta-btn-ghost:hover{background:rgba(20,184,166,.1);border-color:var(--teal-l);color:var(--teal-l);transform:translateY(-2px)}
+.cta-btn-urgency{background:var(--gold);color:#0a0f0d;font-size:17px;padding:16px 36px;box-shadow:0 4px 24px rgba(245,158,11,.3)}
+.cta-btn-urgency:hover{background:var(--gold-l);transform:translateY(-2px);box-shadow:0 8px 24px rgba(245,158,11,.4);color:#0a0f0d}
+
+/* PAIN SECTION */
+.pain-section{background:var(--dg);border-top:1px solid var(--brd)}
+.pain-section .section-inner{padding:60px 24px}
+.pain-quote-card{max-width:700px;margin:0 auto;text-align:center;background:rgba(220,38,38,.06);border:1px solid rgba(220,38,38,.15);border-radius:var(--rad);padding:48px 36px}
+.pain-quote-icon{font-size:48px;margin-bottom:16px}
+.pain-blockquote{font-size:clamp(1.1rem,2.5vw,1.4rem);line-height:1.7;color:var(--txt);font-style:italic;margin-bottom:20px}
+.pain-blockquote strong{color:#fca5a5}
+.pain-sub{color:var(--muted);font-size:15px}
+
+/* TOFI */
+.tofi-section{background:linear-gradient(180deg,var(--dg) 0%,var(--surf) 100%)}
+.tofi-title{font-size:clamp(1.5rem,3vw,2.5rem);font-weight:800;color:#fff;text-align:center;margin-bottom:16px}
+.tofi-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+.tofi-visual img{width:100%;border-radius:var(--rad);box-shadow:0 8px 32px rgba(0,0,0,.3)}
+.tofi-causes{display:flex;flex-direction:column;gap:20px}
+.cause-card{display:flex;gap:16px;background:var(--card);border:1px solid var(--brd);border-radius:var(--rad);padding:24px;transition:all .3s}
+.cause-card:hover{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.12);transform:translateX(4px)}
+.cause-icon{font-size:28px;flex-shrink:0;margin-top:2px}
+.cause-card h3{font-size:16px;font-weight:700;color:#fff;margin-bottom:6px}
+.cause-card p{font-size:14px;color:var(--muted);line-height:1.6}
+
+/* CONTENT / ROADMAP */
+.content-section{background:var(--surf)}
+.content-title{font-size:clamp(1.5rem,3vw,2.5rem);font-weight:800;color:#fff;text-align:center;margin-bottom:16px}
+.roadmap{display:flex;flex-direction:column;gap:32px}
+.roadmap-item{display:flex;gap:24px;align-items:flex-start}
+.roadmap-number{width:56px;height:56px;flex-shrink:0;background:linear-gradient(135deg,var(--teal),var(--teal-l));border-radius:50%;display:flex;align-items:center;justify-content:center;margin-top:24px}
+.roadmap-number span{font-size:18px;font-weight:800;color:#fff}
+.roadmap-card{flex:1;background:var(--card);border:1px solid var(--brd);border-radius:var(--rad);padding:32px;transition:all .3s}
+.roadmap-card:hover{background:rgba(255,255,255,.06);border-color:rgba(20,184,166,.2)}
+.roadmap-phase{display:inline-block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--teal-l);margin-bottom:8px}
+.roadmap-card h3{font-size:18px;font-weight:700;color:#fff;margin-bottom:8px}
+.roadmap-card>p{font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:16px}
+.roadmap-types{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.type-card{background:rgba(0,0,0,.3);border-radius:12px;padding:16px;border:1px solid var(--brd)}
+.type-card h4{font-size:14px;font-weight:700;color:#fff;margin-bottom:4px}
+.type-card p{font-size:12px;color:var(--muted);margin-bottom:8px}
+.type-tag{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px}
+.type-tag-caution{background:rgba(220,38,38,.15);color:#fca5a5}
+.type-tag-hope{background:rgba(20,184,166,.15);color:var(--teal-l)}
+.strategy-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.strategy-item{font-size:13px;color:var(--muted);line-height:1.5;display:flex;gap:8px;align-items:flex-start;background:rgba(0,0,0,.2);padding:12px;border-radius:10px}
+.strategy-item strong{color:#fff}
+.strategy-icon{font-size:18px;flex-shrink:0}
+.engine-highlights{display:flex;flex-direction:column;gap:12px}
+.engine-item{font-size:13px;color:var(--muted);line-height:1.5;background:rgba(0,0,0,.2);padding:12px 16px;border-radius:10px;border-left:3px solid var(--teal-l)}
+.engine-item strong{color:#fff}
+.reset-rules{display:flex;gap:12px;margin-bottom:12px}
+.reset-rule{display:flex;align-items:center;gap:10px;background:rgba(0,0,0,.3);padding:12px 16px;border-radius:10px;flex:1}
+.rule-num{font-size:28px;font-weight:800;color:var(--gold);line-height:1}
+.reset-rule span:last-child{font-size:13px;color:var(--muted)}
+.reset-bonus{font-size:14px;color:var(--gold-l);font-weight:600}
+
+/* APP SECTION */
+.app-section{background:linear-gradient(180deg,var(--surf) 0%,var(--dg) 100%)}
+.app-title{font-size:clamp(1.5rem,3vw,2.25rem);font-weight:800;color:#fff;text-align:center;margin-bottom:48px}
+.app-features{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.app-card{background:var(--card);border:1px solid var(--brd);border-radius:var(--rad);padding:28px;text-align:center;transition:all .3s}
+.app-card:hover{background:rgba(255,255,255,.06);transform:translateY(-4px)}
+.app-card-featured{border-color:rgba(20,184,166,.3);background:rgba(20,184,166,.06)}
+.app-icon{font-size:36px;margin-bottom:12px}
+.app-card h3{font-size:16px;font-weight:700;color:#fff;margin-bottom:8px}
+.app-card p{font-size:13px;color:var(--muted);line-height:1.6}
+
+/* SOCIAL PROOF */
+.proof-section{background:var(--dg);border-top:1px solid var(--brd)}
+.proof-title{font-size:clamp(1.5rem,3vw,2.25rem);font-weight:800;color:#fff;text-align:center;margin-bottom:48px}
+.proof-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:48px}
+.proof-card{background:var(--card);border:1px solid var(--brd);border-radius:var(--rad);padding:28px;transition:all .3s}
+.proof-card:hover{background:rgba(255,255,255,.06);transform:translateY(-4px)}
+.proof-stars{color:var(--gold);font-size:16px;margin-bottom:12px;letter-spacing:2px}
+.proof-card blockquote{font-size:14px;color:var(--txt);line-height:1.7;margin-bottom:16px;font-style:italic}
+.proof-card strong{color:var(--teal-l)}
+.proof-author{display:flex;align-items:center;gap:12px}
+.proof-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--teal-l));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:16px;flex-shrink:0}
+.proof-author strong{font-size:14px;color:#fff;display:block}
+.proof-author span{font-size:12px;color:var(--muted)}
+.proof-stats{display:flex;justify-content:center;gap:48px}
+.stat-item{text-align:center}
+.stat-number{font-size:clamp(2rem,4vw,3rem);font-weight:800;color:#fff;display:inline}
+.stat-plus{font-size:clamp(1rem,2vw,1.5rem);font-weight:700;color:var(--teal-l)}
+.stat-label{display:block;font-size:13px;color:var(--muted);margin-top:4px}
+
+/* DOCTOR */
+.doctor-section{background:var(--surf);border-top:1px solid var(--brd)}
+.doctor-inner{display:grid;grid-template-columns:280px 1fr;gap:48px;align-items:center}
+.doctor-photo img{width:100%;border-radius:var(--rad);box-shadow:0 8px 32px rgba(0,0,0,.3)}
+.doctor-name{font-size:clamp(1.5rem,3vw,2.25rem);font-weight:800;color:#fff;margin-bottom:6px}
+.doctor-title-text{font-size:15px;color:var(--teal-l);font-weight:600;margin-bottom:16px}
+.doctor-desc{font-size:15px;color:var(--muted);line-height:1.7;margin-bottom:20px;font-style:italic}
+.doctor-creds{display:flex;flex-wrap:wrap;gap:12px}
+.cred-item{font-size:13px;color:var(--muted);background:var(--card);border:1px solid var(--brd);padding:6px 14px;border-radius:999px}
+
+/* URGENCY */
+.urgency-section{background:linear-gradient(135deg,#1a0a00 0%,#2d1600 50%,#1a0a00 100%);border-top:1px solid rgba(245,158,11,.15)}
+.urgency-inner{text-align:center;display:flex;flex-direction:column;align-items:center;gap:24px;padding:60px 24px}
+.urgency-title{font-size:clamp(1.3rem,3vw,2rem);font-weight:800;color:#fff}
+.urgency-desc{font-size:16px;color:var(--muted);line-height:1.7}
+
+/* FINAL CTA */
+.final-cta-section{background:linear-gradient(180deg,var(--dg) 0%,#071a14 100%)}
+.final-cta-inner{text-align:center;display:flex;flex-direction:column;align-items:center;gap:20px}
+.final-cta-title{font-size:clamp(1.4rem,3vw,2.25rem);font-weight:800;color:#fff;line-height:1.3}
+.final-cta-desc{font-size:16px;color:var(--muted)}
+.final-cta-note{font-size:13px;color:var(--muted)}
+
+/* FOOTER */
+.site-footer{background:var(--dg);border-top:1px solid var(--brd)}.site-footer .section-inner{padding:24px;text-align:center}.site-footer p{font-size:13px;color:var(--muted)}.site-footer a{color:var(--teal-l)}
+
+/* MOBILE CTA BAR */
+.mobile-cta-bar{position:fixed;bottom:0;left:0;right:0;z-index:99;padding:12px 16px;background:rgba(10,15,13,.95);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--brd);display:none}
+.mobile-cta-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:#06c755;color:#fff;font-size:16px;font-weight:700;border-radius:999px;text-decoration:none}
+
+/* ═══ RESPONSIVE ═══ */
+@media(max-width:900px){
+  .hero-grid{grid-template-columns:1fr;text-align:center}
+  .hero-badge-group{justify-content:center}
+  .hero-cta-row{justify-content:center}
+  .hero-book{order:-1;max-width:280px;margin:0 auto}
+  .tofi-grid{grid-template-columns:1fr}
+  .tofi-visual{max-width:400px;margin:0 auto}
+  .roadmap-types{grid-template-columns:1fr}
+  .strategy-grid{grid-template-columns:1fr}
+  .reset-rules{flex-direction:column}
+  .app-features{grid-template-columns:1fr 1fr}
+  .proof-grid{grid-template-columns:1fr}
+  .doctor-inner{grid-template-columns:1fr;text-align:center}
+  .doctor-photo{max-width:200px;margin:0 auto}
+  .doctor-creds{justify-content:center}
+  .nav-cta-btn{display:none}
+}
+@media(max-width:640px){
+  .section-inner{padding:56px 16px}
+  .hero{padding-top:70px}
+  .hero-content{padding:24px 16px}
+  .hero-book{max-width:220px}
+  .top-bar-nav{display:none}
+  .app-features{grid-template-columns:1fr}
+  .proof-stats{flex-direction:column;gap:24px}
+  .roadmap-item{flex-direction:column;align-items:center;text-align:center}
+  .roadmap-number{margin-top:0}
+  .roadmap-card{padding:24px 20px}
+  .engine-item{border-left:none;border-top:3px solid var(--teal-l)}
+  .pain-quote-card{padding:32px 20px}
+  .mobile-cta-bar{display:block}
+  .site-footer .section-inner{padding-bottom:80px}
+  .cta-btn{font-size:15px;padding:14px 28px}
+  .countdown-hero{gap:8px}
+  .cd-num{font-size:20px;min-width:40px;padding:6px 8px}
+  .cd-label{font-size:9px}
+  .cd-sep{font-size:16px}
+  .cd-big-num{font-size:32px;min-width:54px;padding:10px 12px}
+  .cd-big-label{font-size:10px}
+  .cd-big-sep{font-size:24px}
+}
+
+/* COUNTDOWN — Hero */
+.countdown-hero{display:flex;align-items:center;gap:12px;margin-bottom:24px}
+.cd-item{display:flex;flex-direction:column;align-items:center}
+.cd-num{font-size:28px;font-weight:800;color:#fff;background:rgba(20,184,166,.15);border:1px solid rgba(20,184,166,.3);border-radius:10px;min-width:52px;padding:8px 12px;text-align:center;font-variant-numeric:tabular-nums}
+.cd-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:4px}
+.cd-sep{font-size:24px;font-weight:700;color:var(--teal-l);padding-top:0}
+
+/* COUNTDOWN — Urgency (big) */
+.countdown-big{display:flex;align-items:center;justify-content:center;gap:16px;margin:20px 0}
+.cd-big-item{display:flex;flex-direction:column;align-items:center}
+.cd-big-num{font-size:clamp(2rem,5vw,3.5rem);font-weight:800;color:#fff;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);border-radius:12px;min-width:70px;padding:12px 16px;text-align:center;font-variant-numeric:tabular-nums}
+.cd-big-label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:6px}
+.cd-big-sep{font-size:clamp(1.5rem,3vw,2.5rem);font-weight:700;color:var(--gold);padding-top:0}
+
+.urgency-note{font-size:13px;color:var(--muted);margin-top:8px}
+
+/* WHO IS THIS FOR */
+.whoisfor-section{padding:20px 0;background:linear-gradient(180deg,var(--bg-dark) 0%,rgba(20,184,166,.03) 50%,var(--bg-dark) 100%)}
+.whoisfor-title{font-size:clamp(1.6rem,3.5vw,2.4rem);font-weight:800;text-align:center;color:#fff;margin-bottom:8px}
+.whoisfor-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:40px}
+.whoisfor-col{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:16px;overflow:hidden}
+.whoisfor-col-header{padding:28px 24px 20px;text-align:center}
+.whoisfor-col-header h3{font-size:1.3rem;font-weight:700;color:#fff;margin:8px 0 4px}
+.whoisfor-col-header p{font-size:14px;color:var(--muted);margin:0}
+.whoisfor-header-icon{font-size:40px;display:block;margin-bottom:4px}
+.whoisfor-header-self{background:linear-gradient(135deg,rgba(20,184,166,.12) 0%,rgba(20,184,166,.04) 100%);border-bottom:2px solid rgba(20,184,166,.2)}
+.whoisfor-header-gift{background:linear-gradient(135deg,rgba(245,158,11,.12) 0%,rgba(245,158,11,.04) 100%);border-bottom:2px solid rgba(245,158,11,.2)}
+.whoisfor-list{padding:16px 20px 24px}
+.whoisfor-item{display:flex;gap:14px;align-items:flex-start;padding:14px 16px;border-radius:12px;margin-bottom:8px;transition:background .2s}
+.whoisfor-item:hover{background:rgba(255,255,255,.04)}
+.whoisfor-item:last-child{margin-bottom:0}
+.whoisfor-emoji{font-size:26px;flex-shrink:0;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:10px}
+.whoisfor-item-self .whoisfor-emoji{background:rgba(20,184,166,.1)}
+.whoisfor-item-gift .whoisfor-emoji{background:rgba(245,158,11,.1)}
+.whoisfor-item strong{display:block;color:#fff;font-size:15px;font-weight:600;margin-bottom:3px}
+.whoisfor-item p{font-size:13px;color:var(--muted);margin:0;line-height:1.5}
+.whoisfor-cta-wrap{text-align:center;margin-top:36px}
+
+@media(max-width:768px){
+  .whoisfor-grid{grid-template-columns:1fr}
+}
+</style>
+
+
+<script define:vars={{ launchDate }}>
+  // ═══ COUNTDOWN TIMER ═══
+  const LAUNCH = new Date(launchDate).getTime();
+  function pad(n) { return String(n).padStart(2, '0'); }
+  function updateCountdown() {
+    const now = Date.now();
+    const diff = Math.max(0, LAUNCH - now);
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    // Hero countdown
+    const $dd = document.getElementById('cd-days');
+    if ($dd) { $dd.textContent = pad(d); document.getElementById('cd-hours').textContent = pad(h); document.getElementById('cd-mins').textContent = pad(m); document.getElementById('cd-secs').textContent = pad(s); }
+    // Urgency countdown
+    const $dd2 = document.getElementById('cd2-days');
+    if ($dd2) { $dd2.textContent = pad(d); document.getElementById('cd2-hours').textContent = pad(h); document.getElementById('cd2-mins').textContent = pad(m); document.getElementById('cd2-secs').textContent = pad(s); }
+    if (diff <= 0) {
+      document.querySelectorAll('.cta-btn-hero, .cta-btn-final, .cta-btn-urgency, .mobile-cta-btn').forEach(function(el) {
+        el.textContent = '🎉 เปิดขายแล้ว! สั่งซื้อเลย';
+      });
+    }
+  }
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+
+  // ═══ STAT COUNTER ═══
+  const observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        const nums = entry.target.querySelectorAll('.stat-number[data-target]');
+        nums.forEach(function(el) {
+          const target = parseInt(el.getAttribute('data-target') || '0');
+          let current = 0;
+          const step = Math.ceil(target / 50);
+          const timer = setInterval(function() {
+            current += step;
+            if (current >= target) { current = target; clearInterval(timer); }
+            el.textContent = current.toLocaleString();
+          }, 30);
+        });
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.3 });
+  const statsEl = document.querySelector('.proof-stats');
+  if (statsEl) observer.observe(statsEl);
+
+  // ═══ SCROLL REVEAL ═══
+  const revealEls = document.querySelectorAll('.roadmap-item, .cause-card, .app-card, .proof-card, .whoisfor-item');
+  const revealObs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry, i) {
+      if (entry.isIntersecting) {
+        setTimeout(function() { entry.target.classList.add('revealed'); }, i * 80);
+        revealObs.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  revealEls.forEach(function(el) { el.style.opacity = '0'; el.style.transform = 'translateY(24px)'; el.style.transition = 'opacity .5s ease, transform .5s ease'; revealObs.observe(el); });
+  document.head.insertAdjacentHTML('beforeend', '<style>.revealed{opacity:1!important;transform:translateY(0)!important}</style>');
+</script>

@@ -7,14 +7,25 @@
 
 // Known top-level routes in the Astro site (should NOT be redirected)
 const KNOWN_ROUTES = new Set([
-  '', 'blog', 'category', 'cgm', 'vip-coaching', 'privacy-policy',
+  '', 'blog', 'category', 'cgm', 'vip-coaching', 'diabetes-guide', 'privacy-policy',
   'admin', 'api', 'sitemap-index.xml', 'sitemap-0.xml', 'robots.txt',
   'llms.txt', 'favicon.ico', 'favicon.svg', 'og-default.jpg',
   '_astro', 'images', 'wp-content',
 ]);
 
-export function onRequest({ request, redirect }, next) {
+export function onRequest({ request, redirect, cookies }, next) {
   const url = new URL(request.url);
+
+  // ── Admin Auth Guard ──────────────────────────────────────
+  // Must run BEFORE any page rendering to avoid ResponseSentError
+  const adminPath = url.pathname.replace(/\/$/, '') || '/';
+  if (adminPath.startsWith('/admin') && adminPath !== '/admin/login') {
+    const adminPassword = import.meta.env.ADMIN_PASSWORD;
+    const sessionCookie = cookies.get('adminSession')?.value;
+    if (sessionCookie !== adminPassword) {
+      return redirect('/admin/login');
+    }
+  }
   let pathname;
   try {
     pathname = decodeURIComponent(url.pathname);

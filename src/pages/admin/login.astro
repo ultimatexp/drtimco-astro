@@ -1,0 +1,160 @@
+---
+const adminPassword = import.meta.env.ADMIN_PASSWORD;
+let error = false;
+
+// If already logged in, redirect
+if (Astro.cookies.get("adminSession")?.value === adminPassword) {
+    return Astro.redirect('/admin');
+}
+
+if (Astro.request.method === "POST") {
+    try {
+        const data = await Astro.request.formData();
+        const password = data.get("password");
+
+        if (password === adminPassword) {
+            // Set cookie for 7 days
+            Astro.cookies.set("adminSession", password, { 
+                path: '/',
+                maxAge: 60 * 60 * 24 * 7, // 7 days
+                httpOnly: true,
+                secure: import.meta.env.PROD
+            });
+            return Astro.redirect('/admin');
+        } else {
+            error = true;
+        }
+    } catch (e) {
+        error = true;
+    }
+}
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Dr.Tim CMS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #0f172a;
+            --bg-surface: #1e293b;
+            --text-main: #f8fafc;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --border: #334155;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+        }
+
+        .login-box {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+
+        p {
+            color: #94a3b8;
+            margin-bottom: 24px;
+            font-size: 0.95rem;
+        }
+
+        .input-group {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px 14px;
+            background-color: var(--bg-base);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            border-radius: 6px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+        }
+
+        button {
+            width: 100%;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .error {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 0.875rem;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <h1>Welcome Back, Dr. Tim</h1>
+        <p>Please enter your password to access the CMS.</p>
+
+        {error && (
+            <div class="error">
+                Incorrect password. Please try again.
+            </div>
+        )}
+
+        <form method="POST">
+            <div class="input-group">
+                <label for="password">Admin Password</label>
+                <input type="password" id="password" name="password" required autofocus />
+            </div>
+            <button type="submit">Log In</button>
+        </form>
+    </div>
+</body>
+</html>

@@ -21,7 +21,7 @@ if (DATABASE_URL) {
         
         if (statusFilter && searchQuery) {
             articles = await sql`
-                SELECT id, title, slug, category, status, created_at, reviewed_at
+                SELECT id, title, slug, category, status, created_at, reviewed_at, featured_image_url
                 FROM article_drafts
                 WHERE status = ${statusFilter} 
                 AND title ILIKE ${'%' + searchQuery + '%'}
@@ -30,7 +30,7 @@ if (DATABASE_URL) {
             `;
         } else if (statusFilter) {
             articles = await sql`
-                SELECT id, title, slug, category, status, created_at, reviewed_at
+                SELECT id, title, slug, category, status, created_at, reviewed_at, featured_image_url
                 FROM article_drafts
                 WHERE status = ${statusFilter}
                 ORDER BY created_at DESC
@@ -38,7 +38,7 @@ if (DATABASE_URL) {
             `;
         } else if (searchQuery) {
             articles = await sql`
-                SELECT id, title, slug, category, status, created_at, reviewed_at
+                SELECT id, title, slug, category, status, created_at, reviewed_at, featured_image_url
                 FROM article_drafts
                 WHERE title ILIKE ${'%' + searchQuery + '%'}
                 ORDER BY created_at DESC
@@ -46,7 +46,7 @@ if (DATABASE_URL) {
             `;
         } else {
             articles = await sql`
-                SELECT id, title, slug, category, status, created_at, reviewed_at
+                SELECT id, title, slug, category, status, created_at, reviewed_at, featured_image_url
                 FROM article_drafts
                 ORDER BY created_at DESC
                 LIMIT ${limit} OFFSET ${offset}
@@ -101,6 +101,7 @@ if (DATABASE_URL) {
             <table class="data-table">
                 <thead>
                     <tr>
+                        <th class="thumb-col">Image</th>
                         <th>Title</th>
                         <th>Category</th>
                         <th>Status</th>
@@ -111,6 +112,13 @@ if (DATABASE_URL) {
                 <tbody>
                     {articles.map(article => (
                         <tr class="article-row" data-id={article.id}>
+                            <td class="thumb-cell">
+                                {article.featured_image_url ? (
+                                    <img src={article.featured_image_url} alt="" class="row-thumb" loading="lazy" />
+                                ) : (
+                                    <div class="row-thumb-placeholder">📄</div>
+                                )}
+                            </td>
                             <td>
                                 <div class="cell-title">
                                     <a href={`/admin/editor?id=${article.id}`} class="title-link">{article.title}</a>
@@ -321,6 +329,35 @@ if (DATABASE_URL) {
     .date-text {
         font-size: 0.875rem;
         color: var(--text-muted);
+    }
+
+    .thumb-col {
+        width: 60px;
+    }
+
+    .thumb-cell {
+        padding: 8px 12px 8px 24px !important;
+    }
+
+    .row-thumb {
+        width: 48px;
+        height: 48px;
+        border-radius: 6px;
+        object-fit: cover;
+        display: block;
+        border: 1px solid var(--border);
+    }
+
+    .row-thumb-placeholder {
+        width: 48px;
+        height: 48px;
+        border-radius: 6px;
+        background: rgba(148, 163, 184, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        opacity: 0.4;
     }
 
     .actions-col {

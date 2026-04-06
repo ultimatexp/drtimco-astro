@@ -74,6 +74,16 @@ if (DATABASE_URL) {
                 <div class="toolbar-group">
                     <button class="toolbar-btn" data-command="link" title="Insert Link">🔗 Link</button>
                     <button class="toolbar-btn" data-command="image" title="Insert Image">🖼️ Image</button>
+                    <button class="toolbar-btn" data-command="cta" title="Insert CTA Button">🎯 CTA</button>
+                </div>
+                <div class="toolbar-divider"></div>
+                <div class="toolbar-group">
+                    <button class="toolbar-btn" data-command="insertTable" title="Insert Table">▦ Table</button>
+                    <button class="toolbar-btn" data-command="addRowAfter" title="Add Row Below">+ Row</button>
+                    <button class="toolbar-btn" data-command="addColAfter" title="Add Column Right">+ Col</button>
+                    <button class="toolbar-btn" data-command="deleteRow" title="Delete Row">− Row</button>
+                    <button class="toolbar-btn" data-command="deleteCol" title="Delete Column">− Col</button>
+                    <button class="toolbar-btn" data-command="deleteTable" title="Delete Table">🗑 Table</button>
                 </div>
             </div>
 
@@ -317,6 +327,8 @@ if (DATABASE_URL) {
         width: 100%;
         margin: 1.5rem 0;
         font-size: 0.9rem;
+        table-layout: fixed;
+        overflow: hidden;
     }
 
     .tiptap-editor-container .ProseMirror th,
@@ -325,6 +337,8 @@ if (DATABASE_URL) {
         padding: 10px 14px;
         text-align: left;
         vertical-align: top;
+        position: relative;
+        min-width: 80px;
     }
 
     .tiptap-editor-container .ProseMirror th {
@@ -335,6 +349,37 @@ if (DATABASE_URL) {
 
     .tiptap-editor-container .ProseMirror td {
         background-color: var(--bg-surface);
+    }
+
+    /* Selected table cell highlight */
+    .tiptap-editor-container .ProseMirror .selectedCell::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: rgba(99, 102, 241, 0.15);
+        pointer-events: none;
+        z-index: 2;
+    }
+
+    /* Column resize handle */
+    .tiptap-editor-container .ProseMirror .column-resize-handle {
+        position: absolute;
+        right: -2px;
+        top: 0;
+        bottom: -2px;
+        width: 4px;
+        background-color: var(--primary);
+        pointer-events: none;
+    }
+
+    .tiptap-editor-container .ProseMirror.resize-cursor {
+        cursor: col-resize;
+    }
+
+    /* Table paragraph margin fix */
+    .tiptap-editor-container .ProseMirror td p,
+    .tiptap-editor-container .ProseMirror th p {
+        margin-bottom: 0;
     }
 
     /* Code */
@@ -619,16 +664,79 @@ if (DATABASE_URL) {
         font-size: 0.8rem;
         font-weight: 700;
     }
+
+    .cta-button {
+        display: inline-block;
+        padding: 0.75rem 1.75rem;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white !important;
+        text-decoration: none !important;
+        border-radius: 8px;
+        font-weight: 600;
+        text-align: center;
+        margin: 1.5rem 0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        transition: transform 0.2s, box-shadow 0.2s;
+        border: none;
+        cursor: pointer;
+    }
+
+    .cta-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
 </style>
 
-<!-- TipTap Core and Extensions via CDN -->
-<script type="module">
-    import { Editor } from 'https://esm.sh/@tiptap/core';
-    import StarterKit from 'https://esm.sh/@tiptap/starter-kit';
-    import Underline from 'https://esm.sh/@tiptap/extension-underline';
-    import Link from 'https://esm.sh/@tiptap/extension-link';
-    import Image from 'https://esm.sh/@tiptap/extension-image';
-    import Placeholder from 'https://esm.sh/@tiptap/extension-placeholder';
+<!-- TipTap Editor Script -->
+<script>
+    import { Editor, Node, mergeAttributes } from '@tiptap/core';
+    import StarterKit from '@tiptap/starter-kit';
+    import Underline from '@tiptap/extension-underline';
+    import Link from '@tiptap/extension-link';
+    import Image from '@tiptap/extension-image';
+    import Placeholder from '@tiptap/extension-placeholder';
+    import { Table } from '@tiptap/extension-table';
+    import TableRow from '@tiptap/extension-table-row';
+    import TableCell from '@tiptap/extension-table-cell';
+    import TableHeader from '@tiptap/extension-table-header';
+
+    console.log('[TipTap] All extensions loaded successfully');
+
+    // Wait for DOM to be fully ready before accessing elements
+    function initEditor() {
+
+    // CTA Button TipTap Extension
+    const CTAButton = Node.create({
+        name: 'ctaButton',
+        group: 'block',
+        atom: true,
+        addAttributes() {
+            return {
+                href: { default: null },
+                text: { default: 'Check out' }
+            };
+        },
+        parseHTML() {
+            return [
+                {
+                    tag: 'a[data-type="cta-button"]'
+                }
+            ];
+        },
+        renderHTML({ HTMLAttributes }) {
+            return ['a', mergeAttributes(HTMLAttributes, { 'data-type': 'cta-button', class: 'cta-button', target: '_blank', rel: 'noopener noreferrer' }), HTMLAttributes.text];
+        },
+        addCommands() {
+            return {
+                insertCTA: (options) => ({ commands }) => {
+                    return commands.insertContent({
+                        type: this.name,
+                        attrs: options,
+                    });
+                },
+            };
+        },
+    });
 
     // Initialize Editor
     const initialContent = document.getElementById('initialContent').value;
@@ -637,6 +745,7 @@ if (DATABASE_URL) {
     window.tiptapEditor = new Editor({
         element: document.getElementById('editorContent'),
         extensions: [
+            CTAButton,
             StarterKit,
             Underline,
             Link.configure({
@@ -651,7 +760,14 @@ if (DATABASE_URL) {
             }),
             Placeholder.configure({
                 placeholder: 'Start writing your article here...',
-            })
+            }),
+            Table.configure({
+                resizable: true,
+                HTMLAttributes: { class: 'tiptap-table' },
+            }),
+            TableRow,
+            TableCell,
+            TableHeader
         ],
         content: initialContent,
         onUpdate: ({ editor }) => {
@@ -718,11 +834,38 @@ if (DATABASE_URL) {
                         editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
                     }
                     break;
+                case 'cta':
+                    const ctaUrl = window.prompt('CTA Button URL:');
+                    if (ctaUrl) {
+                        const ctaText = window.prompt('CTA Button Text:', 'Check out');
+                        if (ctaText) {
+                            editor.chain().focus().insertCTA({ href: ctaUrl, text: ctaText }).run();
+                        }
+                    }
+                    break;
                 case 'image':
                     const imgUrl = window.prompt('Image URL');
                     if (imgUrl) {
                         editor.chain().focus().setImage({ src: imgUrl }).run();
                     }
+                    break;
+                case 'insertTable':
+                    editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
+                    break;
+                case 'addRowAfter':
+                    editor.chain().focus().addRowAfter().run();
+                    break;
+                case 'addColAfter':
+                    editor.chain().focus().addColumnAfter().run();
+                    break;
+                case 'deleteRow':
+                    editor.chain().focus().deleteRow().run();
+                    break;
+                case 'deleteCol':
+                    editor.chain().focus().deleteColumn().run();
+                    break;
+                case 'deleteTable':
+                    editor.chain().focus().deleteTable().run();
                     break;
             }
         });
@@ -1039,9 +1182,18 @@ if (DATABASE_URL) {
 
     // Close dropdown on outside click
     document.addEventListener('click', (e) => {
-        if (!e.target.closest('.category-combo')) {
+        if (e.target && e.target.closest && !e.target.closest('.category-combo')) {
             closeDropdown();
         }
     });
+
+    } // end initEditor
+
+    // Run when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initEditor);
+    } else {
+        initEditor();
+    }
 
 </script>

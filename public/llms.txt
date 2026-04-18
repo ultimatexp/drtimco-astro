@@ -38,6 +38,10 @@ This site publishes medical health articles in Thai covering:
 - `/blog` — All articles index
 - `/blog/[slug]` — Individual article pages
 - `/category/[slug]` — Category-filtered article listings
+- `/cgm` — Thai-language CGM program (continuous glucose monitoring) for structured diabetes support
+- `/vip-coaching` — Premium 1:1 VIP coaching program (limited enrollment)
+- `/diabetes-guide` — Diabetes guide landing page (lean / TOFI-focused positioning)
+- `/diabetes-guide/checkout` — Checkout / payment instructions for the guide
 
 ## Contact & Social
 

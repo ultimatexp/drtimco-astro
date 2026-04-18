@@ -60,6 +60,16 @@ const resolvedCanonical =
   canonicalUrl || new URL(Astro.url.pathname, siteUrl).href;
 const resolvedOgImage = ogImage || `${siteUrl}/og-default.jpg`;
 
+// Avoid "<title>… | Dr. Tim | Dr. Tim" when pages already pass a branded title.
+const trimmedTitle = title.trim();
+const brandSuffixPattern = new RegExp(
+  `\\|\\s*${siteName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*$`,
+  "i",
+);
+const documentTitle = brandSuffixPattern.test(trimmedTitle)
+  ? trimmedTitle
+  : `${trimmedTitle} | ${siteName}`;
+
 // ── JSON-LD Schema Construction ──────────────────────────────
 
 // 1. Person schema — Dr. Tim (physician/author) — GEO-enhanced
@@ -205,6 +215,20 @@ if (webSiteSchema) jsonLdGraph.push(webSiteSchema);
 if (breadcrumbSchema) jsonLdGraph.push(breadcrumbSchema);
 if (faqSchema) jsonLdGraph.push(faqSchema);
 
+// AEO / GEO: expose the layout-level direct answer in structured data (CreativeWork.abstract)
+if (type === "website" && directAnswer?.trim()) {
+  jsonLdGraph.push({
+    "@type": "WebPage",
+    "@id": `${resolvedCanonical}#direct-answer`,
+    url: resolvedCanonical,
+    name: trimmedTitle,
+    abstract: directAnswer.trim(),
+    inLanguage: "th",
+    isPartOf: { "@id": `${siteUrl}/#website` },
+    author: { "@id": `${siteUrl}/#person` },
+  });
+}
+
 // Speakable schema — AEO for voice search & AI assistants
 if (type === "article") {
   jsonLdGraph.push({
@@ -235,7 +259,7 @@ const jsonLd = {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <!-- Primary Meta -->
-    <title>{title} | {siteName}</title>
+    <title>{documentTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={resolvedCanonical} />
 

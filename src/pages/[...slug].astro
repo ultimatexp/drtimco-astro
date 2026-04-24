@@ -16,6 +16,22 @@ const { slug } = Astro.params;
 const segments = (slug || '').split('/').filter(Boolean);
 const firstSegment = segments[0] || '';
 
+// Reserve top-level static routes so they never get treated as legacy blog slugs.
+const reservedTopLevelRoutes = new Set([
+  'shopping-list-for-lean-diabetes',
+  'cgm',
+  'vip-coaching',
+  'diabetes-guide',
+  'privacy-policy',
+  'blog',
+  'category',
+  'admin',
+]);
+
+if (segments.length === 1 && reservedTopLevelRoutes.has(firstSegment)) {
+  return Astro.redirect(`/${firstSegment}/`, 308);
+}
+
 // 1. Block WP admin/plugin paths with 410 Gone
 if (firstSegment === 'farmx' || firstSegment === 'wp-admin') {
   return new Response('Gone', { status: 410, headers: { 'Content-Type': 'text/plain' } });

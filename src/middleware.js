@@ -7,7 +7,7 @@
 
 // Known top-level routes in the Astro site (should NOT be redirected)
 const KNOWN_ROUTES = new Set([
-  '', 'blog', 'category', 'cgm', 'vip-coaching', 'diabetes-guide', 'privacy-policy',
+  '', 'blog', 'category', 'cgm', 'vip-coaching', 'diabetes-guide', 'shopping-list-for-lean-diabetes', 'privacy-policy',
   'admin', 'api', 'sitemap-index.xml', 'sitemap-0.xml', 'robots.txt',
   'llms.txt', 'favicon.ico', 'favicon.svg', 'og-default.jpg',
   '_astro', 'images', 'wp-content',

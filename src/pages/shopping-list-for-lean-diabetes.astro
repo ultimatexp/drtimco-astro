@@ -1,0 +1,834 @@
+---
+export const prerender = true;
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const breadcrumbs = [
+  { name: "หน้าแรก", url: "https://drtim.co/" },
+  {
+    name: "เช็คลิสต์ไปตลาดสำหรับเบาหวานผอม",
+    url: "https://drtim.co/shopping-list-for-lean-diabetes",
+  },
+];
+---
+
+<BaseLayout
+  title="เช็คลิสต์ไปตลาดสำหรับเบาหวานผอม"
+  description="หน้าเช็กลิสต์ไปตลาดแบบโต้ตอบได้สำหรับผู้มีภาวะเบาหวานผอม (Lean Diabetes) เรียงตามลำดับการกิน: ฐานพีระมิด ผัก คาร์บเชิงซ้อน ผลไม้ GI ต่ำ และรายการที่ควรเลี่ยง"
+  canonicalUrl="https://drtim.co/shopping-list-for-lean-diabetes"
+  type="website"
+  breadcrumbs={breadcrumbs}
+  directAnswer="เช็กลิสต์นี้ช่วยวางแผนซื้อวัตถุดิบสำหรับเบาหวานผอมโดยเรียงจากอาหารที่ควรกินเป็นหลักไปจนถึงรายการที่ควรเลี่ยง ผู้ใช้สามารถติ๊กสินค้าแต่ละรายการ ติดตามความคืบหน้า และรีเซ็ตรายการได้ในหน้าเดียว"
+>
+  <section class="shopping-page container">
+    <header class="shopping-header">
+      <p class="eyebrow">Shopping List</p>
+      <h1>🛒 เช็คลิสต์ไปตลาด (เรียงตามลำดับการกิน)</h1>
+      <p class="subtitle">
+        เลือกจากคอลัมน์ซ้ายให้เต็มก่อน แล้วค่อยพิจารณาคอลัมน์ถัดไป
+      </p>
+    </header>
+
+    <div class="toolbar">
+      <div class="stats" role="status" aria-live="polite">
+        <span id="checkedCount">0</span>/<span id="totalCount">0</span> รายการที่เลือกแล้ว
+      </div>
+      <div class="toolbar-actions">
+        <button id="exportA4Pdf" class="export-btn" type="button">
+          Export A4 PDF
+        </button>
+        <button id="resetChecklist" class="reset-btn" type="button">
+          รีเซ็ตทั้งหมด
+        </button>
+      </div>
+    </div>
+
+    <div class="grid" id="shoppingChecklist">
+      <article class="column primary" data-category="base">
+        <h2>✔ (1) ฐานพีระมิด 🟢 กินเป็นหลัก</h2>
+        <ul>
+          <li><label><input type="checkbox" data-item-id="base-egg" /> ไข่ไก่ทั้งฟอง</label></li>
+          <li><label><input type="checkbox" data-item-id="base-duck-egg" /> ไข่เป็ด</label></li>
+          <li><label><input type="checkbox" data-item-id="base-chicken" /> เนื้อไก่</label></li>
+          <li><label><input type="checkbox" data-item-id="base-chicken-breast" /> อกไก่ลอกหนัง</label></li>
+          <li><label><input type="checkbox" data-item-id="base-chicken-thigh" /> สะโพกไก่ลอกหนัง</label></li>
+          <li><label><input type="checkbox" data-item-id="base-duck" /> เนื้อเป็ดไม่ติดหนัง</label></li>
+          <li><label><input type="checkbox" data-item-id="base-pork" /> เนื้อหมูไม่ติดมัน</label></li>
+          <li><label><input type="checkbox" data-item-id="base-pork-tenderloin" /> สันในหมู</label></li>
+          <li><label><input type="checkbox" data-item-id="base-pork-loin" /> สันนอกหมู</label></li>
+          <li><label><input type="checkbox" data-item-id="base-beef" /> เนื้อวัวไม่ติดมัน</label></li>
+          <li><label><input type="checkbox" data-item-id="base-beef-sirloin" /> สันนอกวัว</label></li>
+          <li><label><input type="checkbox" data-item-id="base-beef-round" /> เนื้อสะโพกวัว</label></li>
+          <li><label><input type="checkbox" data-item-id="base-lamb" /> เนื้อแกะไม่ติดมัน</label></li>
+          <li><label><input type="checkbox" data-item-id="base-fish" /> ปลา (แซลมอน/ทูน่า/ซาร์ดีน)</label></li>
+          <li><label><input type="checkbox" data-item-id="base-mackerel" /> ปลาทู</label></li>
+          <li><label><input type="checkbox" data-item-id="base-seabass" /> ปลากะพง</label></li>
+          <li><label><input type="checkbox" data-item-id="base-snapper" /> ปลาแดง</label></li>
+          <li><label><input type="checkbox" data-item-id="base-tilapia" /> ปลานิล</label></li>
+          <li><label><input type="checkbox" data-item-id="base-cod" /> ปลาค็อด</label></li>
+          <li><label><input type="checkbox" data-item-id="base-shrimp" /> กุ้งสด</label></li>
+          <li><label><input type="checkbox" data-item-id="base-squid" /> ปลาหมึกสด</label></li>
+          <li><label><input type="checkbox" data-item-id="base-shellfish" /> หอย (ไม่ปรุงหวาน)</label></li>
+          <li><label><input type="checkbox" data-item-id="base-organ" /> ตับ / เครื่องใน</label></li>
+          <li><label><input type="checkbox" data-item-id="base-liver-chicken" /> ตับไก่</label></li>
+          <li><label><input type="checkbox" data-item-id="base-liver-pork" /> ตับหมู</label></li>
+          <li><label><input type="checkbox" data-item-id="base-heart" /> หัวใจ (ไก่/หมู/วัว)</label></li>
+          <li><label><input type="checkbox" data-item-id="base-gizzard" /> กึ๋นไก่</label></li>
+          <li><label><input type="checkbox" data-item-id="base-tofu" /> เต้าหู้ขาวแข็ง</label></li>
+          <li><label><input type="checkbox" data-item-id="base-tempeh" /> เทมเป้</label></li>
+          <li><label><input type="checkbox" data-item-id="base-edamame" /> ถั่วแระญี่ปุ่น</label></li>
+          <li><label><input type="checkbox" data-item-id="base-olive-oil" /> น้ำมันมะกอก</label></li>
+          <li><label><input type="checkbox" data-item-id="base-coconut-oil" /> น้ำมันมะพร้าว</label></li>
+          <li><label><input type="checkbox" data-item-id="base-avocado" /> อะโวคาโด</label></li>
+          <li><label><input type="checkbox" data-item-id="base-nuts" /> ถั่ว / เมล็ดพืช</label></li>
+        </ul>
+      </article>
+
+      <article class="column" data-category="veg">
+        <h2>(2) 🥦 ผัก</h2>
+        <ul>
+          <li><label><input type="checkbox" data-item-id="veg-kale" /> คะน้า</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-bokchoy" /> กวางตุ้ง</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-choysum" /> ผักกวางตุ้งฮ่องเต้</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-morning-glory" /> ผักบุ้ง</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-chinese-cabbage" /> ผักกาดขาว</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-romaine" /> ผักกาดคอส</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-green-oak" /> กรีนโอ๊ค</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-red-oak" /> เรดโอ๊ค</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-butterhead" /> บัตเตอร์เฮด</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-iceberg" /> ผักกาดแก้ว</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-broccoli" /> บรอกโคลี</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-cauliflower" /> กะหล่ำดอก</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-cabbage" /> กะหล่ำปลี</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-purple-cabbage" /> กะหล่ำปลีม่วง</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-brussels-sprouts" /> บรัสเซลส์สเปราต์</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-spinach" /> ผักโขม</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-kale-curly" /> เคล</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-celery" /> เซเลอรี</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-asparagus" /> หน่อไม้ฝรั่ง</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-zucchini" /> ซูกินี</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-cucumber" /> แตงกวา</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-japanese-cucumber" /> แตงกวาญี่ปุ่น</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-tomato" /> มะเขือเทศ</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-cherry-tomato" /> มะเขือเทศเชอร์รี</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-bell-pepper" /> พริกหวาน</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-carrot" /> แครอท</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-onion" /> หอมหัวใหญ่</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-red-onion" /> หอมแดง</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-garlic" /> กระเทียม</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-ginger" /> ขิง</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-galangal" /> ข่า</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-lemongrass" /> ตะไคร้</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-kaffir-lime-leaf" /> ใบมะกรูด</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-coriander" /> ผักชี</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-spring-onion" /> ต้นหอม</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-dill" /> ผักชีลาว</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-basil" /> โหระพา</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-holy-basil" /> กะเพรา</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-mint" /> สะระแหน่</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-long-bean" /> ถั่วฝักยาว</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-french-bean" /> ถั่วแขก</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-snow-pea" /> ถั่วลันเตา</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-eggplant" /> มะเขือม่วง</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-thai-eggplant" /> มะเขือเปราะ</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-bitter-melon" /> มะระ</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-radish" /> หัวไชเท้า</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-daikon" /> ไดคอน</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-lotus-root" /> รากบัว</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-seaweed" /> สาหร่ายสด/แห้ง (ไม่ปรุงหวาน)</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-mushroom-shimeji" /> เห็ดชิเมจิ</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-mushroom-enoki" /> เห็ดเข็มทอง</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-mushroom-oyster" /> เห็ดนางฟ้า</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-mushroom-king-oyster" /> เห็ดออรินจิ</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-mushroom-button" /> เห็ดแชมปิญอง</label></li>
+          <li><label><input type="checkbox" data-item-id="veg-mushroom-shiitake" /> เห็ดหอมสด</label></li>
+        </ul>
+      </article>
+
+      <article class="column" data-category="carb">
+        <h2>(3) 🍠 คาร์บเชิงซ้อน</h2>
+        <ul>
+          <li><label><input type="checkbox" data-item-id="carb-brown-rice" /> ข้าวกล้อง</label></li>
+          <li><label><input type="checkbox" data-item-id="carb-riceberry" /> ข้าวไรซ์เบอร์รี่</label></li>
+          <li><label><input type="checkbox" data-item-id="carb-red-rice" /> ข้าวกล้องแดง</label></li>
+          <li><label><input type="checkbox" data-item-id="carb-germinated-rice" /> ข้าวกล้องงอก (GABA rice)</label></li>
+          <li><label><input type="checkbox" data-item-id="carb-black-rice" /> ข้าวเหนียวดำ</label></li>
+          <li><label><input type="checkbox" data-item-id="carb-red-quinoa" /> ควินัวแดง</label></li>
+          <li><label><input type="checkbox" data-item-id="carb-white-quinoa" /> ควินัวขาว</label></li>
+          <li><label><input type="checkbox" data-item-id="carb-oat" /> ข้าวโอ๊ตเต็มเมล็ด</label></li>
+          <li><label><input type="checkbox" data-item-id="carb-steel-cut-oat" /> สตีลคัตโอ๊ต</label></li>
+          <li><label><input type="checkbox" data-item-id="carb-barley" /> ข้าวบาร์เลย์</label></li>
+          <li><label><input type="checkbox" data-item-id="carb-bulgur" /> บัลเกอร์วีต</label></li>
+          <li><label><input type="checkbox" data-item-id="carb-buckwheat" /> บัควีต</label></li>
+          <li><label><input type="checkbox" data-item-id="carb-millet" /> ลูกเดือย</label></li>
+          <li><label><input type="checkbox" data-item-id="carb-sweet-potato" /> มันหวาน</label></li>
+          <li><label><input type="checkbox" data-item-id="carb-purple-sweet-potato" /> มันม่วง</label></li>
+          <li><label><input type="checkbox" data-item-id="carb-pumpkin" /> ฟักทอง</label></li>
+          <li><label><input type="checkbox" data-item-id="carb-taro" /> เผือก</label></li>
+          <li><label><input type="checkbox" data-item-id="carb-corn" /> ข้าวโพดต้ม (ทั้งฝัก)</label></li>
+          <li><label><input type="checkbox" data-item-id="carb-boiled-potato" /> มันฝรั่งต้ม/อบ</label></li>
+          <li><label><input type="checkbox" data-item-id="carb-chickpea" /> ถั่วลูกไก่</label></li>
+          <li><label><input type="checkbox" data-item-id="carb-red-kidney-bean" /> ถั่วแดงหลวง</label></li>
+          <li><label><input type="checkbox" data-item-id="carb-black-bean" /> ถั่วดำ</label></li>
+          <li><label><input type="checkbox" data-item-id="carb-lentil" /> ถั่วเลนทิล</label></li>
+          <li><label><input type="checkbox" data-item-id="carb-almond" /> อัลมอนด์ (ไม่อบน้ำตาล)</label></li>
+          <li><label><input type="checkbox" data-item-id="carb-walnut" /> วอลนัต</label></li>
+          <li><label><input type="checkbox" data-item-id="carb-pistachio" /> พิสตาชิโอ</label></li>
+          <li><label><input type="checkbox" data-item-id="carb-macadamia" /> แมคคาเดเมีย</label></li>
+          <li><label><input type="checkbox" data-item-id="carb-hazelnut" /> เฮเซลนัต</label></li>
+          <li><label><input type="checkbox" data-item-id="carb-pecan" /> พีแคน</label></li>
+          <li><label><input type="checkbox" data-item-id="carb-cashew" /> เม็ดมะม่วงหิมพานต์</label></li>
+          <li><label><input type="checkbox" data-item-id="carb-peanut" /> ถั่วลิสงคั่วไม่ปรุงรส</label></li>
+          <li><label><input type="checkbox" data-item-id="carb-brazil-nut" /> บราซิลนัต</label></li>
+          <li><label><input type="checkbox" data-item-id="carb-pine-nut" /> เมล็ดสน</label></li>
+          <li><label><input type="checkbox" data-item-id="carb-wholegrain-bread" /> ขนมปังโฮลเกรน 100%</label></li>
+          <li><label><input type="checkbox" data-item-id="carb-wholewheat-pasta" /> พาสต้าโฮลวีต</label></li>
+        </ul>
+      </article>
+
+      <article class="column" data-category="fruit">
+        <h2>(4) 🍓 ผลไม้ GI ต่ำ</h2>
+        <ul>
+          <li><label><input type="checkbox" data-item-id="fruit-blueberry" /> บลูเบอร์รี่</label></li>
+          <li><label><input type="checkbox" data-item-id="fruit-strawberry" /> สตรอว์เบอร์รี่</label></li>
+          <li><label><input type="checkbox" data-item-id="fruit-green-apple" /> แอปเปิลเขียว</label></li>
+          <li><label><input type="checkbox" data-item-id="fruit-red-apple" /> แอปเปิลแดง</label></li>
+          <li><label><input type="checkbox" data-item-id="fruit-pear" /> แพร์</label></li>
+          <li><label><input type="checkbox" data-item-id="fruit-kiwi" /> กีวี</label></li>
+          <li><label><input type="checkbox" data-item-id="fruit-orange" /> ส้ม (ผลสด)</label></li>
+          <li><label><input type="checkbox" data-item-id="fruit-grapefruit" /> เกรปฟรุต</label></li>
+          <li><label><input type="checkbox" data-item-id="fruit-guava" /> ฝรั่ง</label></li>
+          <li><label><input type="checkbox" data-item-id="fruit-plum" /> พลัม</label></li>
+          <li><label><input type="checkbox" data-item-id="fruit-peach" /> พีช</label></li>
+          <li><label><input type="checkbox" data-item-id="fruit-cherry" /> เชอร์รี</label></li>
+          <li><label><input type="checkbox" data-item-id="fruit-pomegranate" /> ทับทิม</label></li>
+          <li><label><input type="checkbox" data-item-id="fruit-avocado-fruit" /> อะโวคาโด (ผลไม้)</label></li>
+          <li><label><input type="checkbox" data-item-id="fruit-passion-fruit" /> เสาวรส</label></li>
+          <li><label><input type="checkbox" data-item-id="fruit-dragon-fruit" /> แก้วมังกร</label></li>
+          <li><label><input type="checkbox" data-item-id="fruit-jamun" /> ลูกหว้า</label></li>
+        </ul>
+      </article>
+
+      <article class="column avoid" data-category="avoid">
+        <h2>(5) ❌ ควรเลี่ยง</h2>
+        <ul>
+          <li><label><input type="checkbox" data-item-id="avoid-sugar" /> น้ำตาลทุกชนิด</label></li>
+          <li><label><input type="checkbox" data-item-id="avoid-honey" /> น้ำผึ้ง</label></li>
+          <li><label><input type="checkbox" data-item-id="avoid-syrup" /> ไซรัป / น้ำเชื่อม</label></li>
+          <li><label><input type="checkbox" data-item-id="avoid-condensed-milk" /> นมข้นหวาน</label></li>
+          <li><label><input type="checkbox" data-item-id="avoid-sweetened-milk" /> นมปรุงแต่งรสหวาน</label></li>
+          <li><label><input type="checkbox" data-item-id="avoid-sweet-drinks" /> น้ำหวาน</label></li>
+          <li><label><input type="checkbox" data-item-id="avoid-soda" /> น้ำอัดลม</label></li>
+          <li><label><input type="checkbox" data-item-id="avoid-fruit-juice" /> น้ำผลไม้กล่อง / คั้นแยกกาก</label></li>
+          <li><label><input type="checkbox" data-item-id="avoid-energy-drink" /> เครื่องดื่มชูกำลัง</label></li>
+          <li><label><input type="checkbox" data-item-id="avoid-sweet-coffee" /> กาแฟ/ชาใส่น้ำตาล</label></li>
+          <li><label><input type="checkbox" data-item-id="avoid-bubble-tea" /> ชานมไข่มุก</label></li>
+          <li><label><input type="checkbox" data-item-id="avoid-snacks" /> ขนม</label></li>
+          <li><label><input type="checkbox" data-item-id="avoid-cake" /> เค้ก / เบเกอรี่หวาน</label></li>
+          <li><label><input type="checkbox" data-item-id="avoid-cookie" /> คุกกี้ / บิสกิต</label></li>
+          <li><label><input type="checkbox" data-item-id="avoid-ice-cream" /> ไอศกรีม</label></li>
+          <li><label><input type="checkbox" data-item-id="avoid-candy" /> ลูกอม</label></li>
+          <li><label><input type="checkbox" data-item-id="avoid-sweet-cereal" /> ซีเรียลหวาน</label></li>
+          <li><label><input type="checkbox" data-item-id="avoid-white-bread" /> ขนมปังขาว</label></li>
+          <li><label><input type="checkbox" data-item-id="avoid-refined-noodle" /> เส้นก๋วยเตี๋ยวขัดสี / เส้นบะหมี่ขาว</label></li>
+          <li><label><input type="checkbox" data-item-id="avoid-white-rice-large" /> ข้าวขาวปริมาณมาก</label></li>
+          <li><label><input type="checkbox" data-item-id="avoid-deep-fried" /> ของทอดน้ำมันท่วม</label></li>
+          <li><label><input type="checkbox" data-item-id="avoid-french-fries" /> เฟรนช์ฟรายส์</label></li>
+          <li><label><input type="checkbox" data-item-id="avoid-fast-food" /> อาหารฟาสต์ฟู้ด</label></li>
+          <li><label><input type="checkbox" data-item-id="avoid-processed" /> ของแปรรูป</label></li>
+          <li><label><input type="checkbox" data-item-id="avoid-sausage" /> ไส้กรอก / แฮม / เบคอน</label></li>
+          <li><label><input type="checkbox" data-item-id="avoid-crab-stick" /> ปูอัด / ลูกชิ้นแปรรูป</label></li>
+          <li><label><input type="checkbox" data-item-id="avoid-instant-noodle" /> บะหมี่กึ่งสำเร็จรูป</label></li>
+          <li><label><input type="checkbox" data-item-id="avoid-frozen-meal" /> อาหารแช่แข็งปรุงสำเร็จ</label></li>
+          <li><label><input type="checkbox" data-item-id="avoid-sweet-sauce" /> ซอสปรุงรสที่มีน้ำตาลสูง</label></li>
+          <li><label><input type="checkbox" data-item-id="avoid-ready-meal" /> อาหารสำเร็จรูป</label></li>
+        </ul>
+      </article>
+    </div>
+
+    <section class="seasoning">
+      <h2>🧂 เครื่องปรุง (ใช้ได้ ✔)</h2>
+      <p class="tag-legend" aria-label="คำอธิบายป้ายกำกับ">
+        <span class="item-tag tag-often">ใช้บ่อย</span>
+        <span class="item-tag tag-less">ใช้น้อย</span>
+        <span class="item-tag tag-check">ต้องเช็กฉลากน้ำตาล</span>
+      </p>
+      <ul class="seasoning-list">
+        <li><label><input type="checkbox" data-item-id="seasoning-lime" /> มะนาวสด <span class="item-tag tag-often">ใช้บ่อย</span></label></li>
+        <li><label><input type="checkbox" data-item-id="seasoning-vinegar" /> น้ำส้มสายชูหมัก <span class="item-tag tag-often">ใช้บ่อย</span></label></li>
+        <li><label><input type="checkbox" data-item-id="seasoning-apple-cider-vinegar" /> แอปเปิลไซเดอร์วีนีการ์ <span class="item-tag tag-less">ใช้น้อย</span></label></li>
+        <li><label><input type="checkbox" data-item-id="seasoning-rice-vinegar" /> น้ำส้มสายชูหมักจากข้าว <span class="item-tag tag-less">ใช้น้อย</span></label></li>
+        <li><label><input type="checkbox" data-item-id="seasoning-salt" /> เกลือธรรมชาติ <span class="item-tag tag-often">ใช้บ่อย</span></label></li>
+        <li><label><input type="checkbox" data-item-id="seasoning-pink-salt" /> เกลือหิมาลัย <span class="item-tag tag-less">ใช้น้อย</span></label></li>
+        <li><label><input type="checkbox" data-item-id="seasoning-black-pepper" /> พริกไทยดำ <span class="item-tag tag-often">ใช้บ่อย</span></label></li>
+        <li><label><input type="checkbox" data-item-id="seasoning-white-pepper" /> พริกไทยขาว <span class="item-tag tag-less">ใช้น้อย</span></label></li>
+        <li><label><input type="checkbox" data-item-id="seasoning-chili-flakes" /> พริกป่น / พริกแห้งป่น <span class="item-tag tag-often">ใช้บ่อย</span></label></li>
+        <li><label><input type="checkbox" data-item-id="seasoning-fish-sauce" /> น้ำปลาแท้ (ไม่ใส่น้ำตาล) <span class="item-tag tag-check">ต้องเช็กฉลากน้ำตาล</span></label></li>
+        <li><label><input type="checkbox" data-item-id="seasoning-soy-sauce-light" /> ซีอิ๊วขาวสูตรลดโซเดียม <span class="item-tag tag-check">ต้องเช็กฉลากน้ำตาล</span></label></li>
+        <li><label><input type="checkbox" data-item-id="seasoning-soy-sauce-dark" /> ซีอิ๊วดำแบบไม่หวาน <span class="item-tag tag-check">ต้องเช็กฉลากน้ำตาล</span></label></li>
+        <li><label><input type="checkbox" data-item-id="seasoning-tamari" /> ทามาริ (ซีอิ๊วญี่ปุ่นไม่หวาน) <span class="item-tag tag-check">ต้องเช็กฉลากน้ำตาล</span></label></li>
+        <li><label><input type="checkbox" data-item-id="seasoning-oyster-sauce" /> ซอสหอยนางรมสูตรน้ำตาลต่ำ <span class="item-tag tag-check">ต้องเช็กฉลากน้ำตาล</span></label></li>
+        <li><label><input type="checkbox" data-item-id="seasoning-mustard" /> มัสตาร์ดไม่เติมน้ำตาล <span class="item-tag tag-check">ต้องเช็กฉลากน้ำตาล</span></label></li>
+        <li><label><input type="checkbox" data-item-id="seasoning-hot-sauce" /> ซอสพริกแบบไม่เติมน้ำตาล <span class="item-tag tag-check">ต้องเช็กฉลากน้ำตาล</span></label></li>
+        <li><label><input type="checkbox" data-item-id="seasoning-sesame-oil" /> น้ำมันงา (ใช้แต่น้อย) <span class="item-tag tag-less">ใช้น้อย</span></label></li>
+        <li><label><input type="checkbox" data-item-id="seasoning-herbs" /> พริก / กระเทียม / สมุนไพรไทย <span class="item-tag tag-often">ใช้บ่อย</span></label></li>
+        <li><label><input type="checkbox" data-item-id="seasoning-ginger-powder" /> ขิงผง <span class="item-tag tag-less">ใช้น้อย</span></label></li>
+        <li><label><input type="checkbox" data-item-id="seasoning-turmeric" /> ขมิ้นผง <span class="item-tag tag-less">ใช้น้อย</span></label></li>
+        <li><label><input type="checkbox" data-item-id="seasoning-cinnamon" /> อบเชยป่น <span class="item-tag tag-less">ใช้น้อย</span></label></li>
+        <li><label><input type="checkbox" data-item-id="seasoning-nori" /> สาหร่ายโนริอบแห้ง (ไม่ปรุงหวาน) <span class="item-tag tag-check">ต้องเช็กฉลากน้ำตาล</span></label></li>
+      </ul>
+    </section>
+
+    <section class="tips">
+      <h2>💡 วิธีใช้ (สั้นๆ)</h2>
+      <ol>
+        <li>เลือกจากคอลัมน์ซ้ายให้เต็มก่อน</li>
+        <li>คอลัมน์ขวา = พยายามไม่ซื้อเลย</li>
+        <li>คาร์บ = กินเฉพาะช่วงที่ต้องใช้พลังงาน (เช่น วันออกกำลังกาย)</li>
+      </ol>
+    </section>
+  </section>
+
+  <script is:inline>
+    (() => {
+      const STORAGE_KEY = "drtim-lean-diabetes-shopping-list-v1";
+      const checkboxes = Array.from(
+        document.querySelectorAll('input[type="checkbox"][data-item-id]'),
+      );
+      const checkedCountEl = document.getElementById("checkedCount");
+      const totalCountEl = document.getElementById("totalCount");
+      const resetBtn = document.getElementById("resetChecklist");
+      const exportBtn = document.getElementById("exportA4Pdf");
+
+      const getCurrentState = () => {
+        const state = {};
+        checkboxes.forEach((cb) => {
+          state[cb.dataset.itemId] = cb.checked;
+        });
+        return state;
+      };
+
+      const applyState = (state) => {
+        checkboxes.forEach((cb) => {
+          cb.checked = Boolean(state?.[cb.dataset.itemId]);
+        });
+      };
+
+      const updateStats = () => {
+        const checked = checkboxes.filter((cb) => cb.checked).length;
+        if (checkedCountEl) checkedCountEl.textContent = String(checked);
+        if (totalCountEl) totalCountEl.textContent = String(checkboxes.length);
+      };
+
+      const saveState = () => {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(getCurrentState()));
+      };
+
+      const loadState = () => {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return;
+          applyState(JSON.parse(raw));
+        } catch (err) {
+          console.warn("Cannot restore shopping checklist state", err);
+        }
+      };
+
+      loadState();
+      updateStats();
+
+      checkboxes.forEach((cb) => {
+        cb.addEventListener("change", () => {
+          saveState();
+          updateStats();
+        });
+      });
+
+      resetBtn?.addEventListener("click", () => {
+        checkboxes.forEach((cb) => {
+          cb.checked = false;
+        });
+        saveState();
+        updateStats();
+      });
+
+      const escapeHtml = (value) =>
+        value
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+
+      const buildPrintableHtml = () => {
+        const sections = [];
+        let selectedCount = 0;
+        document
+          .querySelectorAll("#shoppingChecklist .column, .seasoning")
+          .forEach((section) => {
+            const titleEl = section.querySelector("h2");
+            const title = titleEl?.textContent?.trim() || "";
+            if (!title) return;
+
+            const items = Array.from(section.querySelectorAll("li label"))
+              .map((label) => {
+                const checkbox = label.querySelector('input[type="checkbox"]');
+                const checked = Boolean(checkbox?.checked);
+                if (!checked) return "";
+                selectedCount += 1;
+                const text = label.textContent?.trim() || "";
+                return `<li><span class="tick">✓</span><span>${escapeHtml(text)}</span></li>`;
+              })
+              .filter(Boolean);
+
+            if (items.length === 0) return;
+
+            sections.push(`
+              <section class="print-section">
+                <h2>${escapeHtml(title)}</h2>
+                <ul>${items.join("")}</ul>
+              </section>
+            `);
+          });
+
+        const now = new Date().toLocaleString("th-TH", {
+          dateStyle: "medium",
+          timeStyle: "short",
+        });
+
+        const emptyState =
+          selectedCount === 0
+            ? `<section class="empty-state">
+                 <h2>ยังไม่มีรายการที่เลือก</h2>
+                 <p>กรุณาติ๊กอย่างน้อย 1 รายการในเช็กลิสต์ แล้วกด Export A4 PDF อีกครั้ง</p>
+               </section>`
+            : "";
+
+        return `<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="utf-8" />
+    <title>Shopping Checklist - Lean Diabetes</title>
+    <style>
+      @page {
+        size: A4;
+        margin: 16mm;
+      }
+      :root {
+        --ink: #0f172a;
+        --muted: #475569;
+        --line: #dbe4f0;
+        --brand: #0f766e;
+        --brand-soft: #e6fffb;
+        --card: #ffffff;
+      }
+      body {
+        font-family: "Inter", "Noto Sans Thai", system-ui, sans-serif;
+        color: var(--ink);
+        margin: 0;
+        line-height: 1.45;
+        background: linear-gradient(180deg, #f8fafc 0%, #ffffff 20%);
+        padding: 2mm;
+      }
+      .head {
+        border: 1px solid var(--line);
+        background: linear-gradient(130deg, var(--brand-soft), #ffffff 55%);
+        border-radius: 14px;
+        padding: 14px;
+        margin-bottom: 14px;
+      }
+      h1 {
+        margin: 0 0 4px 0;
+        font-size: 22px;
+        letter-spacing: -0.01em;
+      }
+      .meta {
+        margin: 0;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .summary {
+        margin-top: 10px;
+        display: inline-flex;
+        border: 1px solid #99f6e4;
+        background: #f0fdfa;
+        color: #115e59;
+        border-radius: 999px;
+        padding: 5px 10px;
+        font-size: 12px;
+        font-weight: 700;
+      }
+      .grid {
+        columns: 2;
+        column-gap: 16px;
+      }
+      .print-section {
+        break-inside: avoid;
+        margin-bottom: 12px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 10px 10px 8px;
+        background: var(--card);
+        box-shadow: 0 3px 10px rgba(15, 23, 42, 0.04);
+      }
+      h2 {
+        font-size: 14px;
+        margin: 0 0 7px 0;
+        color: var(--brand);
+      }
+      ul {
+        margin: 0;
+        padding-left: 0;
+        list-style: none;
+      }
+      li {
+        font-size: 12px;
+        margin-bottom: 4px;
+        display: grid;
+        grid-template-columns: 14px 1fr;
+        gap: 6px;
+        align-items: start;
+      }
+      .tick {
+        color: var(--brand);
+        font-weight: 800;
+      }
+      .empty-state {
+        border: 1px dashed #cbd5e1;
+        border-radius: 12px;
+        padding: 16px;
+        text-align: center;
+        background: #f8fafc;
+      }
+      .empty-state h2 {
+        color: #334155;
+        margin-bottom: 4px;
+      }
+      .empty-state p {
+        margin: 0;
+        color: #64748b;
+        font-size: 12px;
+      }
+      .tips {
+        margin-top: 12px;
+        font-size: 11px;
+        color: #334155;
+        border-top: 1px solid var(--line);
+        padding-top: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="head">
+      <h1>🛒 เช็คลิสต์ไปตลาด (Lean Diabetes)</h1>
+      <p class="meta">สร้างเมื่อ: ${escapeHtml(now)}</p>
+      <p class="meta">Export เฉพาะรายการที่ติ๊กแล้ว • พร้อมพิมพ์ A4</p>
+      <p class="summary">รายการที่เลือกทั้งหมด: ${selectedCount}</p>
+    </header>
+    <main class="grid">
+      ${selectedCount > 0 ? sections.join("") : emptyState}
+    </main>
+    <p class="tips">💡 เลือกจากคอลัมน์ซ้ายให้เต็มก่อน • คาร์บกินช่วงที่ต้องใช้พลังงาน • พยายามเลี่ยงของหวานและแปรรูป</p>
+  </body>
+</html>`;
+      };
+
+      exportBtn?.addEventListener("click", () => {
+        const popup = window.open("about:blank", "_blank");
+        if (!popup) {
+          window.alert("เบราว์เซอร์บล็อก popup กรุณาอนุญาต popup แล้วลองใหม่");
+          return;
+        }
+        popup.document.open();
+        popup.document.write(buildPrintableHtml());
+        popup.document.close();
+        window.setTimeout(() => {
+          popup.focus();
+          popup.print();
+        }, 250);
+      });
+    })();
+  </script>
+
+  <style>
+    .shopping-page {
+      margin-top: 1.25rem;
+      padding-top: 2.75rem;
+      padding-bottom: 4rem;
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+
+    .shopping-header {
+      margin-bottom: 1.25rem;
+    }
+
+    .eyebrow {
+      font-weight: 700;
+      color: #0f766e;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+      font-size: 0.8rem;
+    }
+
+    h1 {
+      font-size: clamp(1.5rem, 3vw, 2.35rem);
+      margin-bottom: 0.45rem;
+      line-height: 1.2;
+    }
+
+    .subtitle {
+      color: #334155;
+      font-size: 1rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.85rem;
+      padding: 0.85rem 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .stats {
+      font-weight: 700;
+      color: #0f172a;
+      font-size: 0.95rem;
+    }
+
+    .toolbar-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .export-btn {
+      border: 1px solid #0891b2;
+      background: #ecfeff;
+      color: #0c4a6e;
+      border-radius: 0.6rem;
+      padding: 0.48rem 0.8rem;
+      cursor: pointer;
+      font-weight: 700;
+      min-height: 40px;
+    }
+
+    .export-btn:hover {
+      background: #cffafe;
+    }
+
+    .reset-btn {
+      border: 1px solid #cbd5e1;
+      background: #fff;
+      color: #0f172a;
+      border-radius: 0.6rem;
+      padding: 0.48rem 0.8rem;
+      cursor: pointer;
+      font-weight: 600;
+      min-height: 40px;
+    }
+
+    .reset-btn:hover {
+      background: #f1f5f9;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+      gap: 0.9rem;
+      margin-bottom: 1rem;
+    }
+
+    .column {
+      border: 1px solid #e2e8f0;
+      border-radius: 0.85rem;
+      padding: 0.9rem;
+      background: #fff;
+    }
+
+    .column.primary {
+      border-color: #86efac;
+      background: #f0fdf4;
+    }
+
+    .column.avoid {
+      border-color: #fecaca;
+      background: #fef2f2;
+    }
+
+    .column h2,
+    .seasoning h2,
+    .tips h2 {
+      font-size: 1rem;
+      margin-bottom: 0.7rem;
+      color: #0f172a;
+    }
+
+    ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 0.45rem;
+    }
+
+    li label {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.55rem;
+      font-size: 0.95rem;
+      color: #1e293b;
+      line-height: 1.4;
+      cursor: pointer;
+      word-break: break-word;
+    }
+
+    input[type="checkbox"] {
+      width: 1.05rem;
+      height: 1.05rem;
+      margin-top: 0.1rem;
+      accent-color: #0f766e;
+      flex-shrink: 0;
+    }
+
+    .seasoning,
+    .tips {
+      border: 1px solid #e2e8f0;
+      background: #fff;
+      border-radius: 0.85rem;
+      padding: 0.95rem;
+      margin-bottom: 1rem;
+    }
+
+    .tag-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 0.7rem;
+    }
+
+    .item-tag {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 0.14rem 0.5rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-left: 0.25rem;
+      white-space: nowrap;
+      vertical-align: middle;
+    }
+
+    .tag-often {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .tag-less {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .tag-check {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .seasoning-list {
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+
+    .tips ol {
+      margin: 0;
+      padding-left: 1.2rem;
+      color: #1e293b;
+      display: grid;
+      gap: 0.35rem;
+    }
+
+    @media (max-width: 560px) {
+      .shopping-page {
+        margin-top: 0.75rem;
+        padding-top: 1.75rem;
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+      }
+
+      .subtitle {
+        font-size: 0.95rem;
+      }
+
+      .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 0.75rem;
+      }
+
+      .toolbar-actions {
+        justify-content: stretch;
+      }
+
+      .export-btn,
+      .reset-btn {
+        width: 100%;
+      }
+
+      .column,
+      .seasoning,
+      .tips {
+        padding: 0.8rem;
+      }
+
+      .column h2,
+      .seasoning h2,
+      .tips h2 {
+        font-size: 0.95rem;
+      }
+
+      li label {
+        font-size: 0.92rem;
+        line-height: 1.45;
+      }
+
+      .item-tag {
+        margin-left: 0;
+        margin-top: 0.2rem;
+      }
+    }
+
+    @media (min-width: 720px) {
+      .shopping-page {
+        margin-top: 1.75rem;
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+      }
+
+      .grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .seasoning-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (min-width: 1100px) {
+      .shopping-page {
+        margin-top: 2rem;
+        padding-left: 2rem;
+        padding-right: 2rem;
+      }
+
+      .grid {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+      }
+    }
+  </style>
+</BaseLayout>

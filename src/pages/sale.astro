@@ -1,0 +1,376 @@
+---
+export const prerender = true;
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const preorderUrl = "https://www.fitkub.com/order/d6c2c53b-a627-4cc1-bb14-5fa3c0338bbe";
+const originalPrice = 545;
+const discountedPrice = 459;
+const discountPercent = 15;
+
+const breadcrumbs = [
+  { name: "หน้าแรก", url: "https://drtim.co/" },
+  { name: "Sale", url: "https://drtim.co/sale" },
+];
+---
+
+<BaseLayout
+  title="Sale | คู่มือพิชิตเบาหวานผอม Preorder"
+  description="Preorder หนังสือคู่มือพิชิตเบาหวานผอมสำหรับคนไทย ราคาปกติ 545 บาท ลดทันที 15% เหลือ 459 บาท พร้อมปุ่มสั่งจองและรองรับ Facebook Pixel"
+  ogImage="https://drtim.co/images/diabetes-guide/ChatGPT%20Image%20Apr%2024%2C%202026%2C%2008_20_15%20PM.png"
+  canonicalUrl="https://drtim.co/sale"
+  type="website"
+  breadcrumbs={breadcrumbs}
+  directAnswer="หน้า Sale สำหรับคนไทยของคู่มือพิชิตเบาหวานผอม เปิด Preorder ราคาปกติ 545 บาท ลดทันที 15% เหลือ 459 บาท พร้อมปุ่มสั่งจองชัดเจนและติดตามผลด้วย Facebook Pixel event"
+>
+  <section class="sale-page">
+    <div class="sale-container">
+      <div class="badge-row">
+        <span class="badge">Preorder สำหรับคนไทย</span>
+        <span class="badge badge-hot">ลดทันที {discountPercent}%</span>
+      </div>
+
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow">คู่มือใหม่ โดยหมอทิม</p>
+          <h1>คู่มือพิชิตเบาหวานผอม</h1>
+          <p class="subtitle">
+            หนังสือภาษาไทย อ่านง่าย ทำตามได้จริง
+            สำหรับคนที่อยากคุมน้ำตาลแบบยั่งยืน
+          </p>
+
+          <div class="price-card">
+            <p class="price-label">ราคา Preorder วันนี้</p>
+            <div class="price-row">
+              <span class="old-price">{originalPrice} บาท</span>
+              <span class="new-price">{discountedPrice} บาท</span>
+            </div>
+            <p class="saving">ประหยัดทันที 100 บาท</p>
+          </div>
+
+          <div class="cta-row">
+            <a
+              href={preorderUrl}
+              target="_blank"
+              rel="noopener"
+              class="preorder-btn"
+              data-track-preorder="hero"
+              >สั่งจอง 459 บาท</a
+            >
+          </div>
+        </div>
+
+        <div class="hero-visual">
+          <img
+            src="/images/diabetes-guide/ChatGPT%20Image%20Apr%2024%2C%202026%2C%2008_20_15%20PM.png"
+            alt="หน้าปกคู่มือพิชิตเบาหวานผอม"
+            loading="eager"
+            width="500"
+            height="650"
+          />
+        </div>
+      </div>
+
+      <div class="feature-grid">
+        <article class="feature-card">
+          <h2>เข้าใจโรคอย่างถูกต้อง</h2>
+          <p>อธิบายเบาหวานผอมแบบตรงประเด็น ไม่ใช้ศัพท์ยากเกินจำเป็น</p>
+        </article>
+        <article class="feature-card">
+          <h2>แผนอาหารทำได้จริง</h2>
+          <p>เน้นอาหารไทยที่หาได้ง่าย พร้อมหลักการกินที่ช่วยคุมระดับน้ำตาล</p>
+        </article>
+        <article class="feature-card">
+          <h2>แนวทางออกกำลังชัดเจน</h2>
+          <p>โฟกัสการสร้างกล้ามเนื้อเพื่อเพิ่มการเผาผลาญและลดภาวะดื้ออินซูลิน</p>
+        </article>
+      </div>
+
+      <section class="final-cta">
+        <h2>พร้อมเริ่มดูแลสุขภาพแบบเข้าใจร่างกายจริง?</h2>
+        <p>กดจองวันนี้ รับสิทธิ์ราคา Preorder พิเศษทันที</p>
+        <a
+          href={preorderUrl}
+          target="_blank"
+          rel="noopener"
+          class="preorder-btn preorder-btn-large"
+          data-track-preorder="final"
+          >สั่งจอง 459 บาท</a
+        >
+      </section>
+    </div>
+  </section>
+
+  <div class="mobile-cta">
+    <a
+      href={preorderUrl}
+      target="_blank"
+      rel="noopener"
+      class="mobile-cta-btn"
+      data-track-preorder="sticky-mobile"
+      >สั่งจอง 459 บาท</a
+    >
+  </div>
+
+  <script define:vars={{ discountedPrice, originalPrice }}>
+    (() => {
+      const buttons = document.querySelectorAll("[data-track-preorder]");
+
+      const trackPreorder = (placement) => {
+        if (typeof window === "undefined") return;
+        if (typeof window.fbq !== "function") return;
+
+        window.fbq("track", "InitiateCheckout", {
+          content_name: "คู่มือพิชิตเบาหวานผอม",
+          content_category: "Book Preorder",
+          currency: "THB",
+          value: discountedPrice,
+          original_price: originalPrice,
+          placement,
+        });
+      };
+
+      buttons.forEach((button) => {
+        button.addEventListener("click", () => {
+          const placement = button.getAttribute("data-track-preorder") || "unknown";
+          trackPreorder(placement);
+        });
+      });
+    })();
+  </script>
+
+  <style>
+    .sale-page {
+      background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+      padding: 2.5rem 1rem 6.5rem;
+    }
+
+    .sale-container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .badge-row {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+
+    .badge {
+      background: #e0f2fe;
+      color: #0c4a6e;
+      border-radius: 999px;
+      padding: 0.35rem 0.75rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .badge-hot {
+      background: #ecfdf5;
+      color: #065f46;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+      align-items: center;
+    }
+
+    .eyebrow {
+      color: #0f766e;
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      letter-spacing: 0.04em;
+    }
+
+    h1 {
+      font-size: clamp(1.75rem, 4vw, 3rem);
+      line-height: 1.15;
+      margin-bottom: 0.7rem;
+      color: #0f172a;
+    }
+
+    .subtitle {
+      color: #334155;
+      font-size: 1.02rem;
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    .price-card {
+      border: 1px solid #99f6e4;
+      background: #f0fdfa;
+      border-radius: 0.9rem;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .price-label {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #0f766e;
+      margin-bottom: 0.4rem;
+    }
+
+    .price-row {
+      display: flex;
+      align-items: baseline;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .old-price {
+      color: #64748b;
+      text-decoration: line-through;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .new-price {
+      color: #b91c1c;
+      font-size: 2rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .saving {
+      margin-top: 0.45rem;
+      color: #166534;
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+
+    .preorder-btn {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      min-height: 48px;
+      border-radius: 999px;
+      padding: 0.75rem 1rem;
+      background: #06c755;
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 1rem;
+      text-decoration: none;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 10px 24px rgba(6, 199, 85, 0.3);
+    }
+
+    .preorder-btn:hover {
+      color: #ffffff;
+      transform: translateY(-1px);
+      box-shadow: 0 14px 28px rgba(6, 199, 85, 0.36);
+    }
+
+    .hero-visual img {
+      width: min(100%, 420px);
+      margin: 0 auto;
+      border-radius: 1rem;
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.16);
+    }
+
+    .feature-grid {
+      margin-top: 1.5rem;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+
+    .feature-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.85rem;
+      padding: 0.95rem;
+    }
+
+    .feature-card h2 {
+      font-size: 1rem;
+      margin-bottom: 0.35rem;
+      color: #0f172a;
+    }
+
+    .feature-card p {
+      color: #475569;
+      line-height: 1.55;
+      font-size: 0.92rem;
+    }
+
+    .final-cta {
+      margin-top: 1.5rem;
+      border: 1px solid #bfdbfe;
+      border-radius: 0.95rem;
+      padding: 1.1rem;
+      background: #eff6ff;
+      text-align: center;
+    }
+
+    .final-cta h2 {
+      font-size: 1.2rem;
+      color: #0f172a;
+      margin-bottom: 0.4rem;
+    }
+
+    .final-cta p {
+      color: #334155;
+      margin-bottom: 0.9rem;
+    }
+
+    .mobile-cta {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-top: 1px solid #e2e8f0;
+      padding: 0.7rem 0.85rem calc(0.7rem + env(safe-area-inset-bottom));
+      z-index: 90;
+    }
+
+    .mobile-cta-btn {
+      display: inline-flex;
+      width: 100%;
+      min-height: 46px;
+      justify-content: center;
+      align-items: center;
+      border-radius: 999px;
+      background: #06c755;
+      color: #ffffff;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .mobile-cta-btn:hover {
+      color: #ffffff;
+    }
+
+    @media (min-width: 860px) {
+      .sale-page {
+        padding-top: 3.2rem;
+      }
+
+      .hero-grid {
+        grid-template-columns: 1.05fr 0.95fr;
+        gap: 1.8rem;
+      }
+
+      .preorder-btn {
+        width: auto;
+        min-width: 280px;
+      }
+
+      .feature-grid {
+        margin-top: 2rem;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .mobile-cta {
+        display: none;
+      }
+    }
+  </style>
+</BaseLayout>

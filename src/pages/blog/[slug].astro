@@ -29,6 +29,12 @@ export function getStaticPaths() {
 }
 
 const { post } = Astro.props;
+const { slug } = Astro.params;
+
+// Compatibility redirect for stale/cached links.
+if (slug === 'diabetes-guide') {
+  return Astro.redirect('/diabetes-guide/', 308);
+}
 
 if (!post) {
   return Astro.redirect('/404');

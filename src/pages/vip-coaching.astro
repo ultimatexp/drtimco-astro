@@ -49,11 +49,11 @@ const breadcrumbs = [
 
 <BaseLayout
     title="1:1 VIP Coaching เบาหวานสงบแบบไม่ใช้ยา | Dr. Tim"
-    description="โปรแกรม 1:1 VIP Coaching 12 สัปดาห์ โดยหมอทิม — รักษาเบาหวานแบบตัวต่อตัวโดยไม่ใช้ยา ด้วย CGM + Functional Medicine รับเพียง 3 ท่านต่อรุ่น ฟรีเครื่อง CGM สมัครผ่าน LINE @Ultramed"
+    description="โปรแกรม 1:1 VIP Coaching 12 สัปดาห์ โดยหมอทิม — รักษาเบาหวานแบบตัวต่อตัวโดยไม่ใช้ยา ด้วย CGM + Functional Medicine รับจำนวนจำกัด (เหลือเพียง 1 ที่นั่งสุดท้าย) ฟรีเครื่อง CGM สมัครผ่าน LINE @Ultramed"
     type="website"
     faqItems={faqItems}
     breadcrumbs={breadcrumbs}
-    directAnswer="โปรแกรม 1:1 VIP Coaching โดยหมอทิม คือการดูแลเบาหวานแบบตัวต่อตัว 12 สัปดาห์ ด้วย CGM และ Functional Medicine เพื่อให้เบาหวานสงบโดยไม่พึ่งยา รับเพียง 3 ท่านต่อรุ่น ที่ Ultramed Clinic ชลบุรี"
+    directAnswer="โปรแกรม 1:1 VIP Coaching โดยหมอทิม คือการดูแลเบาหวานแบบตัวต่อตัว 12 สัปดาห์ ด้วย CGM และ Functional Medicine เพื่อให้เบาหวานสงบโดยไม่พึ่งยา รับจำนวนจำกัด (เหลือ 1 ที่นั่งสุดท้าย) ที่ Ultramed Clinic ชลบุรี"
 >
     <!-- ═══ STICKY TOP BAR ═══ -->
     <header class="top-bar">
@@ -66,6 +66,7 @@ const breadcrumbs = [
                 <a href="/">หน้าแรก</a>
                 <a href="/cgm">คอร์ส CGM</a>
                 <a href="/diabetes-guide">หนังสือเบาหวานผอม</a>
+                <a href="/consult">ปรึกษาส่วนตัว</a>
                 <a href="#hero">VIP Coaching</a>
             </nav>
         </div>
@@ -79,38 +80,82 @@ const breadcrumbs = [
                 <span class="badge badge-vip">💎 VIP 1:1 COACHING</span>
                 <span class="badge badge-urgent">
                     <span class="badge-pulse"></span>
-                    ⚡ เหลือเพียง 3 ที่นั่งสุดท้าย
+                    🔥 เหลือเพียง 1 ที่นั่งสุดท้าย
                 </span>
             </div>
-            <!-- Countdown Timer -->
-            <div class="countdown-wrap" id="hero-countdown">
-                <span class="countdown-label">ปิดรับสมัครใน</span>
-                <div class="countdown-timer">
-                    <div class="countdown-unit">
-                        <span class="cd-num" id="cd-days">00</span><span
-                            class="cd-lbl">วัน</span
-                        >
+
+            <!-- ═══ FOMO SEAT VISUALIZER ═══ -->
+            <div class="seat-visualizer" aria-label="สถานะที่นั่ง: 2 จาก 3 ที่นั่งถูกจองแล้ว เหลือเพียง 1 ที่นั่งสุดท้าย">
+                <div class="seat-viz-header">
+                    <span class="seat-viz-label">รุ่นนี้รับเพียง 3 ท่าน · สถานะที่นั่งล่าสุด</span>
+                </div>
+                <div class="seat-row">
+                    <div class="seat seat-taken" aria-label="ที่นั่งที่ 1 — ถูกจองแล้ว">
+                        <div class="seat-badge seat-badge-taken">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            จองแล้ว
+                        </div>
+                        <div class="seat-icon-wrap">
+                            <svg class="seat-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <path d="M16 28V18a6 6 0 016-6h20a6 6 0 016 6v10" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                                <rect x="12" y="28" width="40" height="18" rx="4" stroke="currentColor" stroke-width="3"/>
+                                <path d="M18 46v8M46 46v8" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                            </svg>
+                            <div class="seat-x">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                            </div>
+                        </div>
+                        <span class="seat-label">ที่นั่ง #1</span>
+                        <span class="seat-meta">คุณ S. · กรุงเทพฯ</span>
                     </div>
-                    <span class="cd-sep">:</span>
-                    <div class="countdown-unit">
-                        <span class="cd-num" id="cd-hours">00</span><span
-                            class="cd-lbl">ชม.</span
-                        >
+
+                    <div class="seat seat-taken" aria-label="ที่นั่งที่ 2 — ถูกจองแล้ว">
+                        <div class="seat-badge seat-badge-taken">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            จองแล้ว
+                        </div>
+                        <div class="seat-icon-wrap">
+                            <svg class="seat-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <path d="M16 28V18a6 6 0 016-6h20a6 6 0 016 6v10" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                                <rect x="12" y="28" width="40" height="18" rx="4" stroke="currentColor" stroke-width="3"/>
+                                <path d="M18 46v8M46 46v8" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                            </svg>
+                            <div class="seat-x">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                            </div>
+                        </div>
+                        <span class="seat-label">ที่นั่ง #2</span>
+                        <span class="seat-meta">คุณ K. · เชียงใหม่</span>
                     </div>
-                    <span class="cd-sep">:</span>
-                    <div class="countdown-unit">
-                        <span class="cd-num" id="cd-mins">00</span><span
-                            class="cd-lbl">นาที</span
-                        >
-                    </div>
-                    <span class="cd-sep">:</span>
-                    <div class="countdown-unit">
-                        <span class="cd-num" id="cd-secs">00</span><span
-                            class="cd-lbl">วินาที</span
-                        >
+
+                    <div class="seat seat-available" aria-label="ที่นั่งที่ 3 — ที่นั่งสุดท้าย ยังว่าง">
+                        <div class="seat-spotlight"></div>
+                        <div class="seat-badge seat-badge-available">
+                            <span class="seat-badge-dot"></span>
+                            ที่นั่งสุดท้าย!
+                        </div>
+                        <div class="seat-icon-wrap">
+                            <svg class="seat-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <path d="M16 28V18a6 6 0 016-6h20a6 6 0 016 6v10" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                                <rect x="12" y="28" width="40" height="18" rx="4" stroke="currentColor" stroke-width="3"/>
+                                <path d="M18 46v8M46 46v8" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                            </svg>
+                            <div class="seat-arrow">👇</div>
+                        </div>
+                        <span class="seat-label seat-label-glow">ที่นั่ง #3 · ของคุณ?</span>
+                        <span class="seat-meta seat-meta-glow">จองด่วน ก่อนคนอื่นคว้าไป</span>
                     </div>
                 </div>
+                <div class="seat-progress">
+                    <div class="seat-progress-bar">
+                        <div class="seat-progress-fill"></div>
+                    </div>
+                    <span class="seat-progress-text">
+                        <strong>2 จาก 3</strong> ที่นั่งถูกจองแล้ว · <span class="text-fomo">เหลือเพียง 1 ที่นั่งสุดท้าย</span>
+                    </span>
+                </div>
             </div>
+
             <h1 class="hero-title">
                 <span class="hero-title-sub">DIABETES REMISSION</span>
                 เบาหวาน<span class="hero-title-accent">สงบได้</span><br />
@@ -139,7 +184,7 @@ const breadcrumbs = [
                             d="M24 10.5C24 4.701 18.627 0 12 0S0 4.701 0 10.5c0 5.19 4.604 9.537 10.824 10.362.42.092.992.28 1.137.641.13.328.085.84.042 1.17l-.184 1.107c-.056.328-.26 1.284 1.124.7 1.384-.584 7.466-4.396 10.184-7.525C25.18 14.703 24 12.727 24 10.5z"
                         ></path>
                     </svg>
-                    สมัครคัดกรอง VIP — เหลือ 3 ที่นั่ง
+                    สมัครคัดกรอง VIP — เหลือ 1 ที่นั่งสุดท้าย
                 </a>
             </div>
             <p class="hero-trust">
@@ -525,40 +570,24 @@ const breadcrumbs = [
     <section class="urgency-section">
         <div class="section-inner urgency-inner">
             <div class="urgency-content">
-                <h2 class="urgency-title">🔥 เหลือเพียง 3 ที่นั่งเท่านั้น</h2>
+                <h2 class="urgency-title">🔥 เหลือเพียง 1 ที่นั่งสุดท้าย</h2>
                 <p class="urgency-desc">
                     เพราะเป็นการดูแลตัวต่อตัว หมอทิมรับได้สูงสุด 3 ท่านต่อรุ่น<br
                     />เมื่อเต็มแล้ว ต้องรอรุ่นถัดไป
                 </p>
-                <div
-                    class="countdown-wrap countdown-urgency"
-                    id="urgency-countdown"
-                >
-                    <div class="countdown-timer">
-                        <div class="countdown-unit">
-                            <span class="cd-num cd-num-gold" id="cd2-days"
-                                >00</span
-                            ><span class="cd-lbl">วัน</span>
-                        </div>
-                        <span class="cd-sep cd-sep-gold">:</span>
-                        <div class="countdown-unit">
-                            <span class="cd-num cd-num-gold" id="cd2-hours"
-                                >00</span
-                            ><span class="cd-lbl">ชม.</span>
-                        </div>
-                        <span class="cd-sep cd-sep-gold">:</span>
-                        <div class="countdown-unit">
-                            <span class="cd-num cd-num-gold" id="cd2-mins"
-                                >00</span
-                            ><span class="cd-lbl">นาที</span>
-                        </div>
-                        <span class="cd-sep cd-sep-gold">:</span>
-                        <div class="countdown-unit">
-                            <span class="cd-num cd-num-gold" id="cd2-secs"
-                                >00</span
-                            ><span class="cd-lbl">วินาที</span>
-                        </div>
-                    </div>
+                <div class="seat-mini-row" aria-hidden="true">
+                    <span class="seat-mini seat-mini-taken">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        จองแล้ว
+                    </span>
+                    <span class="seat-mini seat-mini-taken">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        จองแล้ว
+                    </span>
+                    <span class="seat-mini seat-mini-available">
+                        <span class="seat-mini-dot"></span>
+                        ที่นั่งสุดท้าย!
+                    </span>
                 </div>
             </div>
             <a
@@ -567,7 +596,7 @@ const breadcrumbs = [
                 rel="noopener"
                 class="cta-btn cta-btn-urgency"
             >
-                สมัครคัดกรอง VIP — เหลือ 3 ที่นั่ง
+                คว้าที่นั่งสุดท้าย → สมัครคัดกรอง VIP
             </a>
         </div>
     </section>
@@ -584,7 +613,7 @@ const breadcrumbs = [
             </h2>
             <p class="final-cta-desc">
                 หมอทิมดูแลคุณตัวต่อตัว 12 สัปดาห์<br />
-                ฟรีเครื่อง CGM + LINE ส่วนตัวถึงหมอทิม — รับเพียง 3 ท่านต่อรุ่น
+                ฟรีเครื่อง CGM + LINE ส่วนตัวถึงหมอทิม — เหลือเพียง 1 ที่นั่งสุดท้าย
             </p>
             <a
                 href={lineUrl}
@@ -604,8 +633,8 @@ const breadcrumbs = [
                 สมัครคัดกรอง VIP ผ่าน LINE
             </a>
             <p class="final-cta-note">
-                แอด LINE @Ultramed แล้วแจ้ง "สนใจ VIP Coaching" · รับเพียง 3
-                ท่าน
+                แอด LINE @Ultramed แล้วแจ้ง "สนใจ VIP Coaching" · เหลือเพียง 1
+                ที่นั่ง
             </p>
         </div>
     </section>
@@ -618,7 +647,7 @@ const breadcrumbs = [
                     d="M24 10.5C24 4.701 18.627 0 12 0S0 4.701 0 10.5c0 5.19 4.604 9.537 10.824 10.362.42.092.992.28 1.137.641.13.328.085.84.042 1.17l-.184 1.107c-.056.328-.26 1.284 1.124.7 1.384-.584 7.466-4.396 10.184-7.525C25.18 14.703 24 12.727 24 10.5z"
                 ></path>
             </svg>
-            สมัครคัดกรอง VIP — เหลือ 3 ที่นั่ง
+            สมัครคัดกรอง VIP — เหลือ 1 ที่นั่งสุดท้าย
         </a>
     </div>
 
@@ -910,6 +939,324 @@ const breadcrumbs = [
         color: var(--cgm-text-muted);
         margin-top: 16px;
     }
+
+    /* ═══ FOMO SEAT VISUALIZER ═══ */
+    .seat-visualizer {
+        max-width: 720px;
+        margin: 8px auto 36px;
+        padding: 24px 20px;
+        background: linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0.04) 0%,
+            rgba(245, 158, 11, 0.06) 100%
+        );
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 20px;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+    .seat-viz-header {
+        text-align: center;
+        margin-bottom: 16px;
+    }
+    .seat-viz-label {
+        display: inline-block;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--cgm-text-muted);
+        padding: 4px 14px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .seat-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-bottom: 18px;
+    }
+    .seat {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        padding: 18px 10px 14px;
+        border-radius: 14px;
+        text-align: center;
+        transition: transform 200ms ease;
+    }
+    .seat-taken {
+        background: rgba(0, 0, 0, 0.35);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        opacity: 0.62;
+    }
+    .seat-taken .seat-icon {
+        color: rgba(255, 255, 255, 0.35);
+    }
+    .seat-available {
+        background: linear-gradient(
+            180deg,
+            rgba(245, 158, 11, 0.18) 0%,
+            rgba(245, 158, 11, 0.06) 100%
+        );
+        border: 2px solid var(--cgm-gold);
+        box-shadow:
+            0 0 0 0 rgba(245, 158, 11, 0.5),
+            0 8px 32px rgba(245, 158, 11, 0.25),
+            inset 0 0 24px rgba(245, 158, 11, 0.12);
+        animation: seat-pulse 2s ease-in-out infinite;
+    }
+    .seat-available .seat-icon {
+        color: var(--cgm-gold-light);
+        filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.5));
+    }
+    @keyframes seat-pulse {
+        0%, 100% {
+            box-shadow:
+                0 0 0 0 rgba(245, 158, 11, 0.55),
+                0 8px 32px rgba(245, 158, 11, 0.25),
+                inset 0 0 24px rgba(245, 158, 11, 0.12);
+            transform: scale(1);
+        }
+        50% {
+            box-shadow:
+                0 0 0 12px rgba(245, 158, 11, 0),
+                0 12px 40px rgba(245, 158, 11, 0.4),
+                inset 0 0 32px rgba(245, 158, 11, 0.2);
+            transform: scale(1.03);
+        }
+    }
+    .seat-spotlight {
+        position: absolute;
+        inset: -20%;
+        background: radial-gradient(
+            circle at center,
+            rgba(245, 158, 11, 0.25) 0%,
+            transparent 65%
+        );
+        pointer-events: none;
+        z-index: -1;
+        animation: spotlight-rotate 6s linear infinite;
+    }
+    @keyframes spotlight-rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    .seat-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        padding: 4px 10px;
+        border-radius: 999px;
+        white-space: nowrap;
+    }
+    .seat-badge-taken {
+        background: rgba(255, 255, 255, 0.08);
+        color: rgba(255, 255, 255, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .seat-badge-available {
+        background: var(--cgm-gold);
+        color: #0a0f0d;
+        box-shadow: 0 4px 16px rgba(245, 158, 11, 0.5);
+        animation: badge-shake 1.5s ease-in-out infinite;
+    }
+    @keyframes badge-shake {
+        0%, 100% { transform: translateY(0) rotate(-1deg); }
+        50% { transform: translateY(-3px) rotate(2deg); }
+    }
+    .seat-badge-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #0a0f0d;
+        animation: dot-blink 0.8s ease-in-out infinite;
+    }
+    @keyframes dot-blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.3; }
+    }
+    .seat-icon-wrap {
+        position: relative;
+        width: 56px;
+        height: 56px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .seat-icon {
+        width: 100%;
+        height: 100%;
+    }
+    .seat-x {
+        position: absolute;
+        top: -4px;
+        right: -4px;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: #dc2626;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 8px rgba(220, 38, 38, 0.5);
+    }
+    .seat-arrow {
+        position: absolute;
+        top: -22px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 22px;
+        animation: arrow-bounce 1s ease-in-out infinite;
+        filter: drop-shadow(0 2px 4px rgba(245, 158, 11, 0.6));
+    }
+    @keyframes arrow-bounce {
+        0%, 100% { transform: translateX(-50%) translateY(0); }
+        50% { transform: translateX(-50%) translateY(6px); }
+    }
+    .seat-label {
+        font-size: 13px;
+        font-weight: 700;
+        color: #fff;
+        letter-spacing: 0.02em;
+    }
+    .seat-taken .seat-label {
+        color: rgba(255, 255, 255, 0.45);
+        text-decoration: line-through;
+    }
+    .seat-label-glow {
+        color: var(--cgm-gold-light);
+        text-shadow: 0 0 12px rgba(245, 158, 11, 0.6);
+    }
+    .seat-meta {
+        font-size: 11px;
+        color: var(--cgm-text-muted);
+        font-weight: 500;
+    }
+    .seat-taken .seat-meta {
+        color: rgba(255, 255, 255, 0.3);
+    }
+    .seat-meta-glow {
+        color: rgba(251, 191, 36, 0.85);
+        font-weight: 600;
+    }
+
+    /* PROGRESS BAR */
+    .seat-progress {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        padding-top: 14px;
+        border-top: 1px dashed rgba(255, 255, 255, 0.08);
+    }
+    .seat-progress-bar {
+        width: 100%;
+        max-width: 320px;
+        height: 8px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 999px;
+        overflow: hidden;
+        position: relative;
+    }
+    .seat-progress-fill {
+        height: 100%;
+        width: 66.66%;
+        background: linear-gradient(
+            90deg,
+            #dc2626 0%,
+            #f59e0b 50%,
+            #fbbf24 100%
+        );
+        border-radius: 999px;
+        box-shadow: 0 0 12px rgba(245, 158, 11, 0.6);
+        position: relative;
+        animation: progress-shimmer 2.5s linear infinite;
+    }
+    .seat-progress-fill::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+            90deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0.4) 50%,
+            transparent 100%
+        );
+        animation: shimmer-slide 2s linear infinite;
+    }
+    @keyframes shimmer-slide {
+        from { transform: translateX(-100%); }
+        to { transform: translateX(100%); }
+    }
+    @keyframes progress-shimmer {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.85; }
+    }
+    .seat-progress-text {
+        font-size: 13px;
+        color: var(--cgm-text-muted);
+    }
+    .seat-progress-text strong {
+        color: #fff;
+        font-weight: 700;
+    }
+    .text-fomo {
+        color: var(--cgm-gold-light);
+        font-weight: 800;
+        animation: fomo-flash 1.5s ease-in-out infinite;
+    }
+    @keyframes fomo-flash {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.6; }
+    }
+
+    /* MINI SEAT ROW (Urgency Band) */
+    .seat-mini-row {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 18px;
+        flex-wrap: wrap;
+    }
+    .seat-mini {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 6px 14px;
+        border-radius: 999px;
+        letter-spacing: 0.03em;
+    }
+    .seat-mini-taken {
+        background: rgba(255, 255, 255, 0.05);
+        color: rgba(255, 255, 255, 0.45);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        text-decoration: line-through;
+    }
+    .seat-mini-available {
+        background: var(--cgm-gold);
+        color: #0a0f0d;
+        box-shadow: 0 4px 16px rgba(245, 158, 11, 0.4);
+        animation: seat-pulse 2s ease-in-out infinite;
+    }
+    .seat-mini-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #0a0f0d;
+        animation: dot-blink 0.8s ease-in-out infinite;
+    }
+
     /* CTA */
     .cta-btn {
         display: inline-flex;
@@ -1602,46 +1949,51 @@ const breadcrumbs = [
             width: 52px;
             height: 52px;
         }
+        /* Seat Visualizer Mobile */
+        .seat-visualizer {
+            padding: 18px 12px;
+            margin: 4px auto 28px;
+        }
+        .seat-row {
+            gap: 8px;
+        }
+        .seat {
+            padding: 14px 6px 12px;
+        }
+        .seat-icon-wrap {
+            width: 44px;
+            height: 44px;
+        }
+        .seat-label {
+            font-size: 11px;
+        }
+        .seat-meta {
+            font-size: 10px;
+        }
+        .seat-badge {
+            font-size: 9px;
+            padding: 3px 8px;
+        }
+        .seat-arrow {
+            font-size: 18px;
+            top: -18px;
+        }
+        .seat-progress-text {
+            font-size: 11px;
+            text-align: center;
+        }
+        .seat-mini-row {
+            gap: 6px;
+        }
+        .seat-mini {
+            font-size: 11px;
+            padding: 5px 10px;
+        }
     }
 </style>
 
 <script>
-    // Countdown timer — 7-day localStorage-based deadline
     (function () {
-        var KEY = "vip_coaching_deadline";
-        var stored = localStorage.getItem(KEY);
-        var endTime;
-        if (stored) {
-            endTime = parseInt(stored, 10);
-        } else {
-            endTime = Date.now() + 7 * 24 * 60 * 60 * 1000;
-            localStorage.setItem(KEY, String(endTime));
-        }
-        function pad(n) {
-            return n < 10 ? "0" + n : String(n);
-        }
-        function tick() {
-            var diff = Math.max(0, endTime - Date.now());
-            var d = Math.floor(diff / 86400000);
-            var h = Math.floor((diff % 86400000) / 3600000);
-            var m = Math.floor((diff % 3600000) / 60000);
-            var s = Math.floor((diff % 60000) / 1000);
-            function set(id, val) {
-                var el = document.getElementById(id);
-                if (el) el.textContent = pad(val);
-            }
-            set("cd-days", d);
-            set("cd-hours", h);
-            set("cd-mins", m);
-            set("cd-secs", s);
-            set("cd2-days", d);
-            set("cd2-hours", h);
-            set("cd2-mins", m);
-            set("cd2-secs", s);
-        }
-        tick();
-        setInterval(tick, 1000);
-
         // Animate stat numbers on scroll
         var observer = new IntersectionObserver(
             function (entries) {

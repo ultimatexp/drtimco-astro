@@ -1,0 +1,7 @@
+---
+// Compatibility route for browsers that cached the old /consult → /blog/consult redirect.
+export const prerender = true;
+import ConsultPage from "../consult.astro";
+---
+
+<ConsultPage />

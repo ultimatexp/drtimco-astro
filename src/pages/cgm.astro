@@ -95,14 +95,19 @@ const breadcrumbs = [
         <div class="hero-overlay"></div>
         <div class="hero-content">
             <div class="hero-badge-group">
+                <span class="badge badge-gen">📟 รุ่น CGM 34</span>
                 <span class="badge badge-urgent">
                     <span class="badge-pulse"></span>
-                    ⚡ เปิดรับจำนวนจำกัด — ปิดรับเร็วๆ นี้
+                    ⚡ เหลือเพียง 10 ที่นั่งสุดท้าย
                 </span>
+            </div>
+            <!-- Promo Banner -->
+            <div class="promo-banner">
+                🎁 <strong>พิเศษเฉพาะ CGM 34:</strong> รับส่วนลดทันที 15% สำหรับสั่งจอง "คู่มือพิชิตเบาหวานผอม" เล่มใหม่ล่าสุด
             </div>
             <!-- Countdown Timer -->
             <div class="countdown-wrap" id="hero-countdown">
-                <span class="countdown-label">ปิดรับสมัครใน</span>
+                <span class="countdown-label">ปิดรับสมัคร 24 พ.ค. 2026</span>
                 <div class="countdown-timer">
                     <div class="countdown-unit">
                         <span class="cd-num" id="cd-days">00</span><span
@@ -492,9 +497,10 @@ const breadcrumbs = [
     <section class="urgency-section">
         <div class="section-inner urgency-inner">
             <div class="urgency-content">
-                <h2 class="urgency-title">🔥 เปิดรับจำนวนจำกัด</h2>
+                <h2 class="urgency-title">🔥 รุ่น CGM 34 เหลือ 10 ที่นั่งสุดท้าย</h2>
                 <p class="urgency-desc">
-                    เมื่อเต็มแล้ว ต้องรอรุ่นถัดไป สมัครตอนนี้เพื่อไม่พลาดโอกาส
+                    ปิดรับสมัคร 24 พฤษภาคม 2026 หรือเมื่อครบจำนวน<br />
+                    พร้อมรับสิทธิ์ส่วนลด 15% หนังสือเบาหวานผอมเล่มใหม่
                 </p>
                 <!-- Urgency Countdown -->
                 <div
@@ -840,6 +846,22 @@ const breadcrumbs = [
             opacity: 0.7;
             box-shadow: 0 0 0 8px rgba(245, 158, 11, 0);
         }
+    }
+
+    .promo-banner {
+        background: rgba(245, 158, 11, 0.1);
+        border: 1px solid rgba(245, 158, 11, 0.3);
+        border-radius: 12px;
+        padding: 12px 20px;
+        color: white;
+        font-size: 15px;
+        max-width: 600px;
+        margin: 0 auto 32px auto;
+        line-height: 1.5;
+    }
+
+    .promo-banner strong {
+        color: var(--cgm-gold-light);
     }
 
     .hero-title {
@@ -1612,14 +1634,8 @@ const breadcrumbs = [
     // ── Countdown Timer ──
     // Set deadline to 7 days from the user's first visit (persisted in localStorage)
     (function () {
-        const STORAGE_KEY = "cgm_countdown_end";
-        let endTime = localStorage.getItem(STORAGE_KEY);
-        if (!endTime) {
-            // 7 days from now
-            endTime = Date.now() + 7 * 24 * 60 * 60 * 1000;
-            localStorage.setItem(STORAGE_KEY, endTime);
-        }
-        endTime = parseInt(endTime);
+        // Set deadline to May 24, 2026
+        let endTime = new Date("2026-05-24T23:59:59+07:00").getTime();
 
         function pad(n) {
             return String(n).padStart(2, "0");

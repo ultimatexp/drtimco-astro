@@ -1,0 +1,410 @@
+---
+export const prerender = true;
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const buyUrl = "https://www.fitkub.com/order/d6c2c53b-a627-4cc1-bb14-5fa3c0338bbe";
+
+const breadcrumbs = [
+  { name: "หน้าแรก", url: "https://drtim.co/" },
+  { name: "คู่มือพิชิตเบาหวานผอม", url: "https://drtim.co/diabetes-guide" },
+  { name: "งานเปิดตัวหนังสือและคัดกรองสุขภาพ", url: "https://drtim.co/diabetes-guide/event" },
+  { name: "แพ็กเกจคัดกรอง", url: "https://drtim.co/diabetes-guide/package" }
+];
+---
+
+<BaseLayout
+  title="แพ็กเกจ MALI METABOLIC SCREENING | คู่มือพิชิตเบาหวานสำหรับคนผอม"
+  description="คัดกรองภาวะดื้ออินซูลิน เบาหวาน และไขมันเบื้องต้น ราคาพิเศษ 990 บาท"
+  type="website"
+  breadcrumbs={breadcrumbs}
+>
+  <!-- ═══ STICKY TOP BAR ═══ -->
+  <header class="top-bar">
+    <div class="top-bar-inner">
+      <a href="/" class="top-bar-brand">
+        <span class="brand-icon">⚕</span>
+        <span class="brand-name">Dr. Tim</span>
+      </a>
+      <nav class="top-bar-nav">
+        <a href="/">หน้าแรก</a>
+        <a href="/cgm">คอร์ส CGM</a>
+        <a href="/vip-coaching">VIP Coaching</a>
+        <a href="/consult">ปรึกษาส่วนตัว</a>
+        <a href="/diabetes-guide">หนังสือเบาหวานผอม</a>
+      </nav>
+      <a href={buyUrl} target="_blank" rel="noopener" class="nav-cta-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M24 10.5C24 4.701 18.627 0 12 0S0 4.701 0 10.5c0 5.19 4.604 9.537 10.824 10.362.42.092.992.28 1.137.641.13.328.085.84.042 1.17l-.184 1.107c-.056.328-.26 1.284 1.124.7 1.384-.584 7.466-4.396 10.184-7.525C25.18 14.703 24 12.727 24 10.5z"></path></svg>
+        สั่งจอง 459 บาท
+      </a>
+    </div>
+  </header>
+
+  <div class="package-page-container">
+    <div class="package-banner-wrapper event-reveal">
+      <div class="event-package-header">
+        <span class="event-package-tag">MALI CARE SPECIAL PACKAGE</span>
+        <h1 class="event-package-title">Package MALI METABOLIC SCREENING</h1>
+        <p class="event-package-subtitle">คัดกรองภาวะดื้ออินซูลิน เบาหวาน และไขมันเบื้องต้น</p>
+      </div>
+      
+      <div class="event-package-body">
+        <div class="event-package-col">
+          <div class="event-package-col-title">🧪 รายการตรวจวิเคราะห์ (Laboratory Tests)</div>
+          <ul class="event-package-list">
+            <li><strong>Fasting Insulin</strong> (ตรวจระดับอินซูลินเพื่อวิเคราะห์ภาวะดื้ออินซูลินซ่อนเร้น)</li>
+            <li><strong>HbA1c</strong> (ตรวจค่าน้ำตาลสะสมเฉลี่ยสะท้อนพฤติกรรมย้อนหลัง 3 เดือน)</li>
+            <li><strong>Lipid Profile</strong> (ตรวจคอเลสเตอรอล ไตรกลีเซอไรด์ HDL และ LDL แบบละเอียด)</li>
+          </ul>
+        </div>
+        
+        <div class="event-package-col">
+          <div class="event-package-col-title">🎁 สิทธิ์พิเศษเพิ่มเติม (Additional Privileges)</div>
+          <ul class="event-package-list event-package-list-gift">
+            <li>รับฟังการบรรยายเรื่องระบบเผาผลาญและเบาหวานโดยแพทย์ผู้เชี่ยวชาญ</li>
+            <li>คำแนะนำการอ่านแปลผลเลือดเบื้องต้น (Basic Lab Interpretation)</li>
+            <li>คำแนะนำแนวทางการดูแลโภชนาการอาหารและพฤติกรรมสุขภาพเบื้องต้น</li>
+            <li>ตรวจวิเคราะห์องค์ประกอบร่างกายอย่างละเอียด (Body Composition Analysis)</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="event-package-footer">
+        <div class="event-package-price">
+          <span class="price-label">ค่าบริการแพ็กเกจคัดกรองพิเศษเพียง</span>
+          <strong class="price-value">990 <span class="price-unit">บาท</span></strong>
+        </div>
+        <a href={buyUrl} target="_blank" rel="noopener" class="event-btn event-btn-primary event-package-btn">
+          จองสิทธิ์รับบริการตรวจคัดกรอง
+        </a>
+      </div>
+    </div>
+    
+    <div class="back-link-wrapper event-reveal">
+      <a href="/diabetes-guide/event" class="back-link">← กลับไปยังหน้ารายละเอียดงาน</a>
+    </div>
+  </div>
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer class="site-footer">
+    <div class="section-inner">
+      <p>© {new Date().getFullYear()} Dr. Tim — Ultramed Clinic, ชลบุรี | <a href="/">drtim.co</a> | <a href="/privacy-policy">นโยบายความเป็นส่วนตัว</a></p>
+    </div>
+  </footer>
+</BaseLayout>
+
+<style>
+  :root {
+    --dg: #0a0f0d;
+    --teal: #0f766e;
+    --teal-l: #14b8a6;
+    --gold: #f59e0b;
+    --gold-l: #fbbf24;
+    --surf: #111816;
+    --card: rgba(255, 255, 255, 0.04);
+    --brd: rgba(255, 255, 255, 0.08);
+    --txt: #f0fdf4;
+    --muted: rgba(255, 255, 255, 0.6);
+    --rad: 16px;
+    --mx: 1100px;
+  }
+  
+  .package-page-container {
+    background: linear-gradient(120deg, rgba(255, 250, 242, 0.94), rgba(255, 236, 207, 0.78) 50%, rgba(233, 120, 40, 0.22));
+    min-height: 100vh;
+    padding-top: 140px;
+    padding-bottom: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .package-banner-wrapper {
+    position: relative;
+    z-index: 3;
+    width: 90%;
+    max-width: 900px;
+    margin: 0 auto 40px;
+    padding: clamp(24px, 5vw, 44px);
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 28px;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 16px 40px rgba(97, 50, 24, 0.06);
+  }
+  
+  /* TOP BAR */
+  .top-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: rgba(10, 15, 13, 0.88);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+  .top-bar-inner {
+    max-width: var(--mx);
+    margin: 0 auto;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+  }
+  .top-bar-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    color: #fff;
+    font-weight: 700;
+    font-size: 18px;
+  }
+  .brand-icon {
+    font-size: 20px;
+    color: var(--teal-l);
+  }
+  .top-bar-nav {
+    display: flex;
+    gap: 28px;
+    margin-right: auto;
+  }
+  .top-bar-nav a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+  .top-bar-nav a:hover {
+    color: #fff;
+  }
+  .nav-cta-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    color: var(--dg);
+    padding: 8px 16px;
+    border-radius: 99px;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: transform 0.2s;
+  }
+  .nav-cta-btn:hover {
+    transform: scale(1.04);
+  }
+
+  /* BUTTONS */
+  .event-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    text-decoration: none;
+    border-radius: 12px;
+    transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .event-btn-primary {
+    background: linear-gradient(135deg, #e97828 0%, #c65318 100%);
+    color: #fff;
+    box-shadow: 0 6px 20px rgba(198, 83, 24, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  }
+  .event-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(198, 83, 24, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  }
+
+  .event-package-header {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  .event-package-tag {
+    display: inline-block;
+    padding: 4px 12px;
+    background: #c65318;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    border-radius: 99px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .event-package-title {
+    margin: 0;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-weight: 700;
+    color: #321c12;
+    letter-spacing: -0.02em;
+  }
+  .event-package-subtitle {
+    margin: 6px 0 0;
+    font-size: 16px;
+    color: #6d4632;
+    font-weight: 800;
+  }
+  .event-package-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    margin-bottom: 28px;
+  }
+  .event-package-col {
+    display: flex;
+    flex-direction: column;
+  }
+  .event-package-col-title {
+    font-size: 14px;
+    font-weight: 900;
+    color: #321c12;
+    margin-bottom: 12px;
+    border-bottom: 2px solid rgba(97, 50, 24, 0.12);
+    padding-bottom: 6px;
+  }
+  .event-package-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .event-package-list li {
+    position: relative;
+    padding-left: 24px;
+    font-size: 15px;
+    line-height: 1.6;
+    color: rgba(50, 28, 18, 0.85);
+  }
+  .event-package-list li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: #c65318;
+    font-weight: 900;
+    font-size: 15px;
+  }
+  .event-package-list-gift li::before {
+    content: "★";
+    color: #e97828;
+  }
+  .event-package-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    border-top: 1px solid rgba(97, 50, 24, 0.12);
+    padding-top: 24px;
+    flex-wrap: wrap;
+  }
+  .event-package-price {
+    display: flex;
+    flex-direction: column;
+  }
+  .price-label {
+    font-size: 12px;
+    color: #6d4632;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+  .price-value {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 38px;
+    font-weight: 800;
+    color: #c65318;
+    line-height: 1;
+    margin-top: 4px;
+  }
+  .price-unit {
+    font-size: 18px;
+    font-weight: 700;
+    color: #321c12;
+  }
+  .event-package-btn {
+    min-height: 48px !important;
+    font-size: 16px !important;
+    padding: 12px 36px !important;
+  }
+  .back-link-wrapper {
+    text-align: center;
+  }
+  .back-link {
+    color: #c65318;
+    font-weight: 700;
+    text-decoration: none;
+    font-size: 15px;
+  }
+  .back-link:hover {
+    text-decoration: underline;
+  }
+  
+  .event-reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: event-rise 0.72s ease forwards;
+  }
+  @keyframes event-rise {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* FOOTER */
+  .site-footer {
+    background: var(--dg);
+    border-top: 1px solid var(--brd);
+    width: 100%;
+  }
+  .site-footer .section-inner {
+    padding: 24px;
+    text-align: center;
+  }
+  .site-footer p {
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .site-footer a {
+    color: var(--teal-l);
+  }
+
+  @media (max-width: 900px) {
+    .top-bar-nav { display: none; }
+  }
+
+  @media (max-width: 768px) {
+    .event-package-body {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+    .event-package-footer {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 16px;
+    }
+  }
+</style>
+
+<script>
+  // ═══ SCROLL REVEAL ═══
+  const revealEls = document.querySelectorAll('.event-reveal');
+  const revealObs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry, i) {
+      if (entry.isIntersecting) {
+        setTimeout(function() { entry.target.classList.add('revealed'); }, i * 80);
+        revealObs.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  revealEls.forEach(function(el) {
+    (el as HTMLElement).style.opacity = '0';
+    (el as HTMLElement).style.transform = 'translateY(24px)';
+    (el as HTMLElement).style.transition = 'opacity .5s ease, transform .5s ease';
+    revealObs.observe(el);
+  });
+  document.head.insertAdjacentHTML('beforeend', '<style>.revealed{opacity:1!important;transform:translateY(0)!important}</style>');
+</script>

@@ -1,4 +1,8 @@
+import { ADMIN_PASSWORD } from 'astro:env/server';
+
 export function getEnv(name) {
+    if (name === 'ADMIN_PASSWORD' && ADMIN_PASSWORD) return ADMIN_PASSWORD;
+
     const metaValue = import.meta.env?.[name];
     if (metaValue) return metaValue;
 

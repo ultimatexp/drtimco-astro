@@ -5,15 +5,15 @@
 export const prerender = false;
 
 import { neon } from '@neondatabase/serverless';
+import { isAdminKey, unauthorizedJson } from '../../lib/adminAuth.js';
 
 export async function GET({ request }) {
   const url = new URL(request.url);
   const status = url.searchParams.get('status');
   const password = url.searchParams.get('key');
 
-  // Simple admin auth
-  if (password !== (import.meta.env.ADMIN_PASSWORD || process.env.ADMIN_PASSWORD)) {
-    return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
+  if (!isAdminKey(password)) {
+    return unauthorizedJson();
   }
 
   const sql = neon(import.meta.env.NEON_DATABASE_URL || process.env.NEON_DATABASE_URL);

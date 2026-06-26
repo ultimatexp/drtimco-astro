@@ -12,6 +12,7 @@ import {
   stripHtml,
   formatDate,
   localizeImageUrl,
+  getPostSummary,
 } from '../../lib/api.js';
 
 export function getStaticPaths() {
@@ -87,7 +88,7 @@ const breadcrumbs = [
                   )}
                 </div>
                 <h2 set:html={post.title} />
-                <p class="post-card-excerpt" set:html={stripHtml(post.excerpt).substring(0, 120) + '…'} />
+                <p class="post-card-excerpt">{getPostSummary(post, 120)}</p>
                 <span class="read-more">Read article →</span>
               </div>
             </a>

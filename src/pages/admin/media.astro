@@ -302,7 +302,6 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
 
             const formData = new FormData();
             formData.append('image', file);
-            formData.append('key', getCookie('adminSession')); // Pass auth token
 
             try {
                 const res = await fetch('/api/upload-image', {

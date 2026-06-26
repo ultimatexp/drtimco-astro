@@ -426,23 +426,10 @@ if (DATABASE_URL) {
             currentTarget.disabled = true;
 
             try {
-                // Fetch the auth token from cookies is tricky out of the box in client JS without an explicit endpoint 
-                // Wait! The endpoint /api/approve-article previously took `key` param:
-                // `if (key !== import.meta.env.ADMIN_PASSWORD) ...`
-                // Let's modify the approve request slightly to read the cookies, or we use a pass-through here.
-                
-                // Read from cookies in the browser: Look for adminSession
-                const getCookie = (name: string) => {
-                    const value = `; ${document.cookie}`;
-                    const parts = value.split(`; ${name}=`);
-                    if (parts.length === 2) return parts.pop().split(';').shift();
-                }
-                const password = getCookie("adminSession");
-
                 const res = await fetch('/api/approve-article', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id, action: 'approve', key: password })
+                    body: JSON.stringify({ id, action: 'approve' })
                 });
 
                 const data = await res.json();

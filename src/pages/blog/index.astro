@@ -5,7 +5,7 @@ export const prerender = true;
  * Lists all posts with pagination.
  */
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getAllPosts, getCategories, stripHtml, formatDate, localizeImageUrl } from '../../lib/api.js';
+import { getAllPosts, getCategories, stripHtml, formatDate, localizeImageUrl, getPostSummary } from '../../lib/api.js';
 import { getTranslations } from '../../i18n/translations.js';
 
 const ui = getTranslations('th');
@@ -69,7 +69,7 @@ const breadcrumbs = [
                 <time datetime={post.date}>{formatDate(post.date)}</time>
               </div>
               <h2 set:html={post.title} />
-              <p set:html={stripHtml(post.excerpt).substring(0, 160) + '…'} />
+              <p>{getPostSummary(post, 160)}</p>
               <span class="read-more">Read article →</span>
             </div>
           </a>

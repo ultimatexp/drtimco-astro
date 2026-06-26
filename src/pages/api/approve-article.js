@@ -11,14 +11,14 @@
 export const prerender = false;
 
 import { neon } from '@neondatabase/serverless';
+import { isAdminKey, isAdminSession, unauthorizedJson } from '../../lib/adminAuth.js';
 
-export async function POST({ request }) {
+export async function POST({ request, cookies }) {
     const body = await request.json();
     const { id, action, notes, key } = body;
 
-    // Simple admin auth
-    if (key !== (import.meta.env.ADMIN_PASSWORD || process.env.ADMIN_PASSWORD)) {
-        return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
+    if (!isAdminSession(cookies) && !isAdminKey(key)) {
+        return unauthorizedJson();
     }
 
     if (!id || !['approve', 'reject'].includes(action)) {

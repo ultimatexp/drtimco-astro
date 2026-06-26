@@ -1,58 +1,47 @@
 # Dr. Tim — Functional Medicine & Metabolic Health
 
-> Dr. Tim is a medical doctor (MD) specializing in Functional Medicine at Ultramed Clinic, Chonburi, Thailand. This website contains evidence-based Thai-language medical articles on metabolic health, diabetes management, longevity, and functional medicine.
+> Dr. Tim is a medical doctor (MD) specializing in Functional Medicine at Ultramed Clinic, Chonburi, Thailand. This site publishes Thai-language educational medical content about metabolic health, diabetes management, longevity, nutrition, lab interpretation, and root-cause health optimization.
 
-## About the Author
+Dr. Tim (หมอทิม) writes for a patient audience in Thai. Content is educational, evidence-informed, and should not replace individualized medical care. Key topics include Functional Medicine, insulin resistance, diabetes remission, CGM, nutrition, biomarkers, thyroid health, cardiovascular risk markers, and longevity science.
 
-- **Name:** Dr. Tim (หมอทิม)
-- **Credentials:** MD (Medical Doctor)
-- **Specialty:** Functional Medicine
-- **Affiliation:** Ultramed Clinic, Chonburi, Thailand
-- **Focus Areas:** Metabolic health, diabetes management, longevity science, root-cause diagnosis
-- **Languages:** Thai (primary), English
+## Core Pages
 
-## Content Overview
+- [Homepage](https://drtim.co/): Featured and latest Thai-language medical articles from Dr. Tim.
+- [Blog Index](https://drtim.co/blog): Full article archive.
+- [CGM Program](https://drtim.co/cgm): Continuous glucose monitoring program for structured diabetes and metabolic health support.
+- [VIP Coaching](https://drtim.co/vip-coaching): Premium 1:1 coaching program.
+- [Diabetes Guide](https://drtim.co/diabetes-guide): Landing page for the lean diabetes / TOFI-focused diabetes guide.
+- [Diabetes Guide Checkout](https://drtim.co/diabetes-guide/checkout): Checkout and payment instructions for the guide.
+- [Privacy Policy](https://drtim.co/privacy-policy): Privacy and data policy.
 
-This site publishes medical health articles in Thai covering:
+## Content Areas
 
-- Functional Medicine approaches to chronic disease
-- Metabolic health and insulin resistance
-- Diabetes management and blood sugar optimization
-- Longevity and healthspan science
-- Nutrition and dietary interventions
-- Lab result interpretation and biomarkers
-- Thyroid health and hormone optimization
-- Cardiovascular health markers (triglycerides, cholesterol)
+- [Diabetes Type 2](https://drtim.co/category/diabetes-type-2/): Articles about type 2 diabetes, insulin resistance, remission, and metabolic recovery.
+- [Intermittent Fasting](https://drtim.co/category/intermittent-fasting/): Articles about fasting protocols and metabolic adaptation.
+- [Cholesterol](https://drtim.co/category/cholesterol/): Articles about cholesterol, triglycerides, and cardiovascular markers.
+- [Weight Control](https://drtim.co/category/weight-control/): Articles about body composition, appetite, and weight management.
+- [Blood Profile](https://drtim.co/category/blood-profile/): Articles about lab markers and interpretation.
+- [Fatty Liver](https://drtim.co/category/%e0%b9%84%e0%b8%82%e0%b8%a1%e0%b8%b1%e0%b8%99%e0%b8%9e%e0%b8%ad%e0%b8%81%e0%b8%95%e0%b8%b1%e0%b8%9a/): Thai articles about fatty liver and metabolic dysfunction.
 
-## Content Policies
+## Featured Articles
 
-- All articles are written or reviewed by Dr. Tim (MD)
-- Content is evidence-based and references peer-reviewed research
-- Articles are intended for educational purposes (patient audience)
-- Medical content follows Functional Medicine principles
-- Primary language: Thai (ภาษาไทย)
+- [What is CGM?](https://drtim.co/blog/what-is-cgm-continuous-glucose-monitor-functional-medicine/): Overview of continuous glucose monitoring in a Functional Medicine context.
+- [Why Diabetics Should Use CGM](https://drtim.co/blog/why-diabetics-should-use-cgm/): Explains CGM benefits for people managing diabetes.
+- [Fasting Insulin Test](https://drtim.co/blog/fasting-insulin-test/): Explains fasting insulin and metabolic risk interpretation.
+- [Basic CGM Read](https://drtim.co/blog/basic-cgm-read/): Introductory guide to reading CGM data.
+- [Diabetes Is Not a Disease, It Is Metabolic Crash](https://drtim.co/blog/diabetes-is-not-a-disease-it-is-metabolic-crash/): Metabolic framing of diabetes.
+- [Diabetes Remission Consensus](https://drtim.co/blog/diabetes-remission-consensus/): Article about diabetes remission definitions and consensus.
 
-## Site Structure
+## Contact
 
-- `/` — Homepage with featured and latest articles
-- `/blog` — All articles index
-- `/blog/[slug]` — Individual article pages
-- `/category/[slug]` — Category-filtered article listings
-- `/cgm` — Thai-language CGM program (continuous glucose monitoring) for structured diabetes support
-- `/vip-coaching` — Premium 1:1 VIP coaching program (limited enrollment)
-- `/diabetes-guide` — Diabetes guide landing page (lean / TOFI-focused positioning)
-- `/diabetes-guide/checkout` — Checkout / payment instructions for the guide
+- [Website](https://drtim.co): Main website.
+- [Facebook](https://www.facebook.com/dr.timdietclinic/): Dr. Tim Diet Clinic Facebook page.
+- [YouTube](https://www.youtube.com/@dr.timdietclinic): Dr. Tim YouTube channel.
+- [Instagram](https://www.instagram.com/dr.timdietclinic/): Dr. Tim Instagram profile.
+- [LINE](https://lin.ee/LwEtisp): LINE contact link.
 
-## Contact & Social
+## Technical
 
-- Website: https://drtim.co
-- Facebook: https://www.facebook.com/dr.timdietclinic/
-- YouTube: https://www.youtube.com/@dr.timdietclinic
-- Instagram: https://www.instagram.com/dr.timdietclinic/
-- LINE: https://lin.ee/LwEtisp
-
-## Technical Details
-
-- Built with Astro (static site generator)
-- Structured data: JSON-LD with MedicalWebPage, Person, BreadcrumbList, FAQPage, SpeakableSpecification
-- Sitemap: https://drtim.co/sitemap-index.xml
+- [Sitemap](https://drtim.co/sitemap-index.xml): Sitemap index for discoverable site URLs.
+- [Robots.txt](https://drtim.co/robots.txt): Crawler guidance and sitemap location.
+- [llms.txt](https://drtim.co/llms.txt): This LLM-oriented site overview.

@@ -24,6 +24,7 @@ import {
   formatDate,
   localizeImageUrl,
   getAuthorName,
+  getPostSummary,
 } from "../lib/api.js";
 
 const ui = getTranslations("th");
@@ -212,7 +213,7 @@ const faqItems = [
         </span>
         <h1 class="hero-title" set:html={heroPost.title}></h1>
         <p class="hero-excerpt">
-          {stripHtml(heroPost.excerpt).substring(0, 180)}…
+          {getPostSummary(heroPost, 180)}
         </p>
         <div class="hero-meta">
           {
@@ -390,7 +391,7 @@ const faqItems = [
                   )}
                   <h3 set:html={post.title} />
                   <p class="pick-excerpt">
-                    {stripHtml(post.excerpt).substring(0, 100)}…
+                    {getPostSummary(post, 100)}
                   </p>
                   <div class="pick-meta">
                     <time datetime={post.date}>{formatDate(post.date)}</time>
@@ -430,7 +431,7 @@ const faqItems = [
               <div class="article-body">
                 <h3 set:html={post.title} />
                 <p class="article-excerpt">
-                  {stripHtml(post.excerpt).substring(0, 90)}…
+                  {getPostSummary(post, 90)}
                 </p>
                 <div class="article-meta">
                   <time datetime={post.date}>{formatDate(post.date)}</time>

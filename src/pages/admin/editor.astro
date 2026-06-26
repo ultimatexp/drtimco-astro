@@ -8,6 +8,7 @@ const DATABASE_URL = import.meta.env.NEON_DATABASE_URL;
 let articleId = Astro.url.searchParams.get('id');
 let article = {
     title: '',
+    slug: '',
     content: '',
     status: 'draft',
     category: '',
@@ -47,48 +48,64 @@ if (DATABASE_URL) {
 ---
 
 <AdminLayout title={articleId ? "Edit Article" : "New Article"}>
+    <header class="editor-workspace-header">
+        <div class="editor-heading">
+            <div class="editor-kicker">Content editor</div>
+            <h1>{articleId ? "Edit article" : "New article"}</h1>
+        </div>
+        <div class="editor-header-actions">
+            <div id="saveStatus" class="save-status" aria-live="polite"></div>
+            <button id="btnPreview" class="btn-secondary" type="button">Preview</button>
+            <button id="btnSaveDraft" class="btn-secondary" type="button">Save Draft</button>
+            <button id="btnPublish" class="btn-primary" type="button">Publish</button>
+        </div>
+    </header>
+
     <div class="editor-container">
         <!-- Editor Main Area -->
         <div class="editor-main">
             <!-- Toolbar -->
-            <div class="editor-toolbar" id="toolbar">
+            <div class="editor-toolbar" id="toolbar" aria-label="Editor toolbar">
                 <div class="toolbar-group">
-                    <button class="toolbar-btn" data-command="bold" title="Bold"><b>B</b></button>
-                    <button class="toolbar-btn" data-command="italic" title="Italic"><i>I</i></button>
-                    <button class="toolbar-btn" data-command="underline" title="Underline"><u>U</u></button>
-                    <button class="toolbar-btn" data-command="strike" title="Strikethrough"><s>S</s></button>
+                    <button class="toolbar-btn" type="button" data-command="bold" title="Bold" aria-label="Bold"><b>B</b></button>
+                    <button class="toolbar-btn" type="button" data-command="italic" title="Italic" aria-label="Italic"><i>I</i></button>
+                    <button class="toolbar-btn" type="button" data-command="underline" title="Underline" aria-label="Underline"><u>U</u></button>
+                    <button class="toolbar-btn" type="button" data-command="strike" title="Strikethrough" aria-label="Strikethrough"><s>S</s></button>
                 </div>
                 <div class="toolbar-divider"></div>
                 <div class="toolbar-group">
-                    <button class="toolbar-btn" data-command="h2" title="Heading 2">H2</button>
-                    <button class="toolbar-btn" data-command="h3" title="Heading 3">H3</button>
-                    <button class="toolbar-btn" data-command="paragraph" title="Paragraph">P</button>
+                    <button class="toolbar-btn" type="button" data-command="h2" title="Heading 2">H2</button>
+                    <button class="toolbar-btn" type="button" data-command="h3" title="Heading 3">H3</button>
+                    <button class="toolbar-btn" type="button" data-command="paragraph" title="Paragraph">P</button>
                 </div>
                 <div class="toolbar-divider"></div>
                 <div class="toolbar-group">
-                    <button class="toolbar-btn" data-command="bulletList" title="Bullet List">• List</button>
-                    <button class="toolbar-btn" data-command="orderedList" title="Numbered List">1. List</button>
-                    <button class="toolbar-btn" data-command="blockquote" title="Quote">""</button>
+                    <button class="toolbar-btn" type="button" data-command="bulletList" title="Bullet List">List</button>
+                    <button class="toolbar-btn" type="button" data-command="orderedList" title="Numbered List">1. List</button>
+                    <button class="toolbar-btn" type="button" data-command="blockquote" title="Quote">Quote</button>
                 </div>
                 <div class="toolbar-divider"></div>
                 <div class="toolbar-group">
-                    <button class="toolbar-btn" data-command="link" title="Insert Link">🔗 Link</button>
-                    <button class="toolbar-btn" data-command="image" title="Insert Image">🖼️ Image</button>
-                    <button class="toolbar-btn" data-command="cta" title="Insert CTA Button">🎯 CTA</button>
+                    <button class="toolbar-btn" type="button" data-command="link" title="Insert Link">Link</button>
+                    <button class="toolbar-btn" type="button" data-command="image" title="Insert Image">Image</button>
+                    <button class="toolbar-btn" type="button" data-command="cta" title="Insert CTA Button">CTA</button>
                 </div>
                 <div class="toolbar-divider"></div>
                 <div class="toolbar-group">
-                    <button class="toolbar-btn" data-command="insertTable" title="Insert Table">▦ Table</button>
-                    <button class="toolbar-btn" data-command="addRowAfter" title="Add Row Below">+ Row</button>
-                    <button class="toolbar-btn" data-command="addColAfter" title="Add Column Right">+ Col</button>
-                    <button class="toolbar-btn" data-command="deleteRow" title="Delete Row">− Row</button>
-                    <button class="toolbar-btn" data-command="deleteCol" title="Delete Column">− Col</button>
-                    <button class="toolbar-btn" data-command="deleteTable" title="Delete Table">🗑 Table</button>
+                    <button class="toolbar-btn" type="button" data-command="insertTable" title="Insert Table">Table</button>
+                    <button class="toolbar-btn" type="button" data-command="addRowAfter" title="Add Row Below">+ Row</button>
+                    <button class="toolbar-btn" type="button" data-command="addColAfter" title="Add Column Right">+ Col</button>
+                    <button class="toolbar-btn" type="button" data-command="deleteRow" title="Delete Row">- Row</button>
+                    <button class="toolbar-btn" type="button" data-command="deleteCol" title="Delete Column">- Col</button>
+                    <button class="toolbar-btn toolbar-btn-danger" type="button" data-command="deleteTable" title="Delete Table">Delete Table</button>
                 </div>
             </div>
 
             <!-- Title Input -->
-            <input type="text" id="articleTitle" class="article-title-input" placeholder="Enter article title here..." value={article.title} />
+            <div class="title-field">
+                <label for="articleTitle">Article title</label>
+                <input type="text" id="articleTitle" class="article-title-input" placeholder="Enter article title here..." value={article.title} />
+            </div>
 
             <!-- The Editor Content -->
             <div class="editor-content-wrapper">
@@ -101,17 +118,30 @@ if (DATABASE_URL) {
 
         <!-- SEO & Settings Sidebar -->
         <aside class="editor-sidebar">
-            <div class="sidebar-header">
-                <h3>Publish Settings</h3>
-                <div class="action-buttons">
-                    <button id="btnSaveDraft" class="btn-secondary">Save Draft</button>
-                    <button id="btnPublish" class="btn-primary">Publish</button>
+            <div class="settings-header">
+                <h2>Article settings</h2>
+                <p>Publishing, media, and search metadata.</p>
+            </div>
+
+            <div class="sidebar-section facebook-import-section">
+                <label for="facebookImportUrl">Import from Facebook URL</label>
+                <div class="facebook-import-row">
+                    <input type="url" id="facebookImportUrl" class="form-input" placeholder="https://www.facebook.com/..." autocomplete="off" />
+                    <button id="btnFacebookImport" class="btn-facebook-import" type="button">Import Draft</button>
                 </div>
-                <div id="saveStatus" class="save-status"></div>
+                <div id="facebookImportStatus" class="facebook-import-status" aria-live="polite"></div>
             </div>
 
             <div class="sidebar-section">
-                <label>Status</label>
+                <label for="articleSlug">Slug</label>
+                <div class="slug-field">
+                    <span>/blog/</span>
+                    <input type="text" id="articleSlug" class="form-input" value={article.slug} placeholder="article-url-slug" autocomplete="off" />
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <label for="articleStatus">Status</label>
                 <select id="articleStatus" class="form-select">
                     <option value="draft" selected={article.status === 'draft'}>Draft</option>
                     <option value="review" selected={article.status === 'review'}>Pending Review</option>
@@ -121,7 +151,7 @@ if (DATABASE_URL) {
             </div>
 
             <div class="sidebar-section">
-                <label>Category</label>
+                <label for="articleCategory">Category</label>
                 <div class="category-combo" id="categoryCombo">
                     <input type="text" id="articleCategory" class="form-input" value={article.category} placeholder="Select or type new category..." autocomplete="off" />
                     <div class="category-dropdown" id="categoryDropdown">
@@ -136,10 +166,10 @@ if (DATABASE_URL) {
             </div>
 
             <div class="sidebar-section">
-                <label>Featured Image URL</label>
+                <label for="featuredImage">Featured Image URL</label>
                 <div class="image-upload-row">
                     <input type="text" id="featuredImage" class="form-input" value={article.featured_image_url} placeholder="https://..." />
-                    <button id="btnUploadFeatured" class="btn-secondary btn-icon" title="Upload Image">⬆️</button>
+                    <button id="btnUploadFeatured" class="btn-secondary btn-icon" type="button" title="Upload Image">Upload</button>
                 </div>
                 <!-- Hidden file input for featured image -->
                 <input type="file" id="featuredFileInput" accept="image/*" style="display:none;" />
@@ -150,64 +180,126 @@ if (DATABASE_URL) {
 
             <div class="sidebar-section ai-autofill-section">
                 <button id="btnAiAutofill" class="btn-ai-autofill" type="button">
-                    <span class="ai-icon">✨</span> AI Autofill SEO
+                    AI Autofill SEO
                 </button>
                 <div id="aiAutofillStatus" class="ai-status"></div>
             </div>
 
             <div class="sidebar-section">
                 <div class="section-title-with-badge">
-                    <label>SEO Description</label>
+                    <label for="seoDescription">SEO Description</label>
                     <span class="char-count" id="seoDescCount">0/160</span>
                 </div>
                 <textarea id="seoDescription" class="form-textarea" rows="3" placeholder="Meta description for search engines...">{article.seo_description}</textarea>
             </div>
 
             <div class="sidebar-section">
-                <label>Direct Answer (AI snippet)</label>
+                <label for="directAnswer">Direct Answer (AI snippet)</label>
                 <textarea id="directAnswer" class="form-textarea" rows="2" placeholder="Short answer for top-of-article snippet...">{article.direct_answer}</textarea>
             </div>
             
             <div class="sidebar-section">
-                <label>Focus Keyword</label>
+                <label for="focusKeyword">Focus Keyword</label>
                 <input type="text" id="focusKeyword" class="form-input" value={article.focus_keyword} placeholder="Primary SEO keyword" />
             </div>
             
             <input type="hidden" id="articleId" value={articleId || ''} />
         </aside>
     </div>
+
+    <div id="previewModal" class="preview-modal" role="dialog" aria-modal="true" aria-labelledby="previewTitle" hidden>
+        <div class="preview-backdrop" data-preview-close></div>
+        <div class="preview-dialog">
+            <div class="preview-toolbar">
+                <div>
+                    <div class="editor-kicker">Preview</div>
+                    <h2 id="previewTitle">Article preview</h2>
+                </div>
+                <button id="btnClosePreview" class="btn-secondary" type="button">Close</button>
+            </div>
+            <article class="preview-article">
+                <div id="previewMeta" class="preview-meta"></div>
+                <h1 id="previewArticleTitle"></h1>
+                <img id="previewImage" class="preview-image" alt="" hidden />
+                <div id="previewDirectAnswer" class="preview-direct-answer" hidden></div>
+                <div id="previewBody" class="preview-body"></div>
+            </article>
+        </div>
+    </div>
 </AdminLayout>
 
 <style is:global>
-    .editor-container {
+    .editor-workspace-header {
         display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
         gap: 24px;
-        height: calc(100vh - 140px); /* Fill remaining space minus topbar and padding */
+        margin-bottom: 20px;
+    }
+
+    .editor-heading {
+        min-width: 0;
+    }
+
+    .editor-kicker {
+        color: var(--text-muted);
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0;
+        text-transform: uppercase;
+        margin-bottom: 6px;
+    }
+
+    .editor-heading h1 {
+        font-size: 1.5rem;
+        line-height: 1.2;
+        margin: 0;
+    }
+
+    .editor-header-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .editor-container {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 360px;
+        gap: 24px;
+        min-height: calc(100vh - 172px);
     }
 
     /* Main Editor */
     .editor-main {
-        flex-grow: 1;
+        min-width: 0;
         display: flex;
         flex-direction: column;
         background-color: var(--bg-surface);
         border: 1px solid var(--border);
-        border-radius: 12px;
+        border-radius: 8px;
         overflow: hidden;
+        box-shadow: 0 18px 45px rgba(2, 6, 23, 0.18);
     }
 
     .editor-toolbar {
         display: flex;
         align-items: center;
-        padding: 12px 16px;
-        background-color: var(--bg-surface);
+        padding: 10px 12px;
+        background-color: rgba(15, 23, 42, 0.72);
         border-bottom: 1px solid var(--border);
         gap: 8px;
         flex-wrap: wrap;
+        position: sticky;
+        top: 0;
+        z-index: 3;
+        backdrop-filter: blur(10px);
     }
 
     .toolbar-group {
         display: flex;
+        flex-wrap: wrap;
         gap: 4px;
     }
 
@@ -219,30 +311,65 @@ if (DATABASE_URL) {
     }
 
     .toolbar-btn {
+        min-height: 34px;
         background: transparent;
-        border: 1px solid transparent;
+        border: 1px solid rgba(148, 163, 184, 0.14);
         color: var(--text-main);
-        padding: 6px 10px;
+        padding: 6px 9px;
         border-radius: 6px;
         cursor: pointer;
-        font-size: 0.9rem;
-        transition: all 0.2s;
+        font-size: 0.84rem;
+        line-height: 1;
+        transition: background-color 0.2s, border-color 0.2s, color 0.2s;
     }
 
     .toolbar-btn:hover {
         background-color: var(--bg-surface-hover);
+        border-color: rgba(148, 163, 184, 0.35);
+    }
+
+    .toolbar-btn:focus-visible,
+    .btn-ai-autofill:focus-visible,
+    .btn-facebook-import:focus-visible,
+    .form-input:focus-visible,
+    .form-select:focus-visible,
+    .form-textarea:focus-visible,
+    .article-title-input:focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: 2px;
     }
     
     .toolbar-btn.is-active {
         background-color: rgba(59, 130, 246, 0.2);
         color: var(--primary);
+        border-color: rgba(59, 130, 246, 0.48);
+    }
+
+    .toolbar-btn-danger {
+        color: #fca5a5;
+    }
+
+    .title-field {
+        padding: 28px 36px 16px;
+        border-bottom: 1px solid rgba(51, 65, 85, 0.65);
+    }
+
+    .title-field label {
+        display: block;
+        color: var(--text-muted);
+        font-size: 0.78rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0;
     }
 
     .article-title-input {
         width: 100%;
-        font-size: 2rem;
+        font-size: 2.15rem;
+        line-height: 1.18;
         font-weight: 700;
-        padding: 24px 32px 12px;
+        padding: 0;
         background: transparent;
         border: none;
         color: var(--text-main);
@@ -257,16 +384,18 @@ if (DATABASE_URL) {
     .editor-content-wrapper {
         flex-grow: 1;
         overflow-y: auto;
-        padding: 0 32px 32px;
+        padding: 28px 36px 44px;
     }
 
     /* Target the automatically generated TipTap element */
     .tiptap-editor-container .ProseMirror {
-        min-height: 300px;
+        min-height: 560px;
+        max-width: 760px;
         outline: none;
         font-size: 1.05rem;
         line-height: 1.8;
         color: #e2e8f0;
+        margin: 0 auto;
     }
 
     .tiptap-editor-container .ProseMirror p.is-editor-empty:first-child::before {
@@ -421,46 +550,45 @@ if (DATABASE_URL) {
 
     /* Sidebar */
     .editor-sidebar {
-        width: 320px;
-        flex-shrink: 0;
+        min-width: 0;
         background-color: var(--bg-surface);
         border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 24px;
+        border-radius: 8px;
+        padding: 20px;
         display: flex;
         flex-direction: column;
-        gap: 24px;
+        gap: 18px;
         overflow-y: auto;
+        max-height: calc(100vh - 172px);
+        position: sticky;
+        top: 84px;
     }
 
-    .sidebar-header {
+    .settings-header {
         display: flex;
         flex-direction: column;
-        gap: 12px;
-        padding-bottom: 20px;
+        gap: 4px;
+        padding-bottom: 16px;
         border-bottom: 1px solid var(--border);
     }
 
-    .sidebar-header h3 {
-        font-size: 1.1rem;
+    .settings-header h2 {
+        font-size: 1rem;
         margin: 0;
     }
 
-    .action-buttons {
-        display: flex;
-        gap: 10px;
-    }
-
-    .action-buttons button {
-        flex: 1;
-        justify-content: center;
+    .settings-header p {
+        margin: 0;
+        color: var(--text-muted);
+        font-size: 0.86rem;
+        line-height: 1.45;
     }
 
     .save-status {
-        font-size: 0.8rem;
+        font-size: 0.84rem;
         color: var(--text-muted);
-        text-align: center;
-        min-height: 1.2em;
+        min-width: 130px;
+        text-align: right;
     }
 
     .sidebar-section {
@@ -480,7 +608,7 @@ if (DATABASE_URL) {
         background-color: var(--bg-base);
         border: 1px solid var(--border);
         color: var(--text-main);
-        padding: 10px;
+        padding: 11px 12px;
         border-radius: 6px;
         font-size: 0.9rem;
         outline: none;
@@ -490,10 +618,43 @@ if (DATABASE_URL) {
 
     .form-input:focus, .form-select:focus, .form-textarea:focus {
         border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
     }
 
     .form-textarea {
         resize: vertical;
+    }
+
+    .slug-field {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr);
+        align-items: center;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        background: var(--bg-base);
+    }
+
+    .slug-field span {
+        color: var(--text-muted);
+        font-size: 0.86rem;
+        padding: 0 0 0 12px;
+        white-space: nowrap;
+    }
+
+    .slug-field .form-input {
+        border: 0;
+        background: transparent;
+        padding-left: 2px;
+    }
+
+    .slug-field .form-input:focus {
+        box-shadow: none;
+    }
+
+    .slug-field:focus-within {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
     }
 
     .section-title-with-badge {
@@ -508,8 +669,14 @@ if (DATABASE_URL) {
     }
 
     .image-upload-row {
-        display: flex;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
         gap: 8px;
+    }
+
+    .btn-icon {
+        min-height: 42px;
+        white-space: nowrap;
     }
 
     .featured-preview {
@@ -521,29 +688,262 @@ if (DATABASE_URL) {
         margin-top: 8px;
     }
 
+    .facebook-import-section {
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .facebook-import-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 8px;
+    }
+
+    .btn-facebook-import {
+        width: 100%;
+        min-height: 42px;
+        padding: 10px 14px;
+        background: #0f766e;
+        color: #ffffff;
+        border: 0;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        font-weight: 700;
+        cursor: pointer;
+        font-family: inherit;
+        transition: background-color 0.2s, transform 0.2s;
+    }
+
+    .btn-facebook-import:hover {
+        background: #0d9488;
+        transform: translateY(-1px);
+    }
+
+    .btn-facebook-import:disabled {
+        opacity: 0.72;
+        cursor: wait;
+        transform: none;
+    }
+
+    .facebook-import-status {
+        color: var(--text-muted);
+        font-size: 0.8rem;
+        line-height: 1.4;
+        min-height: 1.2em;
+    }
+
     @media (max-width: 1024px) {
-        .editor-container {
+        .editor-workspace-header {
             flex-direction: column;
-            height: auto;
+            align-items: stretch;
         }
+
+        .editor-header-actions {
+            justify-content: flex-start;
+        }
+
+        .editor-container {
+            grid-template-columns: 1fr;
+            height: auto;
+            min-height: 0;
+        }
+
         .editor-sidebar {
             width: 100%;
+            max-height: none;
+            position: static;
+        }
+    }
+
+    .preview-modal[hidden] {
+        display: none;
+    }
+
+    .preview-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 1000;
+        display: grid;
+        place-items: center;
+        padding: 28px;
+    }
+
+    .preview-backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(2, 6, 23, 0.78);
+    }
+
+    .preview-dialog {
+        position: relative;
+        width: min(920px, 100%);
+        max-height: min(860px, calc(100vh - 56px));
+        background: #f8fafc;
+        color: #0f172a;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.36);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .preview-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        padding: 18px 22px;
+        border-bottom: 1px solid #e2e8f0;
+        background: #ffffff;
+    }
+
+    .preview-toolbar h2 {
+        margin: 0;
+        font-size: 1.05rem;
+        color: #0f172a;
+    }
+
+    .preview-article {
+        overflow-y: auto;
+        padding: 42px 54px 56px;
+    }
+
+    .preview-meta {
+        color: #64748b;
+        font-size: 0.88rem;
+        margin-bottom: 12px;
+    }
+
+    .preview-article h1 {
+        font-size: 2.2rem;
+        line-height: 1.18;
+        margin: 0 0 22px;
+        color: #0f172a;
+    }
+
+    .preview-image {
+        width: 100%;
+        max-height: 420px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin: 0 0 28px;
+        background: #e2e8f0;
+    }
+
+    .preview-direct-answer {
+        border-left: 4px solid var(--primary);
+        background: #eff6ff;
+        color: #1e3a8a;
+        padding: 16px 18px;
+        border-radius: 0 8px 8px 0;
+        margin-bottom: 28px;
+        line-height: 1.65;
+    }
+
+    .preview-body {
+        color: #1e293b;
+        font-size: 1.02rem;
+        line-height: 1.75;
+    }
+
+    .preview-body h2,
+    .preview-body h3,
+    .preview-body h4 {
+        color: #0f172a;
+        line-height: 1.25;
+        margin: 1.7em 0 0.7em;
+    }
+
+    .preview-body p,
+    .preview-body ul,
+    .preview-body ol,
+    .preview-body blockquote,
+    .preview-body table {
+        margin-bottom: 1rem;
+    }
+
+    .preview-body ul,
+    .preview-body ol {
+        padding-left: 1.4rem;
+    }
+
+    .preview-body img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+    }
+
+    .preview-body table {
+        width: 100%;
+        border-collapse: collapse;
+        overflow-x: auto;
+    }
+
+    .preview-body th,
+    .preview-body td {
+        border: 1px solid #cbd5e1;
+        padding: 10px 12px;
+        vertical-align: top;
+    }
+
+    .preview-body th {
+        background: #e2e8f0;
+    }
+
+    @media (max-width: 640px) {
+        .editor-header-actions .btn-primary,
+        .editor-header-actions .btn-secondary {
+            flex: 1;
+            justify-content: center;
+            min-height: 44px;
+        }
+
+        .save-status {
+            flex-basis: 100%;
+            text-align: left;
+        }
+
+        .title-field,
+        .editor-content-wrapper {
+            padding-left: 18px;
+            padding-right: 18px;
+        }
+
+        .article-title-input {
+            font-size: 1.55rem;
+        }
+
+        .toolbar-btn {
+            min-height: 38px;
+        }
+
+        .preview-modal {
+            padding: 12px;
+        }
+
+        .preview-article {
+            padding: 28px 20px 36px;
+        }
+
+        .preview-article h1 {
+            font-size: 1.65rem;
         }
     }
 
     /* AI Autofill Button */
     .ai-autofill-section {
-        padding: 16px 0;
+        padding: 14px 0;
         border-bottom: 1px solid var(--border);
+        border-top: 1px solid var(--border);
     }
 
     .btn-ai-autofill {
         width: 100%;
         padding: 12px 16px;
-        background: linear-gradient(135deg, #6366f1, #8b5cf6, #a855f7);
+        background: #4f46e5;
         color: white;
         border: none;
-        border-radius: 8px;
+        border-radius: 6px;
         font-size: 0.95rem;
         font-weight: 600;
         cursor: pointer;
@@ -551,24 +951,19 @@ if (DATABASE_URL) {
         align-items: center;
         justify-content: center;
         gap: 8px;
-        transition: all 0.3s ease;
+        transition: background-color 0.2s, transform 0.2s;
         font-family: inherit;
-        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
     }
 
     .btn-ai-autofill:hover {
+        background: #4338ca;
         transform: translateY(-1px);
-        box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
     }
 
     .btn-ai-autofill:disabled {
         opacity: 0.7;
         cursor: wait;
         transform: none;
-    }
-
-    .ai-icon {
-        font-size: 1.1rem;
     }
 
     .ai-status {
@@ -604,7 +999,7 @@ if (DATABASE_URL) {
         top: 100%;
         left: 0;
         right: 0;
-        background: var(--bg-secondary);
+        background: var(--bg-surface);
         border: 1px solid var(--border);
         border-top: none;
         border-radius: 0 0 8px 8px;
@@ -901,7 +1296,7 @@ if (DATABASE_URL) {
             if (!file) return;
 
             const btnOriginalText = btnUploadFeatured.textContent;
-            btnUploadFeatured.textContent = '⏳';
+            btnUploadFeatured.textContent = 'Uploading';
             
             const formData = new FormData();
             formData.append('file', file);
@@ -939,6 +1334,104 @@ if (DATABASE_URL) {
         });
     }
 
+    // Slug Logic
+    const titleInput = document.getElementById('articleTitle');
+    const slugInput = document.getElementById('articleSlug');
+    let slugManuallyEdited = Boolean(slugInput.value.trim());
+
+    function slugify(value) {
+        return value
+            .toLowerCase()
+            .trim()
+            .replace(/[^\w\s\u0E00-\u0E7F-]/g, '')
+            .replace(/\s+/g, '-')
+            .replace(/-+/g, '-')
+            .replace(/^-|-$/g, '')
+            .substring(0, 80);
+    }
+
+    function syncSlugFromTitle() {
+        if (slugManuallyEdited) return;
+        slugInput.value = slugify(titleInput.value);
+    }
+
+    if (!slugInput.value && titleInput.value) {
+        syncSlugFromTitle();
+    }
+
+    titleInput.addEventListener('input', () => {
+        syncSlugFromTitle();
+        triggerAutosave();
+    });
+
+    slugInput.addEventListener('input', () => {
+        slugManuallyEdited = true;
+        const cursorPosition = slugInput.selectionStart;
+        slugInput.value = slugify(slugInput.value);
+        const nextPosition = Math.min(cursorPosition || 0, slugInput.value.length);
+        slugInput.setSelectionRange(nextPosition, nextPosition);
+        triggerAutosave();
+    });
+
+    // Preview Logic
+    const btnPreview = document.getElementById('btnPreview');
+    const previewModal = document.getElementById('previewModal');
+    const btnClosePreview = document.getElementById('btnClosePreview');
+    const previewMeta = document.getElementById('previewMeta');
+    const previewArticleTitle = document.getElementById('previewArticleTitle');
+    const previewImage = document.getElementById('previewImage');
+    const previewDirectAnswer = document.getElementById('previewDirectAnswer');
+    const previewBody = document.getElementById('previewBody');
+
+    function openPreview() {
+        const title = titleInput.value.trim() || 'Untitled article';
+        const slug = slugInput.value.trim();
+        const category = document.getElementById('articleCategory').value.trim();
+        const status = document.getElementById('articleStatus').value;
+        const imageUrl = document.getElementById('featuredImage').value.trim();
+        const directAnswer = document.getElementById('directAnswer').value.trim();
+        const content = window.tiptapEditor ? window.tiptapEditor.getHTML() : '';
+
+        previewArticleTitle.textContent = title;
+        previewMeta.textContent = [category || 'Uncategorized', status, slug ? `/blog/${slug}` : 'No slug yet'].join(' / ');
+        previewBody.innerHTML = content || '<p>No content yet.</p>';
+
+        if (imageUrl) {
+            previewImage.src = imageUrl;
+            previewImage.hidden = false;
+        } else {
+            previewImage.removeAttribute('src');
+            previewImage.hidden = true;
+        }
+
+        if (directAnswer) {
+            previewDirectAnswer.textContent = directAnswer;
+            previewDirectAnswer.hidden = false;
+        } else {
+            previewDirectAnswer.textContent = '';
+            previewDirectAnswer.hidden = true;
+        }
+
+        previewModal.hidden = false;
+        document.body.style.overflow = 'hidden';
+        btnClosePreview.focus();
+    }
+
+    function closePreview() {
+        previewModal.hidden = true;
+        document.body.style.overflow = '';
+        btnPreview.focus();
+    }
+
+    btnPreview.addEventListener('click', openPreview);
+    btnClosePreview.addEventListener('click', closePreview);
+    previewModal.querySelector('[data-preview-close]').addEventListener('click', closePreview);
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !previewModal.hidden) {
+            closePreview();
+        }
+    });
+
     // Save Logic (Draft and Publish)
     let autosaveTimeout = null;
     const saveStatus = document.getElementById('saveStatus');
@@ -952,15 +1445,12 @@ if (DATABASE_URL) {
         }, 30000); // 30 sec autosave debounce
     }
 
-    // Listen to title changes too
-    document.getElementById('articleTitle').addEventListener('input', triggerAutosave);
-
     async function saveArticle(isPublishAction = false) {
         saveStatus.textContent = 'Saving...';
         
         // Gather data
         const id = document.getElementById('articleId').value;
-        const title = document.getElementById('articleTitle').value;
+        const title = titleInput.value;
         const content = window.tiptapEditor.getHTML();
         
         let status = document.getElementById('articleStatus').value;
@@ -972,6 +1462,7 @@ if (DATABASE_URL) {
         const payload = {
             id: id || null,
             title,
+            slug: slugInput.value || slugify(title),
             content,
             status,
             category: document.getElementById('articleCategory').value,
@@ -1013,6 +1504,57 @@ if (DATABASE_URL) {
     document.getElementById('btnSaveDraft').addEventListener('click', () => saveArticle(false));
     document.getElementById('btnPublish').addEventListener('click', () => saveArticle(true));
 
+    // ── Facebook Import ──────────────────────────────────────
+    const facebookImportUrl = document.getElementById('facebookImportUrl');
+    const btnFacebookImport = document.getElementById('btnFacebookImport');
+    const facebookImportStatus = document.getElementById('facebookImportStatus');
+
+    async function importFacebookPost() {
+        const url = facebookImportUrl.value.trim();
+
+        if (!url) {
+            facebookImportStatus.textContent = 'Paste a Facebook Page post URL first.';
+            facebookImportStatus.style.color = 'var(--warning)';
+            facebookImportUrl.focus();
+            return;
+        }
+
+        btnFacebookImport.disabled = true;
+        btnFacebookImport.textContent = 'Importing...';
+        facebookImportStatus.textContent = 'Fetching post and creating draft...';
+        facebookImportStatus.style.color = 'var(--text-muted)';
+
+        try {
+            const res = await fetch('/api/admin/import-facebook-post', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url })
+            });
+            const data = await res.json();
+
+            if (!res.ok || !data.success) {
+                throw new Error(data.error || 'Facebook import failed.');
+            }
+
+            facebookImportStatus.textContent = 'Draft created. Opening editor...';
+            facebookImportStatus.style.color = 'var(--success)';
+            window.location.href = `/admin/editor?id=${data.article.id}`;
+        } catch (err) {
+            facebookImportStatus.textContent = err.message || 'Facebook import failed.';
+            facebookImportStatus.style.color = 'var(--danger)';
+            btnFacebookImport.disabled = false;
+            btnFacebookImport.textContent = 'Import Draft';
+        }
+    }
+
+    btnFacebookImport.addEventListener('click', importFacebookPost);
+    facebookImportUrl.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            importFacebookPost();
+        }
+    });
+
     // ── AI Autofill SEO ──────────────────────────────────────
     const btnAiAutofill = document.getElementById('btnAiAutofill');
     const aiStatus = document.getElementById('aiAutofillStatus');
@@ -1023,7 +1565,7 @@ if (DATABASE_URL) {
         const category = document.getElementById('articleCategory').value;
 
         if (!title && !content) {
-            aiStatus.textContent = '⚠️ Write a title or content first';
+            aiStatus.textContent = 'Write a title or content first';
             aiStatus.style.color = 'var(--warning)';
             return;
         }
@@ -1055,19 +1597,19 @@ if (DATABASE_URL) {
                     document.getElementById('focusKeyword').value = data.focus_keyword;
                 }
 
-                aiStatus.textContent = '✅ SEO fields filled!';
+                aiStatus.textContent = 'SEO fields filled';
                 aiStatus.style.color = 'var(--success)';
                 triggerAutosave();
             } else {
-                aiStatus.textContent = '❌ ' + (data.error || 'Failed');
+                aiStatus.textContent = data.error || 'Failed';
                 aiStatus.style.color = 'var(--danger)';
             }
         } catch (err) {
-            aiStatus.textContent = '❌ Network error';
+            aiStatus.textContent = 'Network error';
             aiStatus.style.color = 'var(--danger)';
         } finally {
             btnAiAutofill.disabled = false;
-            btnAiAutofill.innerHTML = '<span class="ai-icon">✨</span> AI Autofill SEO';
+            btnAiAutofill.textContent = 'AI Autofill SEO';
         }
     });
 

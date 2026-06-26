@@ -1,9 +1,11 @@
 ---
-const adminPassword = import.meta.env.ADMIN_PASSWORD;
+import { getAdminPassword, isAdminSession } from '../../lib/adminAuth.js';
+
+const adminPassword = getAdminPassword();
 let error = false;
 
 // If already logged in, redirect
-if (Astro.cookies.get("adminSession")?.value === adminPassword) {
+if (isAdminSession(Astro.cookies)) {
     return Astro.redirect('/admin');
 }
 
@@ -12,12 +14,13 @@ if (Astro.request.method === "POST") {
         const data = await Astro.request.formData();
         const password = data.get("password");
 
-        if (password === adminPassword) {
+        if (adminPassword && password === adminPassword) {
             // Set cookie for 7 days
             Astro.cookies.set("adminSession", password, { 
                 path: '/',
                 maxAge: 60 * 60 * 24 * 7, // 7 days
                 httpOnly: true,
+                sameSite: 'lax',
                 secure: import.meta.env.PROD
             });
             return Astro.redirect('/admin');

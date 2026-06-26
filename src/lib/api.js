@@ -199,6 +199,33 @@ export function stripHtml(html = '') {
 }
 
 /**
+ * Get display summary for post cards.
+ * AI-generated posts may not have a WordPress-style excerpt, so fall back
+ * through SEO fields and finally content.
+ * @param {object} post
+ * @param {number} [maxChars=160]
+ * @returns {string}
+ */
+export function getPostSummary(post, maxChars = 160) {
+    const candidates = [
+        post?.excerpt,
+        post?._seo_description,
+        post?.seo_description,
+        post?.seoDescription,
+        post?.description,
+        post?.metaDescription,
+        post?._direct_answer,
+        post?.direct_answer,
+        post?.content,
+    ];
+
+    const raw = candidates.map((value) => stripHtml(value || '')).find(Boolean) || '';
+
+    if (!raw) return '';
+    return raw.length > maxChars ? `${raw.substring(0, Math.max(0, maxChars - 1))}…` : raw;
+}
+
+/**
  * Truncate text to a max word count.
  * @param {string}  text
  * @param {number}  [maxWords=30]
@@ -335,4 +362,3 @@ export function sanitizeContent(html = '') {
         .replace(/<p>\s*<\/p>/g, '')
         .replace(/<p>&nbsp;<\/p>/g, '');
 }
-

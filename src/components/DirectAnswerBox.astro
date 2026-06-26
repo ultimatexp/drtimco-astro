@@ -8,8 +8,8 @@
  * featured snippet / direct answer.
  *
  * Uses semantic HTML attributes:
- *   - role="doc-abstract"  → signals a document summary
- *   - itemprop="abstract"  → schema.org abstract property
+ *   - <aside>              → complementary direct-answer content
+ *   - itemprop="text"      → schema.org Answer text property
  *   - data-answer="true"   → custom hook for AI crawlers
  *
  * Props:
@@ -44,7 +44,6 @@ if (wordCount < 35 || wordCount > 70) {
 
 <aside
   class="direct-answer-box"
-  role="doc-abstract"
   itemscope
   itemtype="https://schema.org/Answer"
   data-answer="true"

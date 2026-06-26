@@ -1,20 +1,11 @@
 import { neon } from '@neondatabase/serverless';
+import { isAdminSession, unauthorizedJson } from '../../../../../lib/adminAuth.js';
 
-export async function PATCH({ params, request }) {
+export async function PATCH({ params, request, cookies }) {
     const { id } = params;
     
-    // Auth Check
-    const adminPassword = import.meta.env.ADMIN_PASSWORD;
-    const cookieString = request.headers.get('cookie') || '';
-    const hasValidAuth = cookieString.includes(`adminSession=${adminPassword}`);
-    
-    // In dev mode, we might allow fallback auth checking via header, 
-    // but the cookie is the primary way now.
-    if (!hasValidAuth) {
-        return new Response(JSON.stringify({ success: false, error: 'Unauthorized' }), {
-            status: 401,
-            headers: { 'Content-Type': 'application/json' }
-        });
+    if (!isAdminSession(cookies)) {
+        return unauthorizedJson();
     }
 
     try {
@@ -35,6 +26,7 @@ export async function PATCH({ params, request }) {
             UPDATE article_drafts
             SET 
                 title = COALESCE(${body.title !== undefined ? body.title : sql`title`}, title),
+                slug = COALESCE(${body.slug !== undefined ? body.slug : sql`slug`}, slug),
                 content = COALESCE(${body.content !== undefined ? body.content : sql`content`}, content),
                 status = COALESCE(${body.status !== undefined ? body.status : sql`status`}, status),
                 category = COALESCE(${body.category !== undefined ? body.category : sql`category`}, category),

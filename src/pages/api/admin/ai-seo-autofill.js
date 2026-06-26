@@ -5,12 +5,11 @@
  */
 export const prerender = false;
 
-export async function POST({ request }) {
-    // Auth
-    const adminPassword = import.meta.env.ADMIN_PASSWORD;
-    const cookieString = request.headers.get('cookie') || '';
-    if (!cookieString.includes(`adminSession=${adminPassword}`)) {
-        return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
+import { isAdminSession, unauthorizedJson } from '../../../lib/adminAuth.js';
+
+export async function POST({ request, cookies }) {
+    if (!isAdminSession(cookies)) {
+        return unauthorizedJson();
     }
 
     const apiKey = import.meta.env.GEMINI_API_KEY;

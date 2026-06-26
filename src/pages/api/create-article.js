@@ -4,20 +4,18 @@
 export const prerender = false;
 
 import { neon } from '@neondatabase/serverless';
+import { isAdminKey, isAdminSession, unauthorizedJson } from '../../lib/adminAuth.js';
 
-export async function POST({ request }) {
+export async function POST({ request, cookies }) {
   const body = await request.json();
   const { id, key, title, slug, content, excerpt, seo_description, direct_answer, category, tags, image_url, status, focus_keyword, featured_image_url } = body;
 
-  const adminPassword = import.meta.env.ADMIN_PASSWORD || process.env.ADMIN_PASSWORD;
-
   // Accept auth via JSON body key (for scripts) OR via cookie (for CMS dashboard)
-  const cookieString = request.headers.get('cookie') || '';
-  const hasValidCookie = cookieString.includes(`adminSession=${adminPassword}`);
-  const hasValidKey = key === adminPassword;
+  const hasValidCookie = isAdminSession(cookies);
+  const hasValidKey = isAdminKey(key);
 
   if (!hasValidCookie && !hasValidKey) {
-    return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
+    return unauthorizedJson();
   }
 
   if (!title || !content) {

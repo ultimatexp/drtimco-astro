@@ -1,14 +1,10 @@
 export const prerender = false;
 
 import * as ftp from 'basic-ftp';
+import { isAdminSession } from '../../../lib/adminAuth.js';
 
-export async function GET({ request }) {
-    // Auth Check
-    const adminPassword = import.meta.env.ADMIN_PASSWORD;
-    const cookieString = request.headers.get('cookie') || '';
-    const hasValidAuth = cookieString.includes(`adminSession=${adminPassword}`);
-    
-    if (!hasValidAuth) {
+export async function GET({ cookies }) {
+    if (!isAdminSession(cookies)) {
         return new Response(JSON.stringify({ success: false, error: 'Unauthorized' }), {
             status: 401,
             headers: { 'Content-Type': 'application/json' }

@@ -1,15 +1,11 @@
 export const prerender = false;
 
 import { neon } from '@neondatabase/serverless';
+import { isAdminSession, unauthorizedJson } from '../../../lib/adminAuth.js';
 
-export async function GET({ request }) {
-    // Auth Check
-    const adminPassword = import.meta.env.ADMIN_PASSWORD;
-    const cookieString = request.headers.get('cookie') || '';
-    const hasValidAuth = cookieString.includes(`adminSession=${adminPassword}`);
-    
-    if (!hasValidAuth) {
-        return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
+export async function GET({ cookies }) {
+    if (!isAdminSession(cookies)) {
+        return unauthorizedJson();
     }
 
     try {
@@ -36,14 +32,9 @@ export async function GET({ request }) {
     }
 }
 
-export async function POST({ request }) {
-    // Auth Check
-    const adminPassword = import.meta.env.ADMIN_PASSWORD;
-    const cookieString = request.headers.get('cookie') || '';
-    const hasValidAuth = cookieString.includes(`adminSession=${adminPassword}`);
-    
-    if (!hasValidAuth) {
-        return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
+export async function POST({ request, cookies }) {
+    if (!isAdminSession(cookies)) {
+        return unauthorizedJson();
     }
 
     try {

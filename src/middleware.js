@@ -5,6 +5,8 @@
 // Handles redirects for old WordPress URLs that Google has cached.
 // ============================================================
 
+import { isAdminSession } from './lib/adminAuth.js';
+
 // Known top-level routes in the Astro site (should NOT be redirected)
 const KNOWN_ROUTES = new Set([
   '', 'blog', 'category', 'cgm', 'consult', 'vip-coaching', 'diabetes-guide', 'shopping-list-for-lean-diabetes', 'privacy-policy', 'sale',
@@ -20,9 +22,7 @@ export function onRequest({ request, redirect, cookies }, next) {
   // Must run BEFORE any page rendering to avoid ResponseSentError
   const adminPath = url.pathname.replace(/\/$/, '') || '/';
   if (adminPath.startsWith('/admin') && adminPath !== '/admin/login') {
-    const adminPassword = import.meta.env.ADMIN_PASSWORD;
-    const sessionCookie = cookies.get('adminSession')?.value;
-    if (sessionCookie !== adminPassword) {
+    if (!isAdminSession(cookies)) {
       return redirect('/admin/login');
     }
   }

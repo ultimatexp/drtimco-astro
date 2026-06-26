@@ -15,17 +15,16 @@ export const prerender = false;
 
 import * as ftp from 'basic-ftp';
 import { Readable } from 'stream';
+import { isAdminKey, isAdminSession, unauthorizedJson } from '../../lib/adminAuth.js';
 
-export async function POST({ request }) {
+export async function POST({ request, cookies }) {
     try {
         const formData = await request.formData();
-        const file = formData.get('image');
+        const file = formData.get('image') || formData.get('file');
         const key = formData.get('key');
 
-        if (key !== (import.meta.env.ADMIN_PASSWORD || process.env.ADMIN_PASSWORD)) {
-            return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-                status: 401, headers: { 'Content-Type': 'application/json' }
-            });
+        if (!isAdminSession(cookies) && !isAdminKey(key)) {
+            return unauthorizedJson();
         }
 
         if (!file || !(file instanceof File)) {

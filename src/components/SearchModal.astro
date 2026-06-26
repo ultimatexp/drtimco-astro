@@ -6,7 +6,7 @@
  * Opens as a modal overlay with keyboard shortcuts (Cmd+K / Ctrl+K).
  * Zero server dependencies — works fully client-side.
  */
-import { getAllPosts, stripHtml, formatDate, localizeImageUrl, getAuthorName } from '../lib/api.js';
+import { getAllPosts, stripHtml, formatDate, localizeImageUrl, getPostSummary } from '../lib/api.js';
 import { getTranslations } from '../i18n/translations.js';
 
 const ui = getTranslations('th');
@@ -17,7 +17,7 @@ const posts = getAllPosts();
 const searchIndex = posts.map(p => ({
   slug: p.slug,
   title: stripHtml(p.title),
-  excerpt: stripHtml(p.excerpt).substring(0, 200),
+  excerpt: getPostSummary(p, 200),
   date: formatDate(p.date),
   category: p.categories?.[0]?.name || '',
   image: localizeImageUrl(p.featuredImage?.sourceUrl || ''),

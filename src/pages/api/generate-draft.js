@@ -5,6 +5,8 @@
  */
 export const prerender = false;
 
+import { isAdminKey, unauthorizedJson } from '../../lib/adminAuth.js';
+
 const SYSTEM_PROMPT = `คุณคือ Dr. Tim (หมอทิม) แพทย์ผู้เชี่ยวชาญด้าน Functional Medicine จาก Ultramed Clinic ชลบุรี
 คุณเขียนบทความภาษาไทยเกี่ยวกับสุขภาพ เบาหวาน การลดน้ำหนัก และ Metabolic Health โดยเน้นผลลัพธ์ที่พิสูจน์ได้จริง
 
@@ -40,8 +42,8 @@ export async function POST({ request }) {
     const body = await request.json();
     const { key, keyword, category } = body;
 
-    if (key !== (import.meta.env.ADMIN_PASSWORD || process.env.ADMIN_PASSWORD)) {
-        return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
+    if (!isAdminKey(key)) {
+        return unauthorizedJson();
     }
 
     if (!keyword) {

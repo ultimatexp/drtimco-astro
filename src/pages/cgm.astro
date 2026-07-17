@@ -65,7 +65,7 @@ const breadcrumbs = [
         <div class="hero-overlay"></div>
         <div class="hero-content">
             <div class="hero-badge-group">
-                <span class="badge badge-gen">📟 รุ่น CGM 34</span>
+                <span class="badge badge-gen">📟 รุ่น CGM 36</span>
                 <span class="badge badge-urgent">
                     <span class="badge-pulse"></span>
                     ⚡ เหลือเพียง 10 ที่นั่งสุดท้าย
@@ -73,36 +73,7 @@ const breadcrumbs = [
             </div>
             <!-- Promo Banner -->
             <div class="promo-banner">
-                🎁 <strong>พิเศษเฉพาะ CGM 34:</strong> รับส่วนลดทันที 15% สำหรับสั่งจอง "คู่มือพิชิตเบาหวานผอม" เล่มใหม่ล่าสุด
-            </div>
-            <!-- Countdown Timer -->
-            <div class="countdown-wrap" id="hero-countdown">
-                <span class="countdown-label">ปิดรับสมัคร 24 พ.ค. 2026</span>
-                <div class="countdown-timer">
-                    <div class="countdown-unit">
-                        <span class="cd-num" id="cd-days">00</span><span
-                            class="cd-lbl">วัน</span
-                        >
-                    </div>
-                    <span class="cd-sep">:</span>
-                    <div class="countdown-unit">
-                        <span class="cd-num" id="cd-hours">00</span><span
-                            class="cd-lbl">ชม.</span
-                        >
-                    </div>
-                    <span class="cd-sep">:</span>
-                    <div class="countdown-unit">
-                        <span class="cd-num" id="cd-mins">00</span><span
-                            class="cd-lbl">นาที</span
-                        >
-                    </div>
-                    <span class="cd-sep">:</span>
-                    <div class="countdown-unit">
-                        <span class="cd-num" id="cd-secs">00</span><span
-                            class="cd-lbl">วินาที</span
-                        >
-                    </div>
-                </div>
+                🎁 <strong>พิเศษเฉพาะ CGM 36:</strong> รับส่วนลดทันที 15% สำหรับสั่งจอง "คู่มือพิชิตเบาหวานผอม" เล่มใหม่ล่าสุด
             </div>
             <h1 class="hero-title">
                 <span class="hero-title-sub">CURE DIABETES</span>
@@ -467,42 +438,11 @@ const breadcrumbs = [
     <section class="urgency-section">
         <div class="section-inner urgency-inner">
             <div class="urgency-content">
-                <h2 class="urgency-title">🔥 รุ่น CGM 34 เหลือ 10 ที่นั่งสุดท้าย</h2>
+                <h2 class="urgency-title">🔥 รุ่น CGM 36 เหลือ 10 ที่นั่งสุดท้าย</h2>
                 <p class="urgency-desc">
                     ปิดรับสมัคร 24 พฤษภาคม 2026 หรือเมื่อครบจำนวน<br />
                     พร้อมรับสิทธิ์ส่วนลด 15% หนังสือเบาหวานผอมเล่มใหม่
                 </p>
-                <!-- Urgency Countdown -->
-                <div
-                    class="countdown-wrap countdown-urgency"
-                    id="urgency-countdown"
-                >
-                    <div class="countdown-timer">
-                        <div class="countdown-unit">
-                            <span class="cd-num cd-num-gold" id="cd2-days"
-                                >00</span
-                            ><span class="cd-lbl">วัน</span>
-                        </div>
-                        <span class="cd-sep cd-sep-gold">:</span>
-                        <div class="countdown-unit">
-                            <span class="cd-num cd-num-gold" id="cd2-hours"
-                                >00</span
-                            ><span class="cd-lbl">ชม.</span>
-                        </div>
-                        <span class="cd-sep cd-sep-gold">:</span>
-                        <div class="countdown-unit">
-                            <span class="cd-num cd-num-gold" id="cd2-mins"
-                                >00</span
-                            ><span class="cd-lbl">นาที</span>
-                        </div>
-                        <span class="cd-sep cd-sep-gold">:</span>
-                        <div class="countdown-unit">
-                            <span class="cd-num cd-num-gold" id="cd2-secs"
-                                >00</span
-                            ><span class="cd-lbl">วินาที</span>
-                        </div>
-                    </div>
-                </div>
             </div>
             <a
                 href={lineUrl}
@@ -1437,135 +1377,10 @@ const breadcrumbs = [
         }
         .section-inner {
             padding: 56px 16px;
-        }
-        .countdown-timer {
-            gap: 8px;
-        }
-        .cd-num {
-            font-size: 28px;
-            width: 52px;
-            height: 52px;
         }}
-
-    /* ── COUNTDOWN TIMER ── */
-    .countdown-wrap {
-        margin-bottom: 32px;
-    }
-
-    .countdown-label {
-        display: block;
-        font-size: 13px;
-        font-weight: 600;
-        letter-spacing: 0.06em;
-        text-transform: uppercase;
-        color: var(--cgm-text-muted);
-        margin-bottom: 12px;
-    }
-
-    .countdown-timer {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 12px;
-    }
-
-    .countdown-unit {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 4px;
-    }
-
-    .cd-num {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 64px;
-        height: 64px;
-        border-radius: 14px;
-        background: rgba(255, 255, 255, 0.06);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(8px);
-        font-size: 32px;
-        font-weight: 800;
-        color: white;
-        font-variant-numeric: tabular-nums;
-    }
-
-    .cd-num-gold {
-        background: rgba(245, 158, 11, 0.12);
-        border-color: rgba(245, 158, 11, 0.25);
-        color: var(--cgm-gold-light);
-    }
-
-    .cd-lbl {
-        font-size: 11px;
-        font-weight: 600;
-        color: var(--cgm-text-muted);
-        letter-spacing: 0.03em;
-    }
-
-    .cd-sep {
-        font-size: 28px;
-        font-weight: 700;
-        color: rgba(255, 255, 255, 0.3);
-        margin-top: -16px;
-    }
-
-    .cd-sep-gold {
-        color: rgba(245, 158, 11, 0.4);
-    }
-
-    .countdown-urgency {
-        margin-top: 20px;
-        margin-bottom: 0;
-    }
-
-    .countdown-urgency .cd-num {
-        width: 56px;
-        height: 56px;
-        font-size: 28px;
-    }</style>
+</style>
 
 <script>
-    // ── Countdown Timer ──
-    // Set deadline to 7 days from the user's first visit (persisted in localStorage)
-    (function () {
-        // Set deadline to May 24, 2026
-        let endTime = new Date("2026-05-24T23:59:59+07:00").getTime();
-
-        function pad(n) {
-            return String(n).padStart(2, "0");
-        }
-
-        function updateCountdown() {
-            const now = Date.now();
-            let diff = Math.max(0, endTime - now);
-            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-            diff -= d * 1000 * 60 * 60 * 24;
-            const h = Math.floor(diff / (1000 * 60 * 60));
-            diff -= h * 1000 * 60 * 60;
-            const m = Math.floor(diff / (1000 * 60));
-            diff -= m * 1000 * 60;
-            const s = Math.floor(diff / 1000);
-
-            // Hero countdown
-            const el = (id) => document.getElementById(id);
-            if (el("cd-days")) el("cd-days").textContent = pad(d);
-            if (el("cd-hours")) el("cd-hours").textContent = pad(h);
-            if (el("cd-mins")) el("cd-mins").textContent = pad(m);
-            if (el("cd-secs")) el("cd-secs").textContent = pad(s);
-            // Urgency countdown
-            if (el("cd2-days")) el("cd2-days").textContent = pad(d);
-            if (el("cd2-hours")) el("cd2-hours").textContent = pad(h);
-            if (el("cd2-mins")) el("cd2-mins").textContent = pad(m);
-            if (el("cd2-secs")) el("cd2-secs").textContent = pad(s);
-        }
-
-        updateCountdown();
-        setInterval(updateCountdown, 1000);
-    })();
-
     // ── Animate stats on scroll ──
     const observer = new IntersectionObserver(
         (entries) => {

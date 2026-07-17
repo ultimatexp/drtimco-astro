@@ -1,6 +1,7 @@
 ---
 export const prerender = true;
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import SiteHeader from "../../components/SiteHeader.astro";
 
 const buyUrl = "https://www.fitkub.com/order/d6c2c53b-a627-4cc1-bb14-5fa3c0338bbe";
 
@@ -19,25 +20,7 @@ const breadcrumbs = [
   breadcrumbs={breadcrumbs}
 >
   <!-- ═══ STICKY TOP BAR ═══ -->
-  <header class="top-bar">
-    <div class="top-bar-inner">
-      <a href="/" class="top-bar-brand">
-        <span class="brand-icon">⚕</span>
-        <span class="brand-name">Dr. Tim</span>
-      </a>
-      <nav class="top-bar-nav">
-        <a href="/">หน้าแรก</a>
-        <a href="/cgm">คอร์ส CGM</a>
-        <a href="/vip-coaching">VIP Coaching</a>
-        <a href="/consult">ปรึกษาส่วนตัว</a>
-        <a href="/diabetes-guide">หนังสือเบาหวานผอม</a>
-      </nav>
-      <a href={buyUrl} target="_blank" rel="noopener" class="nav-cta-btn">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M24 10.5C24 4.701 18.627 0 12 0S0 4.701 0 10.5c0 5.19 4.604 9.537 10.824 10.362.42.092.992.28 1.137.641.13.328.085.84.042 1.17l-.184 1.107c-.056.328-.26 1.284 1.124.7 1.384-.584 7.466-4.396 10.184-7.525C25.18 14.703 24 12.727 24 10.5z"></path></svg>
-        สั่งจอง 459 บาท
-      </a>
-    </div>
-  </header>
+  <SiteHeader current="/diabetes-guide" cta={{ href: buyUrl, label: "สั่งซื้อ 495 บาท", icon: "cart" }} />
 
   <div class="package-page-container">
     <div class="package-banner-wrapper event-reveal">
@@ -131,71 +114,6 @@ const breadcrumbs = [
     border-radius: 28px;
     border: 1px solid rgba(255, 255, 255, 0.8);
     box-shadow: 0 16px 40px rgba(97, 50, 24, 0.06);
-  }
-  
-  /* TOP BAR */
-  .top-bar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 100;
-    background: rgba(10, 15, 13, 0.88);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-  }
-  .top-bar-inner {
-    max-width: var(--mx);
-    margin: 0 auto;
-    padding: 14px 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 32px;
-  }
-  .top-bar-brand {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    text-decoration: none;
-    color: #fff;
-    font-weight: 700;
-    font-size: 18px;
-  }
-  .brand-icon {
-    font-size: 20px;
-    color: var(--teal-l);
-  }
-  .top-bar-nav {
-    display: flex;
-    gap: 28px;
-    margin-right: auto;
-  }
-  .top-bar-nav a {
-    color: var(--muted);
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 500;
-    transition: color 0.2s;
-  }
-  .top-bar-nav a:hover {
-    color: #fff;
-  }
-  .nav-cta-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: #fff;
-    color: var(--dg);
-    padding: 8px 16px;
-    border-radius: 99px;
-    font-size: 13px;
-    font-weight: 700;
-    text-decoration: none;
-    transition: transform 0.2s;
-  }
-  .nav-cta-btn:hover {
-    transform: scale(1.04);
   }
 
   /* BUTTONS */
@@ -371,10 +289,6 @@ const breadcrumbs = [
     color: var(--teal-l);
   }
 
-  @media (max-width: 900px) {
-    .top-bar-nav { display: none; }
-  }
-
   @media (max-width: 768px) {
     .event-package-body {
       grid-template-columns: 1fr;
@@ -385,9 +299,7 @@ const breadcrumbs = [
       align-items: center;
       text-align: center;
       gap: 16px;
-    }
-  }
-</style>
+    }}</style>
 
 <script>
   // ═══ SCROLL REVEAL ═══

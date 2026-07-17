@@ -4,9 +4,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 
 const lineUrl = "https://www.fitkub.com/order/d6c2c53b-a627-4cc1-bb14-5fa3c0338bbe";
 const promptpayNumber = "087-748-4066";
-const productPrice = 459;
-const originalPrice = 545;
-const discountPercent = 15;
+const productPrice = 495;
 
 const breadcrumbs = [
   { name: "หน้าแรก", url: "https://drtim.co/" },
@@ -100,17 +98,9 @@ const breadcrumbs = [
 
           <!-- Pricing -->
           <div class="ck-pricing">
-            <div class="ck-price-row">
-              <span>ราคาปกติ</span>
-              <span class="ck-price-original">฿{originalPrice.toLocaleString()}</span>
-            </div>
-            <div class="ck-price-row ck-discount-row">
-              <span>🎉 ส่วนลด Early Bird (-{discountPercent}%)</span>
-              <span class="ck-price-discount">-฿{(originalPrice - productPrice).toLocaleString()}</span>
-            </div>
             <div class="ck-price-divider"></div>
             <div class="ck-price-row ck-total-row">
-              <span>ยอดชำระทั้งหมด</span>
+              <span>ราคาคู่มือและสิทธิ์ใช้งาน</span>
               <span class="ck-price-total">฿{productPrice.toLocaleString()}</span>
             </div>
           </div>
@@ -373,24 +363,6 @@ const breadcrumbs = [
           <p class="ck-guarantee-desc">หากอ่านแล้วไม่พึงพอใจ สามารถขอคืนเงินเต็มจำนวนภายใน 7 วันหลังซื้อ โดยไม่ต้องระบุเหตุผล</p>
         </div>
 
-        <!-- SOCIAL PROOF MINI -->
-        <div class="ck-card ck-social-card">
-          <div class="ck-social-row">
-            <div class="ck-avatars">
-              <span class="ck-mini-avatar" style="background:#14b8a6">ก</span>
-              <span class="ck-mini-avatar" style="background:#f59e0b">ว</span>
-              <span class="ck-mini-avatar" style="background:#8b5cf6">ส</span>
-              <span class="ck-mini-avatar" style="background:#ec4899">น</span>
-            </div>
-            <div class="ck-social-text">
-              <strong>1,200+ คน</strong> ลงทะเบียนรอแล้ว
-              <span class="ck-social-live">
-                <span class="ck-pulse"></span>
-                <span id="ck-live-count">3</span> คนกำลังดูหน้านี้
-              </span>
-            </div>
-          </div>
-        </div>
       </div>
 
     </div>
@@ -399,7 +371,6 @@ const breadcrumbs = [
   <!-- MOBILE STICKY CTA -->
   <div class="ck-mobile-sticky">
     <div class="ck-mobile-sticky-price">
-      <span class="ck-ms-original">฿{originalPrice.toLocaleString()}</span>
       <span class="ck-ms-total">฿{productPrice.toLocaleString()}</span>
     </div>
     <a href={lineUrl} target="_blank" rel="noopener" class="ck-mobile-sticky-btn">
@@ -1234,54 +1205,6 @@ const breadcrumbs = [
   line-height: 1.7;
 }
 
-/* SOCIAL CARD */
-.ck-social-card { padding: 20px 24px; }
-.ck-social-row {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-.ck-avatars {
-  display: flex;
-}
-.ck-mini-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-size: 13px;
-  font-weight: 700;
-  margin-right: -8px;
-  border: 2px solid var(--ck-bg);
-}
-.ck-social-text {
-  font-size: 13px;
-  color: var(--ck-muted);
-}
-.ck-social-text strong { color: #fff; }
-.ck-social-live {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 4px;
-  font-size: 12px;
-  color: var(--ck-teal-l);
-}
-.ck-pulse {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--ck-teal-l);
-  animation: livePulse 2s ease-in-out infinite;
-}
-@keyframes livePulse {
-  0%,100% { opacity: 1; box-shadow: 0 0 0 0 rgba(20,184,166,.5); }
-  50% { opacity: .6; box-shadow: 0 0 0 6px rgba(20,184,166,0); }
-}
-
 /* MOBILE STICKY */
 .ck-mobile-sticky {
   position: fixed;
@@ -1297,12 +1220,6 @@ const breadcrumbs = [
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-top: 1px solid var(--ck-brd);
-}
-.ck-ms-original {
-  font-size: 13px;
-  color: rgba(255,255,255,.35);
-  text-decoration: line-through;
-  display: block;
 }
 .ck-ms-total {
   font-size: 20px;
@@ -1579,15 +1496,6 @@ const breadcrumbs = [
           }, 2000);
         });
       });
-    }
-
-    // ═══ LIVE VIEWER COUNT (Social Proof) ═══
-    var liveCount = document.getElementById('ck-live-count');
-    if (liveCount) {
-      setInterval(function() {
-        var n = Math.floor(Math.random() * 5) + 2;
-        liveCount.textContent = String(n);
-      }, 8000);
     }
 
     // ═══ ENTRANCE ANIMATIONS ═══

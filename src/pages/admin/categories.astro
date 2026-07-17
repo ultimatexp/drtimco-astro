@@ -92,59 +92,14 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
         gap: 4px;
     }
 
-    .form-input {
-        padding: 10px;
-        border: 1px solid var(--border);
-        border-radius: 6px;
-        font-size: 0.95rem;
-        background: var(--bg-surface);
-        color: var(--text-main);
-    }
-
-    .data-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    .data-table th, .data-table td {
-        padding: 12px 16px;
-        border-bottom: 1px solid var(--border);
-        text-align: left;
-    }
-
-    .data-table th {
-        background-color: var(--bg-surface);
-        font-weight: 500;
-        font-size: 0.85rem;
-        color: var(--text-muted);
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-    }
-
-    .data-table tr:hover {
-        background-color: rgba(0, 0, 0, 0.01);
-    }
-
-    .btn-sm {
-        padding: 4px 8px;
-        font-size: 0.8rem;
-        border: 1px solid var(--border);
-        background: var(--bg-surface);
-        border-radius: 4px;
-        cursor: pointer;
-    }
-
-    .btn-sm:hover {
-        background: var(--border);
-    }
-
-    .btn-danger {
-        color: #ef4444;
-        border-color: #fca5a5;
-    }
-    
-    .btn-danger:hover {
-        background: #fee2e2;
+    /* .form-input, .data-table, .btn-sm and .btn-danger now come from
+       AdminLayout's global stylesheet. They cannot live here: the table rows
+       below are built with innerHTML, and Astro scoped styles only match
+       elements carrying its data-astro-cid attribute, which injected markup
+       never has — so scoping them left the buttons visually unstyled. */
+    .table-card {
+        padding: 0;
+        overflow: hidden;
     }
 </style>
 
@@ -180,10 +135,12 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
         tbody.innerHTML = categories.map(cat => `
             <tr data-id="${cat.id}">
                 <td>${cat.name}</td>
-                <td><code style="background:var(--bg-base); padding:2px 6px; border-radius:4px;">${cat.slug}</code></td>
-                <td style="text-align: right; display:flex; gap:8px; justify-content:flex-end;">
-                    <button class="btn-sm edit-btn" data-id="${cat.id}">Edit</button>
-                    <button class="btn-sm btn-danger del-btn" data-id="${cat.id}">Delete</button>
+                <td><code>${cat.slug}</code></td>
+                <td>
+                    <div class="cell-actions">
+                        <button class="btn-sm edit-btn" data-id="${cat.id}">Edit</button>
+                        <button class="btn-sm btn-danger del-btn" data-id="${cat.id}">Delete</button>
+                    </div>
                 </td>
             </tr>
         `).join('');

@@ -1,17 +1,40 @@
+# robots.txt — drtim.co
+# NOTE: directives must sit directly under their User-agent line with no
+# blank lines inside a group, or crawlers ignore them.
+
+# ── Default: allow all reputable crawlers, block private/non-content areas ──
 User-agent: *
 Allow: /
-
-# Sitemaps
-Sitemap: https://drtim.co/sitemap-index.xml
-
-# AI Crawler Info
-LLMs: https://drtim.co/llms.txt
-
-# Crawl-delay (optional, for politeness)
-Crawl-delay: 1
-
-# Block admin/scripts paths
+Disallow: /admin/
+Disallow: /api/
 Disallow: /scripts/
 Disallow: /farmx/
 Disallow: /wp-admin/
 Disallow: /wp-content/plugins/
+
+# ── AI / LLM crawlers — explicitly welcomed for AI search & citations (GEO) ──
+User-agent: GPTBot
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: ClaudeBot
+User-agent: Claude-Web
+User-agent: anthropic-ai
+User-agent: PerplexityBot
+User-agent: Perplexity-User
+User-agent: Google-Extended
+User-agent: Applebot-Extended
+User-agent: Amazonbot
+User-agent: Meta-ExternalAgent
+User-agent: cohere-ai
+User-agent: CCBot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /scripts/
+Disallow: /farmx/
+Disallow: /wp-admin/
+Disallow: /wp-content/plugins/
+
+# ── Discovery ──
+Sitemap: https://drtim.co/sitemap-index.xml
+LLMs: https://drtim.co/llms.txt

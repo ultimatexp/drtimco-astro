@@ -99,6 +99,10 @@ if (DATABASE_URL) {
                     <button class="toolbar-btn" type="button" data-command="deleteCol" title="Delete Column">- Col</button>
                     <button class="toolbar-btn toolbar-btn-danger" type="button" data-command="deleteTable" title="Delete Table">Delete Table</button>
                 </div>
+                <div class="toolbar-divider"></div>
+                <div class="toolbar-group">
+                    <button class="toolbar-btn toolbar-btn-ai" type="button" id="btnAiCorrectSpelling" title="AI Correct Spelling">✨ Correct Spelling</button>
+                </div>
             </div>
 
             <!-- Title Input -->
@@ -173,8 +177,12 @@ if (DATABASE_URL) {
                 </div>
                 <!-- Hidden file input for featured image -->
                 <input type="file" id="featuredFileInput" accept="image/*" style="display:none;" />
+                <button id="btnAiGenerateImage" class="btn-ai-generate-image" type="button" style="margin-top: 8px;">
+                    ✨ AI Generate Image (1:1)
+                </button>
+                <div id="aiImageStatus" class="ai-status" style="margin-top: 6px;"></div>
                 {article.featured_image_url && (
-                    <img id="featuredImagePreview" src={article.featured_image_url} alt="Preview" class="featured-preview" />
+                    <img id="featuredImagePreview" src={article.featured_image_url} alt="Preview" class="featured-preview" style="margin-top: 8px;" />
                 )}
             </div>
 
@@ -224,6 +232,69 @@ if (DATABASE_URL) {
                 <div id="previewDirectAnswer" class="preview-direct-answer" hidden></div>
                 <div id="previewBody" class="preview-body"></div>
             </article>
+        </div>
+    </div>
+
+    <!-- AI Spelling Review Modal -->
+    <div id="spellingModal" class="preview-modal" role="dialog" aria-modal="true" aria-labelledby="spellingTitle" hidden>
+        <div class="preview-backdrop" id="btnCancelSpellingBackdrop"></div>
+        <div class="preview-dialog" style="width: min(600px, 95vw); background-color: var(--bg-surface); color: var(--text-main);">
+            <div class="preview-toolbar" style="border-bottom: 1px solid var(--border); padding: 16px 24px; background-color: var(--bg-surface);">
+                <div>
+                    <div class="editor-kicker" style="color: #6366f1;">AI Spelling Correction</div>
+                    <h2 id="spellingTitle" style="font-size: 1.25rem; font-weight: 600; margin: 4px 0 0 0; color: var(--text-main);">Review Spelling Changes</h2>
+                </div>
+                <button id="btnCloseSpellingModal" class="btn-secondary" type="button">Close</button>
+            </div>
+            <div style="padding: 24px; overflow-y: auto; max-height: 400px; display: flex; flex-direction: column; gap: 16px;">
+                <p style="margin: 0; color: var(--text-muted); font-size: 0.95rem; line-height: 1.5;">
+                    The AI found the following spelling mistakes or typos. Review the corrections below before applying them to your article.
+                </p>
+                <div style="border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background-color: var(--bg-base);">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
+                        <thead>
+                            <tr style="background-color: var(--border); border-bottom: 1px solid var(--border);">
+                                <th style="padding: 12px 16px; font-weight: 600; color: var(--text-main); width: 50%;">Original Text</th>
+                                <th style="padding: 12px 16px; font-weight: 600; color: var(--text-main); width: 50%;">Corrected Text</th>
+                            </tr>
+                        </thead>
+                        <tbody id="spellingCorrectionsBody">
+                            <!-- Rows will be dynamically added by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 12px; padding: 16px 24px; background-color: var(--border); border-top: 1px solid var(--border);">
+                <button id="btnCancelSpelling" class="btn-secondary" type="button">Cancel</button>
+                <button id="btnApplySpelling" class="btn-primary" type="button" style="background: linear-gradient(135deg, #4f46e5 0%, #0ea5e9 100%); border: none;">Apply Corrections</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Image Prompt Modal -->
+    <div id="imagePromptModal" class="preview-modal" role="dialog" aria-modal="true" aria-labelledby="imagePromptTitle" hidden>
+        <div class="preview-backdrop" id="btnCancelImagePromptBackdrop"></div>
+        <div class="preview-dialog" style="width: min(600px, 95vw); background-color: var(--bg-surface); color: var(--text-main);">
+            <div class="preview-toolbar" style="border-bottom: 1px solid var(--border); padding: 16px 24px; background-color: var(--bg-surface);">
+                <div>
+                    <div class="editor-kicker" style="color: #0ea5e9;">AI Image Generator</div>
+                    <h2 id="imagePromptTitle" style="font-size: 1.25rem; font-weight: 600; margin: 4px 0 0 0; color: var(--text-main);">Review & Edit Image Prompt</h2>
+                </div>
+                <button id="btnCloseImagePromptModal" class="btn-secondary" type="button">Close</button>
+            </div>
+            <div style="padding: 24px; display: flex; flex-direction: column; gap: 16px;">
+                <p style="margin: 0; color: var(--text-muted); font-size: 0.95rem; line-height: 1.5;">
+                    The AI generated this prompt representing you (Dr. Tim) in a clinical, scientific environment. You can customize the description before generating the image.
+                </p>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <label for="txtImagePrompt" style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">Visual Prompt (English):</label>
+                    <textarea id="txtImagePrompt" style="width: 100%; height: 140px; padding: 12px; border: 1px solid var(--border); border-radius: 6px; background-color: var(--bg-base); color: var(--text-main); font-family: inherit; font-size: 0.9rem; resize: vertical; line-height: 1.5; outline: none;"></textarea>
+                </div>
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 12px; padding: 16px 24px; background-color: var(--border); border-top: 1px solid var(--border);">
+                <button id="btnCancelImagePrompt" class="btn-secondary" type="button">Cancel</button>
+                <button id="btnSubmitImagePrompt" class="btn-primary" type="button" style="background: linear-gradient(135deg, #4f46e5 0%, #0ea5e9 100%); border: none;">Generate Image</button>
+            </div>
         </div>
     </div>
 </AdminLayout>
@@ -341,7 +412,7 @@ if (DATABASE_URL) {
     
     .toolbar-btn.is-active {
         background-color: rgba(59, 130, 246, 0.2);
-        color: var(--primary);
+        color: var(--primary-text);
         border-color: rgba(59, 130, 246, 0.48);
     }
 
@@ -428,7 +499,7 @@ if (DATABASE_URL) {
     }
 
     .tiptap-editor-container .ProseMirror a {
-        color: var(--primary);
+        color: var(--primary-text);
         text-decoration: underline;
     }
 
@@ -522,7 +593,9 @@ if (DATABASE_URL) {
     }
 
     .tiptap-editor-container .ProseMirror pre {
-        background: #0f172a;
+        /* Token, not #0f172a: the text colour is themed, so a fixed dark
+           background made code blocks unreadable in light mode. */
+        background: var(--bg-inset);
         border: 1px solid var(--border);
         border-radius: 8px;
         padding: 16px;
@@ -988,6 +1061,45 @@ if (DATABASE_URL) {
         to { transform: rotate(360deg); }
     }
 
+    .toolbar-btn-ai {
+        background-color: rgba(99, 102, 241, 0.12) !important;
+        border-color: rgba(99, 102, 241, 0.3) !important;
+        color: #a5b4fc !important;
+        font-weight: 600 !important;
+    }
+    .toolbar-btn-ai:hover {
+        background-color: rgba(99, 102, 241, 0.25) !important;
+        border-color: rgba(99, 102, 241, 0.6) !important;
+        color: #fff !important;
+    }
+
+    .btn-ai-generate-image {
+        width: 100%;
+        padding: 10px 14px;
+        background: linear-gradient(135deg, #4f46e5, #0ea5e9);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 0.88rem;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        transition: opacity 0.2s, transform 0.2s;
+        font-family: inherit;
+    }
+    .btn-ai-generate-image:hover {
+        opacity: 0.9;
+        transform: translateY(-1px);
+    }
+    .btn-ai-generate-image:disabled {
+        opacity: 0.7;
+        cursor: wait;
+        transform: none;
+    }
+
     /* Category Combo Dropdown */
     .category-combo {
         position: relative;
@@ -1134,45 +1246,81 @@ if (DATABASE_URL) {
     });
 
     // Initialize Editor
-    const initialContent = document.getElementById('initialContent').value;
-    
-    // We export editor to window so button clicks can access it
-    window.tiptapEditor = new Editor({
-        element: document.getElementById('editorContent'),
-        extensions: [
-            CTAButton,
-            StarterKit,
-            Underline,
-            Link.configure({
-                openOnClick: false,
-                HTMLAttributes: {
-                    class: 'tiptap-link',
-                },
-            }),
-            Image.configure({
-                inline: true,
-                allowBase64: true,
-            }),
-            Placeholder.configure({
-                placeholder: 'Start writing your article here...',
-            }),
-            Table.configure({
-                resizable: true,
-                HTMLAttributes: { class: 'tiptap-table' },
-            }),
-            TableRow,
-            TableCell,
-            TableHeader
-        ],
-        content: initialContent,
-        onUpdate: ({ editor }) => {
-            updateToolbarState(editor);
-            triggerAutosave();
-        },
-        onSelectionUpdate: ({ editor }) => {
-            updateToolbarState(editor);
+    let editor;
+    try {
+        const initialContentElement = document.getElementById('initialContent');
+        const initialContent = initialContentElement ? initialContentElement.value : '';
+        const editorContentElement = document.getElementById('editorContent');
+        
+        if (!editorContentElement) {
+            throw new Error("Editor container element (#editorContent) not found in DOM.");
         }
-    });
+
+        console.log('[TipTap] Initializing editor with content length:', initialContent.length);
+
+        editor = new Editor({
+            element: editorContentElement,
+            extensions: [
+                CTAButton,
+                StarterKit.configure({
+                    link: false,
+                    underline: false,
+                }),
+                Underline,
+                Link.configure({
+                    openOnClick: false,
+                    HTMLAttributes: {
+                        class: 'tiptap-link',
+                    },
+                }),
+                Image.configure({
+                    inline: true,
+                    allowBase64: true,
+                }),
+                Placeholder.configure({
+                    placeholder: 'Start writing your article here...',
+                    emptyNodeClass: 'is-editor-empty',
+                }),
+                Table.configure({
+                    resizable: true,
+                    HTMLAttributes: { class: 'tiptap-table' },
+                }),
+                TableRow,
+                TableCell,
+                TableHeader
+            ],
+            content: initialContent,
+            onUpdate: ({ editor }) => {
+                updateToolbarState(editor);
+                triggerAutosave();
+            },
+            onSelectionUpdate: ({ editor }) => {
+                updateToolbarState(editor);
+            }
+        });
+
+        window.tiptapEditor = editor;
+        console.log('[TipTap] Editor initialized successfully');
+    } catch (err) {
+        console.error('[TipTap] Failed to initialize TipTap editor:', err);
+        const container = document.getElementById('editorContent');
+        if (container) {
+            container.innerHTML = `
+                <div class="editor-init-error" style="padding: 24px; border: 2px dashed var(--danger); border-radius: 8px; background-color: rgba(239, 68, 68, 0.05); color: #fca5a5; margin: 20px 0; font-family: sans-serif;">
+                    <h3 style="margin-top: 0; color: #ef4444; font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
+                        ⚠️ Failed to load text editor
+                    </h3>
+                    <p style="font-size: 0.9rem; margin: 8px 0 16px 0; line-height: 1.5;">
+                        An error occurred while loading the editing component. The rest of the page features (like imports) remain available.
+                    </p>
+                    <details style="font-size: 0.8rem; cursor: pointer; background: rgba(0, 0, 0, 0.2); padding: 12px; border-radius: 4px;">
+                        <summary style="font-weight: 600; outline: none; margin-bottom: 6px;">Error Details</summary>
+                        <pre style="white-space: pre-wrap; font-family: monospace; overflow-x: auto; margin: 0; color: #f8fafc; line-height: 1.4;">\${err.stack || err.message || err}</pre>
+                    </details>
+                </div>
+            `;
+        }
+    }
 
     // Toolbar logic
     function updateToolbarState(editor) {
@@ -1434,16 +1582,39 @@ if (DATABASE_URL) {
 
     // Save Logic (Draft and Publish)
     let autosaveTimeout = null;
+    let isDirty = false;
     const saveStatus = document.getElementById('saveStatus');
 
+    // A brand-new article can only be created once it has both a title and some
+    // content: the database requires a non-empty, unique slug (derived from the
+    // title) and create-article rejects an empty body. Until then autosave would
+    // either error or leave an empty row behind, so we hold off and say so.
+    function newDraftBlocker() {
+        if (document.getElementById('articleId').value) return null;
+        if (!titleInput.value.trim()) return 'Add a title to enable autosave';
+        const text = window.tiptapEditor ? window.tiptapEditor.getText().trim() : '';
+        if (!text) return 'Add some content to enable autosave';
+        return null;
+    }
+
     function triggerAutosave() {
-        if (!document.getElementById('articleId').value) return; // Don't autosave purely new unsaved articles yet
-        saveStatus.textContent = 'Unsaved changes...';
+        isDirty = true;
+        const blocker = newDraftBlocker();
+        saveStatus.textContent = blocker ? `Unsaved — ${blocker.toLowerCase()}` : 'Unsaved changes...';
         clearTimeout(autosaveTimeout);
         autosaveTimeout = setTimeout(() => {
+            // Re-check at fire time: the title may have arrived since.
+            if (newDraftBlocker()) return;
             saveArticle(false);
         }, 30000); // 30 sec autosave debounce
     }
+
+    // Autosave is debounced, so a tab closed mid-edit can still lose work.
+    window.addEventListener('beforeunload', (e) => {
+        if (!isDirty) return;
+        e.preventDefault();
+        e.returnValue = '';
+    });
 
     async function saveArticle(isPublishAction = false) {
         saveStatus.textContent = 'Saving...';
@@ -1451,7 +1622,7 @@ if (DATABASE_URL) {
         // Gather data
         const id = document.getElementById('articleId').value;
         const title = titleInput.value;
-        const content = window.tiptapEditor.getHTML();
+        const content = window.tiptapEditor ? window.tiptapEditor.getHTML() : '';
         
         let status = document.getElementById('articleStatus').value;
         if (isPublishAction && status === 'draft') {
@@ -1486,23 +1657,59 @@ if (DATABASE_URL) {
             if (data.success) {
                 const now = new Date();
                 saveStatus.textContent = `Saved at ${now.toLocaleTimeString()}`;
-                
+                isDirty = false;
+                clearTimeout(autosaveTimeout);
+
                 // If it was new, set the ID
                 if (!id && data.article && data.article.id) {
                     document.getElementById('articleId').value = data.article.id;
                     // Update URL without reload
                     window.history.replaceState({}, '', `/admin/editor?id=${data.article.id}`);
                 }
+                return true;
             } else {
                 saveStatus.textContent = `Error: ${data.error || 'Failed to save'}`;
+                return false;
             }
         } catch (err) {
             saveStatus.textContent = 'Network error saving draft.';
+            return false;
+        }
+    }
+
+    // Saving only writes to the database — the public blog is prerendered from
+    // posts.json at build time, so a published article is not live until the
+    // site rebuilds. Publishing therefore kicks off a deploy.
+    async function triggerDeploy() {
+        const btnPublish = document.getElementById('btnPublish');
+        const previous = btnPublish.textContent;
+        btnPublish.disabled = true;
+        btnPublish.textContent = 'Deploying…';
+        saveStatus.textContent = '🚀 Saved. Starting site rebuild…';
+
+        try {
+            const res = await fetch('/api/admin/deploy', { method: 'POST' });
+            const data = await res.json().catch(() => ({}));
+
+            if (data.success) {
+                saveStatus.textContent = '🚀 Published — site is rebuilding, live in ~2 minutes.';
+            } else {
+                // The article is saved either way; only the rebuild failed.
+                saveStatus.textContent = `Saved, but the rebuild did not start: ${data.error || res.status}`;
+            }
+        } catch (err) {
+            saveStatus.textContent = `Saved, but the rebuild request failed: ${err.message}`;
+        } finally {
+            btnPublish.disabled = false;
+            btnPublish.textContent = previous;
         }
     }
 
     document.getElementById('btnSaveDraft').addEventListener('click', () => saveArticle(false));
-    document.getElementById('btnPublish').addEventListener('click', () => saveArticle(true));
+    document.getElementById('btnPublish').addEventListener('click', async () => {
+        const saved = await saveArticle(true);
+        if (saved) await triggerDeploy();
+    });
 
     // ── Facebook Import ──────────────────────────────────────
     const facebookImportUrl = document.getElementById('facebookImportUrl');
@@ -1520,7 +1727,7 @@ if (DATABASE_URL) {
         }
 
         btnFacebookImport.disabled = true;
-        btnFacebookImport.textContent = 'Importing...';
+        btnFacebookImport.innerHTML = '<span class="ai-spinner"></span> Importing...';
         facebookImportStatus.textContent = 'Fetching post and creating draft...';
         facebookImportStatus.style.color = 'var(--text-muted)';
 
@@ -1728,6 +1935,250 @@ if (DATABASE_URL) {
             closeDropdown();
         }
     });
+
+    // ── AI Correct Spelling ──────────────────────────────────
+    const btnAiCorrectSpelling = document.getElementById('btnAiCorrectSpelling');
+    const spellingModal = document.getElementById('spellingModal');
+    const spellingCorrectionsBody = document.getElementById('spellingCorrectionsBody');
+    const btnCancelSpelling = document.getElementById('btnCancelSpelling');
+    const btnCancelSpellingBackdrop = document.getElementById('btnCancelSpellingBackdrop');
+    const btnCloseSpellingModal = document.getElementById('btnCloseSpellingModal');
+    const btnApplySpelling = document.getElementById('btnApplySpelling');
+
+    let pendingCorrectedHtml = '';
+
+    const closeSpellingModal = () => {
+        if (spellingModal) spellingModal.hidden = true;
+    };
+
+    if (btnCancelSpelling) btnCancelSpelling.addEventListener('click', closeSpellingModal);
+    if (btnCancelSpellingBackdrop) btnCancelSpellingBackdrop.addEventListener('click', closeSpellingModal);
+    if (btnCloseSpellingModal) btnCloseSpellingModal.addEventListener('click', closeSpellingModal);
+
+    if (btnApplySpelling) {
+        btnApplySpelling.addEventListener('click', () => {
+            if (window.tiptapEditor && pendingCorrectedHtml) {
+                window.tiptapEditor.commands.setContent(pendingCorrectedHtml);
+                console.log('[AI Spelling] Applied corrected HTML');
+                triggerAutosave();
+            }
+            closeSpellingModal();
+        });
+    }
+
+    if (btnAiCorrectSpelling) {
+        btnAiCorrectSpelling.addEventListener('click', async () => {
+            if (!window.tiptapEditor) return;
+            const content = window.tiptapEditor.getHTML();
+
+            if (!content || content === '<p></p>') {
+                alert('Write some content first.');
+                return;
+            }
+
+            const originalText = btnAiCorrectSpelling.innerHTML;
+            btnAiCorrectSpelling.disabled = true;
+            btnAiCorrectSpelling.innerHTML = '<span class="ai-spinner"></span> Correcting...';
+
+            try {
+                const res = await fetch('/api/admin/ai-correct-spelling', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content })
+                });
+
+                const data = await res.json();
+                if (data.success && data.correctedHtml) {
+                    pendingCorrectedHtml = data.correctedHtml;
+                    const corrections = data.corrections || [];
+
+                    if (corrections.length === 0) {
+                        alert('No spelling issues found. Your content is clean!');
+                    } else {
+                        // Populate modal table
+                        if (spellingCorrectionsBody) {
+                            spellingCorrectionsBody.innerHTML = '';
+                            corrections.forEach(item => {
+                                const tr = document.createElement('tr');
+                                tr.style.borderBottom = '1px solid var(--border)';
+
+                                const tdOrig = document.createElement('td');
+                                tdOrig.style.padding = '12px 16px';
+                                tdOrig.style.color = '#ef4444'; // red
+                                tdOrig.style.fontWeight = '500';
+                                tdOrig.textContent = item.original;
+
+                                const tdCorr = document.createElement('td');
+                                tdCorr.style.padding = '12px 16px';
+                                tdCorr.style.color = '#22c55e'; // green
+                                tdCorr.style.fontWeight = '600';
+                                tdCorr.textContent = item.corrected;
+
+                                tr.appendChild(tdOrig);
+                                tr.appendChild(tdCorr);
+                                spellingCorrectionsBody.appendChild(tr);
+                            });
+                        }
+                        if (spellingModal) {
+                            spellingModal.hidden = false;
+                        }
+                    }
+                } else {
+                    alert('Spelling correction failed: ' + (data.error || 'Unknown error'));
+                }
+            } catch (err) {
+                console.error('[AI Spelling] Error:', err);
+                alert('Network error during spelling correction: ' + err.message);
+            } finally {
+                btnAiCorrectSpelling.disabled = false;
+                btnAiCorrectSpelling.innerHTML = originalText;
+            }
+        });
+    }
+
+    // ── AI Generate Image ────────────────────────────────────
+    const btnAiGenerateImage = document.getElementById('btnAiGenerateImage');
+    const aiImageStatus = document.getElementById('aiImageStatus');
+    const imagePromptModal = document.getElementById('imagePromptModal');
+    const txtImagePrompt = document.getElementById('txtImagePrompt');
+    const btnCancelImagePrompt = document.getElementById('btnCancelImagePrompt');
+    const btnCancelImagePromptBackdrop = document.getElementById('btnCancelImagePromptBackdrop');
+    const btnCloseImagePromptModal = document.getElementById('btnCloseImagePromptModal');
+    const btnSubmitImagePrompt = document.getElementById('btnSubmitImagePrompt');
+
+    const closeImagePromptModal = () => {
+        if (imagePromptModal) imagePromptModal.hidden = true;
+    };
+
+    if (btnCancelImagePrompt) btnCancelImagePrompt.addEventListener('click', closeImagePromptModal);
+    if (btnCancelImagePromptBackdrop) btnCancelImagePromptBackdrop.addEventListener('click', closeImagePromptModal);
+    if (btnCloseImagePromptModal) btnCloseImagePromptModal.addEventListener('click', closeImagePromptModal);
+
+    if (btnAiGenerateImage) {
+        btnAiGenerateImage.addEventListener('click', async () => {
+            const title = titleInput.value.trim();
+            const content = window.tiptapEditor ? window.tiptapEditor.getHTML() : '';
+
+            if (!title && !content) {
+                if (aiImageStatus) {
+                    aiImageStatus.textContent = 'Write a title or content first';
+                    aiImageStatus.style.color = 'var(--warning)';
+                }
+                return;
+            }
+
+            const originalText = btnAiGenerateImage.innerHTML;
+            btnAiGenerateImage.disabled = true;
+            btnAiGenerateImage.innerHTML = '<span class="ai-spinner"></span> Generating Prompt...';
+            if (aiImageStatus) {
+                aiImageStatus.textContent = 'Analyzing content and creating prompt...';
+                aiImageStatus.style.color = 'var(--text-muted)';
+            }
+
+            try {
+                const res = await fetch('/api/admin/ai-generate-prompt', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, content })
+                });
+
+                const data = await res.json();
+                if (data.success && data.prompt) {
+                    if (txtImagePrompt) {
+                        txtImagePrompt.value = data.prompt;
+                    }
+                    if (imagePromptModal) {
+                        imagePromptModal.hidden = false;
+                    }
+                    if (aiImageStatus) {
+                        aiImageStatus.textContent = 'Prompt created. Review and confirm to generate image.';
+                        aiImageStatus.style.color = 'var(--text-muted)';
+                    }
+                } else {
+                    if (aiImageStatus) {
+                        aiImageStatus.textContent = data.error || 'Failed to create prompt';
+                        aiImageStatus.style.color = 'var(--danger)';
+                    }
+                }
+            } catch (err) {
+                console.error('[AI Image Prompt] Error:', err);
+                if (aiImageStatus) {
+                    aiImageStatus.textContent = 'Network error: ' + err.message;
+                    aiImageStatus.style.color = 'var(--danger)';
+                }
+            } finally {
+                btnAiGenerateImage.disabled = false;
+                btnAiGenerateImage.innerHTML = originalText;
+            }
+        });
+    }
+
+    if (btnSubmitImagePrompt) {
+        btnSubmitImagePrompt.addEventListener('click', async () => {
+            if (!txtImagePrompt) return;
+            const prompt = txtImagePrompt.value.trim();
+
+            if (!prompt) {
+                alert('Prompt cannot be empty');
+                return;
+            }
+
+            const originalText = btnSubmitImagePrompt.innerHTML;
+            btnSubmitImagePrompt.disabled = true;
+            btnSubmitImagePrompt.innerHTML = '<span class="ai-spinner"></span> Generating Image...';
+            if (aiImageStatus) {
+                aiImageStatus.textContent = 'Generating 1:1 scientific featured image...';
+                aiImageStatus.style.color = 'var(--text-muted)';
+            }
+
+            try {
+                const res = await fetch('/api/admin/ai-generate-image', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt })
+                });
+
+                const data = await res.json();
+                if (data.success && data.url) {
+                    if (featuredImageInput) {
+                        featuredImageInput.value = data.url;
+                    }
+                    if (featuredImagePreview) {
+                        featuredImagePreview.src = data.url;
+                        featuredImagePreview.style.display = 'block';
+                    } else {
+                        // Create preview if it didn't exist
+                        const img = document.createElement('img');
+                        img.id = 'featuredImagePreview';
+                        img.src = data.url;
+                        img.className = 'featured-preview';
+                        img.style.marginTop = '8px';
+                        btnAiGenerateImage.after(img);
+                    }
+                    if (aiImageStatus) {
+                        aiImageStatus.innerHTML = `Image generated & uploaded successfully!<br><span style="display: block; margin-top: 6px; font-size: 0.8rem; line-height: 1.4; color: var(--text-muted); font-style: italic;">Prompt: "${data.prompt}"</span>`;
+                        aiImageStatus.style.color = 'var(--success)';
+                    }
+                    triggerAutosave();
+                    closeImagePromptModal();
+                } else {
+                    if (aiImageStatus) {
+                        aiImageStatus.textContent = data.error || 'Generation failed';
+                        aiImageStatus.style.color = 'var(--danger)';
+                    }
+                }
+            } catch (err) {
+                console.error('[AI Image Generate] Error:', err);
+                if (aiImageStatus) {
+                    aiImageStatus.textContent = 'Network error: ' + err.message;
+                    aiImageStatus.style.color = 'var(--danger)';
+                }
+            } finally {
+                btnSubmitImagePrompt.disabled = false;
+                btnSubmitImagePrompt.innerHTML = originalText;
+            }
+        });
+    }
 
     } // end initEditor
 

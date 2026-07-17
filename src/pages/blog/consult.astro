@@ -1,7 +1,6 @@
 ---
-// Compatibility route for browsers that cached the old /consult → /blog/consult redirect.
-export const prerender = true;
-import ConsultPage from "../consult.astro";
+// Compatibility route for browsers that cached the old /consult → /blog/consult
+// redirect. Redirects rather than re-rendering the page, so /consult is the only
+// URL serving this content (matches blog/diabetes-guide.astro).
+return Astro.redirect("/consult/", 308);
 ---
-
-<ConsultPage />

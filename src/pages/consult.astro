@@ -7,6 +7,7 @@ export const prerender = true;
  */
 import BaseLayout from "../layouts/BaseLayout.astro";
 import FAQSection from "../components/FAQSection.astro";
+import SiteHeader from "../components/SiteHeader.astro";
 
 const lineUrl = "https://lin.ee/3E7wEPz";
 const firstPrice = 2000;
@@ -61,20 +62,7 @@ const breadcrumbs = [
     directAnswer={`บริการปรึกษาส่วนตัวกับหมอทิม ครั้งแรก ${firstDuration} นาที ${firstPrice.toLocaleString()} บาท ครั้งถัดไป ${followUpDuration} นาที ${followUpPrice} บาท วิเคราะห์ผลเลือดอย่างเป็นระบบ ออกแบบแนวทางดูแลสุขภาพเฉพาะบุคคล นัดผ่าน LINE @Ultramed`}
 >
     <!-- ═══ STICKY TOP BAR ═══ -->
-    <header class="top-bar">
-        <div class="top-bar-inner">
-            <a href="/" class="top-bar-brand">
-                <span class="brand-icon">⚕</span>
-                <span class="brand-name">Dr. Tim</span>
-            </a>
-            <nav class="top-bar-nav">
-                <a href="/">หน้าแรก</a>
-                <a href="/cgm">คอร์ส CGM</a>
-                <a href="/diabetes-guide">หนังสือเบาหวานผอม</a>
-                <a href="/vip-coaching">VIP Coaching</a>
-            </nav>
-        </div>
-    </header>
+    <SiteHeader current="/consult" />
 
     <!-- ═══ SECTION 1: HERO ═══ -->
     <section class="hero" id="hero">
@@ -431,52 +419,6 @@ const breadcrumbs = [
         text-align: center;
         line-height: 1.7;
         margin-bottom: 48px;
-    }
-
-    /* TOP BAR */
-    .top-bar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        z-index: 100;
-        background: rgba(10, 15, 13, 0.85);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border-bottom: 1px solid var(--cgm-border);
-    }
-    .top-bar-inner {
-        max-width: var(--cgm-max);
-        margin: 0 auto;
-        padding: 12px 24px;
-        display: flex;
-        align-items: center;
-        gap: 24px;
-    }
-    .top-bar-brand {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        color: white;
-        font-weight: 700;
-        font-size: 16px;
-    }
-    .brand-icon {
-        font-size: 20px;
-    }
-    .top-bar-nav {
-        display: flex;
-        gap: 20px;
-        margin-right: auto;
-    }
-    .top-bar-nav a {
-        font-size: 13px;
-        font-weight: 500;
-        color: var(--cgm-text-muted);
-        transition: color 200ms;
-    }
-    .top-bar-nav a:hover {
-        color: white;
     }
 
     /* HERO */
@@ -1089,8 +1031,7 @@ const breadcrumbs = [
         }
         .pricing-amount {
             font-size: 44px;
-        }
-    }
+        }}
 
     @media (max-width: 480px) {
         .hero-title {
@@ -1101,6 +1042,4 @@ const breadcrumbs = [
         }
         .price-number {
             font-size: 30px;
-        }
-    }
-</style>
+        }}</style>

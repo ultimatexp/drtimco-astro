@@ -42,10 +42,13 @@ const sql = neon(DATABASE_URL);
 async function syncArticles() {
     console.log('🔄 Syncing approved articles from Neon DB...\n');
 
-    // 1. Fetch approved/published articles
+    // 1. Fetch approved/published articles.
+    //    deleted_at IS NULL matters: without it a trashed article would keep
+    //    syncing into posts.json and stay live on the next deploy.
     const articles = await sql`
-    SELECT * FROM article_drafts 
+    SELECT * FROM article_drafts
     WHERE status IN ('approved', 'published')
+      AND deleted_at IS NULL
     ORDER BY published_at DESC
   `;
 

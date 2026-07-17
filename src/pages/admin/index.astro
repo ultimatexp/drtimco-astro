@@ -11,10 +11,11 @@ if (DATABASE_URL) {
     try {
         const sql = neon(DATABASE_URL);
         
-        // Get counts
+        // Get counts (trashed articles are excluded from every stat)
         const counts = await sql`
-            SELECT status, COUNT(*) as count 
-            FROM article_drafts 
+            SELECT status, COUNT(*) as count
+            FROM article_drafts
+            WHERE deleted_at IS NULL
             GROUP BY status
         `;
         
@@ -30,6 +31,7 @@ if (DATABASE_URL) {
         recentActivity = await sql`
             SELECT id, title, status, created_at, reviewed_at
             FROM article_drafts
+            WHERE deleted_at IS NULL
             ORDER BY GREATEST(created_at, reviewed_at) DESC NULLS LAST
             LIMIT 5
         `;
@@ -213,7 +215,7 @@ if (DATABASE_URL) {
     }
 
     .btn-text {
-        color: var(--primary);
+        color: var(--primary-text);
         text-decoration: none;
         font-size: 0.875rem;
         font-weight: 500;
@@ -271,7 +273,7 @@ if (DATABASE_URL) {
     }
 
     .activity-title:hover {
-        color: var(--primary);
+        color: var(--primary-text);
     }
 
     .activity-meta {
@@ -295,18 +297,7 @@ if (DATABASE_URL) {
     .badge[data-status="draft"]     { background: rgba(148, 163, 184, 0.1); color: var(--text-muted); }
     .badge[data-status="rejected"]  { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
 
-    .btn-icon {
-        color: var(--text-muted);
-        text-decoration: none;
-        padding: 6px;
-        border-radius: 6px;
-        transition: background-color 0.2s;
-    }
-
-    .btn-icon:hover {
-        background-color: var(--bg-base);
-    }
-
+    /* .btn-icon comes from AdminLayout's global stylesheet. */
     .empty-state {
         color: var(--text-muted);
         text-align: center;

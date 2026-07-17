@@ -103,12 +103,64 @@ export function getCategorySlugs() {
 }
 
 /**
+ * Top-level, non-empty categories (`parent === 0`).
+ *
+ * Used for the /blog filter bar: listing all 44 categories flat buries the 23
+ * real topics among 21 narrow child topics. Children stay reachable from their
+ * parent's archive page.
+ * @returns {object[]}
+ */
+export function getRootCategories() {
+    return categoriesData.filter((c) => c.count > 0 && !c.parent);
+}
+
+/**
  * Get a category by slug.
  * @param {string} slug
  * @returns {object|undefined}
  */
 export function getCategoryBySlug(slug) {
     return categoriesData.find((c) => c.slug === slug);
+}
+
+/**
+ * Get a category by its numeric WordPress term id.
+ * @param {number} id
+ * @returns {object|undefined}
+ */
+export function getCategoryById(id) {
+    return categoriesData.find((c) => c.id === id);
+}
+
+/**
+ * Ancestors of a category, outermost first (e.g. [โภชนาการพร่องแป้ง, IF] for
+ * ประโยชน์ของการ IF). Categories store `parent` as a term id; 0 means root.
+ * @param {object} category
+ * @returns {object[]}
+ */
+export function getCategoryAncestors(category) {
+    const chain = [];
+    const seen = new Set();
+    let current = category;
+    while (current?.parent) {
+        if (seen.has(current.parent)) break; // defensive: cyclic parent data
+        seen.add(current.parent);
+        const parent = getCategoryById(current.parent);
+        if (!parent) break;
+        chain.unshift(parent);
+        current = parent;
+    }
+    return chain;
+}
+
+/**
+ * Non-empty child categories of a category.
+ * @param {object} category
+ * @returns {object[]}
+ */
+export function getCategoryChildren(category) {
+    if (!category) return [];
+    return categoriesData.filter((c) => c.parent === category.id && c.count > 0);
 }
 
 /**
@@ -265,6 +317,72 @@ export function generateDirectAnswer(excerpt, content) {
 }
 
 /**
+ * Extract FAQ question/answer pairs from article HTML for FAQPage schema.
+ *
+ * GROUNDED-ONLY: returns pairs only when the content has a clearly
+ * delimited FAQ section (an <h2>/<h3> heading containing "FAQ",
+ * "คำถามที่พบบ่อย", or "คำถาม-คำตอบ"), then reads the question
+ * headings that follow it and the text between each. This guarantees
+ * the emitted schema always matches visible on-page content — never
+ * fabricated — so it satisfies Google's FAQ structured-data policy.
+ *
+ * Returns [] (→ no FAQ schema) when no genuine FAQ section is found,
+ * which is the correct behaviour for legacy posts without one.
+ *
+ * @param {string} content  Article HTML
+ * @returns {{question: string, answer: string}[]}
+ */
+export function extractFaqItems(content) {
+    if (!content || typeof content !== 'string') return [];
+
+    // 1. Locate an explicit FAQ section heading (h2 or h3).
+    const faqHeading = /<h([23])[^>]*>([^<]*?(?:FAQ|คำถามที่พบบ่อย|คำถาม[\s\-–—]*คำตอบ)[^<]*?)<\/h\1>/i;
+    const m = content.match(faqHeading);
+    if (!m) return [];
+
+    const headingLevel = m[1];          // '2' or '3'
+    const after = content.slice(m.index + m[0].length);
+
+    // Stop the FAQ section at the next heading of the same-or-higher level.
+    const stopRe = headingLevel === '2'
+        ? /<h2[^>]*>/i
+        : /<h[12][^>]*>/i;
+    const stopMatch = after.match(stopRe);
+    const section = stopMatch ? after.slice(0, stopMatch.index) : after;
+
+    // 2. Questions are the headings one level below the FAQ heading.
+    const qLevel = headingLevel === '2' ? '3' : '4';
+    const qRe = new RegExp(`<h${qLevel}[^>]*>([\\s\\S]*?)<\\/h${qLevel}>`, 'gi');
+
+    const items = [];
+    let qMatch;
+    const positions = [];
+    while ((qMatch = qRe.exec(section)) !== null) {
+        positions.push({
+            question: stripHtml(qMatch[1]).trim(),
+            headingStart: qMatch.index,                      // where the next Q heading begins
+            contentStart: qMatch.index + qMatch[0].length,   // where this Q's answer begins
+        });
+    }
+
+    for (let i = 0; i < positions.length; i++) {
+        // Answer runs from after this question's heading up to the START of
+        // the next question heading (so the next question never leaks in).
+        const end = i + 1 < positions.length ? positions[i + 1].headingStart : section.length;
+        const answer = stripHtml(section.slice(positions[i].contentStart, end))
+            .replace(/\s+/g, ' ')
+            .trim();
+        const question = positions[i].question;
+        if (question && answer && question.length > 3 && answer.length > 10) {
+            items.push({ question, answer });
+        }
+    }
+
+    // Only emit FAQ schema for a real list (>= 2 pairs).
+    return items.length >= 2 ? items : [];
+}
+
+/**
  * Format a date string for display.
  * @param {string} dateStr  ISO date string
  * @returns {string}
@@ -361,4 +479,71 @@ export function sanitizeContent(html = '') {
         // Clean up empty paragraphs
         .replace(/<p>\s*<\/p>/g, '')
         .replace(/<p>&nbsp;<\/p>/g, '');
+}
+
+/**
+ * Derive a human-readable alt text from an image src filename.
+ * e.g. "/wp-content/uploads/2025/10/cgm-sensor-arm-1024x768.webp"
+ *      → "cgm sensor arm"
+ * Returns '' when the filename carries no meaningful words.
+ * @param {string} src
+ * @returns {string}
+ */
+function altFromFilename(src = '') {
+    try {
+        let name = src.split(/[?#]/)[0].split('/').pop() || '';
+        name = name.replace(/\.[a-z0-9]+$/i, '');           // drop extension
+        try { name = decodeURIComponent(name); } catch { /* keep raw */ }
+        name = name
+            .replace(/[-_]+/g, ' ')                          // separators → space
+            .replace(/\b\d{2,4}x\d{2,4}\b/g, ' ')            // strip dimension tokens (1024x768)
+            .replace(/\bscaled\b|\bcopy\b|\bfinal\b/gi, ' ') // common WP noise
+            .replace(/\s+/g, ' ')
+            .trim();
+        // Reject generic/auto-generated names (img, image, dsc1234, screenshot, numbers only).
+        const generic = /^(img|image|photo|pic|picture|dsc|screenshot|untitled|unnamed|download|file)?[\s\d]*$/i;
+        const letters = (name.match(/[A-Za-z฀-๿]/g) || []).length; // Latin or Thai
+        if (!name || letters < 2 || generic.test(name)) return '';
+        return name;
+    } catch {
+        return '';
+    }
+}
+
+/**
+ * Inject alt text into images that are missing it (or have an empty alt).
+ * Alt is derived from the image filename, falling back to `fallbackAlt`
+ * (typically the article title). Images that already have a non-empty
+ * alt — including emoji images — are left untouched.
+ *
+ * Non-destructive: run at render time so it covers both legacy and
+ * future content without mutating the stored data.
+ *
+ * @param {string} html
+ * @param {string} fallbackAlt
+ * @returns {string}
+ */
+export function addImageAltText(html = '', fallbackAlt = '') {
+    if (!html) return html;
+    const fallback = stripHtml(fallbackAlt).replace(/"/g, '').trim();
+
+    return html.replace(/<img\b[^>]*>/gi, (tag) => {
+        // Skip images that already have a non-empty alt.
+        const altMatch = tag.match(/\salt\s*=\s*("([^"]*)"|'([^']*)')/i);
+        if (altMatch) {
+            const val = (altMatch[2] ?? altMatch[3] ?? '').trim();
+            if (val) return tag;
+            // Empty alt="" — remove it so we can insert a meaningful one.
+            tag = tag.replace(/\salt\s*=\s*(""|'')/i, '');
+        }
+
+        const srcMatch = tag.match(/\ssrc\s*=\s*("([^"]*)"|'([^']*)')/i);
+        const src = srcMatch ? (srcMatch[2] ?? srcMatch[3] ?? '') : '';
+        const alt = (altFromFilename(src) || fallback)
+            .replace(/"/g, '')
+            .trim();
+        if (!alt) return tag; // nothing useful to add
+
+        return tag.replace(/^<img\b/i, `<img alt="${alt}"`);
+    });
 }

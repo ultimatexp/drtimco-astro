@@ -5,13 +5,15 @@ export const prerender = true;
  * Lists all posts with pagination.
  */
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getAllPosts, getCategories, stripHtml, formatDate, localizeImageUrl, getPostSummary } from '../../lib/api.js';
+import SiteHeader from '../../components/SiteHeader.astro';
+import { getAllPosts, getRootCategories, stripHtml, formatDate, localizeImageUrl, getPostSummary } from '../../lib/api.js';
 import { getTranslations } from '../../i18n/translations.js';
 
 const ui = getTranslations('th');
 
 const posts = getAllPosts();
-const categories = getCategories();
+// Top-level topics only — child topics are reached from their parent's archive.
+const categories = getRootCategories();
 
 const breadcrumbs = [
   { name: 'Home', url: 'https://drtim.co' },
@@ -25,6 +27,7 @@ const breadcrumbs = [
   canonicalUrl="https://drtim.co/blog"
   breadcrumbs={breadcrumbs}
 >
+  <SiteHeader theme="light" current="/blog" />
   <main class="blog-page">
     <!-- Header -->
     <header class="blog-header">
@@ -83,7 +86,8 @@ const breadcrumbs = [
   .blog-page {
     max-width: var(--max-width);
     margin: 0 auto;
-    padding: var(--space-12) var(--space-4) var(--space-16);
+    /* Extra top padding clears the fixed SiteHeader. */
+    padding: calc(57px + var(--space-12)) var(--space-4) var(--space-16);
   }
 
   .blog-header {

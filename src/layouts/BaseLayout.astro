@@ -39,6 +39,9 @@ interface Props {
   breadcrumbs?: BreadcrumbItem[];
   faqItems?: FaqItem[];
   directAnswer?: string;
+  wordCount?: number;
+  keywords?: string[];
+  about?: string[];
 }
 
 const {
@@ -52,6 +55,9 @@ const {
   breadcrumbs = [],
   faqItems = [],
   directAnswer,
+  wordCount,
+  keywords = [],
+  about = [],
 } = Astro.props;
 
 const siteUrl = import.meta.env.SITE_URL || "https://drtim.co";
@@ -59,6 +65,8 @@ const siteName = import.meta.env.SITE_NAME || "Dr. Tim";
 const resolvedCanonical =
   canonicalUrl || new URL(Astro.url.pathname, siteUrl).href;
 const resolvedOgImage = ogImage || `${siteUrl}/og-default.jpg`;
+// Known dimensions only for the bundled default OG image (640×640).
+const usingDefaultOgImage = !ogImage;
 
 // Avoid "<title>… | Dr. Tim | Dr. Tim" when pages already pass a branded title.
 const trimmedTitle = title.trim();
@@ -135,10 +143,28 @@ const medicalWebPageSchema =
         "@id": resolvedCanonical,
         url: resolvedCanonical,
         name: title,
+        headline: title,
         description: description,
+        ...(directAnswer?.trim() ? { abstract: directAnswer.trim() } : {}),
+        inLanguage: "th",
         datePublished: publishedDate,
         dateModified: modifiedDate || publishedDate,
+        // Medical E-E-A-T: signal that a physician reviewed this content.
+        lastReviewed: modifiedDate || publishedDate,
+        reviewedBy: { "@id": `${siteUrl}/#person` },
         author: { "@id": `${siteUrl}/#person` },
+        ...(typeof wordCount === "number" && wordCount > 0
+          ? { wordCount }
+          : {}),
+        ...(keywords.length > 0 ? { keywords: keywords.join(", ") } : {}),
+        ...(about.length > 0
+          ? {
+              about: about.map((name) => ({
+                "@type": "MedicalCondition",
+                name,
+              })),
+            }
+          : {}),
         publisher: {
           "@type": "Organization",
           name: siteName,
@@ -278,6 +304,15 @@ const jsonLd = {
     <meta property="og:url" content={resolvedCanonical} />
     <meta property="og:site_name" content={siteName} />
     <meta property="og:image" content={resolvedOgImage} />
+    <meta property="og:image:alt" content={title} />
+    {
+      usingDefaultOgImage && (
+        <>
+          <meta property="og:image:width" content="640" />
+          <meta property="og:image:height" content="640" />
+        </>
+      )
+    }
     {
       publishedDate && (
         <meta property="article:published_time" content={publishedDate} />
@@ -294,6 +329,7 @@ const jsonLd = {
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={resolvedOgImage} />
+    <meta name="twitter:image:alt" content={title} />
 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -463,20 +499,41 @@ const jsonLd = {
       (function () {
         const banner = document.getElementById("cookieConsent");
         const btn = document.getElementById("cookieAccept");
-        if (!banner || !btn) return;
+        if (banner && btn) {
+          if (localStorage.getItem("pdpa_consent") === "accepted") {
+            banner.remove();
+          } else {
+            // Show banner after a short delay
+            setTimeout(() => banner.classList.add("visible"), 800);
 
-        if (localStorage.getItem("pdpa_consent") === "accepted") {
-          banner.remove();
-          return;
+            btn.addEventListener("click", () => {
+              localStorage.setItem("pdpa_consent", "accepted");
+              banner.classList.remove("visible");
+              setTimeout(() => banner.remove(), 400);
+            });
+          }
         }
 
-        // Show banner after a short delay
-        setTimeout(() => banner.classList.add("visible"), 800);
+        // Mobile Navigation Menu Toggle
+        document.addEventListener('click', (e) => {
+          const btnMenu = e.target.closest('.mobile-menu-toggle');
+          if (btnMenu) {
+            const topBar = btnMenu.closest('.top-bar');
+            if (topBar) {
+              topBar.classList.toggle('menu-open');
+              btnMenu.classList.toggle('active');
+            }
+          }
 
-        btn.addEventListener("click", () => {
-          localStorage.setItem("pdpa_consent", "accepted");
-          banner.classList.remove("visible");
-          setTimeout(() => banner.remove(), 400);
+          // Handle Mobile Dropdown triggers
+          const trigger = e.target.closest('.nav-dropdown-trigger');
+          if (trigger && window.innerWidth <= 768) {
+            e.preventDefault();
+            const parent = trigger.closest('.nav-dropdown');
+            if (parent) {
+              parent.classList.toggle('active');
+            }
+          }
         });
       })();
     </script>
@@ -773,5 +830,145 @@ const jsonLd = {
       }
     }
 
+    /* ═══ MOBILE NAVIGATION HAMBURGER MENU & DROPDOWNS ═══ */
+    .mobile-menu-toggle {
+      display: none;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 24px;
+      height: 18px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      z-index: 120;
+    }
+
+    .mobile-menu-toggle .bar {
+      width: 100%;
+      height: 2px;
+      background-color: #fff;
+      border-radius: 2px;
+      transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease;
+    }
+
+    .mobile-menu-toggle.active .bar:nth-child(1) {
+      transform: translateY(8px) rotate(45deg);
+    }
+
+    .mobile-menu-toggle.active .bar:nth-child(2) {
+      opacity: 0;
+    }
+
+    .mobile-menu-toggle.active .bar:nth-child(3) {
+      transform: translateY(-8px) rotate(-45deg);
+    }
+
+    @media (max-width: 768px) {
+      .mobile-menu-toggle {
+        display: flex;
+      }
+
+      .top-bar-inner {
+        display: flex;
+        justify-content: space-between !important;
+        align-items: center;
+        width: 100%;
+      }
+
+      .top-bar .nav-cta-btn {
+        display: none !important;
+      }
+
+      /* Override page-level hidden navigation styles */
+      .top-bar .top-bar-nav {
+        display: none !important;
+        position: fixed;
+        top: 60px;
+        left: 0;
+        right: 0;
+        /* An explicit height, not `bottom: 0`: .top-bar sets backdrop-filter,
+           which makes it the containing block for fixed descendants, so
+           `bottom` would resolve against the ~60px bar and collapse the panel. */
+        height: calc(100vh - 60px);
+        height: calc(100dvh - 60px);
+        background: rgba(10, 15, 13, 0.98);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 40px 24px;
+        gap: 24px;
+        z-index: 105;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        overflow-y: auto;
+      }
+
+      .top-bar.menu-open .top-bar-nav {
+        display: flex !important;
+      }
+
+      .top-bar-nav a {
+        font-size: 18px !important;
+        color: #fff !important;
+        width: 100%;
+        text-align: center;
+        padding: 12px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .top-bar-nav a:last-child {
+        border-bottom: none;
+      }
+
+      /* Mobile Dropdowns */
+      .top-bar .nav-dropdown {
+        width: 100%;
+        text-align: center;
+      }
+
+      .top-bar .nav-dropdown-trigger {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-size: 18px !important;
+        color: #fff !important;
+        padding: 12px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        background: transparent;
+        border: none;
+        cursor: pointer;
+      }
+
+      .top-bar .nav-dropdown-menu {
+        position: static !important;
+        background: rgba(255, 255, 255, 0.04) !important;
+        box-shadow: none !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        display: none;
+        padding: 8px 0 !important;
+        border-radius: 6px;
+        margin-top: 8px;
+        width: 100%;
+      }
+
+      .top-bar .nav-dropdown.active .nav-dropdown-menu {
+        display: block;
+      }
+
+      .top-bar .dropdown-item {
+        font-size: 16px !important;
+        padding: 12px 24px !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.02) !important;
+      }
+
+      .top-bar .dropdown-item:last-child {
+        border-bottom: none !important;
+      }
+    }
   </style>
 </html>

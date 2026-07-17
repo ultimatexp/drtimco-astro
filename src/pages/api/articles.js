@@ -23,15 +23,17 @@ export async function GET({ request }) {
     rows = await sql`
       SELECT id, title, slug, excerpt, category, tags, status, image_url,
              keyword, admin_notes, created_at, reviewed_at, published_at
-      FROM article_drafts 
+      FROM article_drafts
       WHERE status = ${status}
+        AND deleted_at IS NULL
       ORDER BY created_at DESC
     `;
   } else {
     rows = await sql`
       SELECT id, title, slug, excerpt, category, tags, status, image_url,
              keyword, admin_notes, created_at, reviewed_at, published_at
-      FROM article_drafts 
+      FROM article_drafts
+      WHERE deleted_at IS NULL
       ORDER BY created_at DESC
       LIMIT 50
     `;

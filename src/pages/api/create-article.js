@@ -89,6 +89,16 @@ export async function POST({ request, cookies }) {
     });
   } catch (err) {
     console.error('create-article error:', err);
+
+    // article_drafts.slug is UNIQUE. Two articles with similar Thai titles can
+    // slugify to the same string, so name the actual problem instead of
+    // surfacing a raw Postgres constraint error.
+    if (err.code === '23505' || /duplicate key|unique constraint/i.test(err.message)) {
+      return new Response(JSON.stringify({
+        error: `The slug "${finalSlug}" is already used by another article. Change the slug and try again.`,
+      }), { status: 409, headers: { 'Content-Type': 'application/json' } });
+    }
+
     return new Response(JSON.stringify({ error: 'Database error: ' + err.message }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },

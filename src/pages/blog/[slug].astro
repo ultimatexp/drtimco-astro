@@ -6,6 +6,7 @@ export const prerender = true;
  * Includes: MedicalWebPage JSON-LD, DirectAnswerBox, related posts.
  */
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
 import DirectAnswerBox from '../../components/DirectAnswerBox.astro';
 import {
   getAllPosts,
@@ -14,8 +15,10 @@ import {
   stripHtml,
   generateMetaDescription,
   generateDirectAnswer,
+  extractFaqItems,
   formatDate,
   sanitizeContent,
+  addImageAltText,
   localizeImageUrl,
   getAuthorName,
 } from '../../lib/api.js';
@@ -44,7 +47,7 @@ const relatedPosts = getRelatedPosts(post, 3);
 const description = generateMetaDescription(post.excerpt, post.content);
 const directAnswer = generateDirectAnswer(post.excerpt, post.content);
 const plainTitle = stripHtml(post.title);
-const cleanContent = sanitizeContent(post.content);
+const cleanContent = addImageAltText(sanitizeContent(post.content), plainTitle);
 
 // Reading time estimate (Thai averages ~200 words/min)
 const wordCount = stripHtml(post.content).split(/\s+/).length;
@@ -67,6 +70,17 @@ const thaiUpdatedDate = hasUpdated ? new Date(post.modified).toLocaleDateString(
 
 // Share URL
 const shareUrl = `https://drtim.co/blog/${post.slug}`;
+
+// Schema enrichment: keywords (tags) and topical "about" (categories)
+const schemaKeywords = [
+  ...(post.tags?.map((t) => t.name) || []),
+  ...(post.categories?.map((c) => c.name) || []),
+].filter(Boolean);
+const schemaAbout = post.categories?.map((c) => c.name).filter(Boolean) || [];
+
+// FAQPage schema — emitted only when the article body has a genuine,
+// visible FAQ section (grounded; legacy posts without one emit nothing).
+const faqItems = extractFaqItems(post.content);
 
 // Breadcrumbs
 const breadcrumbs = [
@@ -95,7 +109,13 @@ breadcrumbs.push({
   ogImage={localizeImageUrl(post.featuredImage?.sourceUrl)}
   canonicalUrl={`https://drtim.co/blog/${post.slug}`}
   breadcrumbs={breadcrumbs}
+  directAnswer={directAnswer}
+  wordCount={wordCount}
+  keywords={schemaKeywords}
+  about={schemaAbout}
+  faqItems={faqItems}
 >
+  <SiteHeader theme="light" current="/blog" />
   <article class="post-page">
     <!-- Breadcrumb Navigation -->
     <nav class="breadcrumbs" aria-label="Breadcrumb">
@@ -308,7 +328,8 @@ breadcrumbs.push({
   .post-page {
     max-width: var(--content-width);
     margin: 0 auto;
-    padding: var(--space-8) var(--space-4) var(--space-16);
+    /* Extra top padding clears the fixed SiteHeader. */
+    padding: calc(57px + var(--space-8)) var(--space-4) var(--space-16);
   }
 
   /* Breadcrumbs */

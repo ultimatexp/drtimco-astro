@@ -5,6 +5,7 @@ export const prerender = true;
  * Thai PDPA-compliant privacy policy for Dr. Tim's medical website.
  */
 import BaseLayout from '../layouts/BaseLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
 
 const lastUpdated = '10 มีนาคม 2568';
 ---
@@ -14,6 +15,7 @@ const lastUpdated = '10 มีนาคม 2568';
   description="นโยบายความเป็นส่วนตัวและการคุ้มครองข้อมูลส่วนบุคคล (PDPA) ของ Dr. Tim — Functional Medicine"
   canonicalUrl="https://drtim.co/privacy-policy"
 >
+  <SiteHeader theme="light" />
   <div class="policy-page">
     <div class="policy-header">
       <nav class="breadcrumbs" aria-label="Breadcrumb">
@@ -257,7 +259,8 @@ const lastUpdated = '10 มีนาคม 2568';
   .policy-page {
     max-width: var(--content-width);
     margin: 0 auto;
-    padding: var(--space-8) var(--space-4) var(--space-16);
+    /* Extra top padding clears the fixed SiteHeader. */
+    padding: calc(57px + var(--space-8)) var(--space-4) var(--space-16);
   }
 
   /* Breadcrumbs */

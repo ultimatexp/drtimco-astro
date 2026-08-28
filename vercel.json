@@ -30,7 +30,7 @@
                 },
                 {
                     "key": "Content-Security-Policy",
-                    "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' https://drtim.co https://*.wp.com https://timdietclinic.com https://www.facebook.com https://*.lazcdn.com data:; connect-src 'self' https://www.google-analytics.com https://www.facebook.com https://region1.google-analytics.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+                    "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com data:; img-src 'self' data: blob: https://*.blob.vercel-storage.com https://*.vercel-storage.com https://drtim.co https://*.wp.com https://timdietclinic.com https://*.fbcdn.net https://www.facebook.com https://*.google.com https://*.google-analytics.com https://*.gstatic.com https://*.lazcdn.com; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.google.com https://*.facebook.com https://*.blob.vercel-storage.com https://*.vercel-storage.com https://region1.google-analytics.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
                 }
             ]
         }

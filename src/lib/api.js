@@ -22,9 +22,8 @@ import categoriesData from '../data/categories.json';
 import tagsData from '../data/tags.json';
 import pagesData from '../data/pages.json';
 import siteInfoData from '../data/site-info.json';
-// Remote timdietclinic.com images that scripts/mirror-remote-images.js pulled
-// into public/, so localizeImageUrl can serve the local (AVIF/WebP-able) copy.
 import mirroredImages from '../data/mirrored-images.json';
+import blobImages from '../data/blob-images-manifest.json';
 
 // ── Post Helpers ─────────────────────────────────────────────
 
@@ -421,10 +420,20 @@ export function getAuthorName(author) {
  */
 export function localizeImageUrl(url = '') {
     if (!url) return url;
-    // A mirrored remote image is now a local file — serve that (then .webp).
+    
+    // 1. Direct match in Vercel Blob CDN manifest
+    if (blobImages[url]) return blobImages[url];
+
+    // 2. A mirrored remote image is now a local file — serve that (then .webp).
     const mirrored = mirroredImages[url];
-    if (mirrored) return mirrored.replace(/\.(png|jpe?g)$/i, '.webp');
-    // Un-mirrored timdietclinic.com URLs stay external (FTP-uploaded images).
+    if (mirrored) {
+        const webpMirrored = mirrored.replace(/\.(png|jpe?g)$/i, '.webp');
+        if (blobImages[webpMirrored]) return blobImages[webpMirrored];
+        if (blobImages[mirrored]) return blobImages[mirrored];
+        return webpMirrored;
+    }
+
+    // 3. Un-mirrored timdietclinic.com URLs stay external.
     if (url.includes('timdietclinic.com')) return url;
 
     let localized = url.replace(/^https?:\/\/(?:www\.)?drtim\.co\//, '/');
@@ -432,7 +441,13 @@ export function localizeImageUrl(url = '') {
         // Normalize WordPress resize suffixes (-300x200, -768x512) back to base webp
         localized = localized.replace(/(?:-e\d+)?-\d{2,4}x\d{2,4}(?=\.[a-zA-Z]+$)/i, '');
     }
-    return localized.replace(/\.(png|jpe?g)$/i, '.webp');
+
+    // Check if cloud blob has this localized path
+    if (blobImages[localized]) return blobImages[localized];
+    const webpPath = localized.replace(/\.(png|jpe?g)$/i, '.webp');
+    if (blobImages[webpPath]) return blobImages[webpPath];
+
+    return webpPath;
 }
 
 /**

@@ -1,13 +1,15 @@
 /**
  * POST /api/admin/ai-generate-image
  * Generates a 1:1 emotional impact featured image using Imagen 4.0 based on article title and content.
- * Automatically uploads it via FTP to the WordPress hosting CDN.
+ * Automatically uploads it via Vercel Blob or local storage and records in Neon DB.
  */
 export const prerender = false;
 
-import { Readable } from 'stream';
-import * as ftp from 'basic-ftp';
+import { writeFile, mkdir } from 'fs/promises';
+import { join } from 'path';
+import { put } from '@vercel/blob';
 import { isAdminSession, unauthorizedJson } from '../../../lib/adminAuth.js';
+import { sql } from '../../../lib/neon.js';
 
 export async function POST({ request, cookies }) {
     if (!isAdminSession(cookies)) {
@@ -28,30 +30,26 @@ export async function POST({ request, cookies }) {
 
         console.log('[AI Image] Using user-confirmed prompt:', prompt);
 
-        // 2. Call Imagen 4.0 to generate the image
+        // 1. Call Imagen 4.0 Generate endpoint
         const imagenUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${apiKey}`;
-        const imagenPayload = {
-            instances: [
-                {
-                    prompt: prompt
-                }
-            ],
-            parameters: {
-                sampleCount: 1,
-                aspectRatio: "1:1",
-                outputMimeType: "image/jpeg"
-            }
-        };
 
         const imagenRes = await fetch(imagenUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(imagenPayload)
+            body: JSON.stringify({
+                instances: [{ prompt: prompt }],
+                parameters: {
+                    sampleCount: 1,
+                    aspectRatio: '1:1',
+                    outputMimeType: 'image/jpeg',
+                    personGeneration: 'ALLOW_ADULT'
+                }
+            })
         });
 
         if (!imagenRes.ok) {
             const errText = await imagenRes.text();
-            console.error('Imagen API error:', imagenRes.status, errText);
+            console.error('Imagen API failed:', imagenRes.status, errText);
             throw new Error(`Imagen 4.0 API error: ${imagenRes.status}`);
         }
 
@@ -61,50 +59,55 @@ export async function POST({ request, cookies }) {
             throw new Error('No image bytes returned by Imagen 4.0');
         }
 
-        // 3. Connect and Upload to FTP CDN
-        const ftpHost = import.meta.env.FTP_HOST || process.env.FTP_HOST;
-        const ftpUser = import.meta.env.FTP_USER || process.env.FTP_USER;
-        const ftpPass = import.meta.env.FTP_PASSWORD || process.env.FTP_PASSWORD;
-
-        if (!ftpHost || !ftpUser || !ftpPass) {
-            throw new Error('FTP credentials not configured.');
-        }
-
-        const ftpPath = import.meta.env.FTP_PATH || process.env.FTP_PATH || '/public_html/wp-content/uploads/astro';
-        const siteUrl = import.meta.env.FTP_SITE_URL || process.env.FTP_SITE_URL || 'https://timdietclinic.com';
-
+        // 2. Save to Vercel Blob CDN or Local public uploads
         const fileName = `ai-featured-${Date.now()}.jpg`;
         const buffer = Buffer.from(base64Image, 'base64');
+        let imageUrl = '';
 
-        const client = new ftp.Client();
-        client.ftp.verbose = false;
+        const blobToken = import.meta.env.BLOB_READ_WRITE_TOKEN || process.env.BLOB_READ_WRITE_TOKEN;
 
-        try {
-            await client.access({
-                host: ftpHost,
-                user: ftpUser,
-                password: ftpPass,
-                secure: false
+        if (blobToken) {
+            const blob = await put(`uploads/${fileName}`, buffer, {
+                access: 'public',
+                token: blobToken,
+                contentType: 'image/jpeg'
             });
-
-            await client.ensureDir(ftpPath);
-            const stream = Readable.from(buffer);
-            await client.uploadFrom(stream, `${ftpPath}/${fileName}`);
-
-            const urlPath = ftpPath.replace(/^\/public_html/, '');
-            const imageUrl = `${siteUrl}${urlPath}/${fileName}`;
-
-            return new Response(JSON.stringify({
-                success: true,
-                url: imageUrl,
-                prompt: prompt
-            }), {
-                headers: { 'Content-Type': 'application/json' },
-            });
-
-        } finally {
-            client.close();
+            imageUrl = blob.url;
+        } else {
+            const uploadsDir = join(process.cwd(), 'public', 'images', 'uploads');
+            await mkdir(uploadsDir, { recursive: true });
+            await writeFile(join(uploadsDir, fileName), buffer);
+            imageUrl = `/images/uploads/${fileName}`;
         }
+
+        // 3. Record in Neon Database media_library
+        try {
+            await sql`
+                CREATE TABLE IF NOT EXISTS media_library (
+                    id SERIAL PRIMARY KEY,
+                    filename TEXT NOT NULL,
+                    url TEXT NOT NULL,
+                    alt_text TEXT DEFAULT '',
+                    mime_type TEXT DEFAULT '',
+                    size_bytes INTEGER DEFAULT 0,
+                    uploaded_at TIMESTAMP DEFAULT NOW()
+                );
+            `;
+            await sql`
+                INSERT INTO media_library (filename, url, alt_text, mime_type, size_bytes)
+                VALUES (${fileName}, ${imageUrl}, ${prompt.slice(0, 200)}, 'image/jpeg', ${buffer.length});
+            `;
+        } catch (dbErr) {
+            console.warn('⚠️ Could not record to Neon media_library:', dbErr.message);
+        }
+
+        return new Response(JSON.stringify({
+            success: true,
+            url: imageUrl,
+            prompt: prompt
+        }), {
+            headers: { 'Content-Type': 'application/json' },
+        });
 
     } catch (err) {
         console.error('ai-generate-image error:', err);

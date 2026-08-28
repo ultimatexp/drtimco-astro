@@ -1,7 +1,10 @@
 export const prerender = false;
 
-import * as ftp from 'basic-ftp';
+import { readdir, stat } from 'fs/promises';
+import { join } from 'path';
+import { existsSync } from 'fs';
 import { isAdminSession } from '../../../lib/adminAuth.js';
+import { sql } from '../../../lib/neon.js';
 
 export async function GET({ cookies }) {
     if (!isAdminSession(cookies)) {
@@ -12,53 +15,52 @@ export async function GET({ cookies }) {
     }
 
     try {
-        const ftpHost = import.meta.env.FTP_HOST || process.env.FTP_HOST;
-        const ftpUser = import.meta.env.FTP_USER || process.env.FTP_USER;
-        const ftpPass = import.meta.env.FTP_PASSWORD || process.env.FTP_PASSWORD;
+        const fileList = [];
+        const seenUrls = new Set();
 
-        if (!ftpHost || !ftpUser || !ftpPass) {
-            return new Response(JSON.stringify({
-                error: 'FTP credentials not configured. Set FTP_HOST, FTP_USER, FTP_PASSWORD in .env'
-            }), { status: 500, headers: { 'Content-Type': 'application/json' } });
-        }
-
-        const ftpPath = import.meta.env.FTP_PATH || process.env.FTP_PATH || '/public_html/wp-content/uploads/astro';
-        const siteUrl = import.meta.env.FTP_SITE_URL || process.env.FTP_SITE_URL || 'https://timdietclinic.com';
-        const urlPath = ftpPath.replace(/^\/public_html/, '');
-
-        const client = new ftp.Client();
-        client.ftp.verbose = false;
-
-        let fileList = [];
-
+        // 1. Fetch from Neon Database media_library
         try {
-            await client.access({
-                host: ftpHost,
-                user: ftpUser,
-                password: ftpPass,
-                secure: false, 
-            });
-
-            // Ensure the upload directory exists
-            await client.ensureDir(ftpPath);
-
-            // List files
-            const files = await client.list(ftpPath);
-            
-            // Filter only files (type 1) and map to objects
-            fileList = files
-                .filter(file => file.type === 1) // 1 is File, 2 is Directory
-                .map(file => ({
-                    name: file.name,
-                    size: file.size,
-                    date: file.modifiedAt,
-                    url: `${siteUrl}${urlPath}/${file.name}`
-                }))
-                .sort((a, b) => new Date(b.date) - new Date(a.date)); // Sort newest first
-
-        } finally {
-            client.close();
+            const rows = await sql`
+                SELECT id, filename as name, url, mime_type, size_bytes as size, alt_text, uploaded_at as date
+                FROM media_library
+                ORDER BY uploaded_at DESC
+                LIMIT 150
+            `;
+            for (const r of rows) {
+                fileList.push(r);
+                seenUrls.add(r.url);
+            }
+        } catch (dbErr) {
+            console.warn('⚠️ Could not query Neon media_library:', dbErr.message);
         }
+
+        // 2. Scan local public/images/uploads directory
+        try {
+            const uploadsDir = join(process.cwd(), 'public', 'images', 'uploads');
+            if (existsSync(uploadsDir)) {
+                const files = await readdir(uploadsDir);
+                for (const f of files) {
+                    if (f.startsWith('.')) continue;
+                    const url = `/images/uploads/${f}`;
+                    if (seenUrls.has(url)) continue;
+
+                    const s = await stat(join(uploadsDir, f));
+                    fileList.push({
+                        name: f,
+                        url,
+                        size: s.size,
+                        date: s.mtime,
+                        mime_type: 'image/jpeg',
+                        alt_text: ''
+                    });
+                }
+            }
+        } catch (fsErr) {
+            console.warn('⚠️ Could not scan local uploads:', fsErr.message);
+        }
+
+        // Sort newest first
+        fileList.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
 
         return new Response(JSON.stringify({ success: true, files: fileList }), {
             status: 200,

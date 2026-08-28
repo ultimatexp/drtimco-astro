@@ -1,27 +1,25 @@
 /**
- * POST /api/upload-image — Upload an image via FTP to WordPress hosting.
+ * POST /api/upload-image — Upload an image to Vercel Blob / Local Storage + Neon Media Library.
  * 
- * Uploads to wp-content/uploads/astro/ directory on the WordPress server.
- * Images get permanent URLs like: https://drtim.co/wp-content/uploads/astro/image.webp
- * 
- * Requires env vars:
- *   FTP_HOST      — FTP hostname (e.g. ftp.drtim.co or your hosting IP)
- *   FTP_USER      — FTP username
- *   FTP_PASSWORD   — FTP password
- *   FTP_PATH      — Remote upload path (default: /public_html/wp-content/uploads/astro)
- *   SITE_URL      — Site base URL (default: https://drtim.co)
+ * Flow:
+ *   1. Uploads file to Vercel Blob CDN (if BLOB_READ_WRITE_TOKEN is set) or public/images/uploads/
+ *   2. Saves image metadata (filename, url, size, mime_type) to Neon PostgreSQL media_library table
+ *   3. Returns the permanent CDN / local URL
  */
 export const prerender = false;
 
-import * as ftp from 'basic-ftp';
-import { Readable } from 'stream';
+import { writeFile, mkdir } from 'fs/promises';
+import { join } from 'path';
+import { put } from '@vercel/blob';
 import { isAdminKey, isAdminSession, unauthorizedJson } from '../../lib/adminAuth.js';
+import { sql } from '../../lib/neon.js';
 
 export async function POST({ request, cookies }) {
     try {
         const formData = await request.formData();
         const file = formData.get('image') || formData.get('file');
         const key = formData.get('key');
+        const altText = formData.get('alt') || '';
 
         if (!isAdminSession(cookies) && !isAdminKey(key)) {
             return unauthorizedJson();
@@ -33,58 +31,57 @@ export async function POST({ request, cookies }) {
             });
         }
 
-        const ftpHost = import.meta.env.FTP_HOST || process.env.FTP_HOST;
-        const ftpUser = import.meta.env.FTP_USER || process.env.FTP_USER;
-        const ftpPass = import.meta.env.FTP_PASSWORD || process.env.FTP_PASSWORD;
-
-        if (!ftpHost || !ftpUser || !ftpPass) {
-            return new Response(JSON.stringify({
-                error: 'FTP credentials not configured. Set FTP_HOST, FTP_USER, FTP_PASSWORD in .env'
-            }), { status: 500, headers: { 'Content-Type': 'application/json' } });
-        }
-
-        const ftpPath = import.meta.env.FTP_PATH || process.env.FTP_PATH || '/public_html/wp-content/uploads/astro';
-        const siteUrl = import.meta.env.FTP_SITE_URL || process.env.FTP_SITE_URL || 'https://timdietclinic.com';
-
-        // Prepare file
-        const fileName = `${Date.now()}-${file.name.replace(/\s+/g, '-')}`;
+        const rawName = file.name.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9._-]/g, '');
+        const fileName = `${Date.now()}-${rawName}`;
         const buffer = Buffer.from(await file.arrayBuffer());
+        let imageUrl = '';
 
-        // Connect and upload via FTP
-        const client = new ftp.Client();
-        client.ftp.verbose = false;
+        const blobToken = import.meta.env.BLOB_READ_WRITE_TOKEN || process.env.BLOB_READ_WRITE_TOKEN;
 
-        try {
-            await client.access({
-                host: ftpHost,
-                user: ftpUser,
-                password: ftpPass,
-                secure: false, // Set to true if your host supports FTPS
+        if (blobToken) {
+            // Upload to Vercel Blob Storage
+            const blob = await put(`uploads/${fileName}`, buffer, {
+                access: 'public',
+                token: blobToken,
+                contentType: file.type || 'image/jpeg',
             });
-
-            // Ensure the upload directory exists
-            await client.ensureDir(ftpPath);
-
-            // Upload the file
-            const stream = Readable.from(buffer);
-            await client.uploadFrom(stream, `${ftpPath}/${fileName}`);
-
-            // Build the public URL
-            // ftpPath like /public_html/wp-content/uploads/astro
-            // URL should be https://drtim.co/wp-content/uploads/astro/fileName
-            const urlPath = ftpPath.replace(/^\/public_html/, '');
-            const imageUrl = `${siteUrl}${urlPath}/${fileName}`;
-
-            return new Response(JSON.stringify({
-                success: true,
-                url: imageUrl,
-            }), {
-                headers: { 'Content-Type': 'application/json' },
-            });
-
-        } finally {
-            client.close();
+            imageUrl = blob.url;
+        } else {
+            // Local fallback: save to public/images/uploads/
+            const uploadsDir = join(process.cwd(), 'public', 'images', 'uploads');
+            await mkdir(uploadsDir, { recursive: true });
+            await writeFile(join(uploadsDir, fileName), buffer);
+            imageUrl = `/images/uploads/${fileName}`;
         }
+
+        // Save metadata to Neon DB media_library table
+        try {
+            await sql`
+                CREATE TABLE IF NOT EXISTS media_library (
+                    id SERIAL PRIMARY KEY,
+                    filename TEXT NOT NULL,
+                    url TEXT NOT NULL,
+                    alt_text TEXT DEFAULT '',
+                    mime_type TEXT DEFAULT '',
+                    size_bytes INTEGER DEFAULT 0,
+                    uploaded_at TIMESTAMP DEFAULT NOW()
+                );
+            `;
+            await sql`
+                INSERT INTO media_library (filename, url, alt_text, mime_type, size_bytes)
+                VALUES (${fileName}, ${imageUrl}, ${altText}, ${file.type || ''}, ${file.size || 0});
+            `;
+        } catch (dbErr) {
+            console.warn('⚠️ Could not record to Neon media_library:', dbErr.message);
+        }
+
+        return new Response(JSON.stringify({
+            success: true,
+            url: imageUrl,
+            filename: fileName,
+        }), {
+            headers: { 'Content-Type': 'application/json' },
+        });
 
     } catch (err) {
         console.error('Upload error:', err);

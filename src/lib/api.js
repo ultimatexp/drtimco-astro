@@ -22,6 +22,9 @@ import categoriesData from '../data/categories.json';
 import tagsData from '../data/tags.json';
 import pagesData from '../data/pages.json';
 import siteInfoData from '../data/site-info.json';
+// Remote timdietclinic.com images that scripts/mirror-remote-images.js pulled
+// into public/, so localizeImageUrl can serve the local (AVIF/WebP-able) copy.
+import mirroredImages from '../data/mirrored-images.json';
 
 // ── Post Helpers ─────────────────────────────────────────────
 
@@ -408,29 +411,36 @@ export function getAuthorName(author) {
 }
 
 /**
- * Convert a drtim.co image URL to a local WebP path.
+ * Convert an image URL to its local WebP path.
  * 1. https://drtim.co/wp-content/uploads/2025/10/img.png → /wp-content/uploads/2025/10/img.webp
- * 2. timdietclinic.com URLs are kept as-is (FTP-hosted images)
- * 3. Non-drtim.co URLs are returned unchanged.
- * 4. Swaps .png/.jpg/.jpeg → .webp for local images only.
+ * 2. timdietclinic.com URLs that were mirrored locally → local .webp path
+ * 3. Other timdietclinic.com URLs are kept as-is (still remote)
+ * 4. Non-drtim.co URLs are returned unchanged.
  * @param {string} url
  * @returns {string}
  */
 export function localizeImageUrl(url = '') {
     if (!url) return url;
-    // Keep timdietclinic.com URLs as external (FTP-uploaded images)
+    // A mirrored remote image is now a local file — serve that (then .webp).
+    const mirrored = mirroredImages[url];
+    if (mirrored) return mirrored.replace(/\.(png|jpe?g)$/i, '.webp');
+    // Un-mirrored timdietclinic.com URLs stay external (FTP-uploaded images).
     if (url.includes('timdietclinic.com')) return url;
-    return url
-        .replace(/^https?:\/\/drtim\.co\//, '/')
-        .replace(/\.(png|jpe?g)$/i, '.webp');
+
+    let localized = url.replace(/^https?:\/\/(?:www\.)?drtim\.co\//, '/');
+    if (localized.startsWith('/wp-content/uploads/')) {
+        // Normalize WordPress resize suffixes (-300x200, -768x512) back to base webp
+        localized = localized.replace(/(?:-e\d+)?-\d{2,4}x\d{2,4}(?=\.[a-zA-Z]+$)/i, '');
+    }
+    return localized.replace(/\.(png|jpe?g)$/i, '.webp');
 }
 
 /**
  * Sanitize WordPress HTML content for Astro rendering.
- * - Rewrites drtim.co image URLs to local paths
+ * - Rewrites drtim.co image URLs to local paths with thumbnail fallback
  * - Upgrades http:// to https:// for remaining external images
  * - Adds lazy loading to images
- * - Strips WordPress shortcodes
+ * - Strips WordPress shortcodes and broken srcset attributes
  * - Ensures responsive images
  * @param {string} html
  * @returns {string}
@@ -453,17 +463,19 @@ export function sanitizeContent(html = '') {
         // Rewrite TOC anchor links: convert absolute drtim.co/timdietclinic.com URLs
         // with hash fragments to just the hash fragment (fixes ez-toc 404s)
         .replace(/href="https?:\/\/drtim\.co\/[^"]*?(#[^"]*)"/gi, 'href="$1"')
+        // Remove legacy WP srcset attributes that point to missing thumbnail sizes
+        .replace(/\ssrcset="[^"]*"/gi, '')
+        .replace(/\ssizes="[^"]*"/gi, '')
         // Rewrite drtim.co image URLs to local paths (for images served from public/)
         .replace(/src="https?:\/\/drtim\.co\//g, 'src="/')
-        .replace(/srcset="https?:\/\/drtim\.co\//g, 'srcset="/')
+        // Normalize WordPress resize suffixes in local src attributes
+        .replace(/src="(\/wp-content\/uploads\/[^"]*?)(?:-e\d+)?-\d{2,4}x\d{2,4}\.(png|jpe?g|webp)"/gi, 'src="$1.$2"')
         // Upgrade remaining http:// to https:// for external images
         .replace(/src="http:\/\//g, 'src="https://')
-        .replace(/srcset="http:\/\//g, 'srcset="https://')
 
         // ── Image Optimization ──
         // Swap local .png/.jpg/.jpeg → .webp for all local image src
         .replace(/src="(\/[^"]*)\.(png|jpe?g)"/gi, 'src="$1.webp"')
-        .replace(/srcset="(\/[^"]*)\.(png|jpe?g)/gi, 'srcset="$1.webp')
         // Add lazy loading to images that don't already have it
         .replace(/<img(?![^>]*loading=)/g, '<img loading="lazy"')
         // Add decoding=async for non-blocking image decode

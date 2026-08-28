@@ -117,6 +117,6 @@ function slugify(text) {
 }
 
 syncArticles().catch(err => {
-    console.error('❌ Sync failed:', err.message);
-    process.exit(1);
+    console.warn('⚠️ Sync warning (continuing with cached posts):', err.message);
+    process.exit(0);
 });

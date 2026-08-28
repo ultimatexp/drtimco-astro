@@ -483,13 +483,20 @@ export function sanitizeContent(html = '') {
         .replace(/\ssizes="[^"]*"/gi, '')
         // Rewrite drtim.co image URLs to local paths (for images served from public/)
         .replace(/src="https?:\/\/drtim\.co\//g, 'src="/')
-        // Normalize WordPress resize suffixes in local src attributes
-        .replace(/src="(\/wp-content\/uploads\/[^"]*?)(?:-e\d+)?-\d{2,4}x\d{2,4}\.(png|jpe?g|webp)"/gi, 'src="$1.$2"')
-        // Upgrade remaining http:// to https:// for external images
-        .replace(/src="http:\/\//g, 'src="https://')
-
-        // ── Image Optimization ──
-        // Swap local .png/.jpg/.jpeg → .webp for all local image src
+        // ── Image Optimization & Cloud CDN Resolution ──
+        // Swap local paths to Vercel Blob CDN URLs if present in manifest
+        .replace(/src="(\/wp-content\/uploads\/[^"]+)"/g, (match, path) => {
+            const cleanPath = path.replace(/(?:-e\d+)?-\d{2,4}x\d{2,4}(?=\.[a-zA-Z]+$)/i, '');
+            const webpPath = cleanPath.replace(/\.(png|jpe?g)$/i, '.webp');
+            const avifPath = cleanPath.replace(/\.(png|jpe?g|webp)$/i, '.avif');
+            
+            if (blobImages[path]) return `src="${blobImages[path]}"`;
+            if (blobImages[cleanPath]) return `src="${blobImages[cleanPath]}"`;
+            if (blobImages[webpPath]) return `src="${blobImages[webpPath]}"`;
+            if (blobImages[avifPath]) return `src="${blobImages[avifPath]}"`;
+            return `src="${webpPath}"`;
+        })
+        // Swap remaining local .png/.jpg/.jpeg → .webp
         .replace(/src="(\/[^"]*)\.(png|jpe?g)"/gi, 'src="$1.webp"')
         // Add lazy loading to images that don't already have it
         .replace(/<img(?![^>]*loading=)/g, '<img loading="lazy"')

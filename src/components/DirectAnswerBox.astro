@@ -33,11 +33,12 @@ const {
   specialty = 'Functional Medicine',
 } = Astro.props;
 
-// Word count validation (log warning at build time if out of range)
-const wordCount = answer.split(/\s+/).length;
-if (wordCount < 35 || wordCount > 70) {
+// Length validation (build-time warning). Measured in characters, not
+// whitespace words: Thai has no word spaces, so a word count always misfired.
+const charCount = answer.replace(/\s+/g, '').length;
+if (charCount > 0 && (charCount < 120 || charCount > 400)) {
   console.warn(
-    `[DirectAnswerBox] Answer is ${wordCount} words (target: 40-60). Consider adjusting.`
+    `[DirectAnswerBox] Answer is ${charCount} characters (target: ~180-320). Consider adjusting.`
   );
 }
 ---

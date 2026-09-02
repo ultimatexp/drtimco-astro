@@ -280,6 +280,34 @@ export function getPostSummary(post, maxChars = 160) {
 }
 
 /**
+ * Count words in a way that works for Thai.
+ *
+ * Thai is written without spaces between words, so `text.split(/\s+/)` collapses
+ * a full article into a handful of tokens — which is why schema wordCount and
+ * reading times were wildly understated. Intl.Segmenter knows Thai word
+ * boundaries; the fallback estimates from character count for spaceless scripts.
+ * @param {string} text
+ * @returns {number}
+ */
+export function countWords(text = '') {
+    const clean = stripHtml(text).trim();
+    if (!clean) return 0;
+    if (typeof Intl !== 'undefined' && Intl.Segmenter) {
+        try {
+            const seg = new Intl.Segmenter('th', { granularity: 'word' });
+            let n = 0;
+            for (const part of seg.segment(clean)) if (part.isWordLike) n++;
+            if (n > 0) return n;
+        } catch {
+            // fall through to heuristic
+        }
+    }
+    const whitespaceTokens = clean.split(/\s+/).filter(Boolean).length;
+    const charEstimate = Math.round(clean.replace(/\s+/g, '').length / 2);
+    return Math.max(whitespaceTokens, charEstimate);
+}
+
+/**
  * Truncate text to a max word count.
  * @param {string}  text
  * @param {number}  [maxWords=30]
@@ -304,18 +332,37 @@ export function generateMetaDescription(excerpt, content) {
 }
 
 /**
- * Generate a 40-60 word direct answer from an excerpt.
- * For AEO (AI Engine Optimization).
+ * Generate a direct answer (~180-320 characters) for AEO.
+ *
+ * Prefers the article body over the excerpt: excerpts here are often
+ * promotional taglines ("🥗น้ำมันมะกอก สรรพคุณเพียบ🥗"), useless as answers.
+ * Measured in characters, not whitespace words, because Thai has no spaces —
+ * the old word-slice produced ~8-word taglines on every post. Callers should
+ * still prefer a curated `_direct_answer` when one exists.
  * @param {string} excerpt
- * @param {string} content  Fallback
+ * @param {string} content
  * @returns {string}
  */
 export function generateDirectAnswer(excerpt, content) {
-    const raw = stripHtml(excerpt || content || '');
-    const words = raw.split(/\s+/);
-    // Target 40-60 words
-    const target = Math.min(Math.max(words.length, 40), 60);
-    return words.slice(0, target).join(' ') + (words.length > target ? '…' : '');
+    const raw = stripHtml(content || excerpt || '')
+        // Drop leading emoji / decorative punctuation before the first real character.
+        .replace(/^[^\p{L}\p{N}]+/u, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+    if (!raw) return '';
+
+    const MAX = 320;
+    const MIN = 180;
+    if (raw.length <= MAX) return raw;
+
+    // Prefer a sentence/space boundary within the window; else hard-cut.
+    const window = raw.slice(0, MAX);
+    const boundary = Math.max(
+        window.lastIndexOf('. '), window.lastIndexOf('! '), window.lastIndexOf('? '),
+        window.lastIndexOf('ครับ'), window.lastIndexOf('ค่ะ'), window.lastIndexOf(' ')
+    );
+    const end = boundary >= MIN ? boundary + 1 : MAX;
+    return raw.slice(0, end).trim() + '…';
 }
 
 /**

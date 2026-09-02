@@ -91,7 +91,14 @@ const personSchema = {
     "Functional Medicine physician specializing in metabolic health, longevity, and evidence-based wellness at Ultramed Clinic Chonburi, Thailand.",
   url: siteUrl,
   image: `${siteUrl}/images/about/drtim.png`,
-  medicalSpecialty: "Functional Medicine",
+  // schema.org MedicalSpecialty is a closed enumeration; "Functional Medicine"
+  // is not a member and gets dropped by validators. The phrase is kept in
+  // knowsAbout/description below.
+  medicalSpecialty: [
+    "https://schema.org/DietNutrition",
+    "https://schema.org/Endocrine",
+    "https://schema.org/PrimaryCare",
+  ],
   knowsAbout: [
     "Functional Medicine",
     "Metabolic Health",
@@ -125,7 +132,11 @@ const personSchema = {
       latitude: "13.3611",
       longitude: "100.9847",
     },
-    medicalSpecialty: "Functional Medicine",
+    medicalSpecialty: [
+      "https://schema.org/DietNutrition",
+      "https://schema.org/Endocrine",
+      "https://schema.org/PrimaryCare",
+    ],
   },
   sameAs: [
     "https://www.facebook.com/dr.timdietclinic/",
@@ -446,6 +457,7 @@ const jsonLd = {
         height="1"
         width="1"
         style="display:none"
+        alt=""
         src="https://www.facebook.com/tr?id=26085245234467647&ev=PageView&noscript=1"
       />
     </noscript>

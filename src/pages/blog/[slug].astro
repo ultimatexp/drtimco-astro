@@ -15,6 +15,7 @@ import {
   stripHtml,
   generateMetaDescription,
   generateDirectAnswer,
+  countWords,
   extractFaqItems,
   formatDate,
   sanitizeContent,
@@ -45,12 +46,15 @@ if (!post) {
 
 const relatedPosts = getRelatedPosts(post, 3);
 const description = generateMetaDescription(post.excerpt, post.content);
-const directAnswer = generateDirectAnswer(post.excerpt, post.content);
+// Prefer a curated answer (7 posts have one in posts.json under _direct_answer);
+// fall back to the Thai-aware generator only when none is authored.
+const directAnswer =
+  (post._direct_answer || '').trim() || generateDirectAnswer(post.excerpt, post.content);
 const plainTitle = stripHtml(post.title);
 const cleanContent = addImageAltText(sanitizeContent(post.content), plainTitle);
 
-// Reading time estimate (Thai averages ~200 words/min)
-const wordCount = stripHtml(post.content).split(/\s+/).length;
+// Thai has no word spaces, so count with the Thai-aware helper (~200 words/min).
+const wordCount = countWords(post.content);
 const readingTime = Math.max(1, Math.ceil(wordCount / 200));
 
 // Thai-formatted date

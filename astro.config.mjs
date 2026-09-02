@@ -42,6 +42,13 @@ export default defineConfig({
   },
   integrations: [
     sitemap({
+      // Keep robots-disallowed, non-content routes out of the sitemap. Listing
+      // /admin and /api URLs (which robots.txt blocks) makes Search Console
+      // report "Submitted URL blocked by robots.txt" for each one.
+      filter: (page) => {
+        const path = new URL(page).pathname;
+        return !path.startsWith('/admin') && !path.startsWith('/api');
+      },
       serialize(item) {
         try {
           const path = new URL(item.url).pathname.replace(/\/$/, '');

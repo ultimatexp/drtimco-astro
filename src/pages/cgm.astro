@@ -519,16 +519,11 @@ const breadcrumbs = [
             name: "คอร์ส CGM หายจากเบาหวาน",
             description:
                 "คอร์สรักษาเบาหวานโดยไม่ใช้ยา ด้วยการวิเคราะห์ข้อมูล CGM เฉพาะบุคคล โดยหมอทิม Functional Medicine",
-            provider: {
-                "@type": "Organization",
-                name: "Dr. Tim — Ultramed Clinic",
-                sameAs: "https://drtim.co",
-            },
-            instructor: {
-                "@type": "Person",
-                name: "หมอทิม (Dr. Tim)",
-                jobTitle: "แพทย์เวชศาสตร์ชะลอวัย & Functional Medicine",
-            },
+            // Reference the canonical clinic entity instead of a new anonymous org.
+            provider: { "@id": "https://drtim.co/#clinic" },
+            inLanguage: "th",
+            // timeRequired is the valid Course property (`duration` is not).
+            timeRequired: "P14D",
             offers: {
                 "@type": "Offer",
                 price: "3290",
@@ -536,12 +531,16 @@ const breadcrumbs = [
                 availability: "https://schema.org/LimitedAvailability",
                 url: "https://lin.ee/3E7wEPz",
             },
-            courseMode: "Online",
-            duration: "P14D",
-            inLanguage: "th",
-            areaServed: {
-                "@type": "Country",
-                name: "Thailand",
+            // courseMode + instructor belong on CourseInstance, not Course.
+            hasCourseInstance: {
+                "@type": "CourseInstance",
+                courseMode: "Online",
+                inLanguage: "th",
+                instructor: { "@id": "https://drtim.co/#person" },
+                location: {
+                    "@type": "VirtualLocation",
+                    url: "https://lin.ee/3E7wEPz",
+                },
             },
         })}
     ></script>

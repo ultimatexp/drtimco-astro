@@ -80,25 +80,37 @@ const documentTitle = brandSuffixPattern.test(trimmedTitle)
 
 // ── JSON-LD Schema Construction ──────────────────────────────
 
-// 1. Person schema — Dr. Tim (physician/author) — GEO-enhanced
+// Canonical @ids for the two real-world entities, referenced everywhere so the
+// graph describes one person and one clinic — not the fragmented set of
+// anonymous Person/Organization nodes that used to appear across pages.
+const personId = `${siteUrl}/#person`;
+const clinicId = `${siteUrl}/#clinic`;
+const websiteId = `${siteUrl}/#website`;
+
+const socialProfiles = [
+  "https://www.facebook.com/dr.timdietclinic/",
+  "https://www.youtube.com/@dr.timdietclinic",
+  "https://www.instagram.com/dr.timdietclinic/",
+  "https://lin.ee/LwEtisp",
+];
+
+// Ensure ISO-8601 timestamps carry a timezone offset (Google prefers it).
+const withTz = (d?: string) =>
+  d && !/(Z|[+-]\d{2}:?\d{2})$/.test(d) ? `${d}+07:00` : d;
+
+// 1. Person — Dr. Tim, the author. A pure Person: schema.org Physician is an
+//    organization subtype, so the practice facts live on the clinic node below,
+//    which this Person is affiliated with.
 const personSchema = {
-  "@type": ["Person", "Physician"],
-  "@id": `${siteUrl}/#person`,
+  "@type": "Person",
+  "@id": personId,
   name: "Dr. Tim",
   alternateName: ["หมอทิม", "Dr. Tim Diet Clinic"],
-  jobTitle: "Medical Doctor",
+  jobTitle: "Physician (MD)",
   description:
-    "Functional Medicine physician specializing in metabolic health, longevity, and evidence-based wellness at Ultramed Clinic Chonburi, Thailand.",
+    "Functional Medicine physician specializing in metabolic health, longevity, and evidence-based wellness at Ultramed Clinic, Ban Bueng, Chonburi, Thailand.",
   url: siteUrl,
   image: `${siteUrl}/images/about/drtim.png`,
-  // schema.org MedicalSpecialty is a closed enumeration; "Functional Medicine"
-  // is not a member and gets dropped by validators. The phrase is kept in
-  // knowsAbout/description below.
-  medicalSpecialty: [
-    "https://schema.org/DietNutrition",
-    "https://schema.org/Endocrine",
-    "https://schema.org/PrimaryCare",
-  ],
   knowsAbout: [
     "Functional Medicine",
     "Metabolic Health",
@@ -117,40 +129,62 @@ const personSchema = {
       name: "MD",
     },
   ],
-  affiliation: {
-    "@type": "MedicalClinic",
-    "@id": `${siteUrl}/#clinic`,
-    name: "Ultramed Clinic Chonburi",
-    url: siteUrl,
-    address: {
-      "@type": "PostalAddress",
-      addressLocality: "Chonburi",
-      addressCountry: "TH",
-    },
-    geo: {
-      "@type": "GeoCoordinates",
-      latitude: "13.3611",
-      longitude: "100.9847",
-    },
-    medicalSpecialty: [
-      "https://schema.org/DietNutrition",
-      "https://schema.org/Endocrine",
-      "https://schema.org/PrimaryCare",
-    ],
-  },
-  sameAs: [
-    "https://www.facebook.com/dr.timdietclinic/",
-    "https://www.youtube.com/@dr.timdietclinic",
-    "https://www.instagram.com/dr.timdietclinic/",
-    "https://lin.ee/LwEtisp",
-  ],
+  worksFor: { "@id": clinicId },
+  affiliation: { "@id": clinicId },
+  sameAs: socialProfiles,
 };
 
-// 2. MedicalWebPage schema (for articles/medical content)
+// 1b. MedicalClinic — Ultramed Clinic. One fully-defined node, emitted on every
+//     page, that also carries the brand logo + socials so it serves as the
+//     publishing organization (schema.org MedicalClinic is an Organization).
+//     Coordinates corrected: the old 13.3611,100.9847 was ~13km off the clinic.
+//     No street/postalCode or openingHours are asserted — those aren't known.
+const clinicSchema = {
+  "@type": "MedicalClinic",
+  "@id": clinicId,
+  name: "Ultramed Clinic",
+  alternateName: ["Ultramed Clinic บ้านบึง", "อุลตร้าเมด คลินิก"],
+  url: siteUrl,
+  telephone: "+66949455399",
+  image: `${siteUrl}/og-default.jpg`,
+  logo: {
+    "@type": "ImageObject",
+    url: `${siteUrl}/logo.png`,
+  },
+  priceRange: "฿฿",
+  currenciesAccepted: "THB",
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: "Ban Bueng",
+    addressRegion: "Chonburi",
+    addressCountry: "TH",
+  },
+  geo: {
+    "@type": "GeoCoordinates",
+    latitude: "13.3199417",
+    longitude: "101.1011077",
+  },
+  hasMap: "https://maps.app.goo.gl/MkTi4i7NicSQB5no6",
+  medicalSpecialty: [
+    "https://schema.org/DietNutrition",
+    "https://schema.org/Endocrine",
+    "https://schema.org/PrimaryCare",
+  ],
+  availableLanguage: ["th", "en"],
+  physician: { "@id": personId },
+  sameAs: socialProfiles,
+};
+
+// 2. Article schema. Dual-typed [MedicalWebPage, Article]: MedicalWebPage keeps
+//    the medical E-E-A-T semantics, while Article is the type Google uses for
+//    Article rich results. The page node IS the canonical @id, so the old
+//    self-referential mainEntityOfPage (a second node with the same @id) is
+//    dropped. publisher references the clinic entity rather than re-declaring
+//    an anonymous Organization.
 const medicalWebPageSchema =
   type === "article"
     ? {
-        "@type": "MedicalWebPage",
+        "@type": ["MedicalWebPage", "Article"],
         "@id": resolvedCanonical,
         url: resolvedCanonical,
         name: title,
@@ -158,12 +192,13 @@ const medicalWebPageSchema =
         description: description,
         ...(directAnswer?.trim() ? { abstract: directAnswer.trim() } : {}),
         inLanguage: "th",
-        datePublished: publishedDate,
-        dateModified: modifiedDate || publishedDate,
+        datePublished: withTz(publishedDate),
+        dateModified: withTz(modifiedDate || publishedDate),
         // Medical E-E-A-T: signal that a physician reviewed this content.
-        lastReviewed: modifiedDate || publishedDate,
-        reviewedBy: { "@id": `${siteUrl}/#person` },
-        author: { "@id": `${siteUrl}/#person` },
+        lastReviewed: withTz(modifiedDate || publishedDate),
+        reviewedBy: { "@id": personId },
+        author: { "@id": personId },
+        isPartOf: { "@id": websiteId },
         ...(typeof wordCount === "number" && wordCount > 0
           ? { wordCount }
           : {}),
@@ -176,19 +211,7 @@ const medicalWebPageSchema =
               })),
             }
           : {}),
-        publisher: {
-          "@type": "Organization",
-          name: siteName,
-          url: siteUrl,
-          logo: {
-            "@type": "ImageObject",
-            url: `${siteUrl}/logo.png`,
-          },
-        },
-        mainEntityOfPage: {
-          "@type": "WebPage",
-          "@id": resolvedCanonical,
-        },
+        publisher: { "@id": clinicId },
         image: resolvedOgImage,
         medicalAudience: {
           "@type": "MedicalAudience",
@@ -197,23 +220,19 @@ const medicalWebPageSchema =
       }
     : null;
 
-// 3. WebSite schema (for the homepage / general pages)
-const webSiteSchema =
-  type === "website"
-    ? {
-        "@type": "WebSite",
-        "@id": `${siteUrl}/#website`,
-        url: siteUrl,
-        name: siteName,
-        description: description,
-        publisher: { "@id": `${siteUrl}/#person` },
-        potentialAction: {
-          "@type": "SearchAction",
-          target: `${siteUrl}/?s={search_term_string}`,
-          "query-input": "required name=search_term_string",
-        },
-      }
-    : null;
+// 3. WebSite — emitted on every page (articles included) so they can link
+//    isPartOf it. No SearchAction: /?s= is a WordPress search URL that this
+//    Astro site does not serve, so advertising it would be an invalid action.
+const webSiteSchema = {
+  "@type": "WebSite",
+  "@id": websiteId,
+  url: siteUrl,
+  name: siteName,
+  description:
+    "Dr. Tim — Functional Medicine | Evidence-based metabolic health, longevity, and wellness.",
+  inLanguage: "th",
+  publisher: { "@id": clinicId },
+};
 
 // 4. BreadcrumbList schema
 const breadcrumbSchema =
@@ -245,10 +264,14 @@ const faqSchema =
       }
     : null;
 
-// Assemble the full JSON-LD graph
-const jsonLdGraph: Record<string, unknown>[] = [personSchema];
+// Assemble the full JSON-LD graph. Person + Clinic + WebSite anchor every page
+// so cross-references by @id always resolve.
+const jsonLdGraph: Record<string, unknown>[] = [
+  personSchema,
+  clinicSchema,
+  webSiteSchema,
+];
 if (medicalWebPageSchema) jsonLdGraph.push(medicalWebPageSchema);
-if (webSiteSchema) jsonLdGraph.push(webSiteSchema);
 if (breadcrumbSchema) jsonLdGraph.push(breadcrumbSchema);
 if (faqSchema) jsonLdGraph.push(faqSchema);
 

@@ -341,17 +341,22 @@ const breadcrumbs = [
         </div>
     </footer>
 
-    <!-- ═══ JSON-LD: MedicalBusiness Service Schema ═══ -->
+    <!-- ═══ JSON-LD: Service (provided by the clinic entity) ═══ -->
+    <!-- Modeled as a Service, not a MedicalBusiness: this is a service the
+         clinic offers, not a separate business. `provider` references the
+         canonical #clinic node in BaseLayout's graph by @id, so the two merge
+         instead of declaring a second, address-less business. -->
     <script
         type="application/ld+json"
         set:html={JSON.stringify({
             "@context": "https://schema.org",
-            "@type": "MedicalBusiness",
+            "@type": "Service",
+            serviceType: "Medical consultation",
             name: "ปรึกษาส่วนตัวกับหมอทิม",
             description:
                 "บริการปรึกษาส่วนตัวกับหมอทิม วิเคราะห์ผลเลือดอย่างเป็นระบบ ออกแบบแนวทางดูแลสุขภาพเฉพาะบุคคล",
             url: "https://drtim.co/consult",
-            priceRange: `฿${followUpPrice}-฿${firstPrice}`,
+            provider: { "@id": "https://drtim.co/#clinic" },
             areaServed: { "@type": "Country", name: "Thailand" },
             hasOfferCatalog: {
                 "@type": "OfferCatalog",

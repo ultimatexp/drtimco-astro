@@ -468,6 +468,11 @@ export function getAuthorName(author) {
 export function localizeImageUrl(url = '') {
     if (!url) return url;
     
+    // 0. Vercel Blob CDN URLs are already public & permanent — return as-is
+    if (url.includes('.blob.vercel-storage.com') || url.includes('blob.vercel-storage.com')) {
+        return url;
+    }
+
     // 1. Direct match in Vercel Blob CDN manifest
     if (blobImages[url]) return blobImages[url];
 

@@ -1,0 +1,2073 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="referrer" content="no-referrer" />
+  <title>จาก Organ Aging สู่ Toxic Exposure — 30-Slide Interactive Presentation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #070b14;
+      --bg-card: rgba(17, 25, 40, 0.78);
+      --bg-card-hover: rgba(30, 41, 59, 0.88);
+      --border-subtle: rgba(255, 255, 255, 0.1);
+      --border-highlight: rgba(255, 255, 255, 0.24);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.25);
+      --act-0: #38bdf8; /* Intro - Sky */
+      --act-1: #f59e0b; /* Act 1 Exposure - Amber/Red */
+      --act-2: #f43f5e; /* Act 2 Cellular Damage - Rose/Crimson */
+      --act-3: #10b981; /* Act 3 Natural Detox - Emerald */
+      --act-4: #8b5cf6; /* Act 4 Nutrition - Violet/Indigo */
+      --act-5: #06b6d4; /* Act 5 Take Action - Cyan/Gold */
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --success: #10b981;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Anuphan', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Animated Ambient Background */
+    .ambient-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 15% 20%, var(--orb-1, rgba(56, 189, 248, 0.14)) 0%, transparent 45%),
+        radial-gradient(circle at 85% 80%, var(--orb-2, rgba(16, 185, 129, 0.12)) 0%, transparent 45%),
+        radial-gradient(circle at 50% 50%, rgba(15, 23, 42, 0.95) 0%, #050811 100%);
+      transition: background 0.8s ease;
+    }
+
+    .grid-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(to right, rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: radial-gradient(circle at center, black 40%, transparent 90%);
+    }
+
+    /* Top Navigation Bar */
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      z-index: 40;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      background: rgba(7, 11, 20, 0.75);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .act-pill {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 5px 12px;
+      border-radius: 999px;
+      background: var(--accent-glow);
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      transition: all 0.4s ease;
+    }
+
+    .deck-title {
+      font-size: 0.92rem;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .topbar-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .timer-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      padding: 5px 12px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      color: #cbd5e1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .icon-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-family: inherit;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .icon-btn:hover {
+      background: rgba(255, 255, 255, 0.14);
+      border-color: var(--border-highlight);
+      transform: translateY(-1px);
+    }
+
+    /* Main Slide Viewport */
+    .stage {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      height: calc(100vh - 114px);
+      margin-top: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 48px;
+      overflow-y: auto;
+    }
+
+    .slide-container {
+      width: 100%;
+      max-width: 1360px;
+      min-height: 580px;
+      margin: auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      animation: slideEnter 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes slideEnter {
+      0% {
+        opacity: 0;
+        transform: translateY(22px) scale(0.985);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .stagger-1 { animation: fadeUp 0.5s 0.08s cubic-bezier(0.16, 1, 0.3, 1) both; }
+    .stagger-2 { animation: fadeUp 0.55s 0.18s cubic-bezier(0.16, 1, 0.3, 1) both; }
+    .stagger-3 { animation: fadeUp 0.6s 0.28s cubic-bezier(0.16, 1, 0.3, 1) both; }
+    .stagger-4 { animation: fadeUp 0.65s 0.38s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Slide Header */
+    .slide-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+      font-size: 0.85rem;
+      color: var(--accent);
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+
+    .ref-badge {
+      font-size: 0.75rem;
+      padding: 2px 10px;
+      border-radius: 99px;
+      background: rgba(255, 255, 255, 0.07);
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    .slide-title {
+      font-size: clamp(1.75rem, 2.8vw, 2.65rem);
+      font-weight: 700;
+      line-height: 1.25;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .slide-subtitle {
+      font-size: clamp(1rem, 1.35vw, 1.2rem);
+      color: var(--text-muted);
+      line-height: 1.55;
+      margin-bottom: 24px;
+      max-width: 980px;
+    }
+
+    /* Layout Grids */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 28px;
+      align-items: stretch;
+    }
+
+    .grid-2-equal {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 22px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .grid-5 {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+    }
+
+    /* Cards & Glass Panels */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 18px;
+      padding: 22px;
+      backdrop-filter: blur(12px);
+      transition: all 0.28s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card:hover {
+      border-color: var(--border-highlight);
+      background: var(--bg-card-hover);
+      transform: translateY(-3px);
+    }
+
+    .card-accent-top {
+      border-top: 3px solid var(--accent);
+    }
+
+    .card h3 {
+      font-size: 1.18rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #fff;
+    }
+
+    .card p, .card li {
+      font-size: 0.96rem;
+      line-height: 1.62;
+      color: #cbd5e1;
+    }
+
+    .card ul {
+      padding-left: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* External Image Card Component */
+    .media-frame {
+      position: relative;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+      background: #0f172a;
+      min-height: 290px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+
+    .media-frame img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.7s ease, opacity 0.4s ease;
+    }
+
+    .media-frame:hover img {
+      transform: scale(1.04);
+    }
+
+    .media-overlay {
+      position: relative;
+      z-index: 2;
+      background: linear-gradient(to top, rgba(7, 11, 20, 0.95) 0%, rgba(7, 11, 20, 0.65) 60%, transparent 100%);
+      padding: 24px 20px 18px;
+    }
+
+    .media-caption {
+      font-size: 0.88rem;
+      color: #e2e8f0;
+      font-weight: 500;
+    }
+
+    .media-source {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .edit-img-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 5;
+      background: rgba(7, 11, 20, 0.78);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      color: #f8fafc;
+      font-size: 0.74rem;
+      padding: 5px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      opacity: 0.75;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .edit-img-btn:hover {
+      opacity: 1;
+      transform: scale(1.04);
+      border-color: var(--accent);
+    }
+
+    /* Callout / Alert Boxes */
+    .callout {
+      margin-top: 16px;
+      padding: 15px 20px;
+      border-radius: 14px;
+      border-left: 4px solid var(--accent);
+      background: rgba(56, 189, 248, 0.08);
+      font-size: 0.95rem;
+      line-height: 1.55;
+      color: #e2e8f0;
+    }
+
+    .callout.warn {
+      border-left-color: var(--warning);
+      background: rgba(245, 158, 11, 0.1);
+    }
+
+    .callout.danger {
+      border-left-color: var(--danger);
+      background: rgba(239, 68, 68, 0.12);
+    }
+
+    .callout.success {
+      border-left-color: var(--success);
+      background: rgba(16, 185, 129, 0.1);
+    }
+
+    /* Interactive Reveal / Flip Cards */
+    .interactive-card {
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .interactive-card .reveal-answer {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px dashed rgba(255, 255, 255, 0.15);
+      display: none;
+      color: #38bdf8;
+      font-size: 0.9rem;
+    }
+
+    .interactive-card.revealed .reveal-answer {
+      display: block;
+      animation: fadeUp 0.3s ease forwards;
+    }
+
+    .interactive-card .click-hint {
+      display: inline-block;
+      margin-top: 10px;
+      font-size: 0.76rem;
+      color: var(--accent);
+      opacity: 0.85;
+    }
+
+    /* Tables */
+    .evidence-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--bg-card);
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .evidence-table th,
+    .evidence-table td {
+      padding: 13px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .evidence-table th {
+      background: rgba(255, 255, 255, 0.06);
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .evidence-table tr:hover td {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    /* Badge / Tag */
+    .tag {
+      display: inline-block;
+      padding: 3px 9px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .tag-green { background: rgba(16, 185, 129, 0.18); color: #34d399; }
+    .tag-amber { background: rgba(245, 158, 11, 0.18); color: #fbbf24; }
+    .tag-red { background: rgba(239, 68, 68, 0.18); color: #f87171; }
+    .tag-blue { background: rgba(56, 189, 248, 0.18); color: #38bdf8; }
+
+    /* Flow / Domino Steps */
+    .flow-chain {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 18px 0;
+      flex-wrap: wrap;
+    }
+
+    .flow-node {
+      flex: 1;
+      min-width: 160px;
+      padding: 18px 14px;
+      border-radius: 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-highlight);
+      text-align: center;
+      position: relative;
+      transition: transform 0.3s ease;
+    }
+
+    .flow-node:hover {
+      transform: translateY(-5px) scale(1.02);
+      border-color: var(--accent);
+    }
+
+    .flow-arrow {
+      font-size: 1.4rem;
+      color: var(--accent);
+      animation: pulseRight 1.6s infinite;
+    }
+
+    @keyframes pulseRight {
+      0%, 100% { transform: translateX(0); opacity: 0.6; }
+      50% { transform: translateX(5px); opacity: 1; }
+    }
+
+    /* Bar Meters */
+    .bar-wrap {
+      margin: 10px 0;
+    }
+    .bar-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.86rem;
+      margin-bottom: 5px;
+    }
+    .bar-track {
+      height: 10px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Bottom Navigation Bar */
+    .bottombar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 54px;
+      z-index: 40;
+      background: rgba(7, 11, 20, 0.85);
+      backdrop-filter: blur(14px);
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+    }
+
+    .progress-track {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), #10b981);
+      width: 3.33%;
+      transition: width 0.35s ease;
+    }
+
+    .nav-btns {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .slide-counter {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      min-width: 90px;
+      text-align: center;
+    }
+
+    /* Presenter Notes Drawer */
+    .notes-drawer {
+      position: fixed;
+      bottom: 64px;
+      right: 28px;
+      width: 440px;
+      max-width: calc(100vw - 56px);
+      background: rgba(15, 23, 42, 0.96);
+      border: 1px solid var(--accent);
+      border-radius: 16px;
+      padding: 18px 20px;
+      z-index: 50;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      display: none;
+    }
+
+    .notes-drawer.open {
+      display: block;
+      animation: fadeUp 0.25s ease forwards;
+    }
+
+    .notes-drawer h4 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent);
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .notes-drawer p {
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: #e2e8f0;
+    }
+
+    /* Modal for Overview Grid & External Image Customizer */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 7, 15, 0.88);
+      backdrop-filter: blur(12px);
+      z-index: 60;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-box {
+      width: 100%;
+      max-width: 1180px;
+      max-height: 85vh;
+      overflow-y: auto;
+      background: #0f172a;
+      border: 1px solid var(--border-highlight);
+      border-radius: 20px;
+      padding: 28px;
+    }
+
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .overview-item {
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .overview-item:hover,
+    .overview-item.active {
+      border-color: var(--accent);
+      background: rgba(56, 189, 248, 0.12);
+    }
+
+    .url-input {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border-highlight);
+      background: #070b14;
+      color: #fff;
+      font-size: 0.95rem;
+      margin: 12px 0;
+    }
+
+    @media (max-width: 980px) {
+      .grid-2, .grid-3, .grid-4, .grid-5, .grid-2-equal {
+        grid-template-columns: 1fr;
+      }
+      .stage {
+        padding: 16px 20px;
+      }
+      .media-frame {
+        min-height: 220px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="ambient-bg" id="ambientBg"></div>
+  <div class="grid-overlay"></div>
+
+  <!-- Top Navigation -->
+  <header class="topbar">
+    <div class="brand-group">
+      <span class="act-pill" id="actPill">INTRODUCTION</span>
+      <span class="deck-title">จาก Organ Aging สู่ Toxic Exposure · หลักสูตร 75 นาที (30 สไลด์)</span>
+    </div>
+    <div class="topbar-controls">
+      <div class="timer-badge" id="timerBadge" title="คลิกเพื่อเริ่ม/หยุดเวลาเรียน 75 นาที">
+        <span>⏱️</span>
+        <span id="timerText">00:00 / 75:00</span>
+      </div>
+      <button class="icon-btn" onclick="openImageManagerModal()" title="จัดการรูปภาพจากเว็บไซต์ภายนอก">
+        🖼️ เปลี่ยนรูปจากเว็บ (URL)
+      </button>
+      <button class="icon-btn" onclick="toggleNotes()" title="เปิด/ปิด บทพูดผู้สอน (ปุ่ม N)">
+        🎙️ บทผู้สอน (N)
+      </button>
+      <button class="icon-btn" onclick="toggleOverview()" title="ดูสไลด์ทั้งหมด 30 หน้า (ปุ่ม M)">
+        🗂️ สารบัญ 30 หน้า (M)
+      </button>
+      <button class="icon-btn" onclick="toggleFullscreen()" title="เต็มจอ (ปุ่ม F)">
+        ⛶ เต็มจอ
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Slide Stage -->
+  <main class="stage">
+    <div id="slideRoot" class="slide-container"></div>
+  </main>
+
+  <!-- Presenter Notes Drawer -->
+  <aside class="notes-drawer" id="notesDrawer">
+    <h4>
+      <span>🎙️ Instructor Notes & จุดเน้นผู้สอน</span>
+      <span style="cursor:pointer" onclick="toggleNotes()">✕</span>
+    </h4>
+    <p id="notesContent"></p>
+  </aside>
+
+  <!-- Slide Overview Modal -->
+  <div class="modal-backdrop" id="overviewModal" onclick="if(event.target===this)toggleOverview()">
+    <div class="modal-box">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <h2>🗂️ สารบัญสไลด์ทั้งหมด (30 Slides · 75 นาที)</h2>
+        <button class="icon-btn" onclick="toggleOverview()">✕ ปิด</button>
+      </div>
+      <div class="overview-grid" id="overviewGrid"></div>
+    </div>
+  </div>
+
+  <!-- External Website Image URL Customizer Modal -->
+  <div class="modal-backdrop" id="imageModal" onclick="if(event.target===this)closeImageModal()">
+    <div class="modal-box" style="max-width:620px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <h3>🖼️ ตั้งค่ารูปภาพจากเว็บไซต์ภายนอก (External Image URL)</h3>
+        <button class="icon-btn" onclick="closeImageModal()">✕ ปิด</button>
+      </div>
+      <p style="color:var(--text-muted);font-size:0.9rem;margin-top:8px;">
+        คุณสามารถวางลิงก์รูปภาพ (`https://...`) จากเว็บไซต์ใดก็ได้สำหรับสไลด์หน้านี้ ระบบรองรับการดึงรูปข้ามโดเมน (`no-referrer`) และบันทึกไว้ในเบราว์เซอร์อัตโนมัติ
+      </p>
+      <input type="url" id="customImgInput" class="url-input" placeholder="https://example.com/image.jpg" />
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
+        <button class="icon-btn" onclick="resetSlideImage()">↺ คืนค่ารูปต้นฉบับ</button>
+        <button class="icon-btn" style="background:var(--accent);color:#050811;font-weight:700;" onclick="saveSlideImage()">✓ บันทึกรูปภาพ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Bar -->
+  <footer class="bottombar">
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <div style="font-size:0.82rem;color:var(--text-muted);" id="timeSlotLabel">
+      🕒 ช่วงเวลา: 0–5 นาที
+    </div>
+    <div class="nav-btns">
+      <button class="icon-btn" onclick="prevSlide()">← ก่อนหน้า</button>
+      <span class="slide-counter" id="slideCounter">01 / 30</span>
+      <button class="icon-btn" onclick="nextSlide()">ถัดไป →</button>
+    </div>
+    <div style="font-size:0.78rem;color:var(--text-muted);">
+      กด <code>←</code> <code>→</code> หรือ <code>Space</code> เพื่อเลื่อนสไลด์
+    </div>
+  </footer>
+  <script>
+    // External Website Images (Includes exact URLs from curriculum + high-availability external photos)
+    const DEFAULT_IMAGES = {
+      bangkokAir: "https://images.openai.com/static-rsc-4/ErbAJDuilJa7UAXQSLFPEdcEkBi5bMPoJlevhtoBMb8L83jFnAuujl98K5tPLFhdodRDJBn3H-CMyQkOmzKOsLc4IWBGoFpx8p2UKVq9osqz2OgqwZ9DDjdQKeoN4b41k7BZpT4fWSOv9lLz9AP2C0RI3624YLwPRHvavamr7X0?purpose=inline",
+      burntFood: "https://images.openai.com/static-rsc-4/asqmk2bcO_h5-32ka5PB2s_1ch5ZiDW4iMedgFd_fFp9A64LPyWpEjzb0Tqg8y1uJamrbHAIb4MR0hAqe3YyT1vZ9tbwrfHeMK1t3rdc4xzqu2a3Z0vbBQOpZ-4CoHUXDtH_-F-soDFTgYKGq9UpXRbv43zampCXOEA8Jy_GETQ?purpose=inline",
+      cellularAging: "https://images.openai.com/static-rsc-4/ZXNJop5WTZeS1p7zvVb2iUhnRI8zq_-uVMdrnCzobqQCVz5vSqhJO8gsDWRhtgjgrkbeEfC3wPJr2nwPFYXBqPsNjoZAVecLR83v8QdzoONCNDMFZiDoLVvrqDWifs8KmElX8XQCfRHXX6mHrfJihS81v-OMhcZTwjnwLYR0k_A?purpose=inline",
+      naturalDetox: "https://images.openai.com/static-rsc-4/BzLoqnxyCvjtNHfPLmUeWZ1iyFxzrM-54Sy1jktsDx9HfrDUBoWXokSutmNnS5HhqEl2d67c7YRLtfLZR_8_BT2e81u28VUqMcoSCOv1UiGnDTvCdNFpuluDK0nEf5ZvpQReB-fYTnaxfDjBt4kqdL6eNVhWZKSYS59AXsOTIRc?purpose=inline",
+      healthyFood: "https://images.openai.com/static-rsc-4/udRDHYZvwBJdT5IPiJbbD1HXAQJOEwpLkPqSrazmko_tenGNNB-oH8m7sgDKvTOiP_Rx7hszyUr_BvmKFoAH_xhm87-ZzhGJ000uIGTwtY8i12VHDFYNf4L_gOiLn6mhakuv-5KKE-ZFGcV4EfVZzhVzGXbRzkV7gt0APVXquh9eWuUcPIYUOyHa9q-dgJB0?purpose=inline",
+      morningWalk: "https://images.openai.com/static-rsc-4/s1rYig2qy2YPiof1HHHFPuhjLng0VgnkBzFfP__or1Tl619aCAcyblyf50M8rNGwxmJLqD7-t77BXYz9L4Tpi8P9B3lgGrgADfWoU-5g719_nbI75V9WQjeFS5mHs2hMOejvZi8OcZXTCbv9nbCBNM5eGvMevWU2vAfVH6wGRgI?purpose=inline",
+      peanutsMold: "https://images.unsplash.com/photo-1567892737950-30c4db37cd89?auto=format&fit=crop&w=1000&q=80",
+      riceGrain: "https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=1000&q=80",
+      plasticBottle: "https://images.unsplash.com/photo-1611284446314-60a58ac0deb9?auto=format&fit=crop&w=1000&q=80",
+      cruciferous: "https://images.unsplash.com/photo-1459411621453-7b03977f4bfc?auto=format&fit=crop&w=1000&q=80",
+      turmeric: "https://images.unsplash.com/photo-1615485500704-8e990f9900f7?auto=format&fit=crop&w=1000&q=80",
+      waterKidney: "https://images.unsplash.com/photo-1548839140-29a749e1cf4d?auto=format&fit=crop&w=1000&q=80"
+    };
+
+    const FALLBACK_SVG = "data:image/svg+xml;utf8," + encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500">
+        <defs>
+          <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#0f172a"/>
+            <stop offset="100%" stop-color="#1e293b"/>
+          </linearGradient>
+        </defs>
+        <rect width="800" height="500" fill="url(#g)"/>
+        <circle cx="400" cy="220" r="60" fill="none" stroke="#38bdf8" stroke-width="3" stroke-dasharray="8 6"/>
+        <text x="400" y="330" text-anchor="middle" fill="#94a3b8" font-family="sans-serif" font-size="20">คลิกปุ่ม "🖼️ เปลี่ยนรูป" เพื่อใส่ URL รูปจากเว็บไซต์</text>
+      </svg>
+    `);
+
+    function getCustomImages() {
+      try {
+        return JSON.parse(localStorage.getItem("toxic_slides_custom_images") || "{}");
+      } catch (e) {
+        return {};
+      }
+    }
+
+    function getSlideImage(slideIndex, defaultUrl) {
+      const map = getCustomImages();
+      return map[slideIndex] || defaultUrl;
+    }
+
+    function mediaBox(slideIdx, imgUrl, caption, sourceText) {
+      const resolved = getSlideImage(slideIdx, imgUrl);
+      return `
+        <div class="media-frame stagger-2">
+          <button class="edit-img-btn" onclick="openImageManagerModal()">🖼️ เปลี่ยนรูป URL</button>
+          <img src="${resolved}" alt="${caption}" referrerpolicy="no-referrer" loading="lazy" onerror="this.onerror=null;this.src=FALLBACK_SVG;" />
+          <div class="media-overlay">
+            <div class="media-caption">${caption}</div>
+            <div class="media-source">${sourceText || "External Web Image · คลิกปุ่มมุมขวาบนเพื่อเปลี่ยนลิงก์รูปได้ทันที"}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    const SLIDES = [
+      // SLIDE 1
+      {
+        act: "INTRODUCTION",
+        actColor: "#38bdf8",
+        time: "0–5 นาที",
+        ref: "ต้นฉบับหน้า 1–2",
+        title: "จาก Organ Aging สู่ Toxic Exposure",
+        subtitle: "“นอกจากอายุที่เพิ่มขึ้นแล้ว สิ่งที่เรากิน หายใจ และสัมผัสทุกวัน มีส่วนทำให้เซลล์และอวัยวะเสื่อมอย่างไร?”",
+        image: DEFAULT_IMAGES.bangkokAir,
+        notes: "เชื่อมโยงจากคลาสที่แล้วเรื่องความชราของอวัยวะภายใน (Organ Aging) วันนี้เราจะดูตัวเร่งจากภายนอกและภายในผ่าน 5 องก์ต่อเนื่องกัน",
+        render: (idx) => `
+          <div class="grid-2">
+            <div class="stagger-1" style="display:flex;flex-direction:column;justify-content:space-between;gap:16px;">
+              <div class="card card-accent-top">
+                <h3>🧭 แผนการเดินทาง 5 องก์ (75 นาที)</h3>
+                <div style="display:grid;gap:10px;margin-top:12px;">
+                  <div><span class="tag tag-amber">ACT 1</span> <strong>INVISIBLE EXPOSURE</strong> — สารพิษอยู่รอบตัวเรา (PM2.5, อาหาร, โลหะหนัก, ไมโครพลาสติก)</div>
+                  <div><span class="tag tag-red">ACT 2</span> <strong>CELLULAR DAMAGE</strong> — สารพิษทำอะไรกับเซลล์? (Oxidative stress & Inflammation)</div>
+                  <div><span class="tag tag-green">ACT 3</span> <strong>NATURAL DETOX</strong> — ตับ ไต ลำไส้ กำจัดสารอย่างไร?</div>
+                  <div><span class="tag tag-blue">ACT 4</span> <strong>NUTRITION & SUPPLEMENTS</strong> — สารอาหาร Nrf2, Glutathione และหลักฐานจริง</div>
+                  <div><span class="tag tag-green">ACT 5</span> <strong>TAKE ACTION</strong> — แยกแยะโฆษณา Detox และออกแบบภารกิจ 7 วัน</div>
+                </div>
+              </div>
+              <div class="callout">
+                🎯 <strong>Learning Outcomes:</strong> ระบุแหล่งสัมผัสใกล้ตัวได้ ≥ 3 แหล่ง · อธิบายตับและไตแบบพื้นฐาน · แยกแยะคำโฆษณา Detox ออกจากหลักฐานแพทย์ · เลือก 1 พฤติกรรมเปลี่ยนทันที
+              </div>
+            </div>
+            ${mediaBox(idx, DEFAULT_IMAGES.bangkokAir, "มลพิษทางอากาศและสิ่งแวดล้อมรอบตัวที่เราสัมผัสทุกวันโดยไม่รู้ตัว", "ต้นฉบับหน้า 2–3 · Air pollution in Bangkok")}
+          </div>
+        `
+      },
+      // SLIDE 2
+      {
+        act: "INTRODUCTION",
+        actColor: "#38bdf8",
+        time: "0–5 นาที",
+        ref: "ต้นฉบับหน้า 2–3",
+        title: "คำถามเปิดห้องเรียน: เราได้รับสารอันตรายจากอะไรบ้าง โดยไม่รู้ตัว?",
+        subtitle: "ลองช่วยกันทายว่าตั้งแต่ตื่นเช้ามาถึงตอนนี้ เราสัมผัสอะไรไปแล้วบ้าง? (คลิกที่การ์ดเพื่อเปิดเฉลย)",
+        image: DEFAULT_IMAGES.bangkokAir,
+        notes: "ให้ผู้เรียนช่วยกันตอบ: ควันรถยนต์ อาหารไหม้ ภาชนะอาหาร สารกำจัดศัตรูพืช และสารปนเปื้อนในอาหาร ก่อนคลิกเปิดทีละการ์ด",
+        render: () => `
+          <div class="grid-3 stagger-2">
+            <div class="card interactive-card" onclick="this.classList.toggle('revealed')">
+              <h3>🚗 1. ลมหายใจระหว่างเดินทาง</h3>
+              <p>ฝุ่นควันการจราจร การเผาไหม้ และอากาศในเมือง</p>
+              <span class="click-hint">👆 คลิกเพื่อดูสารหลัก</span>
+              <div class="reveal-answer"><strong>PM2.5, ก๊าซไนโตรเจนไดออกไซด์, โลหะหนักที่เกาะมากับฝุ่น</strong> ซึมผ่านถุงลมเข้ากระแสเลือด</div>
+            </div>
+            <div class="card interactive-card" onclick="this.classList.toggle('revealed')">
+              <h3>🍖 2. อาหารปิ้งย่าง ทอดเกรียม</h3>
+              <p>หมูปิ้ง ไก่ทอด เบคอน หรือของอบกรอบสีน้ำตาลเข้ม</p>
+              <span class="click-hint">👆 คลิกเพื่อดูสารหลัก</span>
+              <div class="reveal-answer"><strong>AGEs (Advanced Glycation End-products), PAHs, Acrylamide</strong> จากความร้อนสูงแบบแห้ง</div>
+            </div>
+            <div class="card interactive-card" onclick="this.classList.toggle('revealed')">
+              <h3>🥜 3. ถั่ว พริกแห้ง ธัญพืชชื้น</h3>
+              <p>เครื่องปรุงบนโต๊ะก๋วยเตี๋ยว หรือธัญพืชที่เก็บไว้นาน</p>
+              <span class="click-hint">👆 คลิกเพื่อดูสารหลัก</span>
+              <div class="reveal-answer"><strong>Aflatoxin</strong> สารพิษจากเชื้อราที่ทนความร้อนจากการปรุงอาหารปกติ</div>
+            </div>
+            <div class="card interactive-card" onclick="this.classList.toggle('revealed')">
+              <h3>🍚 4. น้ำดื่มและวัตถุดิบจากดิน</h3>
+              <p>ข้าว ธัญพืช ผักผลไม้ หรืออาหารทะเลบางชนิด</p>
+              <span class="click-hint">👆 คลิกเพื่อดูสารหลัก</span>
+              <div class="reveal-answer"><strong>โลหะหนัก (Arsenic, ตะกั่ว, แคดเมียม, ปรอท)</strong> และสารกำจัดศัตรูพืชตกค้าง</div>
+            </div>
+            <div class="card interactive-card" onclick="this.classList.toggle('revealed')">
+              <h3>🥤 5. ถุงร้อน กล่องพลาสติก แก้วกาแฟ</h3>
+              <p>อาหารร้อนจัดในภาชนะพลาสติก หรือการอุ่นไมโครเวฟ</p>
+              <span class="click-hint">👆 คลิกเพื่อดูสารหลัก</span>
+              <div class="reveal-answer"><strong>ไมโครพลาสติก (Microplastics) และสารเติมแต่ง (BPA, Phthalates)</strong> ที่หลุดลอกเมื่อเจอความร้อน</div>
+            </div>
+            <div class="card card-accent-top">
+              <h3>💡 ข้อคิดสำคัญ</h3>
+              <p>เราไม่สามารถอยู่ในโลกที่ปลอดสารเคมี 100% ได้ แต่เราสามารถ <strong>“ลดภาระที่ไม่จำเป็น”</strong> ได้ทันทีเมื่อรู้แหล่งที่มา</p>
+            </div>
+          </div>
+        `
+      },
+      // SLIDE 3
+      {
+        act: "INTRODUCTION",
+        actColor: "#38bdf8",
+        time: "0–5 นาที",
+        ref: "หลักการพิษวิทยาพื้นฐาน",
+        title: "หลักการสำคัญ: สารพิษไม่ใช่ทุกอย่างที่เป็นสารเคมี",
+        subtitle: "ความเสี่ยงจากสารหนึ่ง ๆ ไม่ได้ดูแค่ว่า “มีหรือไม่มี” แต่ขึ้นอยู่กับ 5 ปัจจัยสำคัญร่วมกัน",
+        notes: "ย้ำกับผู้เรียนว่า อย่าเพิ่งตื่นตระหนกเมื่อเห็นข่าวตรวจพบสารเคมี ให้พิจารณา 5 ปัจจัยนี้เสมอ",
+        render: () => `
+          <div class="grid-5 stagger-2">
+            <div class="card card-accent-top">
+              <h3>🧪 1. ชนิดของสาร</h3>
+              <p>โครงสร้างทางเคมีและรูปแบบของสาร เช่น สารหนูอนินทรีย์ (Inorganic Arsenic) อันตรายกว่าสารหนูอินทรีย์</p>
+            </div>
+            <div class="card card-accent-top">
+              <h3>⚖️ 2. ปริมาณที่ได้รับ</h3>
+              <p>“The Dose Makes the Poison” — ปริมาณน้อยมากอาจไม่ก่อผลทางคลินิก แต่ปริมาณสูงทำลายเซลล์ทันที</p>
+            </div>
+            <div class="card card-accent-top">
+              <h3>⏳ 3. ระยะเวลาสัมผัส</h3>
+              <p>ได้รับครั้งเดียวแบบเฉียบพลัน (Acute) หรือสะสมทีละน้อยทุกวันต่อเนื่องหลายปี (Chronic Exposure)</p>
+            </div>
+            <div class="card card-accent-top">
+              <h3>🫁 4. ช่องทางเข้าสู่ร่างกาย</h3>
+              <p>การสูดดมผ่านปอด การกินผ่านทางเดินอาหาร หรือการซึมผ่านผิวหนัง มีอัตราการดูดซึมต่างกัน</p>
+            </div>
+            <div class="card card-accent-top">
+              <h3>🧬 5. ความไวแต่ละบุคคล</h3>
+              <p>อายุ พันธุกรรม เอนไซม์ตับ โรคประจำตัว (ตับ/ไตเสื่อม) และสถานะโภชนาการของแต่ละคน</p>
+            </div>
+          </div>
+          <div class="callout stagger-3">
+            📌 <strong>หลักคิดตลอดคลาสนี้:</strong> แยกแยะระหว่าง “ตรวจพบในห้องแล็บ” กับ “ก่อให้เกิดโรคในมนุษย์จริง” เพื่อจัดการความเสี่ยงอย่างมีสติ ไม่ตื่นตระหนก
+          </div>
+        `
+      },
+      // SLIDE 4
+      {
+        act: "ACT 1 · INVISIBLE EXPOSURE",
+        actColor: "#f59e0b",
+        time: "5–20 นาที",
+        ref: "ต้นฉบับหน้า 6–28",
+        title: "องก์ที่ 1: 5 แหล่งสารอันตรายที่พบในชีวิตประจำวัน",
+        subtitle: "สำรวจเส้นทางที่สารอันตรายแฝงตัวเข้ามาในกิจวัตรประจำวันของคนเมือง",
+        notes: "ภาพรวมขององก์ที่ 1 ที่เราจะเจาะลึกทีละตัว: PM2.5, AGEs, Aflatoxin, โลหะหนัก/Arsenic, และไมโครพลาสติก",
+        render: () => `
+          <div class="flow-chain stagger-2">
+            <div class="flow-node">
+              <div style="font-size:2rem;margin-bottom:8px;">🌫️</div>
+              <strong>1. PM2.5 & มลพิษอากาศ</strong>
+              <p style="font-size:0.82rem;color:var(--text-muted);margin-top:6px;">ฝุ่นขนาดจิ๋วทะลุเข้ากระแสเลือด</p>
+            </div>
+            <div class="flow-node">
+              <div style="font-size:2rem;margin-bottom:8px;">🔥</div>
+              <strong>2. AGEs จากความร้อนสูง</strong>
+              <p style="font-size:0.82rem;color:var(--text-muted);margin-top:6px;">ปิ้ง ย่าง ทอด อบแห้งเกรียม</p>
+            </div>
+            <div class="flow-node">
+              <div style="font-size:2rem;margin-bottom:8px;">🍄</div>
+              <strong>3. Aflatoxin จากเชื้อรา</strong>
+              <p style="font-size:0.82rem;color:var(--text-muted);margin-top:6px;">ถั่ว ธัญพืช พริกแห้งที่ชื้น</p>
+            </div>
+            <div class="flow-node">
+              <div style="font-size:2rem;margin-bottom:8px;">🌾</div>
+              <strong>4. โลหะหนัก & สารหนู</strong>
+              <p style="font-size:0.82rem;color:var(--text-muted);margin-top:6px;">ปนเปื้อนจากดินและน้ำในอาหาร</p>
+            </div>
+            <div class="flow-node">
+              <div style="font-size:2rem;margin-bottom:8px;">🧴</div>
+              <strong>5. ไมโครพลาสติก</strong>
+              <p style="font-size:0.82rem;color:var(--text-muted);margin-top:6px;">ภาชนะพลาสติกและความร้อน</p>
+            </div>
+          </div>
+          <div class="grid-2-equal stagger-3">
+            <div class="card">
+              <h3>🔍 ทำไมเรื่องนี้สำคัญกับ Organ Aging?</h3>
+              <p>สารทั้ง 5 กลุ่มนี้ไม่ได้ทำให้เกิดอาการป่วยฉับพลันในทันที แต่มันสร้าง <strong>ภาระสะสมระดับเซลล์ (Cumulative Cellular Burden)</strong> ให้กับปอด หลอดเลือด ตับ และไต ทุกวัน</p>
+            </div>
+            <div class="card">
+              <h3>🛡️ ข่าวดีคืออะไร?</h3>
+              <p>มากกว่า 70% ของการสัมผัสสารเหล่านี้ ขึ้นอยู่กับ <strong>วิธีเลือกซื้อ เก็บรักษา และปรุงอาหาร</strong> ซึ่งเราปรับเปลี่ยนได้เองที่บ้าน</p>
+            </div>
+          </div>
+        `
+      },
+      // SLIDE 5
+      {
+        act: "ACT 1 · INVISIBLE EXPOSURE",
+        actColor: "#f59e0b",
+        time: "5–20 นาที",
+        ref: "ต้นฉบับหน้า 6–10",
+        title: "แหล่งที่ 1: PM2.5 — ฝุ่นจิ๋วที่ไม่ได้หยุดแค่ปอด",
+        subtitle: "ขนาดเล็กกว่า 2.5 ไมครอน (เล็กกว่าเส้นผมมนุษย์ถึง 20–30 เท่า) ทำให้ซึมผ่านถุงลมเข้าสู่ระบบไหลเวียนเลือดได้",
+        image: DEFAULT_IMAGES.bangkokAir,
+        notes: "ชี้ให้เห็นว่า PM2.5 ไม่ได้ทำร้ายแค่ปอด แต่พาโลหะหนักและสารอินทรีย์ระเหยง่ายเข้าสู่หลอดเลือดหัวใจและสมองด้วย",
+        render: (idx) => `
+          <div class="grid-2">
+            <div class="stagger-1">
+              <div class="card">
+                <h3>📏 เปรียบเทียบขนาดอนุภาค</h3>
+                <div class="bar-wrap">
+                  <div class="bar-label"><span>เส้นผมมนุษย์ (50–70 µm)</span><span>100%</span></div>
+                  <div class="bar-track"><div class="bar-fill" style="width:100%;background:#64748b;"></div></div>
+                </div>
+                <div class="bar-wrap">
+                  <div class="bar-label"><span>ฝุ่น PM10 (≤ 10 µm) — ติดที่โพรงจมูก/หลอดลม</span><span>18%</span></div>
+                  <div class="bar-track"><div class="bar-fill" style="width:18%;background:#f59e0b;"></div></div>
+                </div>
+                <div class="bar-wrap">
+                  <div class="bar-label"><span>ฝุ่น PM2.5 (≤ 2.5 µm) — ทะลุถุงลมปอดเข้ากระแสเลือด</span><span>4%</span></div>
+                  <div class="bar-track"><div class="bar-fill" style="width:4%;background:#ef4444;"></div></div>
+                </div>
+                <ul style="margin-top:14px;">
+                  <li><strong>พื้นผิวของ PM2.5</strong> มักแบกสาร PAHs, โลหะหนัก และซัลเฟตติดมาด้วย</li>
+                  <li>กระตุ้นการอักเสบของผนังหลอดเลือด เพิ่มความเสี่ยงโรคหัวใจและหลอดเลือดสมอง</li>
+                </ul>
+              </div>
+              <div class="callout warn">
+                😷 <strong>วิธีลดการสัมผัสจริง:</strong> เช็กค่า AQI ก่อนออกกำลังกายกลางแจ้ง, ใช้เครื่องฟอกอากาศแผ่นกรอง HEPA ในห้องนอน และสวมหน้ากาก N95 ในวันที่ค่าฝุ่นสีส้ม-แดง
+              </div>
+            </div>
+            ${mediaBox(idx, DEFAULT_IMAGES.bangkokAir, "วิกฤตฝุ่น PM2.5 ในเขตเมืองที่ส่งผลกระทบต่อปอดและหลอดเลือด", "Air pollution in Bangkok · Red Level")}
+          </div>
+        `
+      },
+      // SLIDE 6
+      {
+        act: "ACT 1 · INVISIBLE EXPOSURE",
+        actColor: "#f59e0b",
+        time: "5–20 นาที",
+        ref: "ต้นฉบับหน้า 14–18",
+        title: "แหล่งที่ 2: AGEs จากการปรุงอาหารด้วยความร้อนสูง",
+        subtitle: "Advanced Glycation End-products เกิดเมื่อน้ำตาลทำปฏิกิริยากับโปรตีนหรือไขมัน (Maillard Reaction)",
+        image: DEFAULT_IMAGES.burntFood,
+        notes: "จุดเน้นผู้สอน: AGEs เกิดได้ทั้งภายในร่างกาย (โดยเฉพาะคนน้ำตาลในเลือดสูง) และจากอาหารที่ปรุงแบบแห้งด้วยความร้อนสูง แต่ไม่ควรสรุปเหมารวมว่าอาหารที่มี AGEs ทุกชนิดทำให้อวัยวะแก่เร็วในมนุษย์โดยตรง",
+        render: (idx) => `
+          <div class="grid-2">
+            <div class="stagger-1">
+              <div class="card">
+                <h3>🔥 2 แหล่งที่มาของ AGEs</h3>
+                <ul>
+                  <li><strong>1. เกิดขึ้นภายในร่างกาย (Endogenous):</strong> เมื่อระดับน้ำตาลในเลือดสูงต่อเนื่อง น้ำตาลจะไปจับกับโปรตีนในเนื้อเยื่อและหลอดเลือด</li>
+                  <li><strong>2. ได้รับจากอาหาร (Dietary / Exogenous):</strong> การปิ้ง ย่าง ทอด อบกรอบ ที่ใช้ <strong>ความร้อนสูงและสภาวะแห้ง</strong> จนเกิดสีน้ำตาลเข้มหรือไหม้เกรียม</li>
+                </ul>
+                <div style="margin-top:14px;padding:12px;border-radius:12px;background:rgba(255,255,255,0.04);">
+                  <strong>วิธีปรุงที่ลดการเกิด AGEs ได้มาก:</strong><br/>
+                  ✅ ต้ม · นึ่ง · ตุ๋น · ลวก (มีน้ำและความชื้น อุณหภูมิไม่เกิน 100°C)<br/>
+                  ✅ การหมักเนื้อสัตว์ด้วยกรดอ่อนๆ เช่น น้ำมะนาว หรือน้ำส้มสายชู ก่อนนำไปปรุง
+                </div>
+              </div>
+              <div class="callout warn">
+                ⚖️ <strong>Nuance สำคัญทางการแพทย์:</strong> แม้การลดของปิ้งย่างไหม้เกรียมจะดีต่อสุขภาพ แต่ <em>ไม่ควรสรุปเหมารวมว่าอาหารที่มี AGEs ทุกชนิดทำให้อวัยวะแก่เร็วในมนุษย์โดยตรง</em> เพราะการดูดซึมและการกำจัดในร่างกายมีหลายปัจจัยร่วมด้วย
+              </div>
+            </div>
+            ${mediaBox(idx, DEFAULT_IMAGES.burntFood, "คราบไหม้เกรียมและสีน้ำตาลเข้มจากการปรุงอาหารด้วยอุณหภูมิสูงแบบแห้ง", "ต้นฉบับหน้า 14–18 · Burnt crust & Maillard reaction")}
+          </div>
+        `
+      },
+      // SLIDE 7
+      {
+        act: "ACT 1 · INVISIBLE EXPOSURE",
+        actColor: "#f59e0b",
+        time: "5–20 นาที",
+        ref: "ต้นฉบับหน้า 19–21",
+        title: "แหล่งที่ 3: Aflatoxin — พิษร้ายจากเชื้อราที่ความร้อนทำลายไม่หมด",
+        subtitle: "สร้างจากเชื้อราตระกูล Aspergillus flavus และ A. parasiticus ในอาหารแห้งที่เก็บในที่ชื้นและร้อน",
+        image: DEFAULT_IMAGES.peanutsMold,
+        notes: "เน้นย้ำ: การให้ความร้อนตามปกติในการหุงต้มไม่สามารถรับประกันว่าทำลาย Aflatoxin ได้หมด ดังนั้นถ้าเห็นราหรือมีกลิ่นหืน ต้องทิ้งทันที",
+        render: (idx) => `
+          <div class="grid-2">
+            <div class="stagger-1">
+              <div class="card">
+                <h3>🥜 พบได้บ่อยในอาหารชนิดใด?</h3>
+                <ul>
+                  <li><strong>ถั่วลิสงคั่วป่น</strong> ที่เปิดทิ้งไว้นานในสภาพอากาศชื้น</li>
+                  <li><strong>พริกแห้ง พริกป่น กระเทียม หอมแดง</strong> ที่มีคราบราดำ/เขียว</li>
+                  <li><strong>ข้าวโพด ธัญพืช และเมล็ดพันธุ์</strong> ที่อบแห้งไม่สนิท</li>
+                </ul>
+              </div>
+              <div class="callout danger" style="margin-top:16px;">
+                🌡️ <strong>ความเข้าใจผิดที่พบบ่อย:</strong> “เอาไปต้มหรือผัดไฟแรงๆ เชื้อราก็ตายหมดแล้ว”<br/>
+                <strong>ความจริง:</strong> ความร้อนจากการปรุงอาหารปกติอาจฆ่าตัวเชื้อราได้ แต่ <strong>ตัวสารพิษ Aflatoxin ทนความร้อนสูงมาก (สลายตัวที่ > 250°C)</strong> การอุ่นหรือต้มตามปกติจึงไม่รับประกันว่าจะทำลายพิษได้หมด!
+              </div>
+              <div class="callout success">
+                ✅ <strong>ทางออก:</strong> เลือกซื้อถั่วคั่วใหม่ บรรจุภัณฑ์มิดชิด เก็บในตู้เย็น และหากพบกลิ่นหืนหรือจุดราให้ทิ้งทั้งถุงทันที
+              </div>
+            </div>
+            ${mediaBox(idx, DEFAULT_IMAGES.peanutsMold, "ถั่วลิสงและธัญพืชแห้งที่เสี่ยงต่อการปนเปื้อนสารพิษ Aflatoxin หากเก็บในที่ชื้น", "Food Safety & Mycotoxins")}
+          </div>
+        `
+      },
+      // SLIDE 8
+      {
+        act: "ACT 1 · INVISIBLE EXPOSURE",
+        actColor: "#f59e0b",
+        time: "5–20 นาที",
+        ref: "ต้นฉบับหน้า 22–25",
+        title: "แหล่งที่ 4: โลหะหนักและ Arsenic (สารหนู) ในข้าวและอาหาร",
+        subtitle: "ทำไมในข้าวจึงตรวจพบสารหนูได้? และเราควรเข้าใจเรื่องนี้อย่างไรโดยไม่ตื่นตระหนก?",
+        image: DEFAULT_IMAGES.riceGrain,
+        notes: "อธิบายว่า Arsenic เป็นธาตุที่มีตามธรรมชาติในเปลือกโลกและน้ำบาดาล ต้นข้าวเติบโตในแปลงนาที่มีน้ำขังจึงดูดซับสารหนูได้มากกว่าพืชไร่ชนิดอื่น แต่ไม่จำเป็นต้องเลิกกินข้าว!",
+        render: (idx) => `
+          <div class="grid-2">
+            <div class="stagger-1">
+              <div class="card">
+                <h3>🌾 ทำไมต้นข้าวถึงสะสมสารหนูได้มากกว่าพืชอื่น?</h3>
+                <ul>
+                  <li><strong>สภาพแปลงนาที่มีน้ำขัง:</strong> ทำให้สารหนูในดินละลายออกมาในน้ำ และรากข้าวดูดซับเข้าไปผ่านช่องทางเดียวกับซิลิกอน (Silicon)</li>
+                  <li><strong>สะสมที่ชั้นรำข้าว (Bran layer):</strong> ข้าวกล้องมีใยอาหารและวิตามินสูงกว่าข้าวขาว แต่อาจมีสารหนูอนินทรีย์สะสมที่ผิวรำมากกว่าเล็กน้อยหากมาจากแหล่งดินที่มีสารหนูสูง</li>
+                </ul>
+              </div>
+              <div class="callout">
+                🍚 <strong>ข้อสรุปจาก FDA และองค์กรอาหารระดับสากล:</strong><br/>
+                นี่คือตัวอย่างของสารปนเปื้อนที่มีหลักฐานจริง แต่ <strong>“ไม่จำเป็นต้องเลิกกินข้าว”</strong> เราสามารถลดความเสี่ยงได้อย่างมีประสิทธิภาพด้วยการสลับแหล่งคาร์โบไฮเดรตและวิธีหุงข้าวที่ถูกต้อง
+              </div>
+            </div>
+            ${mediaBox(idx, DEFAULT_IMAGES.riceGrain, "ข้าวเป็นอาหารหลักที่ให้พลังงานสำคัญ การเข้าใจวิธีจัดการช่วยลดสารหนูตกค้างได้", "Arsenic in Rice · Risk Management")}
+          </div>
+        `
+      },
+      // SLIDE 9
+      {
+        act: "ACT 1 · INVISIBLE EXPOSURE",
+        actColor: "#f59e0b",
+        time: "5–20 นาที",
+        ref: "FDA & งานวิจัยวิธีหุงข้าว",
+        title: "เทคนิคจัดการความเสี่ยง Arsenic ในข้าวอย่างสมดุล",
+        subtitle: "วิธีหุงข้าวด้วยน้ำส่วนเกินแล้วเทน้ำทิ้ง ช่วยลดสารหนูอนินทรีย์ได้ 40–60% พร้อมข้อแลกเปลี่ยนที่ต้องรู้",
+        notes: "เน้นตัวเลขจากงานศึกษา: การหุงด้วยน้ำส่วนเกิน (เช่น น้ำ 6–10 ส่วน ต่อข้าว 1 ส่วน) แล้วเทน้ำทิ้ง ลดสารหนูอนินทรีย์ได้ประมาณ 40–60% แต่ทำให้สูญเสียสารอาหารที่ละลายน้ำบางส่วน (เช่น วิตามินบี/โฟเลต) ด้วย",
+        render: () => `
+          <div class="grid-3 stagger-2">
+            <div class="card card-accent-top">
+              <h3>🚿 1. ซาวข้าวและหุงแบบเช็ดน้ำ</h3>
+              <p>การซาวข้าวหลายครั้ง และหุงด้วย <strong>น้ำส่วนเกิน (6–10 ต่อ 1) แล้วเทน้ำทิ้ง</strong></p>
+              <div class="bar-wrap" style="margin-top:14px;">
+                <div class="bar-label"><span>ลดสารหนูอนินทรีย์ (Inorganic Arsenic)</span><span class="tag tag-green">-40% ถึง -60%</span></div>
+                <div class="bar-track"><div class="bar-fill" style="width:55%;background:#10b981;"></div></div>
+              </div>
+            </div>
+            <div class="card card-accent-top">
+              <h3>⚖️ 2. ข้อแลกเปลี่ยน (Trade-off)</h3>
+              <p>การเทน้ำซาวข้าวและน้ำต้มข้าวทิ้ง จะทำให้ <strong>สูญเสียวิตามินที่ละลายน้ำบางส่วน</strong> (เช่น วิตามินบี 1, ไนอะซิน, โฟเลต และธาตุเหล็กบางส่วน)</p>
+              <p style="margin-top:10px;color:#38bdf8;">👉 จึงควรได้รับวิตามินบีและแร่ธาตุจากกับข้าว ผัก ไข่ และเนื้อสัตว์ที่หลากหลายควบคู่กัน</p>
+            </div>
+            <div class="card card-accent-top">
+              <h3>🥗 3. กินอาหารให้หลากหลาย</h3>
+              <p>ไม่กินข้าวจากแหล่งเดียวหรือชนิดเดียวซ้ำๆ ตลอดปี สลับกินคาร์โบไฮเดรตเชิงซ้อนอื่นๆ บ้าง เช่น:</p>
+              <ul style="margin-top:8px;">
+                <li>มันเทศ ฟักทอง เผือก ข้าวโอ๊ต คีนัว</li>
+                <li>สลับพันธุ์ข้าวและแหล่งเพาะปลูก</li>
+              </ul>
+            </div>
+          </div>
+          <div class="callout success stagger-3">
+            💡 <strong>Key Message:</strong> การจัดการความเสี่ยงทางพิษวิทยาที่ดี คือการเลือกวิธีที่ทำได้จริงในชีวิตประจำวัน โดยไม่สร้างภาวะขาดสารอาหารหรือความเครียดเกินจำเป็น
+          </div>
+        `
+      },
+      // SLIDE 10
+      {
+        act: "ACT 1 · INVISIBLE EXPOSURE",
+        actColor: "#f59e0b",
+        time: "5–20 นาที",
+        ref: "ต้นฉบับหน้า 26–28",
+        title: "แหล่งที่ 5: ไมโครพลาสติกจากภาชนะและเครื่องดื่ม",
+        subtitle: "แยกแยะระหว่าง “การตรวจพบอนุภาคในอาหาร” กับ “ผลเสียทางคลินิกที่พิสูจน์แล้วในมนุษย์”",
+        image: DEFAULT_IMAGES.plasticBottle,
+        notes: "สำหรับไมโครพลาสติก ให้แยกว่าการตรวจพบอนุภาคในอาหารหรือเครื่องดื่มไม่ได้แปลว่าได้พิสูจน์ผลเสียทางคลินิกในคนทุกกรณีแล้ว แต่การลดพลาสติกโดนความร้อนเป็นหลัก Precautionary Principle ที่คุ้มค่าและปลอดภัย",
+        render: (idx) => `
+          <div class="grid-2">
+            <div class="stagger-1">
+              <div class="card">
+                <h3>🔬 สิ่งที่วิทยาศาสตร์รู้แล้ว vs สิ่งที่กำลังศึกษา</h3>
+                <ul>
+                  <li><strong>สิ่งที่ตรวจพบจริง:</strong> พบอนุภาคไมโครพลาสติกและนาโนพลาสติกในน้ำดื่มบรรจุขวด เกลือทะเล อาหารทะเล และภาชนะพลาสติกที่โดนความร้อนสูง</li>
+                  <li><strong>ข้อเท็จจริงที่ต้องแยกแยะ:</strong> <em>การตรวจพบอนุภาคในอาหารหรือในเนื้อเยื่อ ไม่ได้แปลว่าได้พิสูจน์ผลเสียทางคลินิกในคนทุกกรณีแล้ว</em></li>
+                  <li>สิ่งที่ชัดเจนกว่าคือ <strong>สารเคมีเติมแต่งในพลาสติก (เช่น BPA, Phthalates)</strong> ที่รบกวนระบบฮอร์โมน (Endocrine Disruptors) เมื่อละลายออกมาโดนความร้อน</li>
+                </ul>
+              </div>
+              <div class="callout success">
+                🥣 <strong>วิธีปฏิบัติที่คุ้มค่าทันที:</strong> เลี่ยงการเทน้ำเดือดจัดใส่ถุงพลาสติก/กล่องโฟม และเปลี่ยนไปใช้ภาชนะแก้วหรือเซรามิกเมื่ออุ่นอาหารในไมโครเวฟ
+              </div>
+            </div>
+            ${mediaBox(idx, DEFAULT_IMAGES.plasticBottle, "ลดการใช้พลาสติกกับอาหารร้อนจัด ช่วยลดทั้งไมโครพลาสติกและสารรบกวนฮอร์โมน", "Microplastics & Food Contact Materials")}
+          </div>
+        `
+      },
+      // SLIDE 11
+      {
+        act: "ACT 2 · CELLULAR DAMAGE",
+        actColor: "#f43f5e",
+        time: "20–30 นาที",
+        ref: "ต้นฉบับหน้า 38–44",
+        title: "องก์ที่ 2: ทำไมสารอันตรายจึงเร่งความเสียหายของเซลล์?",
+        subtitle: "เชื่อมโยงจาก Toxic Exposure สู่ Organ Aging ที่เราเรียนไปในครั้งก่อน",
+        image: DEFAULT_IMAGES.cellularAging,
+        notes: "สไลด์นี้คือสะพานเชื่อมคลาสที่แล้วกับคลาสนี้: Exposure -> Oxidative Stress -> Inflammation -> Cellular Dysfunction -> Organ Aging",
+        render: (idx) => `
+          <div class="flow-chain stagger-1">
+            <div class="flow-node" style="border-color:#f59e0b;">
+              <strong>1. Toxic Exposure</strong>
+              <p style="font-size:0.8rem;color:var(--text-muted);margin-top:4px;">PM2.5, โลหะหนัก, สารปนเปื้อน</p>
+            </div>
+            <span class="flow-arrow">➜</span>
+            <div class="flow-node" style="border-color:#ef4444;">
+              <strong>2. Oxidative Stress</strong>
+              <p style="font-size:0.8rem;color:var(--text-muted);margin-top:4px;">อนุมูลอิสระ ROS ล้นเซลล์</p>
+            </div>
+            <span class="flow-arrow">➜</span>
+            <div class="flow-node" style="border-color:#f43f5e;">
+              <strong>3. Inflammation</strong>
+              <p style="font-size:0.8rem;color:var(--text-muted);margin-top:4px;">การอักเสบเรื้อรังระดับเซลล์</p>
+            </div>
+            <span class="flow-arrow">➜</span>
+            <div class="flow-node" style="border-color:#ec4899;">
+              <strong>4. Cell Dysfunction</strong>
+              <p style="font-size:0.8rem;color:var(--text-muted);margin-top:4px;">ไมโทคอนเดรีย & DNA เสียหาย</p>
+            </div>
+            <span class="flow-arrow">➜</span>
+            <div class="flow-node" style="border-color:#a855f7;">
+              <strong>5. Organ Aging</strong>
+              <p style="font-size:0.8rem;color:var(--text-muted);margin-top:4px;">ตับ ไต ปอด หลอดเลือดเสื่อมเร็ว</p>
+            </div>
+          </div>
+          <div class="grid-2" style="margin-top:12px;">
+            <div class="card">
+              <h3>🔗 จุดเชื่อมโยงกับเรื่อง Organ Aging</h3>
+              <p>อายุตามปฏิทิน (Chronological Age) เดินหน้าเท่ากันทุกคน แต่ <strong>อายุชีวภาพของอวัยวะ (Biological Organ Age)</strong> ของคนที่รับสารพิษสะสมและมีภาวะอักเสบเรื้อรัง จะเสื่อมเร็วกว่าคนวัยเดียวกัน</p>
+            </div>
+            ${mediaBox(idx, DEFAULT_IMAGES.cellularAging, "ความเสียหายระดับเซลล์ที่สะสมต่อเนื่องนำไปสู่ความเสื่อมของอวัยวะ", "ต้นฉบับหน้า 38–44 · Cellular Aging Mechanisms")}
+          </div>
+        `
+      },
+      // SLIDE 12
+      {
+        act: "ACT 2 · CELLULAR DAMAGE",
+        actColor: "#f43f5e",
+        time: "20–30 นาที",
+        ref: "ต้นฉบับหน้า 39–41",
+        title: "กลไกที่ 1 & 2: Oxidative Stress และ Chronic Inflammation",
+        subtitle: "เมื่อ “สนิมระดับโมเลกุล” จุดชนวน “ไฟอักเสบเรื้อรัง” ในเนื้อเยื่อ",
+        notes: "เปรียบเทียบ Oxidative stress เหมือนสนิมที่กัดกร่อนเยื่อหุ้มเซลล์ และ Inflammation เหมือนไฟไหม้ซึมลึกที่ทำลายเนื้อเยื่อข้างเคียง",
+        render: () => `
+          <div class="grid-2-equal stagger-2">
+            <div class="card card-accent-top">
+              <h3>⚡ 1. Oxidative Stress (ความเครียดออกซิเดชัน)</h3>
+              <ul>
+                <li>ตามปกติร่างกายสร้างอนุมูลอิสระ (ROS) จากการเผาผลาญพลังงาน และมีระบบต้านอนุมูลอิสระคอยสมดุลไว้</li>
+                <li>เมื่อได้รับสารพิษ (เช่น โลหะหนัก, PM2.5, ควันบุหรี่) ROS จะพุ่งสูงเกินขีดจำกัด</li>
+                <li>อนุมูลอิสระที่เกินมาจะเข้าทำลาย <strong>ไขมันที่เยื่อหุ้มเซลล์ (Lipid Peroxidation)</strong> และโปรตีนสำคัญ</li>
+              </ul>
+            </div>
+            <div class="card card-accent-top">
+              <h3>🔥 2. Chronic Inflammation (การอักเสบเรื้อรัง)</h3>
+              <ul>
+                <li>เซลล์ที่บาดเจ็บจาก Oxidative Stress จะส่งสัญญาณเตือนภัย (เช่น กระตุ้น NF-κB และไซโตไคน์อักเสบ)</li>
+                <li>หากเราสัมผัสสารพิษซ้ำๆ ทุกวัน สวิตช์การอักเสบจะไม่ยอมปิด กลายเป็น <strong>Inflammaging</strong></li>
+                <li>ส่งผลให้หลอดเลือดแข็งตัว เนื้อเยื่อเกิดพังผืด (Fibrosis) และการซ่อมแซมเซลล์ผิดปกติ</li>
+              </ul>
+            </div>
+          </div>
+          <div class="callout danger stagger-3">
+            🔄 <strong>วงจรอุบาทว์ (Vicious Cycle):</strong> Oxidative Stress กระตุ้นให้เกิดการอักเสบ และเซลล์เม็ดเลือดขาวที่เข้ามาอักเสบก็ปล่อยอนุมูลอิสระเพิ่มอีก ทำให้เซลล์เสื่อมสภาพเร็วขึ้นเป็นทวีคูณ
+          </div>
+        `
+      },
+      // SLIDE 13
+      {
+        act: "ACT 2 · CELLULAR DAMAGE",
+        actColor: "#f43f5e",
+        time: "20–30 นาที",
+        ref: "ต้นฉบับหน้า 42–44",
+        title: "กลไกที่ 3 & 4: Mitochondrial Dysfunction และ DNA Damage",
+        subtitle: "เมื่อโรงงานพลังงานของเซลล์รวน และพิมพ์เขียวพันธุกรรมเกิดรอยร้าว",
+        notes: "ไมโทคอนเดรียไวต่อสารพิษมากเพราะไม่มีเกราะป้องกัน DNA ที่แน่นหนาเหมือนนิวเคลียส เมื่อเสียหายเซลล์จะขาดพลังงานและเข้าสู่ภาวะเซลล์ชรา (Senescence)",
+        render: () => `
+          <div class="grid-2-equal stagger-2">
+            <div class="card card-accent-top">
+              <h3>🔋 3. Mitochondrial Dysfunction</h3>
+              <p style="margin-bottom:10px;">ไมโทคอนเดรียคือ “โรงไฟฟ้าของเซลล์” ที่ผลิตพลังงาน ATP ให้หัวใจ สมอง ตับ และไตทำงาน</p>
+              <ul>
+                <li>โลหะหนัก (เช่น ตะกั่ว แคดเมียม ปรอท) และสารพิษจากสิ่งแวดล้อม เข้าไปขัดขวางเอนไซม์ในไมโทคอนเดรีย</li>
+                <li>ทำให้ผลิตพลังงานลดลง แต่ปล่อยอนุมูลอิสระรั่วไหลออกมามากขึ้น</li>
+                <li>อวัยวะที่ใช้พลังงานสูง (สมอง หัวใจ ตับ ไต) จึงเสื่อมสมรรถภาพก่อน</li>
+              </ul>
+            </div>
+            <div class="card card-accent-top">
+              <h3>🧬 4. DNA Damage & Cellular Senescence</h3>
+              <p style="margin-bottom:10px;">สารพิษบางชนิด (เช่น Aflatoxin, PAHs, โลหะหนัก) ทำลายสาย DNA โดยตรงหรือขัดขวางการซ่อมแซม DNA</p>
+              <ul>
+                <li>หากรอยเสียหายซ่อมแซมไม่ทัน เซลล์จะหยุดแบ่งตัวและกลายเป็น <strong>“เซลล์ซอมบี้” (Senescent Cells)</strong></li>
+                <li>หรือหากเกิดการกลายพันธุ์ในยีนควบคุมการแบ่งตัว (เช่น ยีน TP53 จากพิษ Aflatoxin) ก็เพิ่มความเสี่ยงมะเร็งตับ</li>
+              </ul>
+            </div>
+          </div>
+        `
+      },
+      // SLIDE 14
+      {
+        act: "ACT 2 · CELLULAR DAMAGE",
+        actColor: "#f43f5e",
+        time: "20–30 นาที",
+        ref: "สรุปเชื่อมโยงองก์ 1–2",
+        title: "แผนที่ผลกระทบ: สารอันตรายแต่ละกลุ่ม ทิ้งภาระไว้ที่อวัยวะใด?",
+        subtitle: "สรุปความเชื่อมโยงระหว่างชนิดของสารพิษ กลไกระดับเซลล์ และความเสื่อมของอวัยวะเป้าหมาย",
+        notes: "ใช้ตารางนี้ทบทวนความเข้าใจของผู้เรียนก่อนเข้าสู่องก์ที่ 3 เรื่องระบบกำจัดสารตามธรรมชาติของร่างกาย",
+        render: () => `
+          <table class="evidence-table stagger-2">
+            <thead>
+              <tr>
+                <th>สารอันตรายใกล้ตัว</th>
+                <th>ช่องทางหลัก</th>
+                <th>กลไกระดับเซลล์</th>
+                <th>อวัยวะที่รับภาระหลัก (Organ Aging)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>🌫️ PM2.5 & ควันเผาไหม้</strong></td>
+                <td>การหายใจ</td>
+                <td>Oxidative stress + การอักเสบของผนังหลอดเลือด</td>
+                <td><span class="tag tag-red">ปอด · หัวใจและหลอดเลือด · สมอง</span></td>
+              </tr>
+              <tr>
+                <td><strong>🍄 Aflatoxin (เชื้อราในอาหาร)</strong></td>
+                <td>การกิน</td>
+                <td>ถูกเปลี่ยนในตับเป็นสารที่จับกับสาย DNA (DNA Adducts)</td>
+                <td><span class="tag tag-red">ตับ (เซลล์ตับอักเสบ/พังผืด/มะเร็งตับ)</span></td>
+              </tr>
+              <tr>
+                <td><strong>🌾 โลหะหนัก (สารหนู, แคดเมียม, ตะกั่ว)</strong></td>
+                <td>อาหารและน้ำ</td>
+                <td>ยับยั้งเอนไซม์ต้านอนุมูลอิสระ & ทำลายไมโทคอนเดรีย</td>
+                <td><span class="tag tag-amber">ไต (ท่อไตเสื่อม) · ตับ · ระบบประสาท</span></td>
+              </tr>
+              <tr>
+                <td><strong>🔥 AGEs ปริมาณสูงต่อเนื่อง</strong></td>
+                <td>อาหารร้อนจัด/น้ำตาลสูง</td>
+                <td>จับกับตัวรับ RAGE กระตุ้นการอักเสบและคอลลาเจนแข็งตัว</td>
+                <td><span class="tag tag-amber">หลอดเลือด · ไต · ผิวหนังและเนื้อเยื่อ</span></td>
+              </tr>
+            </tbody>
+          </table>
+        `
+      },
+      // SLIDE 15
+      {
+        act: "ACT 3 · NATURAL DETOX",
+        actColor: "#10b981",
+        time: "30–45 นาที",
+        ref: "ต้นฉบับหน้า 68–72",
+        title: "องก์ที่ 3: ร่างกายมีระบบกำจัดสารพิษตามธรรมชาติอยู่แล้ว",
+        subtitle: "ตับ ไต และลำไส้ คือโรงงานจัดการสารเคมีที่ทำงานให้เราตลอด 24 ชั่วโมงโดยไม่ต้องรอ “คอร์สดีท็อกซ์”",
+        image: DEFAULT_IMAGES.naturalDetox,
+        notes: "ประโยคที่ต้องเน้นย้ำในห้องเรียน: “ร่างกายเรามีระบบกำจัดสารอยู่แล้ว เป้าหมายไม่ใช่กระตุ้นให้ขับพิษมากที่สุด แต่คือหลีกเลี่ยงการรับสารอันตรายเกินจำเป็นและดูแลให้ระบบต่าง ๆ ทำงานตามปกติ”",
+        render: (idx) => `
+          <div class="grid-2">
+            <div class="stagger-1" style="display:flex;flex-direction:column;justify-content:center;gap:18px;">
+              <div class="callout success" style="font-size:1.15rem;padding:24px;">
+                💬 <strong>หัวใจสำคัญของห้องเรียนนี้:</strong><br/><br/>
+                “ร่างกายเรามีระบบกำจัดสารอยู่แล้ว เป้าหมาย<strong>ไม่ใช่การกระตุ้นให้ขับพิษมากที่สุด</strong> แต่คือ<strong>หลีกเลี่ยงการรับสารอันตรายเกินจำเป็น</strong> และดูแลให้ระบบต่าง ๆ ทำงานตามปกติ”
+              </div>
+              <div class="card">
+                <h3>🏭 ทำไมตับ ไต ลำไส้ ต้องทำงานร่วมกัน?</h3>
+                <p>สารพิษหลายชนิดละลายในไขมัน (Lipophilic) จึงขับออกทางปัสสาวะหรืออุจจาระโดยตรงไม่ได้ ร่างกายจึงต้องใช้ <strong>ตับ</strong> แปรรูปให้ละลายน้ำได้ก่อน แล้วส่งให้ <strong>ไต</strong> และ <strong>ลำไส้</strong> ขับออกจากร่างกาย</p>
+              </div>
+            </div>
+            ${mediaBox(idx, DEFAULT_IMAGES.naturalDetox, "ระบบสรีรวิทยาของตับ ไต และลำไส้ คือกลไกจัดการสารเคมีตามธรรมชาติที่ทรงประสิทธิภาพที่สุด", "ต้นฉบับหน้า 68–79 · Natural Detoxification Organs")}
+          </div>
+        `
+      }
+    ];
+  </script>
+  <script>
+    SLIDES.push(
+      // SLIDE 16
+      {
+        act: "ACT 3 · NATURAL DETOX",
+        actColor: "#10b981",
+        time: "30–45 นาที",
+        ref: "ต้นฉบับหน้า 73 & 76",
+        title: "อธิบายตับเหมือน “โรงงานจัดการสารเคมี 3 แผนก”",
+        subtitle: "การเปลี่ยนแปลงสารแปลกปลอม (Xenobiotic Biotransformation) ผ่าน Phase I, II และ III",
+        notes: "ใช้แผนภาพหน้า 73 และ 76 ของต้นฉบับ อธิบายว่าตับเปลี่ยนสารที่ละลายในไขมันให้กลายเป็นสารที่ละลายน้ำได้ เพื่อขับออกทางน้ำดีหรือปัสสาวะ",
+        render: () => `
+          <div class="flow-chain stagger-2">
+            <div class="flow-node" style="border-color:#f59e0b;">
+              <span class="tag tag-amber">สารตั้งต้น</span>
+              <h3 style="justify-content:center;margin-top:8px;">🧪 สารแปลกปลอม</h3>
+              <p style="font-size:0.84rem;">ละลายในไขมัน ขับออกยาก (ยา, สารพิษ, ฮอร์โมนเกิน)</p>
+            </div>
+            <span class="flow-arrow">➜</span>
+            <div class="flow-node" style="border-color:#ef4444;">
+              <span class="tag tag-red">PHASE I</span>
+              <h3 style="justify-content:center;margin-top:8px;">⚙️ Transformation</h3>
+              <p style="font-size:0.84rem;">เปลี่ยนโครงสร้างด้วยเอนไซม์ <strong>Cytochrome P450</strong></p>
+            </div>
+            <span class="flow-arrow">➜</span>
+            <div class="flow-node" style="border-color:#10b981;">
+              <span class="tag tag-green">PHASE II</span>
+              <h3 style="justify-content:center;margin-top:8px;">🔗 Conjugation</h3>
+              <p style="font-size:0.84rem;">จับคู่กับโมเลกุล เช่น <strong>Glutathione / Glucuronic acid</strong></p>
+            </div>
+            <span class="flow-arrow">➜</span>
+            <div class="flow-node" style="border-color:#38bdf8;">
+              <span class="tag tag-blue">PHASE III</span>
+              <h3 style="justify-content:center;margin-top:8px;">🚚 Transport</h3>
+              <p style="font-size:0.84rem;">ขนส่งออกจากเซลล์ไปสู่น้ำดี (อุจจาระ) หรือเลือด (ปัสสาวะ)</p>
+            </div>
+          </div>
+          <div class="callout warn stagger-3">
+            ⚠️ <strong>หมายเหตุสำคัญ:</strong> ไม่ใช่ว่าสารทุกชนิดต้องผ่านครบทุกระยะเรียงตามลำดับ 1 → 2 → 3 เสมอไป สารบางตัวเข้าสู่ Phase II ได้เลย หรือบางตัวขับออกทางไตได้โดยตรง
+          </div>
+        `
+      },
+      // SLIDE 17
+      {
+        act: "ACT 3 · NATURAL DETOX",
+        actColor: "#10b981",
+        time: "30–45 นาที",
+        ref: "ต้นฉบับหน้า 73–75",
+        title: "เจาะลึกตับ Phase I — Transformation (การดัดแปลงโครงสร้าง)",
+        subtitle: "ทำงานโดยกลุ่มเอนไซม์ Cytochrome P450 (CYP450) เพื่อเปิดช่องให้สารเคมีพร้อมถูกจัดการต่อ",
+        notes: "จุดที่ผู้สอนต้องเน้น: ปฏิกิริยาบางอย่างใน Phase I อาจทำให้เกิดสารตัวกลางที่มีฤทธิ์หรือมีความเป็นพิษมากขึ้นชั่วคราว (Bioactivation) เช่น กรณีพาราเซตามอลเกินขนาดหรือ Aflatoxin",
+        render: () => `
+          <div class="grid-2-equal stagger-2">
+            <div class="card card-accent-top">
+              <h3>🔬 หน้าที่ของ Phase I</h3>
+              <ul>
+                <li>ใช้ปฏิกิริยา Oxidation, Reduction หรือ Hydrolysis โดยมีเอนไซม์ <strong>Cytochrome P450 (CYP)</strong> เป็นพระเอก</li>
+                <li>เปรียบเสมือนการ “ติดหูหิ้ว” ให้กับโมเลกุลของสารพิษ เพื่อให้แผนกที่ 2 (Phase II) เข้ามาจับตัวได้ง่ายขึ้น</li>
+                <li>จัดการทั้งยา คาเฟอีน แอลกอฮอล์ สารเคมีจากควัน และสารพิษจากอาหาร</li>
+              </ul>
+            </div>
+            <div class="card card-accent-top" style="border-top-color:#ef4444;">
+              <h3>⚡ ดาบสองคมของ Phase I (Bioactivation)</h3>
+              <ul>
+                <li>ปฏิกิริยาบางอย่างใน Phase I อาจสร้าง <strong>สารตัวกลางที่มีฤทธิ์รุนแรงหรือเป็นพิษมากกว่าเดิม (Reactive Intermediates)</strong> และเกิดอนุมูลอิสระขึ้น</li>
+                <li>ตัวอย่างเช่น <strong>Aflatoxin B1</strong> หรือการกินยา <strong>Paracetamol เกินขนาด</strong> (เกิดสารพิษ NAPQI)</li>
+                <li>จึงจำเป็นต้องมี <strong>Phase II และระบบต้านอนุมูลอิสระ</strong> ที่พร้อมทำงานรับช่วงต่อทันที!</li>
+              </ul>
+            </div>
+          </div>
+        `
+      },
+      // SLIDE 18
+      {
+        act: "ACT 3 · NATURAL DETOX",
+        actColor: "#10b981",
+        time: "30–45 นาที",
+        ref: "ต้นฉบับหน้า 76–77",
+        title: "เจาะลึกตับ Phase II — Conjugation (การจับคู่ทำให้เป็นกลาง)",
+        subtitle: "นำสารมาจับกับโมเลกุลอื่นเพื่อให้หมดฤทธิ์พิษและละลายน้ำได้ดียิ่งขึ้น",
+        notes: "ชี้ให้เห็นว่า Phase II ต้องใช้วัตถุดิบจากโภชนาการ เช่น กรดอะมิโนสำหรับสร้าง Glutathione, ซัลเฟต และสารกลุ่ม Glucuronic acid",
+        render: () => `
+          <div class="grid-3 stagger-2">
+            <div class="card card-accent-top">
+              <h3>🛡️ 1. Glutathione Conjugation</h3>
+              <p>ใช้ <strong>กลูตาไธโอน (GSH)</strong> และเอนไซม์ GST จับกับสารพิษที่มีฤทธิ์รุนแรง โลหะหนักบางชนิด และเมแทบอไลต์ของยา</p>
+            </div>
+            <div class="card card-accent-top">
+              <h3>💧 2. Glucuronidation</h3>
+              <p>นำ <strong>Glucuronic acid</strong> มาเกาะกับสารเคมี ยา ฮอร์โมนส่วนเกิน และสารก่อมะเร็งบางชนิด เพื่อให้ละลายน้ำออกไปกับน้ำดีหรือปัสสาวะ</p>
+            </div>
+            <div class="card card-accent-top">
+              <h3>🥦 3. Sulfation & Methylation</h3>
+              <p>อาศัยหมู่ซัลเฟต กรดอะมิโน (เช่น Glycine, Taurine) และวิตามินกลุ่ม Methyl donors ในการทำให้สารเคมีมีความปลอดภัยขึ้น</p>
+            </div>
+          </div>
+          <div class="callout success stagger-3">
+            🥩 <strong>ทำไมคนอดอาหารจัดหรือขาดโปรตีนถึงกำจัดสารพิษได้แย่ลง?</strong><br/>
+            เพราะตับในระยะ Phase II ต้องใช้ <strong>กรดอะมิโนจากโปรตีน</strong> (Cysteine, Glycine, Glutamate, Taurine) เป็นวัตถุดิบในการจับกับสารพิษตลอดเวลา!
+          </div>
+        `
+      },
+      // SLIDE 19
+      {
+        act: "ACT 3 · NATURAL DETOX",
+        actColor: "#10b981",
+        time: "30–45 นาที",
+        ref: "ต้นฉบับหน้า 78–79",
+        title: "เจาะลึก Phase III — Transport & Elimination (การขนส่งและขับออก)",
+        subtitle: "เมื่อตับแพ็กสารพิษใส่กล่องเรียบร้อยแล้ว จะส่งออกนอกเซลล์ผ่าน 2 เส้นทางหลัก",
+        image: DEFAULT_IMAGES.waterKidney,
+        notes: "อธิบายว่า Phase III คือโปรตีนขนส่ง (Transporters) ที่ปั๊มสารออกจากเซลล์ตับไปทางน้ำดี (ออกทางอุจจาระ) หรือเข้ากระแสเลือดไปที่ไต (ออกทางปัสสาวะ)",
+        render: (idx) => `
+          <div class="grid-2">
+            <div class="stagger-1" style="display:flex;flex-direction:column;gap:16px;">
+              <div class="card card-accent-top">
+                <h3>🚰 เส้นทางที่ 1: เข้าสู่กระแสเลือด ➜ ไต ➜ ปัสสาวะ</h3>
+                <p>สารที่ละลายน้ำได้ดีและมีขนาดโมเลกุลเล็ก จะถูกส่งเข้าสู่เลือด กรองผ่านไต และขับออกทางปัสสาวะ</p>
+                <p style="margin-top:8px;color:#38bdf8;">👉 <strong>การดื่มน้ำสะอาดอย่างเพียงพอ</strong> จึงเป็นวิธีช่วยไตที่ตรงไปตรงมาที่สุด</p>
+              </div>
+              <div class="card card-accent-top">
+                <h3>🚽 เส้นทางที่ 2: เข้าสู่ท่อน้ำดี ➜ ลำไส้ ➜ อุจจาระ</h3>
+                <p>สารที่มีขนาดโมเลกุลใหญ่กว่าจะถูกขับออกมากับ <strong>น้ำดี (Bile)</strong> ลงสู่ลำไส้เล็ก เพื่อรอขับออกพร้อมกับอุจจาระ</p>
+                <p style="margin-top:8px;color:#34d399;">👉 <strong>ใยอาหารและการขับถ่ายปกติ</strong> จึงช่วยพาของเสียออกจากร่างกาย</p>
+              </div>
+            </div>
+            ${mediaBox(idx, DEFAULT_IMAGES.waterKidney, "การดื่มน้ำให้เพียงพอคือการสนับสนุนการทำงานของไตในการกรองของเสียตามธรรมชาติ", "Kidney Filtration & Hydration")}
+          </div>
+        `
+      },
+      // SLIDE 20
+      {
+        act: "ACT 3 · NATURAL DETOX",
+        actColor: "#10b981",
+        time: "30–45 นาที",
+        ref: "ต้นฉบับหน้า 101–102",
+        title: "บทบาทของลำไส้และ Gut Microbiome ในการกำจัดสารพิษ",
+        subtitle: "ทำไมสุขภาพลำไส้และจุลินทรีย์จึงเป็นด่านสุดท้ายที่ตัดสินว่าสารพิษจะถูกขับออกหรือถูกดูดซึมกลับ?",
+        notes: "อธิบายกลไก Enterohepatic recirculation: ถ้าท้องผูกหรือจุลินทรีย์เสียสมดุล เอนไซม์บางตัวจากแบคทีเรียตัวร้ายจะตัดพันธะที่ตับอุตส่าห์แพ็กมาใน Phase II ทำให้สารพิษถูกดูดซึมกลับเข้าตับอีกรอบ",
+        render: () => `
+          <div class="grid-3 stagger-2">
+            <div class="card card-accent-top">
+              <h3>🧱 1. Gut Barrier (ผนังกั้นลำไส้)</h3>
+              <p>เยื่อบุลำไส้ที่แข็งแรงทำหน้าที่เป็นด่านตรวจคนเข้าเมือง สกัดกั้นไม่ให้สารพิษ โลหะหนัก และชิ้นส่วนแบคทีเรีย (Endotoxin/LPS) รั่วซึมเข้าสู่กระแสเลือดไปที่ตับ</p>
+            </div>
+            <div class="card card-accent-top">
+              <h3>♻️ 2. ลดการดูดซึมกลับ (Recirculation)</h3>
+              <p>ตับส่งสารพิษที่จับคู่แล้วมากับน้ำดี แต่หาก <strong>ท้องผูกเรื้อรังหรือจุลินทรีย์เสียสมดุล</strong> แบคทีเรียบางชนิดจะสร้างเอนไซม์ตัดพันธะออก ทำให้สารพิษถูกดูดซึมกลับเข้าสู่ตับซ้ำอีกครั้ง</p>
+            </div>
+            <div class="card card-accent-top">
+              <h3>🌾 3. บทบาทของใยอาหาร (Fiber)</h3>
+              <p>ใยอาหารช่วยอุ้มน้ำดีและสารพิษไว้ในลำไส้ เร่งเวลาการเดินทางของอุจจาระ (Transit time) และเป็นอาหารให้จุลินทรีย์ดีผลิตกรดไขมันสายสั้น (SCFAs) บำรุงผนังลำไส้</p>
+            </div>
+          </div>
+        `
+      },
+      // SLIDE 21
+      {
+        act: "ACT 4 · NUTRITION & SUPPLEMENTS",
+        actColor: "#8b5cf6",
+        time: "45–60 นาที",
+        ref: "ต้นฉบับหน้า 81–84",
+        title: "องก์ที่ 4: Glutathione, Nrf2 และระบบปกป้องเซลล์",
+        subtitle: "เข้าใจกลไก “สวิตช์ป้องกันตัวเองของเซลล์” ก่อนตัดสินใจเลือกกินอาหารหรืออาหารเสริม",
+        image: DEFAULT_IMAGES.healthyFood,
+        notes: "อธิบาย Nrf2 ให้เห็นภาพว่าเป็น Master Regulator หรือสวิตช์หลักที่สั่งให้เซลล์สร้างเอนไซม์ต้านอนุมูลอิสระและเอนไซม์ Phase II รวมถึง Glutathione",
+        render: (idx) => `
+          <div class="grid-2">
+            <div class="stagger-1" style="display:flex;flex-direction:column;gap:16px;">
+              <div class="card card-accent-top">
+                <h3>🎛️ Nrf2 คืออะไร? (เปรียบเหมือนสวิตช์สัญญาณป้องกันภัย)</h3>
+                <p><strong>Nrf2</strong> คือโปรตีนควบคุมยีนในเซลล์ เมื่อถูกกระตุ้นอย่างเหมาะสม (เช่น จากการออกกำลังกายพอเหมาะ หรือสารพฤกษเคมีจากผัก) มันจะเข้าไปในนิวเคลียสและสั่งให้เซลล์ผลิตเอนไซม์ต้านอนุมูลอิสระและเอนไซม์ตับ Phase II เพิ่มขึ้น</p>
+              </div>
+              <div class="card card-accent-top">
+                <h3>🛡️ Glutathione (GSH) คืออะไร?</h3>
+                <p>คือสารต้านอนุมูลอิสระหลักที่ <strong>เซลล์ของเราสร้างขึ้นเองภายใน</strong> จากกรดอะมิโน 3 ชนิด (Cysteine, Glycine, Glutamate) ทำหน้าที่ทั้งดับอนุมูลอิสระและจับกับสารพิษในตับ Phase II</p>
+              </div>
+            </div>
+            ${mediaBox(idx, DEFAULT_IMAGES.healthyFood, "สารอาหารจากธรรมชาติและโปรตีนคุณภาพดีคือรากฐานของระบบ Nrf2 และ Glutathione", "ต้นฉบับหน้า 81–94 · Nutrition & Cellular Defense")}
+          </div>
+        `
+      },
+      // SLIDE 22
+      {
+        act: "ACT 4 · NUTRITION & SUPPLEMENTS",
+        actColor: "#8b5cf6",
+        time: "45–60 นาที",
+        ref: "ต้นฉบับหน้า 82–85",
+        title: "Sulforaphane และผักตระกูลกะหล่ำ: สิ่งที่หลักฐานบอก vs ข้อจำกัด",
+        subtitle: "บรอกโคลี คะน้า กะหล่ำปลี เคล และบทบาทต่อ Nrf2 signaling",
+        image: DEFAULT_IMAGES.cruciferous,
+        notes: "เน้นตามคู่มือผู้สอน: Sulforaphane จากผักตระกูลกะหล่ำเกี่ยวข้องกับ Nrf2 signaling จริง แต่ผลทางโมเลกุลไม่ใช่หลักฐานว่ารักษาพิษโลหะหนักในคนได้",
+        render: (idx) => `
+          <div class="grid-2">
+            <div class="stagger-1">
+              <div class="card">
+                <h3>🥦 สิ่งที่วิทยาศาสตร์ค้นพบ (What We Teach)</h3>
+                <ul>
+                  <li>ในผักตระกูลกะหล่ำมีสารตั้งต้นชื่อ <strong>Glucoraphanin</strong> เมื่อเราหั่นหรือเคี้ยว เอนไซม์ Myrosinase จะเปลี่ยนมันเป็น <strong>Sulforaphane</strong></li>
+                  <li>Sulforaphane เป็นตัวกระตุ้นเส้นทาง <strong>Nrf2 signaling</strong> ที่ได้รับการศึกษาอย่างกว้างขวาง ช่วยเพิ่มการทำงานของเอนไซม์ตับ Phase II บางชนิดในการทดลอง</li>
+                </ul>
+              </div>
+              <div class="callout warn" style="margin-top:16px;">
+                ⚠️ <strong>ข้อจำกัดที่ต้องบอกผู้เรียนชัดเจน:</strong><br/>
+                <em>“ผลทางโมเลกุลในการกระตุ้น Nrf2 ไม่ใช่หลักฐานว่าอาหารเสริม Sulforaphane สามารถใช้รักษาภาวะพิษโลหะหนักในคนได้”</em> การกินผักตระกูลกะหล่ำเป็นอาหารปกติให้ความปลอดภัยและได้ใยอาหารควบคู่กัน
+              </div>
+            </div>
+            ${mediaBox(idx, DEFAULT_IMAGES.cruciferous, "บรอกโคลีและผักตระกูลกะหล่ำ แหล่งของ Sulforaphane และใยอาหารตามธรรมชาติ", "Cruciferous Vegetables & Nrf2")}
+          </div>
+        `
+      },
+      // SLIDE 23
+      {
+        act: "ACT 4 · NUTRITION & SUPPLEMENTS",
+        actColor: "#8b5cf6",
+        time: "45–60 นาที",
+        ref: "ต้นฉบับหน้า 87–91",
+        title: "เจาะลึก NAC และ Alpha-Lipoic Acid (ALA)",
+        subtitle: "แยกแยะระหว่าง “ข้อบ่งชี้ทางการแพทย์ในโรงพยาบาล” กับ “การกินเป็นอาหารเสริมล้างพิษทั่วไป”",
+        notes: "NAC เป็นสารตั้งต้นของ Glutathione และใช้เป็นยาต้านพิษ Paracetamol ใน รพ. แต่ไม่ใช่อาหารเสริมล้างพิษที่ทุกคนจำเป็นต้องกิน ส่วน ALA มีงานศึกษาเรื่อง Redox balance แต่ไม่ใช่มาตรฐานการรักษาพิษโลหะหนัก",
+        render: () => `
+          <div class="grid-2-equal stagger-2">
+            <div class="card card-accent-top">
+              <h3>💊 N-Acetylcysteine (NAC)</h3>
+              <p><span class="tag tag-green">สิ่งที่สอน</span></p>
+              <ul style="margin-top:8px;">
+                <li>เป็นแหล่งของกรดอะมิโน Cysteine ซึ่งเป็น <strong>สารตั้งต้นของ Glutathione</strong></li>
+                <li>ในทางการแพทย์ ใช้เป็น <strong>ยาต้านพิษ (Antidote) มาตรฐานสำหรับภาวะพิษจากยา Paracetamol เกินขนาด</strong> และใช้ละลายเสมหะ</li>
+              </ul>
+              <div class="callout warn" style="margin-top:14px;">
+                🚫 <strong>ข้อจำกัดที่ต้องบอก:</strong> <em>ไม่ใช่อาหารเสริมล้างพิษที่คนสุขภาพดีทุกคนจำเป็นต้องกินเป็นประจำ</em>
+              </div>
+            </div>
+            <div class="card card-accent-top">
+              <h3>⚡ Alpha-Lipoic Acid (ALA)</h3>
+              <p><span class="tag tag-green">สิ่งที่สอน</span></p>
+              <ul style="margin-top:8px;">
+                <li>เกี่ยวข้องกับสมดุล <strong>Redox balance</strong> ในไมโทคอนเดรีย และช่วยรีไซเคิลสารต้านอนุมูลอิสระตัวอื่น (เช่น วิตามิน C, E และ Glutathione)</li>
+                <li>มีงานศึกษาทางคลินิกในบางภาวะ เช่น ปลายประสาทเสื่อมจากเบาหวาน (Diabetic Neuropathy)</li>
+              </ul>
+              <div class="callout warn" style="margin-top:14px;">
+                🚫 <strong>ข้อจำกัดที่ต้องบอก:</strong> แม้จะมีคุณสมบัติจับโลหะในหลอดทดลอง แต่ <em>ไม่ใช่มาตรฐานการรักษาพิษโลหะหนักในทางการแพทย์</em>
+              </div>
+            </div>
+          </div>
+        `
+      },
+      // SLIDE 24
+      {
+        act: "ACT 4 · NUTRITION & SUPPLEMENTS",
+        actColor: "#8b5cf6",
+        time: "45–60 นาที",
+        ref: "ต้นฉบับหน้า 86, 92–94, 109–111 & NCCIH",
+        title: "เจาะลึก Curcumin และ Silymarin (Milk Thistle) + ข้อควรระวังสำคัญ",
+        subtitle: "ทำไมสารสกัดสมุนไพรที่โฆษณาว่า “บำรุงตับ” บางครั้งกลับทำให้เกิดการบาดเจ็บของตับได้?",
+        image: DEFAULT_IMAGES.turmeric,
+        notes: "จุดเน้นสำคัญมากจากต้นฉบับหน้า 86 และข้อมูล NCCIH: สารสกัด Curcumin เข้มข้นบางสูตร (โดยเฉพาะสูตรที่เติม Piperine เพื่อเพิ่มการดูดซึม) สัมพันธ์กับรายงานการบาดเจ็บของตับ (Liver injury) และเกิดปฏิกิริยากับยาได้",
+        render: (idx) => `
+          <div class="grid-2">
+            <div class="stagger-1" style="display:flex;flex-direction:column;gap:14px;">
+              <div class="card">
+                <h3>🟡 Curcumin (สารสกัดขมิ้นชัน)</h3>
+                <p><strong>สิ่งที่สอน:</strong> มีงานศึกษาด้านการต้านอักเสบและกลไก Nrf2</p>
+                <div class="callout danger" style="margin-top:10px;">
+                  🚨 <strong>ข้อควรระวังสำคัญ (ต้นฉบับหน้า 86 & NCCIH):</strong><br/>
+                  สารสกัดเข้มข้นบางสูตร (โดยเฉพาะสูตรที่ปรับเพิ่มการดูดซึมสูง) <strong>มีความสัมพันธ์กับรายงานภาวะตับอักเสบ/การบาดเจ็บของตับ (Drug-Induced Liver Injury)</strong> และมีปฏิกิริยากับยาหลายชนิด!
+                </div>
+              </div>
+              <div class="card">
+                <h3>🌸 Silymarin (Milk Thistle)</h3>
+                <p><strong>สิ่งที่สอน:</strong> มีงานศึกษาฤทธิ์ปกป้องเซลล์ตับและต้านอนุมูลอิสระ</p>
+                <p style="margin-top:6px;color:#fbbf24;">⚠️ <strong>ข้อจำกัด:</strong> หลักฐานประสิทธิผลทางคลินิกในมนุษย์ขึ้นกับชนิดของโรคตับ และยังมีข้อจำกัดเรื่องความสม่ำเสมอของผลลัพธ์</p>
+              </div>
+            </div>
+            ${mediaBox(idx, DEFAULT_IMAGES.turmeric, "ขมิ้นชันในอาหารปลอดภัย แต่สารสกัด Curcumin เข้มข้นสูงมีข้อควรระวังเรื่องตับและปฏิกิริยากับยา", "ต้นฉบับหน้า 86 · NCCIH Safety Alert on Concentrated Curcumin")}
+          </div>
+        `
+      },
+      // SLIDE 25
+      {
+        act: "ACT 4 · NUTRITION & SUPPLEMENTS",
+        actColor: "#8b5cf6",
+        time: "45–60 นาที",
+        ref: "ตารางสรุปสำหรับผู้สอน (หน้า 81–94, 109–111)",
+        title: "ตารางสรุปเดียวจบ: โภชนาการและอาหารเสริม อะไรช่วยได้จริง?",
+        subtitle: "เปรียบเทียบสิ่งที่หลักฐานทางวิทยาศาสตร์บอก คู่กับข้อจำกัดที่ต้องรู้ก่อนตัดสินใจซื้อ",
+        notes: "ใช้ตารางเดียวนี้สรุปภาพรวมสารอาหารทั้ง 6 ตัวให้ผู้เรียนเห็นชัด ไม่ต้องท่องจำกลไกชีวเคมีซับซ้อน",
+        render: () => `
+          <table class="evidence-table stagger-2">
+            <thead>
+              <tr>
+                <th style="width:20%;">สารอาหาร / สารสกัด</th>
+                <th style="width:40%;">สิ่งที่สอน (หลักฐานทางวิทยาศาสตร์)</th>
+                <th style="width:40%;">ข้อจำกัดและข้อควรระวังที่ต้องบอก</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>🥦 Sulforaphane</strong></td>
+                <td>สารจากผักตระกูลกะหล่ำ เกี่ยวข้องกับ Nrf2 signaling</td>
+                <td><span class="tag tag-amber">ข้อจำกัด</span> ผลทางโมเลกุลไม่ใช่หลักฐานว่ารักษาพิษโลหะหนักในคนได้</td>
+              </tr>
+              <tr>
+                <td><strong>💊 NAC</strong></td>
+                <td>เป็นสารตั้งต้นของ Glutathione และใช้เป็นยาต้านพิษ Paracetamol</td>
+                <td><span class="tag tag-amber">ข้อจำกัด</span> ไม่ใช่อาหารเสริมล้างพิษที่ทุกคนจำเป็นต้องกิน</td>
+              </tr>
+              <tr>
+                <td><strong>⚡ Alpha-lipoic acid</strong></td>
+                <td>เกี่ยวข้องกับ Redox balance และมีงานศึกษาทางคลินิกในบางภาวะ</td>
+                <td><span class="tag tag-amber">ข้อจำกัด</span> ไม่ใช่มาตรฐานการรักษาพิษโลหะหนัก</td>
+              </tr>
+              <tr>
+                <td><strong>🟡 Curcumin</strong></td>
+                <td>มีงานศึกษาด้านการอักเสบและ Nrf2</td>
+                <td><span class="tag tag-red">ระวังตับ</span> สารสกัดเข้มข้นบางสูตรสัมพันธ์กับการบาดเจ็บของตับและตีกับยา (NCCIH)</td>
+              </tr>
+              <tr>
+                <td><strong>🌸 Silymarin</strong></td>
+                <td>มีงานศึกษาฤทธิ์ต่อเซลล์ตับ</td>
+                <td><span class="tag tag-amber">ข้อจำกัด</span> หลักฐานประสิทธิผลทางคลินิกขึ้นกับโรคและยังมีข้อจำกัด</td>
+              </tr>
+              <tr>
+                <td><strong>🌾 Prebiotics / Fiber</strong></td>
+                <td>สนับสนุนการทำงานของลำไส้และจุลินทรีย์</td>
+                <td><span class="tag tag-blue">สื่อสารให้ถูก</span> ไม่ควรโฆษณาเกินจริงว่าเป็นวิธี “ล้างพิษ” ที่พิสูจน์แล้ว</td>
+              </tr>
+            </tbody>
+          </table>
+        `
+      },
+      // SLIDE 26
+      {
+        act: "ACT 5 · TAKE ACTION",
+        actColor: "#06b6d4",
+        time: "60–68 นาที",
+        ref: "ต้นฉบับหน้า 47, 65–67, 112–116",
+        title: "องก์ที่ 5: Detox Myth vs Fact — จริงหรือความเชื่อ?",
+        subtitle: "คลิกที่การ์ดเพื่อแยกแยะคำโฆษณาทางการตลาดออกจากหลักฐานทางการแพทย์",
+        notes: "วิเคราะห์ตัวอย่าง Detox Products, Sauna, และ Chelation ให้ผู้เรียนแยกแยะได้อย่างมีวิจารณญาณ",
+        render: () => `
+          <div class="grid-3 stagger-2">
+            <div class="card interactive-card" onclick="this.classList.toggle('revealed')">
+              <h3>🧃 1. น้ำผักดีท็อกซ์ / ชาระบาย / สวนล้างลำไส้</h3>
+              <p>คำโฆษณา: “ล้างตะกรันสารพิษสะสมในตับและลำไส้ภายใน 3 วัน”</p>
+              <span class="click-hint">👆 คลิกเพื่อดูข้อเท็จจริงทางการแพทย์</span>
+              <div class="reveal-answer">
+                <strong>❌ MYTH:</strong> ไม่มีเครื่องดื่มหรือการสวนลำไส้ใดเข้าไป “ล้างตับ” ได้ ชาระบายหลายชนิดผสมยาระบายกระตุ้นลำไส้ เสี่ยงขาดน้ำและเกลือแร่รุนแรง
+              </div>
+            </div>
+            <div class="card interactive-card" onclick="this.classList.toggle('revealed')">
+              <h3>🧖 2. การเข้าซาวน่า (Sauna) ขับเหงื่อ</h3>
+              <p>คำโฆษณา: “ขับสารพิษและโลหะหนักออกจากร่างกายผ่านเหงื่อ”</p>
+              <span class="click-hint">👆 คลิกเพื่อดูข้อเท็จจริงทางการแพทย์</span>
+              <div class="reveal-answer">
+                <strong>⚖️ NUANCE:</strong> ซาวน่าดีต่อระบบหลอดเลือดและการผ่อนคลาย และเหงื่ออาจมีโลหะหนักปนออกมาในปริมาณน้อยมาก แต่ <strong>หน้าที่ขับสารพิษหลักมากกว่า 95% ยังคงเป็นของตับและไต</strong> และต้องระวังภาวะขาดน้ำ
+              </div>
+            </div>
+            <div class="card interactive-card" onclick="this.classList.toggle('revealed')">
+              <h3>💉 3. การทำคีเลชัน (Chelation Therapy)</h3>
+              <p>คำโฆษณา: “ดริปวิตามินและสารจับโลหะหนักเพื่อล้างหลอดเลือดและชะลอวัย”</p>
+              <span class="click-hint">👆 คลิกเพื่อดูข้อเท็จจริงทางการแพทย์</span>
+              <div class="reveal-answer">
+                <strong>🚨 CAUTION:</strong> Chelation คือ <strong>การรักษาทางการแพทย์สำหรับผู้ป่วยที่มีภาวะพิษโลหะหนักรุนแรงที่ยืนยันผลตรวจชัดเจนเท่านั้น</strong> การทำพร่ำเพรื่อในคนทั่วไปเสี่ยงต่อภาวะแคลเซียมต่ำ ไตวาย และสูญเสียแร่ธาตุจำเป็น
+              </div>
+            </div>
+          </div>
+        `
+      },
+      // SLIDE 27
+      {
+        act: "ACT 5 · TAKE ACTION",
+        actColor: "#06b6d4",
+        time: "60–68 นาที",
+        ref: "ต้นฉบับหน้า 47 & 65–67",
+        title: "การตรวจสารพิษในร่างกาย (Toxicology Testing): ควรตรวจเมื่อไหร่?",
+        subtitle: "ทำความเข้าใจข้อดีและข้อจำกัดของการตรวจเลือด ปัสสาวะ และเส้นผม",
+        notes: "ช่วยให้ผู้เรียนไม่ตกเป็นเหยื่อแพ็กเกจตรวจสารพิษราคาแพงที่นำไปสู่การขายคอร์สคีเลชันที่ไม่จำเป็น",
+        render: () => `
+          <div class="grid-3 stagger-2">
+            <div class="card card-accent-top">
+              <h3>🩸 1. การตรวจเลือดและปัสสาวะมาตรฐาน</h3>
+              <p>มีประโยชน์เมื่อ <strong>มีประวัติเสี่ยงชัดเจนหรือมีอาการทางคลินิก</strong> (เช่น ทำงานโรงงานแบตเตอรี่/เหมือง หรือมีอาการพิษเฉียบพลัน/กึ่งเฉียบพลัน) โดยใช้ค่าอ้างอิงมาตรฐานทางการแพทย์</p>
+            </div>
+            <div class="card card-accent-top">
+              <h3>💇 2. การตรวจวิเคราะห์เส้นผม (Hair Analysis)</h3>
+              <p>แม้ใช้ดูการสัมผัสสารบางชนิดย้อนหลังในงานวิจัยได้ แต่ <strong>มีความแปรปรวนสูงมากจากแชมพู สีย้อมผม และฝุ่นภายนอก</strong> จึงไม่แนะนำให้ใช้เป็นเกณฑ์เดี่ยวในการวินิจฉัยโรคหรือสั่งทำคีเลชัน</p>
+            </div>
+            <div class="card card-accent-top">
+              <h3>🩺 3. สิ่งที่ควรตรวจเช็กระยะยาวมากกว่า</h3>
+              <p>คือการตรวจสุขภาพพื้นฐานที่สะท้อนการทำงานของโรงงานธรรมชาติโดยตรง ได้แก่ <strong>ค่าการทำงานของตับ (AST, ALT), ค่าการทำงานของไต (Creatinine, eGFR), น้ำตาลและไขมันในเลือด</strong></p>
+            </div>
+          </div>
+          <div class="callout warn stagger-3">
+            💡 <strong>ข้อคิด:</strong> การตรวจพบตัวเลขโลหะหนักปริมาณน้อยมาก (Trace amounts) ในปัสสาวะหลังให้ยากระตุ้น (Provoked urine test) มักทำให้ตัวเลขดูสูงเกินจริงและสร้างความกังวลโดยไม่จำเป็น
+          </div>
+        `
+      },
+      // SLIDE 28
+      {
+        act: "ACT 5 · TAKE ACTION",
+        actColor: "#06b6d4",
+        time: "60–68 นาที",
+        ref: "ต้นฉบับหน้า 112–116",
+        title: "ออกแบบภารกิจสุขภาพ 7 วัน (7-Day Action Mission)",
+        subtitle: "คลิกเลือกอย่างน้อย 1 พฤติกรรมที่คุณจะเริ่มทำทันทีในสัปดาห์นี้ เพื่อลดการรับสารอันตรายและดูแลตับ-ไต",
+        image: DEFAULT_IMAGES.morningWalk,
+        notes: "ให้ผู้เรียนแต่ละคนเลือก 1 ข้อที่เหมาะกับไลฟ์สไตล์ของตัวเองที่สุด แล้วแชร์ในห้องเรียน",
+        render: (idx) => `
+          <div class="grid-2">
+            <div class="stagger-1" style="display:grid;gap:10px;">
+              <div class="card interactive-card" style="padding:14px 18px;" onclick="this.classList.toggle('revealed')">
+                <strong>🥣 Mission 1: เลิกใช้พลาสติกกับความร้อนสูง (7 วัน)</strong>
+                <div class="reveal-answer">เปลี่ยนมาใช้ชามแก้ว/เซรามิกเมื่ออุ่นไมโครเวฟ และไม่เทน้ำแกงเดือดจัดใส่ถุงพลาสติก</div>
+              </div>
+              <div class="card interactive-card" style="padding:14px 18px;" onclick="this.classList.toggle('revealed')">
+                <strong>🍳 Mission 2: เปลี่ยนวิธีปรุงอาหาร ลดไหม้เกรียม</strong>
+                <div class="reveal-answer">สลับจากปิ้งย่าง/ทอดกรอบ มาเป็นต้ม นึ่ง ตุ๋น อย่างน้อย 4–5 มื้อในสัปดาห์นี้</div>
+              </div>
+              <div class="card interactive-card" style="padding:14px 18px;" onclick="this.classList.toggle('revealed')">
+                <strong>🍚 Mission 3: ซาวข้าวและสลับแหล่งคาร์โบไฮเดรต + โละถั่ว/พริกชื้น</strong>
+                <div class="reveal-answer">ตรวจสอบตู้ครัว ทิ้งพริกป่น/ถั่วที่เก็บนานเกินไป และซาวข้าวให้สะอาดก่อนหุง</div>
+              </div>
+              <div class="card interactive-card" style="padding:14px 18px;" onclick="this.classList.toggle('revealed')">
+                <strong>🥦 Mission 4: เติมผักตระกูลกะหล่ำ + ใยอาหาร + ดื่มน้ำให้พอ</strong>
+                <div class="reveal-answer">กินผักหลากสีทุกวัน ดื่มน้ำเปล่าให้ปัสสาวะสีเหลืองใส เพื่อสนับสนุนตับ ไต และลำไส้</div>
+              </div>
+              <div class="card interactive-card" style="padding:14px 18px;" onclick="this.classList.toggle('revealed')">
+                <strong>🌫️ Mission 5: เช็กค่าฝุ่น PM2.5 ก่อนออกจากบ้านทุกเช้า</strong>
+                <div class="reveal-answer">เปิดเครื่องฟอกอากาศในห้องนอน และใส่หน้ากาก N95 ในวันที่ค่าฝุ่นเกินมาตรฐาน</div>
+              </div>
+            </div>
+            ${mediaBox(idx, DEFAULT_IMAGES.morningWalk, "การปรับพฤติกรรมในชีวิตประจำวันคือกุญแจที่ยั่งยืนที่สุดในการชะลอความเสื่อมของเซลล์และอวัยวะ", "ต้นฉบับหน้า 112–116 · Take Action in 7 Days")}
+          </div>
+        `
+      },
+      // SLIDE 29
+      {
+        act: "ACT 5 · TAKE ACTION",
+        actColor: "#06b6d4",
+        time: "68–75 นาที",
+        ref: "Learning Outcomes Check",
+        title: "ทบทวนเป้าหมายการเรียนรู้ (Learning Outcomes Check)",
+        subtitle: "วันนี้เราสามารถตอบคำถามทั้ง 4 ข้อนี้ด้วยตัวเองได้แล้วหรือยัง?",
+        notes: "ใช้สไลด์นี้เช็กความเข้าใจร่วมกับสมาชิกก่อนเปิดช่วง Q&A",
+        render: () => `
+          <div class="grid-2-equal stagger-2">
+            <div class="card card-accent-top">
+              <h3>✅ 1. ระบุแหล่งสัมผัสใกล้ตัวได้ ≥ 3 แหล่ง</h3>
+              <p>เช่น PM2.5 จากอากาศ, AGEs จากของปิ้งย่างเกรียม, Aflatoxin จากถั่ว/พริกแห้งชื้น, สารหนูในข้าว, และไมโครพลาสติกจากภาชนะร้อน</p>
+            </div>
+            <div class="card card-accent-top">
+              <h3>✅ 2. อธิบายการทำงานของตับและไตแบบพื้นฐาน</h3>
+              <p>ตับแปรรูปสารเคมีผ่าน Phase I (Transformation), Phase II (Conjugation) และ Phase III (Transport) เพื่อส่งให้ไตขับออกทางปัสสาวะ และลำไส้ขับออกทางอุจจาระ</p>
+            </div>
+            <div class="card card-accent-top">
+              <h3>✅ 3. แยกแยะคำโฆษณา Detox ออกจากหลักฐานแพทย์</h3>
+              <p>เข้าใจว่าผลระดับโมเลกุล (เช่น Nrf2) ไม่ใช่ข้อพิสูจน์ว่าใช้ล้างพิษในคนได้ทุกกรณี และระวังผลข้างเคียงของสารสกัดเข้มข้นบางชนิดต่อตับ</p>
+            </div>
+            <div class="card card-accent-top">
+              <h3>✅ 4. เลือก 1 พฤติกรรมที่เปลี่ยนได้ทันที</h3>
+              <p>เริ่มจากภารกิจ 7 วันที่ทำได้จริงที่บ้าน โดยเน้นการลดการรับสารอันตรายเกินจำเป็นและดูแลสุขภาพพื้นฐานให้แข็งแรง</p>
+            </div>
+          </div>
+        `
+      },
+      // SLIDE 30
+      {
+        act: "Q&A · SUMMARY",
+        actColor: "#38bdf8",
+        time: "68–75 นาที",
+        ref: "สรุปจบคลาส & Q&A",
+        title: "บทสรุปส่งท้าย & ช่วงถาม-ตอบ (Q&A)",
+        subtitle: "“จาก Organ Aging สู่ Toxic Exposure — ลดภาระให้เซลล์ ดูแลโรงงานธรรมชาติด้วยความเข้าใจ”",
+        image: DEFAULT_IMAGES.healthyFood,
+        notes: "เปิดโอกาสให้สมาชิกถามคำถามเกี่ยวกับอาหาร อาหารเสริมที่กินอยู่ หรือการเลือกซื้อวัตถุดิบในชีวิตประจำวัน และนัดหมายติดตามผลภารกิจ 7 วันในคลาสหน้า",
+        render: (idx) => `
+          <div class="grid-2">
+            <div class="stagger-1" style="display:flex;flex-direction:column;justify-content:space-between;gap:16px;">
+              <div class="card card-accent-top">
+                <h3>📌 3 ประโยคทองจำกลับบ้าน</h3>
+                <ul style="margin-top:10px;">
+                  <li><strong>1. ลดขาเข้าสำคัญกว่าเร่งขาออก:</strong> การเลี่ยงควัน ของไหม้เกรียม เชื้อรา และพลาสติกร้อน คุ้มค่ากว่าการซื้อคอร์สดีท็อกซ์</li>
+                  <li><strong>2. ตับและไตคือฮีโร่ตัวจริง:</strong> สนับสนุนตับ Phase I–III ด้วยโปรตีนคุณภาพ ผักหลากสี น้ำสะอาด การขับถ่ายที่ดี และการนอนหลับ</li>
+                  <li><strong>3. ระวังอาหารเสริมเข้มข้นเกินจำเป็น:</strong> ตรวจสอบยาและอาหารเสริมที่กินอยู่เสมอ เพราะแม้แต่สมุนไพรสกัดเข้มข้นก็อาจเพิ่มภาระให้ตับได้</li>
+                </ul>
+              </div>
+              <div class="callout success">
+                🙋‍♂️ <strong>ช่วง Q&A และแลกเปลี่ยนภารกิจ 7 วัน:</strong> สมาชิกแต่ละท่านเลือกภารกิจข้อไหนสำหรับสัปดาห์นี้ และมีคำถามเพิ่มเติมเรื่องใดบ้าง?
+              </div>
+            </div>
+            ${mediaBox(idx, DEFAULT_IMAGES.healthyFood, "ขอบคุณทุกท่าน — เริ่มต้นภารกิจ 7 วันเพื่อสุขภาพระดับเซลล์และอวัยวะที่ยั่งยืน", "Dr.Tim Longevity & Toxicology Class")}
+          </div>
+        `
+      }
+    );
+
+    // Presentation State & Controller
+    let currentSlide = 0;
+    let timerSeconds = 0;
+    let timerInterval = null;
+
+    function renderCurrentSlide() {
+      const s = SLIDES[currentSlide];
+      const root = document.getElementById("slideRoot");
+
+      // Update Theme Accent per Act
+      document.documentElement.style.setProperty("--accent", s.actColor);
+      document.documentElement.style.setProperty("--accent-glow", s.actColor + "33");
+
+      // Update Topbar & Bottombar
+      document.getElementById("actPill").textContent = s.act;
+      document.getElementById("timeSlotLabel").textContent = `🕒 ช่วงเวลาตามแผนการสอน: ${s.time}`;
+      document.getElementById("slideCounter").textContent = `${String(currentSlide + 1).padStart(2, "0")} / ${SLIDES.length}`;
+      document.getElementById("progressFill").style.width = `${((currentSlide + 1) / SLIDES.length) * 100}%`;
+      document.getElementById("notesContent").textContent = s.notes || "";
+
+      // Re-trigger slide enter animation
+      root.style.animation = "none";
+      void root.offsetWidth;
+      root.style.animation = "slideEnter 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards";
+
+      root.innerHTML = `
+        <div class="slide-meta stagger-1">
+          <span>SLIDE ${String(currentSlide + 1).padStart(2, "0")}</span>
+          <span>•</span>
+          <span>${s.act}</span>
+          <span class="ref-badge">${s.ref}</span>
+        </div>
+        <h1 class="slide-title stagger-1">${s.title}</h1>
+        <p class="slide-subtitle stagger-2">${s.subtitle}</p>
+        ${s.render(currentSlide)}
+      `;
+
+      window.location.hash = `slide-${currentSlide + 1}`;
+    }
+
+    function nextSlide() {
+      if (currentSlide < SLIDES.length - 1) {
+        currentSlide++;
+        renderCurrentSlide();
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 0) {
+        currentSlide--;
+        renderCurrentSlide();
+      }
+    }
+
+    function goToSlide(index) {
+      currentSlide = Math.max(0, Math.min(SLIDES.length - 1, index));
+      renderCurrentSlide();
+      document.getElementById("overviewModal").classList.remove("open");
+    }
+
+    function toggleNotes() {
+      document.getElementById("notesDrawer").classList.toggle("open");
+    }
+
+    function toggleOverview() {
+      const modal = document.getElementById("overviewModal");
+      const grid = document.getElementById("overviewGrid");
+      if (!modal.classList.contains("open")) {
+        grid.innerHTML = SLIDES.map((s, i) => `
+          <div class="overview-item ${i === currentSlide ? "active" : ""}" onclick="goToSlide(${i})">
+            <div style="font-size:0.74rem;color:${s.actColor};font-weight:700;">SLIDE ${String(i + 1).padStart(2, "0")} · ${s.time}</div>
+            <div style="font-size:0.88rem;font-weight:600;margin-top:4px;color:#f8fafc;">${s.title}</div>
+          </div>
+        `).join("");
+      }
+      modal.classList.toggle("open");
+    }
+
+    function openImageManagerModal() {
+      const modal = document.getElementById("imageModal");
+      const input = document.getElementById("customImgInput");
+      const map = getCustomImages();
+      const s = SLIDES[currentSlide];
+      input.value = map[currentSlide] || s.image || "";
+      modal.classList.add("open");
+      input.focus();
+    }
+
+    function closeImageModal() {
+      document.getElementById("imageModal").classList.remove("open");
+    }
+
+    function saveSlideImage() {
+      const url = document.getElementById("customImgInput").value.trim();
+      const map = getCustomImages();
+      if (url) {
+        map[currentSlide] = url;
+      } else {
+        delete map[currentSlide];
+      }
+      localStorage.setItem("toxic_slides_custom_images", JSON.stringify(map));
+      closeImageModal();
+      renderCurrentSlide();
+    }
+
+    function resetSlideImage() {
+      const map = getCustomImages();
+      delete map[currentSlide];
+      localStorage.setItem("toxic_slides_custom_images", JSON.stringify(map));
+      closeImageModal();
+      renderCurrentSlide();
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
+      }
+    }
+
+    // Class 75-minute Timer
+    document.getElementById("timerBadge").addEventListener("click", () => {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      } else {
+        timerInterval = setInterval(() => {
+          timerSeconds++;
+          const m = String(Math.floor(timerSeconds / 60)).padStart(2, "0");
+          const s = String(timerSeconds % 60).padStart(2, "0");
+          document.getElementById("timerText").textContent = `${m}:${s} / 75:00`;
+        }, 1000);
+      }
+    });
+
+    // Keyboard & Touch Navigation
+    window.addEventListener("keydown", (e) => {
+      if (document.getElementById("imageModal").classList.contains("open")) return;
+      if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") {
+        e.preventDefault();
+        nextSlide();
+      } else if (e.key === "ArrowLeft" || e.key === "PageUp") {
+        e.preventDefault();
+        prevSlide();
+      } else if (e.key === "n" || e.key === "N") {
+        toggleNotes();
+      } else if (e.key === "m" || e.key === "M") {
+        toggleOverview();
+      } else if (e.key === "f" || e.key === "F") {
+        toggleFullscreen();
+      } else if (e.key === "Escape") {
+        document.getElementById("overviewModal").classList.remove("open");
+        document.getElementById("notesDrawer").classList.remove("open");
+      }
+    });
+
+    // Initialize from URL hash if present
+    window.addEventListener("DOMContentLoaded", () => {
+      const match = window.location.hash.match(/slide-(\d+)/);
+      if (match) {
+        const idx = parseInt(match[1], 10) - 1;
+        if (idx >= 0 && idx < SLIDES.length) currentSlide = idx;
+      }
+      renderCurrentSlide();
+    });
+  </script>
+</body>
+</html>

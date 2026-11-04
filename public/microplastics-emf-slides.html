@@ -1,0 +1,1521 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="referrer" content="no-referrer" />
+  <title>Microplastics & EMF Pollution ในบริบทประเทศไทย — 15-Slide Interactive Presentation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #060913;
+      --bg-card: rgba(15, 23, 42, 0.78);
+      --bg-card-hover: rgba(30, 41, 59, 0.88);
+      --border-subtle: rgba(255, 255, 255, 0.09);
+      --border-highlight: rgba(255, 255, 255, 0.22);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.25);
+      --act-0: #38bdf8; /* Intro - Sky */
+      --act-1: #f59e0b; /* Part 1 Microplastics - Amber */
+      --act-2: #a855f7; /* Part 2 EMF - Purple */
+      --act-3: #f43f5e; /* Part 3 Biological Crossroads - Rose/Crimson */
+      --act-4: #06b6d4; /* Part 4 Myth vs Fact - Cyan */
+      --act-5: #10b981; /* Part 5 Action Plan - Emerald */
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --success: #10b981;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Anuphan', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .ambient-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 18% 25%, var(--orb-1, rgba(245, 158, 11, 0.12)) 0%, transparent 45%),
+        radial-gradient(circle at 82% 75%, var(--orb-2, rgba(168, 85, 247, 0.14)) 0%, transparent 45%),
+        radial-gradient(circle at 50% 50%, rgba(15, 23, 42, 0.95) 0%, #04060d 100%);
+      transition: background 0.8s ease;
+    }
+
+    .grid-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(to right, rgba(255,255,255,0.022) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.022) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: radial-gradient(circle at center, black 40%, transparent 90%);
+    }
+
+    /* Top Navigation */
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      z-index: 40;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      background: rgba(6, 9, 19, 0.78);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .act-pill {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 5px 12px;
+      border-radius: 999px;
+      background: var(--accent-glow);
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      transition: all 0.4s ease;
+    }
+
+    .deck-title {
+      font-size: 0.92rem;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .topbar-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .timer-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      padding: 5px 12px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      color: #cbd5e1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .icon-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-family: inherit;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .icon-btn:hover {
+      background: rgba(255, 255, 255, 0.14);
+      border-color: var(--border-highlight);
+      transform: translateY(-1px);
+    }
+
+    /* Slide Stage */
+    .stage {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      height: calc(100vh - 114px);
+      margin-top: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 44px;
+      overflow-y: auto;
+    }
+
+    .slide-container {
+      width: 100%;
+      max-width: 1340px;
+      min-height: 570px;
+      margin: auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      animation: slideEnter 0.52s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes slideEnter {
+      0% {
+        opacity: 0;
+        transform: translateY(20px) scale(0.985);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .stagger-1 { animation: fadeUp 0.48s 0.06s cubic-bezier(0.16, 1, 0.3, 1) both; }
+    .stagger-2 { animation: fadeUp 0.52s 0.14s cubic-bezier(0.16, 1, 0.3, 1) both; }
+    .stagger-3 { animation: fadeUp 0.58s 0.22s cubic-bezier(0.16, 1, 0.3, 1) both; }
+    .stagger-4 { animation: fadeUp 0.64s 0.30s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Headers */
+    .slide-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+      font-size: 0.84rem;
+      color: var(--accent);
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+
+    .ref-badge {
+      font-size: 0.74rem;
+      padding: 2px 10px;
+      border-radius: 99px;
+      background: rgba(255, 255, 255, 0.07);
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    .slide-title {
+      font-size: clamp(1.75rem, 2.7vw, 2.6rem);
+      font-weight: 700;
+      line-height: 1.25;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .slide-subtitle {
+      font-size: clamp(0.98rem, 1.3vw, 1.18rem);
+      color: var(--text-muted);
+      line-height: 1.55;
+      margin-bottom: 22px;
+      max-width: 980px;
+    }
+
+    /* Grids */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 26px;
+      align-items: stretch;
+    }
+
+    .grid-2-equal {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 22px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 18px;
+      padding: 22px;
+      backdrop-filter: blur(12px);
+      transition: all 0.28s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card:hover {
+      border-color: var(--border-highlight);
+      background: var(--bg-card-hover);
+      transform: translateY(-3px);
+    }
+
+    .card-accent-top {
+      border-top: 3px solid var(--accent);
+    }
+
+    .card h3 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #fff;
+    }
+
+    .card p, .card li {
+      font-size: 0.95rem;
+      line-height: 1.62;
+      color: #cbd5e1;
+    }
+
+    .card ul {
+      padding-left: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* Media Frame (External Image) */
+    .media-frame {
+      position: relative;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+      background: #0b1120;
+      min-height: 290px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+
+    .media-frame img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.7s ease, opacity 0.4s ease;
+    }
+
+    .media-frame:hover img {
+      transform: scale(1.04);
+    }
+
+    .media-overlay {
+      position: relative;
+      z-index: 2;
+      background: linear-gradient(to top, rgba(6, 9, 19, 0.95) 0%, rgba(6, 9, 19, 0.65) 60%, transparent 100%);
+      padding: 24px 20px 18px;
+    }
+
+    .media-caption {
+      font-size: 0.88rem;
+      color: #e2e8f0;
+      font-weight: 500;
+    }
+
+    .media-source {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .edit-img-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 5;
+      background: rgba(6, 9, 19, 0.78);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      color: #f8fafc;
+      font-size: 0.74rem;
+      padding: 5px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      opacity: 0.75;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .edit-img-btn:hover {
+      opacity: 1;
+      transform: scale(1.04);
+      border-color: var(--accent);
+    }
+
+    /* Callouts */
+    .callout {
+      margin-top: 16px;
+      padding: 15px 20px;
+      border-radius: 14px;
+      border-left: 4px solid var(--accent);
+      background: rgba(56, 189, 248, 0.08);
+      font-size: 0.95rem;
+      line-height: 1.55;
+      color: #e2e8f0;
+    }
+
+    .callout.warn {
+      border-left-color: var(--warning);
+      background: rgba(245, 158, 11, 0.1);
+    }
+
+    .callout.danger {
+      border-left-color: var(--danger);
+      background: rgba(239, 68, 68, 0.12);
+    }
+
+    .callout.success {
+      border-left-color: var(--success);
+      background: rgba(16, 185, 129, 0.1);
+    }
+
+    /* Interactive Reveal Cards */
+    .interactive-card {
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .interactive-card .reveal-answer {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px dashed rgba(255, 255, 255, 0.15);
+      display: none;
+      color: #38bdf8;
+      font-size: 0.92rem;
+      line-height: 1.55;
+    }
+
+    .interactive-card.revealed .reveal-answer {
+      display: block;
+      animation: fadeUp 0.3s ease forwards;
+    }
+
+    .interactive-card .click-hint {
+      display: inline-block;
+      margin-top: 10px;
+      font-size: 0.76rem;
+      color: var(--accent);
+      opacity: 0.85;
+    }
+
+    /* Comparison Tables */
+    .evidence-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--bg-card);
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .evidence-table th,
+    .evidence-table td {
+      padding: 13px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .evidence-table th {
+      background: rgba(255, 255, 255, 0.06);
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .evidence-table tr:hover td {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    /* Tags & Badges */
+    .tag {
+      display: inline-block;
+      padding: 3px 9px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .tag-amber { background: rgba(245, 158, 11, 0.18); color: #fbbf24; }
+    .tag-purple { background: rgba(168, 85, 247, 0.18); color: #c084fc; }
+    .tag-red { background: rgba(239, 68, 68, 0.18); color: #f87171; }
+    .tag-green { background: rgba(16, 185, 129, 0.18); color: #34d399; }
+    .tag-blue { background: rgba(56, 189, 248, 0.18); color: #38bdf8; }
+
+    /* Flow Chain */
+    .flow-chain {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 18px 0;
+      flex-wrap: wrap;
+    }
+
+    .flow-node {
+      flex: 1;
+      min-width: 150px;
+      padding: 16px 14px;
+      border-radius: 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-highlight);
+      text-align: center;
+      position: relative;
+      transition: transform 0.3s ease;
+    }
+
+    .flow-node:hover {
+      transform: translateY(-4px) scale(1.02);
+      border-color: var(--accent);
+    }
+
+    .flow-arrow {
+      font-size: 1.4rem;
+      color: var(--accent);
+      animation: pulseRight 1.6s infinite;
+    }
+
+    @keyframes pulseRight {
+      0%, 100% { transform: translateX(0); opacity: 0.6; }
+      50% { transform: translateX(5px); opacity: 1; }
+    }
+
+    /* Bar Meters */
+    .bar-wrap {
+      margin: 10px 0;
+    }
+    .bar-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.86rem;
+      margin-bottom: 5px;
+    }
+    .bar-track {
+      height: 10px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Bottom Navigation */
+    .bottombar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 54px;
+      z-index: 40;
+      background: rgba(6, 9, 19, 0.86);
+      backdrop-filter: blur(14px);
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+    }
+
+    .progress-track {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), #10b981);
+      width: 6.66%;
+      transition: width 0.35s ease;
+    }
+
+    .nav-btns {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .slide-counter {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      min-width: 90px;
+      text-align: center;
+    }
+
+    /* Presenter Notes */
+    .notes-drawer {
+      position: fixed;
+      bottom: 64px;
+      right: 28px;
+      width: 440px;
+      max-width: calc(100vw - 56px);
+      background: rgba(15, 23, 42, 0.96);
+      border: 1px solid var(--accent);
+      border-radius: 16px;
+      padding: 18px 20px;
+      z-index: 50;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      display: none;
+    }
+
+    .notes-drawer.open {
+      display: block;
+      animation: fadeUp 0.25s ease forwards;
+    }
+
+    .notes-drawer h4 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent);
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .notes-drawer p {
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: #e2e8f0;
+    }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 7, 15, 0.88);
+      backdrop-filter: blur(12px);
+      z-index: 60;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-box {
+      width: 100%;
+      max-width: 1160px;
+      max-height: 85vh;
+      overflow-y: auto;
+      background: #0f172a;
+      border: 1px solid var(--border-highlight);
+      border-radius: 20px;
+      padding: 28px;
+    }
+
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .overview-item {
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .overview-item:hover,
+    .overview-item.active {
+      border-color: var(--accent);
+      background: rgba(56, 189, 248, 0.12);
+    }
+
+    .url-input {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border-highlight);
+      background: #060913;
+      color: #fff;
+      font-size: 0.95rem;
+      margin: 12px 0;
+    }
+
+    @media (max-width: 980px) {
+      .grid-2, .grid-3, .grid-4, .grid-2-equal {
+        grid-template-columns: 1fr;
+      }
+      .stage {
+        padding: 16px 20px;
+      }
+      .media-frame {
+        min-height: 220px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="ambient-bg" id="ambientBg"></div>
+  <div class="grid-overlay"></div>
+
+  <!-- Top Navigation -->
+  <header class="topbar">
+    <div class="brand-group">
+      <span class="act-pill" id="actPill">INTRODUCTION</span>
+      <span class="deck-title">Microplastics & EMF Pollution ในบริบทประเทศไทย · 15 Slides</span>
+    </div>
+    <div class="topbar-controls">
+      <div class="timer-badge" id="timerBadge" title="คลิกเพื่อเริ่ม/หยุดจับเวลาบรรยาย">
+        <span>⏱️</span>
+        <span id="timerText">00:00 / 45:00</span>
+      </div>
+      <button class="icon-btn" onclick="openImageManagerModal()" title="จัดการรูปภาพจากเว็บไซต์ภายนอก">
+        🖼️ เปลี่ยนรูป (URL)
+      </button>
+      <button class="icon-btn" onclick="toggleNotes()" title="เปิด/ปิด บทพูดผู้สอน (ปุ่ม N)">
+        🎙️ บทผู้สอน (N)
+      </button>
+      <button class="icon-btn" onclick="toggleOverview()" title="ดูสไลด์ทั้งหมด 15 หน้า (ปุ่ม M)">
+        🗂️ สารบัญ 15 หน้า (M)
+      </button>
+      <a href="/toxic-exposure-slides.html" class="icon-btn" title="กลับไปดูสไลด์หลัก 30 หน้า Toxic Exposure">
+        🔙 คลาสหลัก (30 Slides)
+      </a>
+      <button class="icon-btn" onclick="toggleFullscreen()" title="เต็มจอ (ปุ่ม F)">
+        ⛶
+      </button>
+    </div>
+  </header>
+
+  <!-- Slide Stage -->
+  <main class="stage">
+    <div id="slideRoot" class="slide-container"></div>
+  </main>
+
+  <!-- Presenter Notes Drawer -->
+  <aside class="notes-drawer" id="notesDrawer">
+    <h4>
+      <span>🎙️ Instructor Notes & Clinical Nuances</span>
+      <span style="cursor:pointer" onclick="toggleNotes()">✕</span>
+    </h4>
+    <p id="notesContent"></p>
+  </aside>
+
+  <!-- Overview Modal -->
+  <div class="modal-backdrop" id="overviewModal" onclick="if(event.target===this)toggleOverview()">
+    <div class="modal-box">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <h2>🗂️ สารบัญสไลด์ Microplastics & EMF Pollution (15 Slides)</h2>
+        <button class="icon-btn" onclick="toggleOverview()">✕ ปิด</button>
+      </div>
+      <div class="overview-grid" id="overviewGrid"></div>
+    </div>
+  </div>
+
+  <!-- External Image Modal -->
+  <div class="modal-backdrop" id="imageModal" onclick="if(event.target===this)closeImageModal()">
+    <div class="modal-box" style="max-width:620px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <h3>🖼️ ตั้งค่ารูปภาพสไลด์จากเว็บไซต์ภายนอก (External Image URL)</h3>
+        <button class="icon-btn" onclick="closeImageModal()">✕ ปิด</button>
+      </div>
+      <p style="color:var(--text-muted);font-size:0.9rem;margin-top:8px;">
+        คุณสามารถวางลิงก์รูปภาพ (`https://...`) จากเว็บไซต์ภายนอกสำหรับสไลด์หน้านี้ ระบบรองรับการดึงรูปข้ามโดเมน (`no-referrer`) และบันทึกลงเบราว์เซอร์อัตโนมัติ
+      </p>
+      <input type="url" id="customImgInput" class="url-input" placeholder="https://images.unsplash.com/photo-..." />
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
+        <button class="icon-btn" onclick="resetSlideImage()">↺ คืนค่ารูปต้นฉบับ</button>
+        <button class="icon-btn" style="background:var(--accent);color:#050811;font-weight:700;" onclick="saveSlideImage()">✓ บันทึกรูปภาพ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Bar -->
+  <footer class="bottombar">
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <div style="font-size:0.82rem;color:var(--text-muted);" id="timeSlotLabel">
+      🕒 ช่วงเวลาบรรยาย: 0–3 นาที
+    </div>
+    <div class="nav-btns">
+      <button class="icon-btn" onclick="prevSlide()">← ก่อนหน้า</button>
+      <span class="slide-counter" id="slideCounter">01 / 15</span>
+      <button class="icon-btn" onclick="nextSlide()">ถัดไป →</button>
+    </div>
+    <div style="font-size:0.78rem;color:var(--text-muted);">
+      ใช้ <code>←</code> <code>→</code> หรือ <code>Space</code> ในการนำเสนอ
+    </div>
+  </footer>
+
+  <script>
+    // High-reliability external photos tailored to Thai daily life and medical evidence
+    const DEFAULT_IMAGES = {
+      cover: "https://images.unsplash.com/photo-1530587191325-3db32d826c18?auto=format&fit=crop&w=1200&q=80",
+      streetFood: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1000&q=80",
+      bottledWater: "https://images.unsplash.com/photo-1548839140-29a749e1cf4d?auto=format&fit=crop&w=1000&q=80",
+      seafoodSea: "https://images.unsplash.com/photo-1534483509719-3feaee7c30da?auto=format&fit=crop&w=1000&q=80",
+      vascularPlaque: "https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=1000&q=80",
+      phoneBedroom: "https://images.unsplash.com/photo-1512428559087-560fa5ceab42?auto=format&fit=crop&w=1000&q=80",
+      cellTowerCity: "https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=1000&q=80",
+      cellularMito: "https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?auto=format&fit=crop&w=1000&q=80",
+      sleepSanctuary: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1000&q=80",
+      healthyGlass: "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=1000&q=80"
+    };
+
+    const FALLBACK_SVG = "data:image/svg+xml;utf8," + encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500">
+        <rect width="800" height="500" fill="#0f172a"/>
+        <text x="400" y="250" text-anchor="middle" fill="#94a3b8" font-family="sans-serif" font-size="20">ภาพประกอบการบรรยาย (คลิกเปลี่ยน URL ได้)</text>
+      </svg>
+    `);
+
+    function getCustomImages() {
+      try {
+        return JSON.parse(localStorage.getItem("microplastics_emf_custom_images") || "{}");
+      } catch (e) {
+        return {};
+      }
+    }
+
+    function getSlideImage(slideIndex, defaultUrl) {
+      const map = getCustomImages();
+      return map[slideIndex] || defaultUrl;
+    }
+
+    function mediaBox(slideIdx, imgUrl, caption, sourceText) {
+      const resolved = getSlideImage(slideIdx, imgUrl);
+      return `
+        <div class="media-frame stagger-2">
+          <button class="edit-img-btn" onclick="openImageManagerModal()">🖼️ เปลี่ยนรูป URL</button>
+          <img src="${resolved}" alt="${caption}" referrerpolicy="no-referrer" loading="lazy" onerror="this.onerror=null;this.src=FALLBACK_SVG;" />
+          <div class="media-overlay">
+            <div class="media-caption">${caption}</div>
+            <div class="media-source">${sourceText || "External Web Image · สามารถคลิกเพื่อเปลี่ยนรูปได้"}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    const SLIDES = [
+      // SLIDE 1
+      {
+        act: "INTRODUCTION",
+        actColor: "#38bdf8",
+        time: "0–3 นาที",
+        ref: "Beyond Visible Toxins",
+        title: "Microplastics & EMF Pollution ในบริบทประเทศไทย",
+        subtitle: "“นอกจากฝุ่นควันและอาหารไหม้เกรียม... พลาสติกขนาดจิ๋วและคลื่นที่มองไม่เห็น ส่งผลต่อเซลล์และหลอดเลือดของเราอย่างไร?”",
+        image: DEFAULT_IMAGES.cover,
+        notes: "บทนำ: สัปดาห์ก่อนเราพูดถึง PM2.5, Aflatoxin และ AGEs วันนี้เราจะต่อยอดสู่ 2 ภัยเงียบที่เติบโตคู่กับวิถีชีวิตคนเมืองในไทย: ไมโครพลาสติกจากวัฒนธรรมพลาสติกใช้ครั้งเดียว และคลื่นแม่เหล็กไฟฟ้าจากการเชื่อมต่อตลอด 24 ชั่วโมง",
+        render: (idx) => `
+          <div class="grid-2">
+            <div class="stagger-1" style="display:flex;flex-direction:column;justify-content:space-between;gap:16px;">
+              <div class="card card-accent-top">
+                <h3>🧭 แผนการเจาะลึก 5 มิติ</h3>
+                <div style="display:grid;gap:10px;margin-top:12px;">
+                  <div><span class="tag tag-amber">PART 1</span> <strong>MICROPLASTICS</strong> — อนุภาคจิ๋วในถุงแกง น้ำขวดตากแดด และอ่าวไทย</div>
+                  <div><span class="tag tag-purple">PART 2</span> <strong>EMF POLLUTION</strong> — สัญญาณมือถือ, Wi-Fi ในคอนโด & สถิติเน็ตไทย</div>
+                  <div><span class="tag tag-red">PART 3</span> <strong>BIOLOGICAL CROSSROADS</strong> — จุดร่วมทำลายหลอดเลือด ลำไส้ และเซลล์</div>
+                  <div><span class="tag tag-blue">PART 4</span> <strong>MYTH BUSTING</strong> — แยกแยะหลักฐานแพทย์ออกจากสติกเกอร์กันคลื่น & ดีท็อกซ์</div>
+                  <div><span class="tag tag-green">PART 5</span> <strong>7-DAY ACTION PLAN</strong> — กฎความคุ้มค่า ปิ่นโต แก้วน้ำ และ Sleep Sanctuary</div>
+                </div>
+              </div>
+              <div class="callout">
+                🎯 <strong>Core Objective:</strong> ตระหนักรู้จุดเสี่ยงใกล้ตัวโดยไม่ตื่นตระหนก แยกแยะสิ่งที่พิสูจน์แล้วออกจากกระแสการตลาด และเริ่มเปลี่ยนพฤติกรรมได้ทันที
+              </div>
+            </div>
+            ${mediaBox(idx, DEFAULT_IMAGES.cover, "มลพิษยุคใหม่ที่แทรกซึมในวิถีชีวิตคนเมือง: พลาสติกขนาดจิ๋วและคลื่นแม่เหล็กไฟฟ้า", "Thailand Modern Exposome")}
+          </div>
+        `
+      },
+      // SLIDE 2
+      {
+        act: "PART 1 · MICROPLASTICS",
+        actColor: "#f59e0b",
+        time: "3–6 นาที",
+        ref: "Particle Physics & Biology",
+        title: "รู้จักขนาด: จากขยะพลาสติก สู่ Microplastics & Nanoplastics",
+        subtitle: "ทำไมยิ่งอนุภาคเล็กลง ยิ่งมีผลต่อการแทรกซึมเข้าสู่อวัยวะภายในร่างกาย?",
+        notes: "ชี้ให้เห็นความแตกต่าง: Microplastics (5 มม. - 1 ไมครอน) มักระคายเคืองเยื่อบุทางเดินอาหาร แต่ Nanoplastics (< 1 ไมครอน) มีขนาดเล็กพอที่จะข้ามเยื่อบุเซลล์ ซึมเข้าเลือด ทะลุรก และผ่าน Blood-Brain Barrier ได้",
+        render: () => `
+          <div class="grid-3 stagger-2">
+            <div class="card card-accent-top">
+              <span class="tag tag-amber">MACROPLASTICS</span>
+              <h3 style="margin-top:8px;">🥤 ขยะพลาสติกทั่วไป</h3>
+              <p>ขนาด <strong>&gt; 5 มิลลิเมตร</strong> เช่น ถุงหิ้ว แก้วน้ำ หลอดดูด ขวด PET แตกหักเป็นชิ้นเล็กๆ ด้วยแรงกล ความร้อน และแสงแดด UV ในสิ่งแวดล้อม</p>
+            </div>
+            <div class="card card-accent-top" style="border-top-color:#fb923c;">
+              <span class="tag tag-amber">MICROPLASTICS (MPs)</span>
+              <h3 style="margin-top:8px;">🔬 ไมโครพลาสติก</h3>
+              <p>ขนาด <strong>1 ไมครอน ถึง 5 มิลลิเมตร</strong> (เท่าเม็ดทรายจนถึงมองด้วยตาเปล่าไม่เห็น) ถูกกลืนกินโดยสัตว์น้ำ และระคายเคืองเยื่อบุลำไส้ของมนุษย์</p>
+            </div>
+            <div class="card card-accent-top" style="border-top-color:#ef4444;">
+              <span class="tag tag-red">NANOPLASTICS (NPs)</span>
+              <h3 style="margin-top:8px;">🧬 นาโนพลาสติก</h3>
+              <p>ขนาด <strong>&lt; 1 ไมครอน (&lt; 1,000 nm)</strong> เล็กกว่าเส้นผ่านศูนย์กลางเซลล์เม็ดเลือดแดง สามารถแทรกซึมเข้ากระแสเลือด ทะลุผ่าน Blood-Brain Barrier และข้ามรกได้</p>
+            </div>
+          </div>
+          <div class="callout warn stagger-3">
+            ⚠️ <strong>The Trojan Horse Effect (ตัวพาสารพิษอื่นเข้าตัว):</strong> ผิวของพลาสติกขนาดจิ๋วเป็น Hydrophobic ซึ่งทำหน้าที่ดูดซับสารพิษรอบตัว เช่น โลหะหนัก ยาฆ่าแมลง และสารเคมีรบกวนฮอร์โมน (BPA, Phthalates, PFAS) พาเข้าสู่เนื้อเยื่อพร้อมกัน!
+          </div>
+        `
+      },
+      // SLIDE 3
+      {
+        act: "PART 1 · MICROPLASTICS",
+        actColor: "#f59e0b",
+        time: "6–9 นาที",
+        ref: "Thai Street Food Context",
+        title: "จุดเสี่ยงไทย 1: วัฒนธรรมอาหารริมทาง ถุงแกงร้อน & ของทอด",
+        subtitle: "การนำพลาสติกแบบใช้ครั้งเดียวไปสัมผัสกับความร้อนสูงและน้ำมันเดือด",
+        image: DEFAULT_IMAGES.streetFood,
+        notes: "เน้นย้ำ: แม้ถุงร้อนระบุว่าทนร้อน (HDPE/PP) แต่น้ำแกงเดือดจัด (100°C) หรือน้ำมันของทอด (160–180°C) มีอุณหภูมิสูงพอที่จะเร่งให้พันธะโพลีเมอร์หลุดลอก และการอุ่นไมโครเวฟในภาชนะพลาสติกบางปล่อยอนุภาคนับล้านชิ้น",
+        render: (idx) => `
+          <div class="grid-2">
+            <div class="stagger-1">
+              <div class="card">
+                <h3>🍲 3 พฤติกรรมเสี่ยงที่พบได้ทุกวันในไทย</h3>
+                <ul>
+                  <li><strong>ถุงแกงทนร้อนใส่น้ำซุปเดือด:</strong> แม้ถุง PP/HDPE จะไม่ละลาย แต่ความร้อนระดับ 100°C เร่งการชะล้างสารเติมแต่งพลาสติกและไมโครพลาสติกออกสู่น้ำแกง</li>
+                  <li><strong>ของทอดร้อนๆ รองกระดาษเคลือบ/โฟม:</strong> ไก่ทอด กล้วยทอด ลูกชิ้นทอดที่เพิ่งขึ้นจากกระทะ (160–180°C) สัมผัสกับกล่องโฟมหรือกระดาษเคลือบฟิล์มพลาสติก</li>
+                  <li><strong>การอุ่นไมโครเวฟทั้งถุงหรือกล่องบาง:</strong> งานวิจัยปี 2023 ใน *Environ. Sci. Technol.* พบว่าการเวฟภาชนะพลาสติกเพียง 3 นาที ปลดปล่อยนาโนพลาสติกได้มากกว่า 4 ล้านชิ้นต่อตารางเซนติเมตร!</li>
+                </ul>
+              </div>
+              <div class="callout success">
+                💡 <strong>ทางออกง่ายๆ:</strong> ถ่ายอาหารลงชามแก้วหรือเซรามิกก่อนนำเข้าไมโครเวฟเสมอ และพกปิ่นโตสแตนเลสสำหรับซื้อกับข้าวร้อน
+              </div>
+            </div>
+            ${mediaBox(idx, DEFAULT_IMAGES.streetFood, "สตรีทฟู้ดเมืองไทยกับวัฒนธรรมถุงพลาสติกสัมผัสอาหารร้อนจัด", "Thai Street Food & Single-use Plastics")}
+          </div>
+        `
+      },
+      // SLIDE 4
+      {
+        act: "PART 1 · MICROPLASTICS",
+        actColor: "#f59e0b",
+        time: "9–12 นาที",
+        ref: "Drinking Water & Bottles",
+        title: "จุดเสี่ยงไทย 2: น้ำดื่มขวด PET ตากแดด & ตู้น้ำหยอดเหรียญ",
+        subtitle: "แสงแดดเมืองไทย + ความร้อนสะสมในรถยนต์ = ตัวเร่งการเสื่อมของพลาสติก",
+        image: DEFAULT_IMAGES.bottledWater,
+        notes: "อุณหภูมิในห้องโดยสารรถยนต์ที่จอดตากแดดเมืองไทยพุ่งสูงถึง 60–70°C ขวดน้ำดื่ม PET ที่ลืมทิ้งไว้จะเกิดการคลายตัวของโมเลกุลและปล่อยสารกลุ่ม Antimony, Phthalates รวมถึงเศษอนุภาคพลาสติก",
+        render: (idx) => `
+          <div class="grid-2">
+            <div class="stagger-1">
+              <div class="card">
+                <h3>🚗 แดดเมืองไทยกับขวดน้ำดื่ม</h3>
+                <ul>
+                  <li><strong>ขวดน้ำที่ทิ้งไว้ในรถตากแดด:</strong> อุณหภูมิในรถยนต์ที่จอดกลางแจ้งสามารถขึ้นไปถึง 60–70°C เร่งให้พลาสติก PET เสื่อมสภาพและปล่อยสารเคมีออกมาในน้ำดื่ม</li>
+                  <li><strong>แพ็คน้ำดื่มหน้าร้านของชำ:</strong> การขนส่งบนรถกระบะเปิดประทุนและการตั้งแพ็คน้ำดื่มตากแดดริมถนน</li>
+                  <li><strong>ตู้น้ำดื่มหยอดเหรียญ & ถังสีฟ้า:</strong> หากขาดการเปลี่ยนไส้กรองคาร์บอนและเมมเบรนตามรอบ หรือใช้ถังพลาสติกเก่าที่มีรอยขูดขีดเป็นเวลานาน</li>
+                  <li><strong>วัฒนธรรมชานม/กาแฟเย็น:</strong> การดูดเครื่องดื่มเย็นผ่านหลอดพลาสติกและฝาปิดที่มีการเสียดสี</li>
+                </ul>
+              </div>
+              <div class="callout warn">
+                🚫 <strong>สิ่งที่ไม่ควรทำ:</strong> ห้ามนำขวดน้ำ PET แบบใช้ครั้งเดียว (Single-use) มากรอกน้ำซ้ำเรื่อยๆ และเลี่ยงการดื่มน้ำจากขวดที่จอดตากแดดจนร้อน
+              </div>
+            </div>
+            ${mediaBox(idx, DEFAULT_IMAGES.bottledWater, "ขวดน้ำดื่มพลาสติกเมื่อสัมผัสความร้อนและรังสี UV จะเร่งการหลุดลอกของอนุภาคพลาสติก", "Bottled Water & Heat Degradation")}
+          </div>
+        `
+      },
+      // SLIDE 5
+      {
+        act: "PART 1 · MICROPLASTICS",
+        actColor: "#f59e0b",
+        time: "12–15 นาที",
+        ref: "Gulf of Thailand Research",
+        title: "จุดเสี่ยงไทย 3: อ่าวไทย อาหารทะเล สัตว์น้ำเปลือกแข็ง & เกลือสมุทร",
+        subtitle: "จุดบรรจบของแม่น้ำ 4 สายหลัก และการสะสมในห่วงโซ่อาหารทางทะเล",
+        image: DEFAULT_IMAGES.seafoodSea,
+        notes: "อ่าวไทยตอนบนรองรับน้ำจากเจ้าพระยา ท่าจีน แม่กลอง บางปะกง งานวิจัยของมหาวิทยาลัยในไทยพบไมโครพลาสติกในหอยแมลงภู่ หอยนางรม และเกลือสมุทร แต่เน้นย้ำว่าไม่ต้องเลิกกินอาหารทะเล ให้กินอย่างเข้าใจ",
+        render: (idx) => `
+          <div class="grid-2">
+            <div class="stagger-1">
+              <div class="card">
+                <h3>🌊 ข้อมูลงานวิจัยในน่านน้ำไทย</h3>
+                <ul>
+                  <li><strong>อ่าวไทยตอนบน (Gulf of Thailand):</strong> รับมลพิษจากปากแม่น้ำสายหลัก ทำให้พบความเข้มข้นของไมโครพลาสติกในตะกอนดินชายฝั่งสูง</li>
+                  <li><strong>สัตว์น้ำเปลือกแข็ง (Filter Feeders):</strong> หอยแมลงภู่ หอยนางรม กรองน้ำทะเลกินอาหาร จึงกักเก็บไมโครพลาสติกไว้ในทางเดินอาหารและเนื้อเยื่อ</li>
+                  <li><strong>เกลือสมุทร (Sea Salt):</strong> การระเหยน้ำทะเลในนาเกลือทำให้อนุภาคไมโครพลาสติกตกค้างอยู่ในผลึกเกลือ</li>
+                </ul>
+              </div>
+              <div class="callout success">
+                🐟 <strong>คำแนะนำเชิงสมดุล (Nuanced Advice):</strong><br/>
+                ไม่ต้องเลิกกินอาหารทะเล เพราะโอเมก้า 3 (EPA/DHA) และแร่ธาตุจำเป็นยังมีประโยชน์สูงมาก! แนะนำให้ <strong>กินปลาหลากหลาย ไม่กินเครื่องใน/ทางเดินอาหารของสัตว์น้ำเปลือกแข็งเป็นประจำ</strong>
+              </div>
+            </div>
+            ${mediaBox(idx, DEFAULT_IMAGES.seafoodSea, "อาหารทะเลและระบบนิเวศอ่าวไทยกับการสะสมไมโครพลาสติกในห่วงโซ่อาหาร", "Marine Microplastics in Thailand")}
+          </div>
+        `
+      },
+      // SLIDE 6
+      {
+        act: "PART 1 · MICROPLASTICS",
+        actColor: "#f59e0b",
+        time: "15–18 นาที",
+        ref: "NEJM March 2024 (Marfella et al.)",
+        title: "งานวิจัยระดับเปลี่ยนเกม: NEJM 2024 ไมโครพลาสติกในคราบหลอดเลือด",
+        subtitle: "หลักฐานทางคลินิกครั้งแรกในมนุษย์ ที่เชื่อมโยงพลาสติกขนาดจิ๋วกับความเสี่ยงโรคหัวใจและหลอดเลือด",
+        image: DEFAULT_IMAGES.vascularPlaque,
+        notes: "งานวิจัยชิ้นประวัติศาสตร์ใน New England Journal of Medicine ตรวจผู้ป่วยผ่าตัดลอกคราบหลอดเลือดคอ (Endarterectomy) 257 ราย พบว่ากลุ่มที่ตรวจเจอพลาสติก (MNPs) ในคราบพลัค มีความเสี่ยง Heart Attack, Stroke, Death สูงกว่ากลุ่มที่ไม่เจอถึง 4.5 เท่า!",
+        render: (idx) => `
+          <div class="grid-2">
+            <div class="stagger-1">
+              <div class="card card-accent-top">
+                <h3>🩸 สรุปผลงานวิจัยจาก NEJM (มีนาคม 2024)</h3>
+                <p>ศึกษาในผู้ป่วย 257 รายที่เข้ารับการผ่าตัดคราบไขมันที่หลอดเลือดแดงใหญ่ที่คอ (Carotid Artery Plaque):</p>
+                <div class="bar-wrap" style="margin-top:14px;">
+                  <div class="bar-label"><span>ผู้ป่วยที่ตรวจพบพลาสติกในคราบพลัค (58.4%)</span><span class="tag tag-red">PE & PVC</span></div>
+                  <div class="bar-track"><div class="bar-fill" style="width:58%;background:#ef4444;"></div></div>
+                </div>
+                <ul style="margin-top:14px;">
+                  <li>ตรวจพบอนุภาค <strong>Polyethylene (PE)</strong> และ <strong>Polyvinyl chloride (PVC)</strong> ฝังตัวอยู่ในก้อนพลัค</li>
+                  <li>กลุ่มที่ตรวจพบ มีระดับสารอักเสบ (IL-6, IL-1β, TNF-α) สูงกว่าชัดเจน</li>
+                  <li>ติดตามผล 34 เดือน: <strong>ความเสี่ยงกล้ามเนื้อหัวใจขาดเลือด หลอดเลือดสมอง หรือเสียชีวิต สูงกว่ากลุ่มที่ไม่พบถึง 4.53 เท่า! (HR 4.53)</strong></li>
+                </ul>
+              </div>
+            </div>
+            ${mediaBox(idx, DEFAULT_IMAGES.vascularPlaque, "ภาพตรวจทางจุลพยาธิวิทยาพบคราบพลัคในหลอดเลือดและอนุภาคสิ่งแปลกปลอม", "NEJM 2024 · Microplastics & Carotid Plaque")}
+          </div>
+        `
+      },
+      // SLIDE 7
+      {
+        act: "PART 2 · EMF POLLUTION",
+        actColor: "#a855f7",
+        time: "18–21 นาที",
+        ref: "Physics & IARC Classification",
+        title: "EMF ฟิสิกส์ & สรีรวิทยา: Ionizing vs Non-ionizing & IARC Group 2B",
+        subtitle: "เข้าใจระดับพลังงานของคลื่นแม่เหล็กไฟฟ้า เพื่อความเข้าใจที่ถูกต้องตามหลักวิทยาศาสตร์",
+        notes: "อธิบายสเปกตรัมคลื่น: รังสีเอกซ์ (Ionizing) ทำลายพันธะ DNA โดยตรง แต่คลื่นมือถือ/Wi-Fi (Non-ionizing) ไม่มีพลังงานพอที่จะทำลาย DNA แบบนั้น จึงถูกจัดเป็น IARC Group 2B (Possibly Carcinogenic) เหมือนกับกาแฟในอดีตหรือผักดอง",
+        render: () => `
+          <div class="grid-2-equal stagger-2">
+            <div class="card card-accent-top" style="border-top-color:#ef4444;">
+              <span class="tag tag-red">IONIZING RADIATION</span>
+              <h3 style="margin-top:8px;">☢️ รังสีแตกตัวเป็นไอออน (อันตรายชัดเจน)</h3>
+              <ul>
+                <li>รังสีเอกซ์ (X-rays), แกมมา, รังสีคอสมิก</li>
+                <li>พลังงานสูงมาก สามารถ <strong>ฉีกอิเล็กตรอนออกจากอะตอม และทำลายพันธะ DNA โดยตรง</strong></li>
+                <li>มีขีดจำกัดความปลอดภัยในการรับสัมผัสทางการแพทย์ชัดเจน</li>
+              </ul>
+            </div>
+            <div class="card card-accent-top" style="border-top-color:#a855f7;">
+              <span class="tag tag-purple">NON-IONIZING (RF-EMF)</span>
+              <h3 style="margin-top:8px;">📶 คลื่นความถี่วิทยุ (โทรศัพท์, Wi-Fi, 5G)</h3>
+              <ul>
+                <li>สัญญาณมือถือ (4G/5G), Wi-Fi, Bluetooth, ไมโครเวฟ</li>
+                <li><strong>ไม่มีพลังงานพอที่จะฉีก DNA โดยตรง</strong></li>
+                <li>กลไกผลกระทบจึงไม่ใช่แบบกัมมันตรังสี แต่เกี่ยวข้องกับความร้อนสะสม และการรบกวนคลื่นสมอง/การนอนหลับ</li>
+              </ul>
+            </div>
+          </div>
+          <div class="callout stagger-3">
+            📋 <strong>WHO / IARC จัด RF-EMF อยู่ในกลุ่ม Group 2B:</strong> หมายถึง “มีความเป็นไปได้ที่จะก่อมะเร็งในมนุษย์ (Possibly Carcinogenic)” บนหลักฐานที่ยังมีข้อจำกัด (Limited evidence) — จึงควรใช้วิธีป้องกันอย่างสมเหตุสมผล (Precautionary Principle) โดยไม่ต้องตื่นกลัวจนเสียสติ
+          </div>
+        `
+      },
+      // SLIDE 8
+      {
+        act: "PART 2 · EMF POLLUTION",
+        actColor: "#a855f7",
+        time: "21–24 นาที",
+        ref: "Thailand Digital Realities",
+        title: "จุดเสี่ยงไทย: คนไทยใช้เน็ตอันดับโลก & ชีวิตในคอนโดมิเนียม",
+        subtitle: "วิถีชีวิตเชื่อมต่อตลอด 24 ชั่วโมง และความหนาแน่นของสัญญาณในเขตเมือง",
+        image: DEFAULT_IMAGES.cellTowerCity,
+        notes: "สถิติ Global Digital Report ระบุว่าคนไทยใช้งานอินเทอร์เน็ตเฉลี่ยวันละ 7-8 ชั่วโมง และคอนโดมิเนียมในเมืองไทยมี Wi-Fi หนาแน่นรอบห้องนอน 20-30 จุด พร้อมเสาส่งสัญญาณบนดาดฟ้า",
+        render: (idx) => `
+          <div class="grid-2">
+            <div class="stagger-1">
+              <div class="card">
+                <h3>📱 สถิติและบริบทชีวิตคนเมืองในไทย</h3>
+                <ul>
+                  <li><strong>คนไทยใช้อินเทอร์เน็ตเฉลี่ย 7–8 ชม./วัน:</strong> ติดอันดับท็อป 10 ของโลก โดยกว่า 80% ใช้งานผ่านสมาร์ทโฟน</li>
+                  <li><strong>ความหนาแน่นในคอนโดมิเนียม:</strong> เมื่อสแกน Wi-Fi ในห้องนอน มักพบสัญญาณเครือข่ายรอบทิศทาง 20–40 เครือข่ายตลอด 24 ชั่วโมง</li>
+                  <li><strong>เสาส่งสัญญาณบนดาดฟ้าและริมถนน:</strong> เสาส่ง Microcells 4G/5G ติดตั้งใกล้ชิดที่อยู่อาศัยในย่านชุมชนเมือง</li>
+                  <li><strong>การทำงานแบบ Always-on:</strong> สวมใส่หูฟัง Bluetooth ค้างไว้หลายชั่วโมง และใส่นาฬิกา Smartwatch ตรวจจับการนอนตลอดคืน</li>
+                </ul>
+              </div>
+            </div>
+            ${mediaBox(idx, DEFAULT_IMAGES.cellTowerCity, "โครงข่ายโทรคมนาคมและสัญญาณไร้สายในเขตเมืองหลวงที่ทำงานตลอด 24 ชั่วโมง", "Urban Connectivity & Wireless Density")}
+          </div>
+        `
+      },
+      // SLIDE 9
+      {
+        act: "PART 2 · EMF POLLUTION",
+        actColor: "#a855f7",
+        time: "24–27 นาที",
+        ref: "Evidence Assessment",
+        title: "Fact vs Hypothesis: อะไรคือสิ่งที่วิทยาศาสตร์พิสูจน์แล้ว vs กำลังศึกษา?",
+        subtitle: "แยกแยะอาการที่เกิดขึ้นจริงในคลินิก ออกจากสมมติฐานระดับเซลล์ที่ยังรอการยืนยัน",
+        image: DEFAULT_IMAGES.phoneBedroom,
+        notes: "แยกแยะชัดเจน: สิ่งที่พิสูจน์แล้วชัดเจนคือ Blue light + Dopamine Arousal ทำลาย Melatonin และ Sleep Architecture ทำให้ปวดหัว ตาล้า เครียด ส่วนสมมติฐาน VGCCs (Voltage-Gated Calcium Channels) เป็นกลไกระดับเซลล์ที่กำลังศึกษา",
+        render: (idx) => `
+          <div class="grid-2">
+            <div class="stagger-1" style="display:flex;flex-direction:column;gap:16px;">
+              <div class="card card-accent-top" style="border-top-color:#10b981;">
+                <span class="tag tag-green">พิสูจน์แล้วทางคลินิก (PROVEN CLINICAL FACTS)</span>
+                <ul style="margin-top:10px;">
+                  <li><strong>การนอนหลับพังทลาย (Sleep Disruption):</strong> แสงสีฟ้าและพฤติกรรมติดจอก่อนนอนกดฮอร์โมน Melatonin และรบกวนวงจร Deep Sleep ชัดเจนที่สุด</li>
+                  <li><strong>ภาวะตาล้าและปวดคอเรื้อรัง:</strong> Digital Eye Strain และ Text-Neck Syndrome จากการก้มเล่นโทรศัพท์เป็นเวลานาน</li>
+                  <li><strong>ผลต่อความร้อนสะสมและคุณภาพอสุจิ:</strong> การเก็บมือถือในกระเป๋ากางเกงด้านหน้าเป็นเวลานาน สัมพันธ์กับจำนวนและความแข็งแรงของอสุจิที่ลดลง</li>
+                </ul>
+              </div>
+              <div class="card card-accent-top" style="border-top-color:#fbbf24;">
+                <span class="tag tag-amber">กำลังศึกษาในห้องทดลอง (EMERGING HYPOTHESES)</span>
+                <ul style="margin-top:10px;">
+                  <li><strong>VGCCs Activation:</strong> สมมติฐานว่าคลื่น RF อาจรบกวนช่องรับแคลเซียมที่เยื่อหุ้มเซลล์ นำไปสู่การปล่อยอนุมูลอิสระ (Peroxynitrite) ในไมโทคอนเดรีย</li>
+                  <li><strong>Blood-Brain Barrier Permeability:</strong> การทดลองในสัตว์บางงานพบการซึมผ่านของหลอดเลือดสมองเพิ่มขึ้นชั่วคราว</li>
+                </ul>
+              </div>
+            </div>
+            ${mediaBox(idx, DEFAULT_IMAGES.phoneBedroom, "การใช้สมาร์ทโฟนบนเตียงนอนก่อนนอนส่งผลทำลายคุณภาพการนอนหลับอย่างชัดเจน", "Screen Addiction & Sleep Deprivation")}
+          </div>
+        `
+      },
+      // SLIDE 10
+      {
+        act: "PART 3 · BIOLOGICAL CROSSROADS",
+        actColor: "#f43f5e",
+        time: "27–30 นาที",
+        ref: "Cellular Aging Convergence",
+        title: "จุดร่วมทำลายเซลล์: Microplastics & EMF เร่ง Organ Aging อย่างไร?",
+        subtitle: "การทำงานประสานกันของ 3 วงจรอุบาทว์: หลอดเลือดอักเสบ ลำไส้รั่ว และไมโทคอนเดรียเสื่อม",
+        image: DEFAULT_IMAGES.cellularMito,
+        notes: "สไลด์นี้สรุปแก่นทางสรีรวิทยา: ทั้งสองตัวสร้าง Oxidative Stress ซึมลึก ทำให้ไมโทคอนเดรียผลิต ATP ลดลง รบกวนฮอร์โมน และกระตุ้น Inflammaging ในอวัยวะสำคัญ",
+        render: (idx) => `
+          <div class="grid-2">
+            <div class="stagger-1">
+              <table class="evidence-table">
+                <thead>
+                  <tr>
+                    <th>กลไกระดับเซลล์</th>
+                    <th>Microplastics (MPs/NPs)</th>
+                    <th>EMF / Screen Lifestyle</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>⚡ Oxidative Stress</strong></td>
+                    <td>กระตุ้น Macrophage ROS และเยื่อหุ้มเซลล์เกิดสนิม</td>
+                    <td>รบกวนไมโทคอนเดรียและแคลเซียมไอออน</td>
+                  </tr>
+                  <tr>
+                    <td><strong>🧱 Gut & Barrier</strong></td>
+                    <td>ระคายเคืองเยื่อบุผิว ทำให้เกิด Leaky Gut</td>
+                    <td>ความเครียดและอดนอนลดเยื่อเมือกปกป้องลำไส้</td>
+                  </tr>
+                  <tr>
+                    <td><strong>❤️ Vascular Aging</strong></td>
+                    <td>แทรกตัวใน Carotid Plaque เพิ่มความเสี่ยงหัวใจ</td>
+                    <td>อดนอนเรื้อรังทำให้ความดันสูง หลอดเลือดแข็งตัว</td>
+                  </tr>
+                  <tr>
+                    <td><strong>🧬 Endocrine Disruption</strong></td>
+                    <td>BPA, Phthalates, PFAS รบกวนฮอร์โมนเพศและไทรอยด์</td>
+                    <td>กดการหลั่ง Melatonin รบกวนวงจรคอร์ติซอล</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            ${mediaBox(idx, DEFAULT_IMAGES.cellularMito, "ความเสียหายระดับไมโทคอนเดรียและการอักเสบเรื้อรัง (Inflammaging)", "Mitochondrial Function & Cellular Aging")}
+          </div>
+        `
+      },
+      // SLIDE 11
+      {
+        act: "PART 4 · MYTH BUSTING",
+        actColor: "#06b6d4",
+        time: "30–33 นาที",
+        ref: "Commercial Hype vs Science",
+        title: "Detox Myth vs Medical Fact: สติกเกอร์กันรังสี ชาดีท็อกซ์ & สร้อยควอนตัม",
+        subtitle: "คลิกที่การ์ดเพื่อเปิดดูข้อเท็จจริงทางการแพทย์ และไม่ตกเป็นเหยื่อของการตลาดตื่นตระหนก",
+        notes: "เน้นย้ำความจริง: สติกเกอร์ติดมือถือบังเสาอากาศทำให้โทรศัพท์เร่งส่งสัญญาณแรงขึ้น และชาดีท็อกซ์ไม่สามารถกำจัดไมโครพลาสติกในเลือดได้",
+        render: () => `
+          <div class="grid-3 stagger-2">
+            <div class="card interactive-card" onclick="this.classList.toggle('revealed')">
+              <span class="tag tag-red">MYTH 1</span>
+              <h3 style="margin-top:8px;">🏷️ สติกเกอร์กันคลื่น / เคสมือถือดูดซับรังสี</h3>
+              <p>คำโฆษณา: “แปะแผ่นทองคำ/หินแร่เพื่อสลายคลื่นแม่เหล็กไฟฟ้า 99.9%”</p>
+              <span class="click-hint">👆 คลิกเพื่อดูข้อเท็จจริง</span>
+              <div class="reveal-answer">
+                <strong>❌ ไร้หลักฐานทางการแพทย์:</strong> หากแผ่นบังเสาสัญญาณ โทรศัพท์จะ <strong>เร่งกำลังส่งสัญญาณ (Boost Output Power)</strong> ให้แรงขึ้นเพื่อให้โทรติด ทำให้ร่างกายได้รับคลื่นมากขึ้นกว่าเดิม!
+              </div>
+            </div>
+            <div class="card interactive-card" onclick="this.classList.toggle('revealed')">
+              <span class="tag tag-red">MYTH 2</span>
+              <h3 style="margin-top:8px;">🧃 ชาดีท็อกซ์ หรือคอร์สสวนล้างไมโครพลาสติก</h3>
+              <p>คำโฆษณา: “ดื่มสมุนไพรสูตรพิเศษเพื่อล้างเศษพลาสติกในหลอดเลือดและเซลล์”</p>
+              <span class="click-hint">👆 คลิกเพื่อดูข้อเท็จจริง</span>
+              <div class="reveal-answer">
+                <strong>❌ เป็นไปไม่ได้ในทางกายวิภาค:</strong> ไม่มีชาหรือการสวนลำไส้ใดสามารถเข้าไปเก็บเศษพลาสติกในคราบหลอดเลือดหรือตับได้ ทางเดียวที่ดีที่สุดคือ <strong>“ลดการนำเข้า (Reduce Intake)”</strong>
+              </div>
+            </div>
+            <div class="card interactive-card" onclick="this.classList.toggle('revealed')">
+              <span class="tag tag-red">MYTH 3</span>
+              <h3 style="margin-top:8px;">🔮 สร้อยควอนตัม / การ์ดพลังงานป้องกัน 5G</h3>
+              <p>คำโฆษณา: “สวมสร้อยปรับสมดุลสนามแม่เหล็กในร่างกาย ต้านคลื่น 5G”</p>
+              <span class="click-hint">👆 คลิกเพื่อดูข้อเท็จจริง</span>
+              <div class="reveal-answer">
+                <strong>🚨 อันตรายแฝง:</strong> สร้อยและแผ่นการ์ดเหล่านี้จำนวนมากในท้องตลาดถูกตรวจพบว่า <strong>ผสมผงกัมมันตรังสีทอเรียม (Thorium)</strong> ซึ่งปล่อยรังสีแกมมาจริงและเป็นสารก่อมะเร็งแท้จริง!
+              </div>
+            </div>
+          </div>
+        `
+      },
+      // SLIDE 12
+      {
+        act: "PART 5 · ACTION PLAN",
+        actColor: "#10b981",
+        time: "33–36 นาที",
+        ref: "Microplastics Reduction",
+        title: "ภารกิจลด Microplastics สไตล์ไทย: กฎความคุ้มค่า (High Impact)",
+        subtitle: "ไม่ต้องเปลี่ยนวิถีชีวิตทั้งหมด แต่ตัดจุดสัมผัสความร้อนสูงให้เด็ดขาด",
+        image: DEFAULT_IMAGES.healthyGlass,
+        notes: "นำเสนอแนวทางที่เป็นไปได้จริงในไทย: พกปิ่นโตสแตนเลส เลิกเวฟพลาสติก และใช้กระบอกน้ำส่วนตัว",
+        render: (idx) => `
+          <div class="grid-2">
+            <div class="stagger-1" style="display:grid;gap:12px;">
+              <div class="card card-accent-top">
+                <h3>🍲 1. จัดการอาหารร้อนและของทอด</h3>
+                <ul>
+                  <li><strong>พกปิ่นโตสแตนเลส หรือกล่องแก้ว:</strong> เมื่อสั่งก๋วยเตี๋ยว ซุปร้อน แกงจืด แกงเผ็ด ให้ใส่ภาชนะของเราแทนถุงแกง</li>
+                  <li><strong>ห้ามนำถุงแกงหรือกล่องพลาสติกเข้าไมโครเวฟ:</strong> ให้ถ่ายลงจานกระเบื้องเซรามิกหรือชามแก้วทนความร้อนเสมอ</li>
+                  <li><strong>หลีกเลี่ยงของทอดร้อนจัดที่เพิ่งขึ้นกระทะบนกล่องโฟม</strong></li>
+                </ul>
+              </div>
+              <div class="card card-accent-top">
+                <h3>💧 2. ปรับพฤติกรรมน้ำดื่ม</h3>
+                <ul>
+                  <li><strong>พกกระบอกน้ำสแตนเลส (Double-wall) หรือขวดแก้ว:</strong> ลดการซื้อขวดพลาสติกแบบใช้ครั้งเดียว</li>
+                  <li><strong>อย่าดื่มน้ำจากขวดที่ลืมไว้ในรถยนต์ตากแดด:</strong> ให้ทิ้งหรือนำไปรดน้ำต้นไม้แทน</li>
+                  <li><strong>ติดตั้งเครื่องกรองน้ำที่บ้านที่ได้มาตรฐาน (RO หรือ Carbon block คุณภาพสูง)</strong></li>
+                </ul>
+              </div>
+            </div>
+            ${mediaBox(idx, DEFAULT_IMAGES.healthyGlass, "การเปลี่ยนมาใช้ภาชนะแก้ว สแตนเลส และเซรามิก คือวิธีตัดไมโครพลาสติกที่มีประสิทธิภาพสูงสุด", "Plastic-Free Food Containers")}
+          </div>
+        `
+      },
+      // SLIDE 13
+      {
+        act: "PART 5 · ACTION PLAN",
+        actColor: "#10b981",
+        time: "36–39 นาที",
+        ref: "EMF & Sleep Hygiene",
+        title: "ภารกิจจัดสมดุล EMF: กฎสร้าง “Sleep Sanctuary” และสายคุย",
+        subtitle: "ใช้เทคโนโลยีอย่างชาญฉลาด โดยไม่ยอมให้เทคโนโลยีมาแย่งการฟื้นฟูของสมอง",
+        image: DEFAULT_IMAGES.sleepSanctuary,
+        notes: "เน้นกฎ Inverse Square Law ในฟิสิกส์: คลื่นแม่เหล็กไฟฟ้าจะลดลงอย่างมหาศาลตามระยะทาง แค่วางมือถือห่างเตียง 1.5-2 เมตร และใช้ลำโพงเวลาคุยสาย ก็ลดการสัมผัสไปกว่า 90%",
+        render: (idx) => `
+          <div class="grid-2">
+            <div class="stagger-1" style="display:grid;gap:12px;">
+              <div class="card card-accent-top">
+                <h3>🛏️ 1. กฎหัวนอนบริสุทธิ์ (Sleep Sanctuary)</h3>
+                <ul>
+                  <li><strong>ไม่อยู่ติดหมอน:</strong> อย่าวางสมาร์ทโฟนไว้ใต้หมอนหรือข้างศีรษะขณะนอนหลับ วางห่างเตียงอย่างน้อย <strong>1.5–2 เมตร</strong> (หรือเปิด Airplane Mode)</li>
+                  <li><strong>ตั้งเราเตอร์ Wi-Fi ห่างห้องนอน:</strong> หากทำได้ ให้ตั้งเราเตอร์ไว้นอกห้องนอน หรือตั้งเวลาปิด Wi-Fi อัตโนมัติในตอนกลางคืน</li>
+                  <li><strong>ถอดหูฟังไร้สายก่อนนอน:</strong> อย่าหลับไปพร้อมกับหูฟังบลูทูธคาหู</li>
+                </ul>
+              </div>
+              <div class="card card-accent-top">
+                <h3>📞 2. กฎการโทรสายและการใช้งานประจำวัน</h3>
+                <ul>
+                  <li><strong>คุยสายนาน &gt; 15 นาที:</strong> ใช้หูฟังแบบมีสาย (Wired headset) หรือเปิด Speakerphone แทนการแนบมือถือกับกะโหลกศีรษะ</li>
+                  <li><strong>Digital Sunset 60 นาที:</strong> วางหน้าจอทุกชนิดก่อนเข้านอน 1 ชั่วโมง เพื่อเปิดทางให้สมองหลั่ง Melatonin ซ่อมแซมไมโทคอนเดรีย</li>
+                  <li><strong>ไม่ใส่โทรศัพท์ในกระเป๋ากางเกงด้านหน้าตลอดวัน</strong></li>
+                </ul>
+              </div>
+            </div>
+            ${mediaBox(idx, DEFAULT_IMAGES.sleepSanctuary, "ห้องนอนที่ปลอดอุปกรณ์อิเล็กทรอนิกส์ติดศีรษะ คืนคุณภาพการนอนหลับลึกและฮอร์โมนชะลอวัย", "Sleep Sanctuary Architecture")}
+          </div>
+        `
+      },
+      // SLIDE 14
+      {
+        act: "PART 5 · ACTION PLAN",
+        actColor: "#10b981",
+        time: "39–42 นาที",
+        ref: "7-Day Action Challenge",
+        title: "Checklist ภารกิจ 7 วัน: เลือก 2 ข้อที่จะเริ่มทำทันทีในสัปดาห์นี้",
+        subtitle: "คลิกที่การ์ดเพื่อปักหมุดภารกิจของคุณสำหรับสัปดาห์นี้",
+        notes: "ให้ผู้เรียนแต่ละคนเลือก 1 ข้อจากฝั่งพลาสติก และ 1 ข้อจากฝั่งคลื่น แล้วแชร์ความตั้งใจในห้องเรียน",
+        render: () => `
+          <div class="grid-2-equal stagger-2">
+            <div style="display:grid;gap:10px;">
+              <h4 style="color:#f59e0b;font-size:0.9rem;text-transform:uppercase;letter-spacing:0.05em;">ฝั่งลด Microplastics (เลือก 1 ข้อ)</h4>
+              <div class="card interactive-card" style="padding:14px;" onclick="this.classList.toggle('revealed')">
+                <strong>🍲 Mission A: ถ่ายอาหารลงชามแก้วก่อนเวฟทุกครั้ง</strong>
+                <div class="reveal-answer">เลิกเวฟทั้งถุงพลาสติก/กล่องบาง 100% เป็นเวลา 7 วัน</div>
+              </div>
+              <div class="card interactive-card" style="padding:14px;" onclick="this.classList.toggle('revealed')">
+                <strong>🥤 Mission B: พกกระบอกน้ำสแตนเลสส่วนตัว</strong>
+                <div class="reveal-answer">งดซื้อน้ำขวดพลาสติกแบบใช้ครั้งเดียว และไม่ดื่มน้ำตากแดด</div>
+              </div>
+              <div class="card interactive-card" style="padding:14px;" onclick="this.classList.toggle('revealed')">
+                <strong>🥡 Mission C: พกปิ่นโต/กล่องแก้วไปซื้อกับข้าวร้อน</strong>
+                <div class="reveal-answer">ปฏิเสธถุงแกงร้อนสำหรับซุปเดือดและของทอดอย่างน้อย 3 มื้อ</div>
+              </div>
+            </div>
+            <div style="display:grid;gap:10px;">
+              <h4 style="color:#a855f7;font-size:0.9rem;text-transform:uppercase;letter-spacing:0.05em;">ฝั่งจัดสมดุล EMF & การนอน (เลือก 1 ข้อ)</h4>
+              <div class="card interactive-card" style="padding:14px;" onclick="this.classList.toggle('revealed')">
+                <strong>📱 Mission D: วางมือถือห่างเตียง 2 เมตรขณะนอน</strong>
+                <div class="reveal-answer">ไม่ชาร์จหรือวางมือถือไว้ติดหมอน เป็นเวลา 7 คืนต่อเนื่อง</div>
+              </div>
+              <div class="card interactive-card" style="padding:14px;" onclick="this.classList.toggle('revealed')">
+                <strong>🎧 Mission E: ใช้ Speakerphone/หูฟังมีสายเมื่อคุยงาน</strong>
+                <div class="reveal-answer">ไม่แนบมือถือกับกะโหลกศีรษะเมื่อคุยสายยาวเกิน 15 นาที</div>
+              </div>
+              <div class="card interactive-card" style="padding:14px;" onclick="this.classList.toggle('revealed')">
+                <strong>🌙 Mission F: Digital Sunset ก่อนนอน 45 นาที</strong>
+                <div class="reveal-answer">หยุดไถจอมือถือและเปลี่ยนมาอ่านหนังสือ/ยืดเหยียดก่อนนอน</div>
+              </div>
+            </div>
+          </div>
+        `
+      },
+      // SLIDE 15
+      {
+        act: "SUMMARY & Q&A",
+        actColor: "#38bdf8",
+        time: "42–45 นาที",
+        ref: "Take-Home Summary",
+        title: "บทสรุปส่งท้าย: 3 ประโยคทองจำกลับบ้าน",
+        subtitle: "“สุขภาพระดับเซลล์ ไม่ได้ขึ้นอยู่กับการหลบหนีโลกปัจจุบัน แต่คือการรู้เท่าทันและลดภาระที่ไม่จำเป็น”",
+        image: DEFAULT_IMAGES.healthyGlass,
+        notes: "สรุปจบคลาสอย่างทรงพลัง: 1) ความร้อนกับพลาสติกคือสิ่งต้องห้าม 2) ระยะห่างคือเพื่อนที่ดีที่สุดของคลื่น 3) อย่าหลงกลการตลาดตื่นตระหนก แล้วเปิดช่วงถาม-ตอบ",
+        render: (idx) => `
+          <div class="grid-2">
+            <div class="stagger-1" style="display:flex;flex-direction:column;justify-content:space-between;gap:16px;">
+              <div class="card card-accent-top">
+                <h3>📌 3 หัวใจสำคัญจำกลับบ้าน</h3>
+                <ul style="margin-top:10px;">
+                  <li><strong>1. ความร้อน + พลาสติกบาง = อันตรายจริง:</strong> ตัดจุดสัมผัสอาหารร้อนจัดกับพลาสติก เลิกเวฟอาหารในถุง และเลิกดื่มน้ำขวดตากแดด</li>
+                  <li><strong>2. คลื่นลดลงตามระยะทาง (Distance is Your Best Friend):</strong> แค่วางมือถือห่างเตียงนอน 2 เมตร และเปิดลำโพงคุยสาย ก็ลดการสัมผัสไปกว่า 90% โดยไม่ต้องซื้อสติกเกอร์ใดๆ</li>
+                  <li><strong>3. โฟกัสที่พื้นฐานร่างกาย:</strong> ตับ ไต ลำไส้ และการนอนหลับลึก คือเกราะป้องกันระดับเซลล์ที่ดีที่สุดในการขับของเสียและซ่อมแซม DNA</li>
+                </ul>
+              </div>
+              <div class="callout success">
+                🙋‍♂️ <strong>ช่วงถาม-ตอบ (Q&A):</strong> มีคำถามข้อสงสัยเกี่ยวกับพลาสติก คลื่นแม่เหล็ก หรือการปรับใช้ในชีวิตประจำวัน สามารถสอบถามได้เลยครับ!
+              </div>
+            </div>
+            ${mediaBox(idx, DEFAULT_IMAGES.healthyGlass, "เริ่มต้นดูแลเซลล์และหลอดเลือดด้วยการปรับเปลี่ยนพฤติกรรมเล็กๆ ที่ทำได้จริงในทุกวัน", "Dr.Tim Longevity Class")}
+          </div>
+        `
+      }
+    ];
+
+    // Presentation Controller
+    let currentSlide = 0;
+    let timerSeconds = 0;
+    let timerInterval = null;
+
+    function renderCurrentSlide() {
+      const s = SLIDES[currentSlide];
+      const root = document.getElementById("slideRoot");
+
+      document.documentElement.style.setProperty("--accent", s.actColor);
+      document.documentElement.style.setProperty("--accent-glow", s.actColor + "33");
+
+      document.getElementById("actPill").textContent = s.act;
+      document.getElementById("timeSlotLabel").textContent = `🕒 ช่วงเวลาบรรยาย: ${s.time}`;
+      document.getElementById("slideCounter").textContent = `${String(currentSlide + 1).padStart(2, "0")} / ${SLIDES.length}`;
+      document.getElementById("progressFill").style.width = `${((currentSlide + 1) / SLIDES.length) * 100}%`;
+      document.getElementById("notesContent").textContent = s.notes || "";
+
+      root.style.animation = "none";
+      void root.offsetWidth;
+      root.style.animation = "slideEnter 0.52s cubic-bezier(0.16, 1, 0.3, 1) forwards";
+
+      root.innerHTML = `
+        <div class="slide-meta stagger-1">
+          <span>SLIDE ${String(currentSlide + 1).padStart(2, "0")}</span>
+          <span>•</span>
+          <span>${s.act}</span>
+          <span class="ref-badge">${s.ref}</span>
+        </div>
+        <h1 class="slide-title stagger-1">${s.title}</h1>
+        <p class="slide-subtitle stagger-2">${s.subtitle}</p>
+        ${s.render(currentSlide)}
+      `;
+
+      window.location.hash = `slide-${currentSlide + 1}`;
+    }
+
+    function nextSlide() {
+      if (currentSlide < SLIDES.length - 1) {
+        currentSlide++;
+        renderCurrentSlide();
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 0) {
+        currentSlide--;
+        renderCurrentSlide();
+      }
+    }
+
+    function goToSlide(index) {
+      currentSlide = Math.max(0, Math.min(SLIDES.length - 1, index));
+      renderCurrentSlide();
+      document.getElementById("overviewModal").classList.remove("open");
+    }
+
+    function toggleNotes() {
+      document.getElementById("notesDrawer").classList.toggle("open");
+    }
+
+    function toggleOverview() {
+      const modal = document.getElementById("overviewModal");
+      const grid = document.getElementById("overviewGrid");
+      if (!modal.classList.contains("open")) {
+        grid.innerHTML = SLIDES.map((s, i) => `
+          <div class="overview-item ${i === currentSlide ? "active" : ""}" onclick="goToSlide(${i})">
+            <div style="font-size:0.74rem;color:${s.actColor};font-weight:700;">SLIDE ${String(i + 1).padStart(2, "0")} · ${s.time}</div>
+            <div style="font-size:0.86rem;font-weight:600;margin-top:4px;color:#f8fafc;">${s.title}</div>
+          </div>
+        `).join("");
+      }
+      modal.classList.toggle("open");
+    }
+
+    function openImageManagerModal() {
+      const modal = document.getElementById("imageModal");
+      const input = document.getElementById("customImgInput");
+      const map = getCustomImages();
+      const s = SLIDES[currentSlide];
+      input.value = map[currentSlide] || s.image || "";
+      modal.classList.add("open");
+      input.focus();
+    }
+
+    function closeImageModal() {
+      document.getElementById("imageModal").classList.remove("open");
+    }
+
+    function saveSlideImage() {
+      const url = document.getElementById("customImgInput").value.trim();
+      const map = getCustomImages();
+      if (url) {
+        map[currentSlide] = url;
+      } else {
+        delete map[currentSlide];
+      }
+      localStorage.setItem("microplastics_emf_custom_images", JSON.stringify(map));
+      closeImageModal();
+      renderCurrentSlide();
+    }
+
+    function resetSlideImage() {
+      const map = getCustomImages();
+      delete map[currentSlide];
+      localStorage.setItem("microplastics_emf_custom_images", JSON.stringify(map));
+      closeImageModal();
+      renderCurrentSlide();
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
+      }
+    }
+
+    // Timer
+    document.getElementById("timerBadge").addEventListener("click", () => {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      } else {
+        timerInterval = setInterval(() => {
+          timerSeconds++;
+          const m = String(Math.floor(timerSeconds / 60)).padStart(2, "0");
+          const s = String(timerSeconds % 60).padStart(2, "0");
+          document.getElementById("timerText").textContent = `${m}:${s} / 45:00`;
+        }, 1000);
+      }
+    });
+
+    // Keyboard & Swipe Controls
+    window.addEventListener("keydown", (e) => {
+      if (document.getElementById("imageModal").classList.contains("open")) return;
+      if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") {
+        e.preventDefault();
+        nextSlide();
+      } else if (e.key === "ArrowLeft" || e.key === "PageUp") {
+        e.preventDefault();
+        prevSlide();
+      } else if (e.key === "n" || e.key === "N") {
+        toggleNotes();
+      } else if (e.key === "m" || e.key === "M") {
+        toggleOverview();
+      } else if (e.key === "f" || e.key === "F") {
+        toggleFullscreen();
+      } else if (e.key === "Escape") {
+        document.getElementById("overviewModal").classList.remove("open");
+        document.getElementById("notesDrawer").classList.remove("open");
+      }
+    });
+
+    // Hash router
+    window.addEventListener("DOMContentLoaded", () => {
+      const match = window.location.hash.match(/slide-(\d+)/);
+      if (match) {
+        const idx = parseInt(match[1], 10) - 1;
+        if (idx >= 0 && idx < SLIDES.length) currentSlide = idx;
+      }
+      renderCurrentSlide();
+    });
+  </script>
+</body>
+</html>

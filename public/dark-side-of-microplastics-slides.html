@@ -1,0 +1,1784 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="referrer" content="no-referrer" />
+  <title>The Dark Side of Microplastics — Thailand-Focused Evidence Review (Nov 2026)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #050813;
+      --bg-card: rgba(15, 23, 42, 0.82);
+      --bg-card-hover: rgba(30, 41, 59, 0.92);
+      --border-subtle: rgba(255, 255, 255, 0.09);
+      --border-highlight: rgba(255, 255, 255, 0.22);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.25);
+      --part-1: #f59e0b; /* Industry - Amber */
+      --part-2: #f43f5e; /* Human Body - Rose/Crimson */
+      --part-3: #10b981; /* Mitigation - Emerald */
+      --part-4: #38bdf8; /* Action & Policy - Sky */
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --success: #10b981;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Anuphan', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .ambient-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 15% 20%, var(--orb-1, rgba(245, 158, 11, 0.14)) 0%, transparent 45%),
+        radial-gradient(circle at 85% 80%, var(--orb-2, rgba(244, 63, 94, 0.12)) 0%, transparent 45%),
+        radial-gradient(circle at 50% 50%, rgba(15, 23, 42, 0.96) 0%, #03060f 100%);
+      transition: background 0.8s ease;
+    }
+
+    .grid-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: radial-gradient(circle at center, black 40%, transparent 90%);
+    }
+
+    /* Top Navigation */
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      z-index: 40;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      background: rgba(5, 8, 19, 0.82);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .act-pill {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 5px 12px;
+      border-radius: 999px;
+      background: var(--accent-glow);
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      transition: all 0.4s ease;
+    }
+
+    .deck-title {
+      font-size: 0.92rem;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .topbar-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .timer-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      padding: 5px 12px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      color: #cbd5e1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .icon-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-family: inherit;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .icon-btn:hover {
+      background: rgba(255, 255, 255, 0.14);
+      border-color: var(--border-highlight);
+      transform: translateY(-1px);
+    }
+
+    /* Stage */
+    .stage {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      height: calc(100vh - 114px);
+      margin-top: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 22px 42px;
+      overflow-y: auto;
+    }
+
+    .slide-container {
+      width: 100%;
+      max-width: 1350px;
+      min-height: 570px;
+      margin: auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      animation: slideEnter 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes slideEnter {
+      0% {
+        opacity: 0;
+        transform: translateY(18px) scale(0.985);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .stagger-1 { animation: fadeUp 0.45s 0.05s cubic-bezier(0.16, 1, 0.3, 1) both; }
+    .stagger-2 { animation: fadeUp 0.5s 0.12s cubic-bezier(0.16, 1, 0.3, 1) both; }
+    .stagger-3 { animation: fadeUp 0.55s 0.20s cubic-bezier(0.16, 1, 0.3, 1) both; }
+    .stagger-4 { animation: fadeUp 0.6s 0.28s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Headers */
+    .slide-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+      font-size: 0.84rem;
+      color: var(--accent);
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+
+    .ref-badge {
+      font-size: 0.74rem;
+      padding: 2px 10px;
+      border-radius: 99px;
+      background: rgba(255, 255, 255, 0.08);
+      color: #94a3b8;
+      font-weight: 400;
+    }
+
+    .slide-title {
+      font-size: clamp(1.7rem, 2.6vw, 2.5rem);
+      font-weight: 700;
+      line-height: 1.25;
+      margin-bottom: 6px;
+      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .slide-subtitle {
+      font-size: clamp(0.96rem, 1.25vw, 1.15rem);
+      color: var(--text-muted);
+      line-height: 1.55;
+      margin-bottom: 20px;
+      max-width: 1020px;
+    }
+
+    /* Layout Grids */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 26px;
+      align-items: stretch;
+    }
+
+    .grid-2-equal {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 22px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 18px;
+      padding: 20px;
+      backdrop-filter: blur(12px);
+      transition: all 0.28s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card:hover {
+      border-color: var(--border-highlight);
+      background: var(--bg-card-hover);
+      transform: translateY(-3px);
+    }
+
+    .card-accent-top {
+      border-top: 3px solid var(--accent);
+    }
+
+    .card h3 {
+      font-size: 1.14rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #fff;
+    }
+
+    .card p, .card li {
+      font-size: 0.94rem;
+      line-height: 1.6;
+      color: #cbd5e1;
+    }
+
+    .card ul {
+      padding-left: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* Media Frame */
+    .media-frame {
+      position: relative;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+      background: #090e1c;
+      min-height: 290px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+
+    .media-frame img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.7s ease, opacity 0.4s ease;
+    }
+
+    .media-frame:hover img {
+      transform: scale(1.04);
+    }
+
+    .media-overlay {
+      position: relative;
+      z-index: 2;
+      background: linear-gradient(to top, rgba(5, 8, 19, 0.95) 0%, rgba(5, 8, 19, 0.65) 60%, transparent 100%);
+      padding: 22px 20px 16px;
+    }
+
+    .media-caption {
+      font-size: 0.88rem;
+      color: #e2e8f0;
+      font-weight: 500;
+    }
+
+    .media-source {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .edit-img-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 5;
+      background: rgba(5, 8, 19, 0.78);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      color: #f8fafc;
+      font-size: 0.74rem;
+      padding: 5px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      opacity: 0.75;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .edit-img-btn:hover {
+      opacity: 1;
+      transform: scale(1.04);
+      border-color: var(--accent);
+    }
+
+    /* Callout */
+    .callout {
+      margin-top: 16px;
+      padding: 15px 18px;
+      border-radius: 14px;
+      border-left: 4px solid var(--accent);
+      background: rgba(56, 189, 248, 0.08);
+      font-size: 0.94rem;
+      line-height: 1.55;
+      color: #e2e8f0;
+    }
+
+    .callout.warn {
+      border-left-color: var(--warning);
+      background: rgba(245, 158, 11, 0.1);
+    }
+
+    .callout.danger {
+      border-left-color: var(--danger);
+      background: rgba(239, 68, 68, 0.12);
+    }
+
+    .callout.success {
+      border-left-color: var(--success);
+      background: rgba(16, 185, 129, 0.1);
+    }
+
+    /* Evidence Tables */
+    .evidence-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--bg-card);
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .evidence-table th,
+    .evidence-table td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 0.88rem;
+      line-height: 1.5;
+    }
+
+    .evidence-table th {
+      background: rgba(255, 255, 255, 0.06);
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .evidence-table tr:hover td {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    /* Tags */
+    .tag {
+      display: inline-block;
+      padding: 3px 9px;
+      border-radius: 6px;
+      font-size: 0.74rem;
+      font-weight: 600;
+    }
+    .tag-amber { background: rgba(245, 158, 11, 0.18); color: #fbbf24; }
+    .tag-rose { background: rgba(244, 63, 94, 0.18); color: #fb7185; }
+    .tag-green { background: rgba(16, 185, 129, 0.18); color: #34d399; }
+    .tag-blue { background: rgba(56, 189, 248, 0.18); color: #38bdf8; }
+    .tag-red { background: rgba(239, 68, 68, 0.18); color: #f87171; }
+
+    /* Bar Track */
+    .bar-wrap {
+      margin: 10px 0;
+    }
+    .bar-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      margin-bottom: 4px;
+    }
+    .bar-track {
+      height: 9px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Interactive Checklist */
+    .checklist-wrap {
+      display: grid;
+      gap: 9px;
+      margin-top: 12px;
+    }
+
+    .check-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+
+    .check-item:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: var(--border-highlight);
+    }
+
+    .check-item.done {
+      background: rgba(16, 185, 129, 0.12);
+      border-color: #10b981;
+    }
+
+    .check-box {
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 2px solid #64748b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      color: transparent;
+      transition: all 0.2s;
+    }
+
+    .check-item.done .check-box {
+      border-color: #10b981;
+      background: #10b981;
+      color: #050813;
+      font-weight: 800;
+    }
+
+    /* Bottom Bar */
+    .bottombar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 54px;
+      z-index: 40;
+      background: rgba(5, 8, 19, 0.86);
+      backdrop-filter: blur(14px);
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+    }
+
+    .progress-track {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), #10b981);
+      width: 5.55%;
+      transition: width 0.35s ease;
+    }
+
+    .nav-btns {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .slide-counter {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      min-width: 90px;
+      text-align: center;
+    }
+
+    /* Presenter Notes */
+    .notes-drawer {
+      position: fixed;
+      bottom: 64px;
+      right: 28px;
+      width: 450px;
+      max-width: calc(100vw - 56px);
+      background: rgba(15, 23, 42, 0.96);
+      border: 1px solid var(--accent);
+      border-radius: 16px;
+      padding: 18px 20px;
+      z-index: 50;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      display: none;
+    }
+
+    .notes-drawer.open {
+      display: block;
+      animation: fadeUp 0.25s ease forwards;
+    }
+
+    .notes-drawer h4 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent);
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .notes-drawer p {
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: #e2e8f0;
+    }
+
+    /* Modals */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 7, 15, 0.88);
+      backdrop-filter: blur(12px);
+      z-index: 60;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-box {
+      width: 100%;
+      max-width: 1180px;
+      max-height: 85vh;
+      overflow-y: auto;
+      background: #0f172a;
+      border: 1px solid var(--border-highlight);
+      border-radius: 20px;
+      padding: 28px;
+    }
+
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .overview-item {
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .overview-item:hover,
+    .overview-item.active {
+      border-color: var(--accent);
+      background: rgba(56, 189, 248, 0.12);
+    }
+
+    .url-input {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border-highlight);
+      background: #050813;
+      color: #fff;
+      font-size: 0.95rem;
+      margin: 12px 0;
+    }
+
+    @media (max-width: 980px) {
+      .grid-2, .grid-3, .grid-4, .grid-2-equal {
+        grid-template-columns: 1fr;
+      }
+      .stage {
+        padding: 16px 20px;
+      }
+      .media-frame {
+        min-height: 220px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="ambient-bg" id="ambientBg"></div>
+  <div class="grid-overlay"></div>
+
+  <!-- Top Navigation -->
+  <header class="topbar">
+    <div class="brand-group">
+      <span class="act-pill" id="actPill">EXECUTIVE REVIEW</span>
+      <span class="deck-title">The Dark Side of Microplastics · Thailand Evidence Review (Nov 2026)</span>
+    </div>
+    <div class="topbar-controls">
+      <div class="timer-badge" id="timerBadge" title="คลิกเพื่อเริ่ม/หยุดจับเวลาบรรยาย">
+        <span>⏱️</span>
+        <span id="timerText">00:00 / 60:00</span>
+      </div>
+      <button class="icon-btn" onclick="openImageManagerModal()" title="จัดการรูปภาพสไลด์">
+        🖼️ เปลี่ยนรูป (URL)
+      </button>
+      <button class="icon-btn" onclick="toggleNotes()" title="เปิด/ปิด บทผู้สอน (ปุ่ม N)">
+        🎙️ บทผู้สอน (N)
+      </button>
+      <button class="icon-btn" onclick="toggleOverview()" title="ดูสารบัญสไลด์ทั้งหมด (ปุ่ม M)">
+        🗂️ สารบัญ 18 หน้า (M)
+      </button>
+      <a href="/toxic-exposure-slides.html" class="icon-btn" style="text-decoration:none;" title="เปิดดูคลาส Toxic Exposure 30 หน้า">
+        🏛️ Toxic Exposure (30 Slides)
+      </a>
+      <a href="/microplastics-emf-slides.html" class="icon-btn" style="text-decoration:none;" title="เปิดดูคลาส Microplastics & EMF 15 หน้า">
+        ⚡ EMF Lecture (15 Slides)
+      </a>
+      <button class="icon-btn" onclick="toggleFullscreen()" title="เต็มจอ (ปุ่ม F)">
+        ⛶
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Slide Stage -->
+  <main class="stage">
+    <div id="slideRoot" class="slide-container"></div>
+  </main>
+
+  <!-- Presenter Notes Drawer -->
+  <aside class="notes-drawer" id="notesDrawer">
+    <h4>
+      <span>🎙️ Instructor Notes & Clinical Appraisal</span>
+      <span style="cursor:pointer" onclick="toggleNotes()">✕</span>
+    </h4>
+    <p id="notesContent"></p>
+  </aside>
+
+  <!-- Overview Modal -->
+  <div class="modal-backdrop" id="overviewModal" onclick="if(event.target===this)toggleOverview()">
+    <div class="modal-box">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <h2>🗂️ สารบัญ The Dark Side of Microplastics (18 Slides)</h2>
+        <button class="icon-btn" onclick="toggleOverview()">✕ ปิด</button>
+      </div>
+      <div class="overview-grid" id="overviewGrid"></div>
+    </div>
+  </div>
+
+  <!-- Image Customizer Modal -->
+  <div class="modal-backdrop" id="imageModal" onclick="if(event.target===this)closeImageModal()">
+    <div class="modal-box" style="max-width:620px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <h3>🖼️ ตั้งค่ารูปภาพสไลด์จากเว็บไซต์ภายนอก (External Image URL)</h3>
+        <button class="icon-btn" onclick="closeImageModal()">✕ ปิด</button>
+      </div>
+      <p style="color:var(--text-muted);font-size:0.9rem;margin-top:8px;">
+        คุณสามารถวางลิงก์รูปภาพ (`https://...`) จากเว็บไซต์ภายนอกสำหรับสไลด์หน้านี้ ระบบบันทึกในเบราว์เซอร์อัตโนมัติ
+      </p>
+      <input type="url" id="customImgInput" class="url-input" placeholder="https://images.openai.com/..." />
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
+        <button class="icon-btn" onclick="resetSlideImage()">↺ คืนค่ารูปต้นฉบับ</button>
+        <button class="icon-btn" style="background:var(--accent);color:#050813;font-weight:700;" onclick="saveSlideImage()">✓ บันทึกรูปภาพ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Bar -->
+  <footer class="bottombar">
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <div style="font-size:0.82rem;color:var(--text-muted);" id="timeSlotLabel">
+      🕒 บรรยาย: Executive Evidence Review
+    </div>
+    <div class="nav-btns">
+      <button class="icon-btn" onclick="prevSlide()">← ก่อนหน้า</button>
+      <span class="slide-counter" id="slideCounter">01 / 18</span>
+      <button class="icon-btn" onclick="nextSlide()">ถัดไป →</button>
+    </div>
+    <div style="font-size:0.78rem;color:var(--text-muted);">
+      ใช้ <code>←</code> <code>→</code> หรือ <code>Space</code> เพื่อเลื่อนสไลด์
+    </div>
+  </footer>
+
+  <script>
+    // Exact Evidence & Image URLs provided in curriculum
+    const CURRICULUM_IMAGES = {
+      cover: "https://images.openai.com/static-rsc-4/9GqKwwIgXCLjhBKuqiHHdjBihFB4mC6sy-MUwfd9yftXa5Pdgim0HjIs47PEaXX51iOF2dcwFudB1Ay7cpKs4uJlS5_13XI8paW8xDWyuuPiJRCt2wb8Y7W-MT-BSJJUvqxNkUNL63kvrGRc63xAy2f2Cl19PM91tA5w5N7JZ6pselzt5OuAX2qx2Dwd82ys?purpose=inline",
+      healthRisk: "https://images.openai.com/static-rsc-4/Z0Yc8MjL79mejVzjHds6lDPZZcPA8IlZ6SwBwox97EqwZ6Qj4E6BHvrQxC91IFmmIhgVA-mWJTqHy4_-uJsOMMm5COldqovX4gADiU1eQa_blznz3_LCRZULO-tInfpCzE-LdrFE95yTE9OHyV1gGQ_ZdzgMw9bnk61WSx4OjvY?purpose=inline",
+      pellets: "https://images.openai.com/static-rsc-4/MCLMSW2Ui90hw8y6FQOql8Y-TY6QCPAQ5lmMnR_Lsj0eFUbFCM6W2mq2njmr6A_yobR3fR3ndo6zNEL2k4WUYA0NzOSK_QFLJ6CtYUOfwrjyhARvdXG5ZqYYf2RW6NWMh0gWW1kxE-xAoER2kzqErUQud75DXxX2NCs9BfFBSQA?purpose=inline",
+      shipBack: "https://images.openai.com/static-rsc-4/CP060z-QxGCArdCtwAbb14NajDX8bzmOVPmscfip6zhpofF4ZgZcOx2Lsdn0-fXaYhwzg0R4QDmtTZqrsfWq-kv3iuR1-Mrsnxn3tCRW9YjYXI9lfC388QuWlHgOFZh-MTpxsrOPS9ViYa9SwhvoGjheRhilva6fUys55LheOJA?purpose=inline",
+      thailandPlastic: "https://images.openai.com/static-rsc-4/SaIi8IS7G5XmTrHqnR_udWtYL9KPuRvE48tkMjrhQVQk1uyN7czWmTdWfxt_KDxZdRjZ82USi1470MSZnBhcVOhEf7Qwr8WLbrtJ9A4kxkaSM5XJsJ3azabPhShSGLhV7edymZII-bliMWfLSO8C5R-V8KroMRf9ayYRRv7AX6uCHGhJxlDTg_mYD-FvmGVP?purpose=inline",
+      riverPollution: "https://images.openai.com/static-rsc-4/kYyeJtsd0Ct3sjKseNGf7w3gUK5hckdRVTmJYW7Q2Cpu9vJdLYHRGMA1HZvgNhqOJjWhlJexL0NytkuuHGff10H05HJLYv_VRlsYmJpRUEhtuxU5Z0id38QAgvOnD1GbGjxWbSzwqmoz3EXZ8gsq8IceDjW1UzThgHyRtRkwFfwt5y8EJyIgZlpYZlRdk_75?purpose=inline",
+      tireDust: "https://images.openai.com/static-rsc-4/anA8HsEwODjla13nSmOlZTA1XGqKiZ85tKFKuCs92OMO7RQr7wb9AdFglYbwRLAA51P6F8ZrrdXxjwvoiR07AkRGAqwbCT3XsHJVhVm7xjfUKksgUyFRhtG7_1Qz-qmrQ8_8Q7QNNKdKs71R6dDfzblumXoeNeAGPiuPCzfNQOY?purpose=inline",
+      syntheticFiber: "https://images.openai.com/static-rsc-4/JEvk4P2mhbHdz_tkB5HT2wE-cYWISXGO-T5MzYKdwjxMa4S0AAXqqT3GHVHRXw3uKjxEBIZC1a8v265tAXvqgc0dHMvdUy1i6KVxvaViecajQ1BK-AKQ9ODwok1wUttexttjehwRaVX8xuA60R9K4XjVVYTlKMFLQpZJs7OJ-L4?purpose=inline",
+      pelletLeak: "https://images.openai.com/static-rsc-4/r2idd4se1-TFjiKMthJj-pm4rXC3qEHA7PSQsVGHK60pDwn2J_zV9IKv3h1l0N9batmF4vI26di2_CVV_oK-brdDOPw_YFcvY8RNvQ03EYdxQXcY41tDJCveySbr3Al268ofNT10bFGQ0ksDpYIgExtamKMxL4fUgy1S5LVAS8o?purpose=inline",
+      paintCoating: "https://images.openai.com/static-rsc-4/XaARjS6T5rSNth2eUL1LhIo6G233dj10L8HguetmARnkzyOqadaad0vy_NRYHDb8MNmSLxYaY7gY7kWi9qMblPx71v-ukucCiPlDlhnYKrL7RVXXVyN8wpxd43rcGPV3NkNWn7_NYfFcH8mWrSkaY0UxbQCdb4cyQSZuEQBF5f68G_Cy0iIhqrf4d-dJfjsE?purpose=inline",
+      glassBox: "https://images.openai.com/static-rsc-4/48sD7sKw0pdt2d2pN9Ekx0-glEe_N8wfK9VTIvMMxl3vlz-jG44urcFqj6a-JCwReYRxvaB8S6kJtCnFtGvY92qZxryQote1v_aLym6dVVJdtHB1S_30nqapTBtAAQ-U8FwpZkQNFZJaHo_-k93B39G9t4hExH4brrvvVczcP88?purpose=inline",
+      roOsmosis: "https://images.openai.com/static-rsc-4/uZ2BIbS8OP8cCvPDpOtvSA2xTN8aF7hsfGjr5eOUS4nXx-TCqgtcHOyLbBiIrxcAyrLb8KaRMLv-OptBfMeeqpCFHMoP5P5orw3E23mHm1jS7cVr42lxDsb8ug-y8aDD3KiAJkOvAXjK6gplTnoqjR5bOVgq7A1ElXwIze3bzA8?purpose=inline",
+      planetCare: "https://images.openai.com/static-rsc-4/hVwR-Ktic9HaUmhuyUcKbNpB0mEMWI8rJ5uzZtjPdrYZkdjwzaqanpudwQQsEkOrX-a16MPCGVJtxbtWSNLdo91jaq9QskaPsoPHYB2vYUr9m8qxPR_0uavoLeyYlwJOLOEu10HMCoN7JV6LsSPux0hU2UpQrcBwXT3IOJ0kezc?purpose=inline",
+      deepClean: "https://images.openai.com/static-rsc-4/tnIBcT2nRWbs6oJCWpfbSvxWSqcwNQKYMm8_J1xtbXpNCJfVYipdPCJ3DeFobDGs68tBqL7YlXWHftbFTl2p2tHQchxm_OVb3js87QFK03Giob0yzz1iAMvqJ257JNHnoyswBwqtE67c_Ah5j5J-R27Ej3chNQRQhqzEA9HhVFY?purpose=inline",
+      hydrogel: "https://images.openai.com/static-rsc-4/a_CTLZ48NWa8oFko6UA1lhXw2ZMebTyOuX-3XRQi8W-vC3YWZgao0JrNbPGYdkqaXnEuB8KSWmpHPILLqtPo7o34aGtExvbVr6HpNvU76LGXjY-RImMOJwDOg_rAdA2MKxNU9anZWYEvjeKYEpKBugH96FlpbNylcMZ3phEUdgo?purpose=inline"
+    };
+
+    const FALLBACK_SVG = "data:image/svg+xml;utf8," + encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500">
+        <rect width="800" height="500" fill="#0f172a"/>
+        <text x="400" y="250" text-anchor="middle" fill="#94a3b8" font-family="sans-serif" font-size="20">ภาพประกอบงานวิจัย Microplastics</text>
+      </svg>
+    `);
+
+    function getCustomImages() {
+      try {
+        return JSON.parse(localStorage.getItem("dark_microplastics_custom_images") || "{}");
+      } catch (e) {
+        return {};
+      }
+    }
+
+    function getSlideImage(slideIndex, defaultUrl) {
+      const map = getCustomImages();
+      return map[slideIndex] || defaultUrl;
+    }
+
+    function mediaBox(slideIdx, imgUrl, caption, sourceText) {
+      const resolved = getSlideImage(slideIdx, imgUrl);
+      return `
+        <div class="media-frame stagger-2">
+          <button class="edit-img-btn" onclick="openImageManagerModal()">🖼️ เปลี่ยนรูป URL</button>
+          <img src="${resolved}" alt="${caption}" referrerpolicy="no-referrer" loading="lazy" onerror="this.onerror=null;this.src=FALLBACK_SVG;" />
+          <div class="media-overlay">
+            <div class="media-caption">${caption}</div>
+            <div class="media-source">${sourceText || "Research Reference Image · คลิกปุ่มเพื่อเปลี่ยน URL ได้"}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    const SLIDES = [
+      // SLIDE 1: Title
+      {
+        part: "EXECUTIVE REVIEW",
+        partColor: "#38bdf8",
+        time: "00–04 นาที",
+        ref: "Thailand-focused Evidence Review (Nov 2026)",
+        title: "The Dark Side of Microplastics",
+        subtitle: "The hidden science, industry failures, human health risks and solutions — Thailand-focused evidence review, November 2026",
+        image: CURRICULUM_IMAGES.cover,
+        notes: "บทนำสำคัญ: เรื่องที่น่ากลัวที่สุดของ Microplastics อาจไม่ใช่แค่การพบพลาสติกในสมองหรือหลอดเลือด แต่คือเรากำลังเผชิญมลพิษที่แพร่กระจายอย่างต่อเนื่อง ขณะที่วิทยาศาสตร์ยังไม่สามารถบอกได้แน่ชัดว่าระดับการรับสัมผัสใดจึงปลอดภัย และใครควรรับผิดชอบค่าใช้จ่ายในการจัดการ",
+        render: (idx) => `
+          <div class="grid-2">
+            <div class="stagger-1" style="display:flex;flex-direction:column;justify-content:space-between;gap:14px;">
+              <div class="card card-accent-top">
+                <h3>🧭 4 โครงสร้างการนำเสนอเชิงลึก</h3>
+                <div style="display:grid;gap:10px;margin-top:12px;">
+                  <div><span class="tag tag-amber">PART I</span> <strong>DARK SIDE OF PLASTIC INDUSTRY:</strong> มายาคติการรีไซเคิล, ขยะข้ามชาติสู่ไทย, น้ำประปา กทม., สารเคมี 13,000 ชนิด และฝุ่นพลาสติกที่มองไม่เห็น</div>
+                  <div><span class="tag tag-rose">PART II</span> <strong>INSIDE THE HUMAN BODY:</strong> ปัจจัยเสี่ยงหัวใจ NEJM 2024, การตรวจพบในสมองและรก, และวิกฤตความแม่นยำในการวัด (QA/QC Crisis)</div>
+                  <div><span class="tag tag-green">PART III</span> <strong>HOW TO MITIGATE:</strong> การจัดการ 4 ระดับ, นโยบายไทยที่ควรเร่ง, การปรับใช้ในบ้าน และงานวิจัยชีวภาพ 2025–2026 (Alginate–Chitin)</div>
+                  <div><span class="tag tag-blue">PART IV</span> <strong>ACTION PLAN:</strong> แผน 30 วันสำหรับบุคคล, 5 นโยบายเร่งด่วนของไทย และโจทย์วิจัยสำคัญที่สุด</div>
+                </div>
+              </div>
+              <div class="callout">
+                📌 <strong>Core Stance:</strong> นำเสนอด้วย Critical Appraisal ทางการแพทย์อย่างเคร่งครัด แยกแยะระหว่าง *สิ่งที่ตรวจพบในแล็บ* กับ *ผลการเกิดโรคจริงในมนุษย์* โดยไม่สร้างความตื่นกลัวเกินหลักฐาน
+              </div>
+            </div>
+            ${mediaBox(idx, CURRICULUM_IMAGES.cover, "วิกฤตมลพิษไมโครพลาสติก: วิทยาศาสตร์ด้านมืด ความล้มเหลวของอุตสาหกรรม และทางออก", "OECD & UNEP Environmental Review 2026")}
+          </div>
+        `
+      },
+
+      // SLIDE 2: Section 1 - Recycling Illusion
+      {
+        part: "PART I · PLASTIC INDUSTRY",
+        partColor: "#f59e0b",
+        time: "04–08 นาที",
+        ref: "OECD Global Plastics Outlook",
+        title: "1. The Recycling Illusion: เรารีไซเคิลน้อยกว่าที่คิดมาก",
+        subtitle: "ทำไมการคัดแยกขยะอย่างเดียวถึงไม่ใช่คำตอบ และทำไมการรีไซเคิลจึงไม่อาจทดแทนการลดผลิตตั้งแต่ต้นทาง?",
+        image: CURRICULUM_IMAGES.pellets,
+        notes: "เน้นย้ำตัวเลขจาก OECD: พลาสติก 353 ล้านตันทั่วโลกในปี 2019 มีเพียง 9% ที่รีไซเคิลสำเร็จจริงหลังหักการสูญเสียในกระบวนการ อีก 50% ฝังกลบ 19% เผา และ 22% จัดการผิดวิธี และการบดรีไซเคิลเองก็ปล่อยอนุภาคไมโครพลาสติกออกสู่สิ่งแวดล้อม",
+        render: (idx) => `
+          <div class="grid-2">
+            <div class="stagger-1">
+              <div class="card card-accent-top">
+                <h3>📊 ชะตากรรมของขยะพลาสติกทั่วโลก (OECD Data)</h3>
+                <p>จากขยะพลาสติก <strong>353 ล้านตันทั่วโลก</strong> (ข้อมูลฐาน OECD):</p>
+                <div class="bar-wrap" style="margin-top:14px;">
+                  <div class="bar-label"><span>ฝังกลบ (Landfilled)</span><span class="tag tag-amber">50%</span></div>
+                  <div class="bar-track"><div class="bar-fill" style="width:50%;background:#f59e0b;"></div></div>
+                </div>
+                <div class="bar-wrap">
+                  <div class="bar-label"><span>จัดการไม่ถูกต้อง (Mismanaged / รั่วไหล)</span><span class="tag tag-red">22%</span></div>
+                  <div class="bar-track"><div class="bar-fill" style="width:22%;background:#ef4444;"></div></div>
+                </div>
+                <div class="bar-wrap">
+                  <div class="bar-label"><span>เผาทำลาย (Incinerated)</span><span class="tag tag-rose">19%</span></div>
+                  <div class="bar-track"><div class="bar-fill" style="width:19%;background:#f43f5e;"></div></div>
+                </div>
+                <div class="bar-wrap">
+                  <div class="bar-label"><span>รีไซเคิลสำเร็จจริง (Successfully Recycled)</span><span class="tag tag-green">เพียง 9%</span></div>
+                  <div class="bar-track"><div class="bar-fill" style="width:9%;background:#10b981;"></div></div>
+                </div>
+                <ul style="margin-top:14px;">
+                  <li><strong>ข้อจำกัดทางเทคนิค:</strong> พอลิเมอร์หลากหลายชนิด สารเติมแต่ง และสารปนเปื้อน ทำให้การรีไซเคิลซ้ำลดคุณภาพลงเรื่อยๆ (Downcycling)</li>
+                  <li><strong>การแตกตัวระหว่างรีไซเคิล:</strong> ขั้นตอนการคัดแยก การล้าง การบด (Shredding) และการหลอมพลาสติก เป็นแหล่งปลดปล่อยไมโครพลาสติกสู่แหล่งน้ำอย่างมหาศาล</li>
+                </ul>
+              </div>
+              <div class="callout warn">
+                🚨 <strong>Dark Implication:</strong> การรีไซเคิลเป็นส่วนหนึ่งของคำตอบ แต่ไม่อาจทดแทนการ <strong>“ลดการผลิตพลาสติกที่ไม่จำเป็นตั้งแต่ต้นทาง”</strong> ได้เลย
+              </div>
+            </div>
+            ${mediaBox(idx, CURRICULUM_IMAGES.pellets, "เม็ดพลาสติกและขยะพลาสติกที่ตกค้างในสิ่งแวดล้อมโดยไม่สามารถรีไซเคิลได้จริง", "OECD Global Plastics Outlook Review")}
+          </div>
+        `
+      },
+
+      // SLIDE 3: Section 2 - Thailand Waste Destination
+      {
+        part: "PART I · PLASTIC INDUSTRY",
+        partColor: "#f59e0b",
+        time: "08–12 นาที",
+        ref: "DSI & กรมศุลกากร (2568–2569)",
+        title: "2. Thailand: จากผู้บริโภค สู่ปลายทางขยะพลาสติกข้ามชาติ",
+        subtitle: "การลักลอบนำเข้าเศษพลาสติกและขยะอิเล็กทรอนิกส์: ปัญหา Environmental Injustice ที่ซ่อนอยู่",
+        image: CURRICULUM_IMAGES.shipBack,
+        notes: "ไทยห้ามนำเข้าเศษพลาสติก 1 ม.ค. 2568 แต่ DSI รายงานอายัด 714 ตู้คอนเทนเนอร์ต้องสงสัย (มี.ค. 2569) และศุลกากรตรวจยึด 9,670 ตันใน 11 เดือน (ต.ค. 2569) ปัญหาคือสิ่งที่หลุดรอดและชุมชนรอบข้างที่ต้องแบกรับสารพิษ",
+        render: (idx) => `
+          <div class="grid-2">
+            <div class="stagger-1" style="display:flex;flex-direction:column;gap:14px;">
+              <div class="card card-accent-top">
+                <h3>⚖️ ความจริงจากการตรวจสอบในประเทศไทย</h3>
+                <ul>
+                  <li><strong>ประกาศห้ามนำเข้าเศษพลาสติก:</strong> มีผลบังคับใช้วันที่ 1 มกราคม 2568 แต่ในทางปฏิบัติยังคงพบการลักลอบสำแดงเท็จเข้ามาอย่างต่อเนื่อง</li>
+                  <li><strong>DSI รายงานการเฝ้าระวัง (มีนาคม 2569):</strong> ตรวจอายัดตู้คอนเทนเนอร์ต้องสงสัยรวม <strong>714 ตู้</strong> จากช่วงเมษายน 2568 ถึงมีนาคม 2569 บางส่วนเกี่ยวข้องกับขยะอิเล็กทรอนิกส์และเศษพลาสติก</li>
+                  <li><strong>กรมศุลกากร (ตุลาคม 2569):</strong> ตรวจยึดขยะนำเข้ารวม <strong>9,670 ตัน</strong> ในรอบ 11 เดือน โดยเป็นเศษพลาสติกมากกว่า 300 ตัน ที่เหลือเป็นขยะอันตรายและ E-waste</li>
+                </ul>
+              </div>
+              <div class="callout danger">
+                ⚠️ <strong>Environmental Injustice (ความอยุติธรรมทางสิ่งแวดล้อม):</strong><br/>
+                ผู้ที่ได้รับความสะดวกสบายจากการบริโภคพลาสติกในประเทศพัฒนาแล้ว ไม่ใช่ผู้ที่ต้องแบกรับมลพิษทางอากาศ ดิน และน้ำบาดาล แต่กลายเป็นชุมชนชาวบ้านรอบโรงงานคัดแยกและบดพลาสติกในประเทศไทย
+              </div>
+            </div>
+            ${mediaBox(idx, CURRICULUM_IMAGES.shipBack, "การสั่งส่งกลับตู้คอนเทนเนอร์ขยะข้ามชาติและปัญหาการลักลอบนำเข้าสู่ไทย", "DFT & DSI Reports Thailand 2569")}
+          </div>
+        `
+      },
+
+      // SLIDE 4: Section 3 - Bangkok Water
+      {
+        part: "PART I · PLASTIC INDUSTRY",
+        partColor: "#f59e0b",
+        time: "12–15 นาที",
+        ref: "ScienceDirect 2025 & PubMed",
+        title: "3. Bangkok's Invisible Water Problem: ระบบบำบัดกำจัดได้ แต่ไม่หมด",
+        subtitle: "โรงผลิตน้ำลดได้ 75–81% แต่พบเพิ่มขึ้นตามท่อจ่าย และน้ำเสีย 2 พันล้านอนุภาค/วัน สู่แม่น้ำเจ้าพระยา",
+        image: CURRICULUM_IMAGES.riverPollution,
+        notes: "งานศึกษาปี 2025: น้ำประปา กทม. น้ำดิบ 114 p/L, ผ่านบำบัดเหลือ 14-22 p/L, แต่ปลายท่อจ่ายบางจุดดีดขึ้น 66 p/L (อาจมาจากการสึกหรอของท่อหรือไบโอฟิล์ม) ส่วนระบบน้ำเสีย 8 แห่งปล่อย 2.04 พันล้านอนุภาค/วันสู่เจ้าพระยา ย้ำว่าไม่ได้แปลว่าน้ำประปาผิดมาตรฐานชีววิทยา แต่บอกว่าระบบกรองเดิมไม่ได้ออกแบบมาดักนาโนพลาสติก",
+        render: (idx) => `
+          <div class="grid-2">
+            <div class="stagger-1">
+              <div class="card card-accent-top">
+                <h3>🚰 ข้อมูลจากการศึกษาระบบน้ำในกรุงเทพฯ</h3>
+                <ul>
+                  <li><strong>โรงผลิตและท่อจ่ายน้ำประปา กทม. (2025):</strong> ระบบผลิตน้ำประปาสามารถลด Microplastics ได้ราว <strong>75–81%</strong></li>
+                  <li><strong>ปริมาณอนุภาคที่ตรวจพบ:</strong>
+                    <div style="margin:8px 0;padding:10px;background:rgba(255,255,255,0.04);border-radius:10px;font-size:0.88rem;">
+                      • น้ำดิบต้นทาง: สูงสุด ~ <strong>114 ± 46 particles/L</strong><br/>
+                      • น้ำผ่านการบำบัด: ลดเหลือ ~ <strong>14–22 ± 18 particles/L</strong><br/>
+                      • ปลายระบบท่อจ่ายบางจุด: พบเพิ่มขึ้นเป็น ~ <strong>66 ± 27 particles/L</strong>
+                    </div>
+                  </li>
+                  <li><strong>ระบบบำบัดน้ำเสีย 8 แห่งใน กทม.:</strong> ประมาณการว่ามี Microplastics หลุดรอดลงแม่น้ำเจ้าพระยาราว <strong>2.04 พันล้านอนุภาคต่อวัน</strong></li>
+                </ul>
+              </div>
+              <div class="callout warn">
+                🔬 <strong>Nuance ทางการแพทย์:</strong> ตัวเลขนี้ขึ้นอยู่กับขีดความสามารถของเครื่องตรวจวัดในงานวิจัย <em>ไม่ได้แปลว่าน้ำประปาผิดมาตรฐานความปลอดภัยด้านแบคทีเรียหรือเคมี</em> แต่สะท้อนว่าระบบกรองแบบดั้งเดิมไม่ได้ถูกสร้างมาเพื่อดักจับอนุภาคระดับไมครอนและนาโน
+              </div>
+            </div>
+            ${mediaBox(idx, CURRICULUM_IMAGES.riverPollution, "แม่น้ำเจ้าพระยาและเส้นทางน้ำเมืองหลวงที่รองรับอนุภาคพลาสติกขนาดเล็กจากระบบบำบัด", "Chao Phraya Microplastics Flux Study")}
+          </div>
+        `
+      },
+
+      // SLIDE 5: Section 4 - Chemical Cocktail
+      {
+        part: "PART I · PLASTIC INDUSTRY",
+        partColor: "#f59e0b",
+        time: "15–18 นาที",
+        ref: "UNEP Chemicals in Plastics (2023)",
+        title: "4. The Chemical Cocktail: สารเคมีแฝงกว่า 13,000 ชนิดในพลาสติก",
+        subtitle: "ทำไมสารเติมแต่ง (Additives) ถึงมีหลักฐานความเป็นพิษ (Toxicology) ชัดเจนกว่าตัวอนุภาคพลาสติกเอง?",
+        notes: "รายงาน UNEP 2023: พลาสติกเกี่ยวข้องกับสารเคมีกว่า 13,000 ชนิด โดยกว่า 3,200 ชนิดมีคุณสมบัติอันตราย เช่น Bisphenols, Phthalates, PFAS และเตือนเรื่อง Regrettable Substitution คือเปลี่ยนจาก BPA เป็น BPS ที่อันตรายไม่ต่างกัน",
+        render: () => `
+          <div class="stagger-1">
+            <table class="evidence-table">
+              <thead>
+                <tr>
+                  <th style="width:22%;">กลุ่มสารเคมีในพลาสติก</th>
+                  <th style="width:40%;">กลไกและความเสี่ยงทางสุขภาพที่พบ</th>
+                  <th style="width:38%;">ตัวอย่างผลิตภัณฑ์ที่พบ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Bisphenols (BPA, BPS, BPF)</strong></td>
+                  <td>Endocrine Disruptor แย่งจับตัวรับเอสโตรเจน รบกวนเมแทบอลิซึมและระบบสืบพันธุ์</td>
+                  <td>พลาสติก Polycarbonate, กระป๋องเคลือบเรซิน, สลิปใบเสร็จ</td>
+                </tr>
+                <tr>
+                  <td><strong>Phthalates</strong></td>
+                  <td>Anti-androgenic activity ยับยั้งฮอร์โมนเพศชาย รบกวนพัฒนาการสืบพันธุ์</td>
+                  <td>พลาสติก PVC นิ่ม, ฟิล์มห่ออาหาร, สายยาง, ภาชนะบางชนิด</td>
+                </tr>
+                <tr>
+                  <td><strong>Flame Retardants</strong></td>
+                  <td>รบกวนฮอร์โมนไทรอยด์, มีพิษต่อระบบประสาทและพัฒนาการของทารก</td>
+                  <td>ชิ้นส่วนพลาสติกเครื่องใช้ไฟฟ้า, โฟม, พลาสติกยานยนต์</td>
+                </tr>
+                <tr>
+                  <td><strong>PFAS (สารเคมีตลอดกาล)</strong></td>
+                  <td>คงทนสูงมาก ไม่สลายตัว สัมพันธ์กับไขมันในเลือดสูง มะเร็ง และภูมิคุ้มกันตก</td>
+                  <td>บรรจุภัณฑ์กันซึมน้ำมัน, กล่องกระดาษเคลือบฟิล์ม, สารเคลือบผิว</td>
+                </tr>
+                <tr>
+                  <td><strong>NIAS (Non-intentionally added)</strong></td>
+                  <td>สารจากการสลายตัว สิ่งเจือปน และผลพลอยได้จากปฏิกิริยาเคมีที่ไม่ได้ระบุบนฉลาก</td>
+                  <td>พลาสติกรีไซเคิล และพลาสติกที่ผ่านความร้อนสูงซ้ำๆ</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="callout danger stagger-2" style="margin-top:14px;">
+            ⚠️ <strong>Regrettable Substitution (การเปลี่ยนสารแบบหนีเสือปะจระเข้):</strong> การแปะป้าย “BPA-Free” มักเปลี่ยนไปใช้ BPS หรือ BPF ซึ่งงานวิจัยระยะหลังพบว่ามีฤทธิ์รบกวนฮอร์โมนรุนแรงไม่แพ้กัน ฉะนั้นการลดการใช้พลาสติกสัมผัสความร้อนจึงเป็นทางออกที่แท้จริง
+          </div>
+        `
+      },
+
+      // SLIDE 6: Section 5 - Unseen Microplastics
+      {
+        part: "PART I · PLASTIC INDUSTRY",
+        partColor: "#f59e0b",
+        time: "18–21 นาที",
+        ref: "OECD & EEA Dashboards",
+        title: "5. The Microplastics You Never See: อนุภาคที่คุณมองไม่เห็น",
+        subtitle: "ต่อให้ทุกคนเลิกใช้หลอดและถุงพลาสติก มลพิษส่วนใหญ่ยังรั่วไหลจาก 4 แหล่งนี้โดยไม่ได้ตั้งใจ",
+        image: CURRICULUM_IMAGES.tireDust,
+        notes: "OECD และ EEA ชี้ว่าแหล่งไมโครพลาสติกขนาดใหญ่ที่สุดโดยไม่ได้ตั้งใจคือ: 1) ฝุ่นสึกหรอจากยางรถยนต์ (รวมถึง EV ที่มีน้ำหนักตัวรถสูงขึ้น) 2) เส้นใยสังเคราะห์จากเสื้อผ้า (Polyester/Nylon) 3) เม็ดพลาสติกบริสุทธิ์ (Pellets/Nurdles) รั่วไหลจากโรงงาน 4) สีทาอาคารและเรือ",
+        render: (idx) => `
+          <div class="grid-2">
+            <div class="stagger-1" style="display:grid;gap:12px;">
+              <div class="card card-accent-top">
+                <h3>🚗 1. Tyre & Road Wear Particles (ฝุ่นยางรถยนต์)</h3>
+                <p>การเสียดสีของล้อยางกับถนนสร้างอนุภาคไมโครพลาสติกผสมสารเคมี (เช่น 6PPD-quinone) พัดสู่อากาศและชะล้างลงท่อระบายน้ำ</p>
+              </div>
+              <div class="card card-accent-top">
+                <h3>👕 2. Synthetic Textile Microfibers (เส้นใยผ้าสังเคราะห์)</h3>
+                <p>เสื้อผ้า Polyester, Nylon, Spandex ปล่อยเส้นใยนับแสนชิ้นต่อการซัก 1 ครั้ง ไหลผ่านเครื่องซักผ้าลงสู่ระบบน้ำ</p>
+              </div>
+              <div class="card card-accent-top">
+                <h3>🏭 3. Plastic Resin Pellets & 🎨 Paint Coatings</h3>
+                <p>เม็ดพลาสติกหลุดรอดระหว่างขนส่งโรงงาน และสีทาอาคาร/เรือที่หลุดลอกตามกาลเวลา กลายเป็นมลพิษในสิ่งแวดล้อม</p>
+              </div>
+            </div>
+            ${mediaBox(idx, CURRICULUM_IMAGES.tireDust, "ฝุ่นสึกหรอจากยางรถยนต์และพื้นถนน หนึ่งในแหล่งปล่อยไมโครพลาสติกที่ใหญ่ที่สุดในโลก", "OECD Involuntary Microplastics Emission Review")}
+          </div>
+        `
+      },
+
+      // SLIDE 7: Section 6 - NEJM 2024 Watershed Study
+      {
+        part: "PART II · HUMAN HEALTH",
+        partColor: "#f43f5e",
+        time: "21–25 นาที",
+        ref: "Marfella et al., NEJM March 2024",
+        title: "6. พลาสติกในคราบหลอดเลือด: งานวิจัย NEJM 2024",
+        subtitle: "หลักฐานทางคลินิกครั้งแรกในมนุษย์ที่เชื่อมโยงไมโครพลาสติกในเนื้อเยื่อกับความเสี่ยงโรคหัวใจและหลอดเลือด",
+        image: CURRICULUM_IMAGES.healthRisk,
+        notes: "วิเคราะห์ Marfella et al. NEJM 2024: ผู้ป่วย 257 รายผ่าตัด Carotid Endarterectomy พบ MNP ใน plaque 58.4% (150 ราย) ติดตาม 33.7 เดือน พบ Adjusted HR 4.53 สำหรับ MI, Stroke, Death แต่ต้องย้ำว่าเป็น association ในผู้ป่วยโรคหลอดเลือดคอ ไม่ใช่หลักฐานว่าประชากรทั่วไปเสี่ยงสูงขึ้น 4.53 เท่า",
+        render: (idx) => `
+          <div class="grid-2">
+            <div class="stagger-1">
+              <div class="card card-accent-top" style="border-top-color:#f43f5e;">
+                <h3>🩸 ข้อมูลเชิงลึกจาก New England Journal of Medicine</h3>
+                <div class="grid-2-equal" style="margin-top:10px;">
+                  <div style="background:rgba(255,255,255,0.04);padding:12px;border-radius:12px;">
+                    <div style="font-size:0.8rem;color:var(--text-muted);">กลุ่มตรวจพบ MNP ใน Plaque</div>
+                    <div style="font-size:1.6rem;font-weight:700;color:#f87171;">20.0%</div>
+                    <div style="font-size:0.75rem;color:#cbd5e1;">(30 / 150 ราย เกิดภาวะแทรกซ้อน)</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.04);padding:12px;border-radius:12px;">
+                    <div style="font-size:0.8rem;color:var(--text-muted);">กลุ่มที่ไม่พบ MNP ใน Plaque</div>
+                    <div style="font-size:1.6rem;font-weight:700;color:#34d399;">7.5%</div>
+                    <div style="font-size:0.75rem;color:#cbd5e1;">(8 / 107 ราย เกิดภาวะแทรกซ้อน)</div>
+                  </div>
+                </div>
+                <div class="bar-wrap" style="margin-top:14px;">
+                  <div class="bar-label"><span>Adjusted Hazard Ratio (ความเสี่ยงสัมพัทธ์)</span><span class="tag tag-red">HR 4.53 (95% CI 2.00–10.27)</span></div>
+                  <div class="bar-track"><div class="bar-fill" style="width:75%;background:#ef4444;"></div></div>
+                </div>
+                <ul style="margin-top:12px;">
+                  <li>ตรวจพบอนุภาค <strong>Polyethylene (PE)</strong> ใน 58.4% และ <strong>PVC</strong> ใน 12.1% ของคราบพลัค</li>
+                  <li><strong>Proposed Mechanism:</strong> พลาสติกกระตุ้น Macrophage, NF-κB, NLRP3 inflammasome ทำให้คราบพลัคเปราะแตกง่าย (Plaque Instability)</li>
+                </ul>
+              </div>
+              <div class="callout warn">
+                ⚖️ <strong>ข้อจำกัดที่แพทย์ต้องทราบ:</strong> นี่คือ <em>Association</em> ในกลุ่มผู้ป่วยที่มีโรคหลอดเลือดคออยู่แล้ว ไม่ใช่ข้อพิสูจน์ว่าพลาสติกทำให้คนปกติเสี่ยงขึ้น 4.53 เท่า และยังแยกไม่ได้ว่าเป็นสาเหตุ หรือเป็นผลพลอยได้ที่มาสะสมในแผลอักเสบเดิม
+              </div>
+            </div>
+            ${mediaBox(idx, CURRICULUM_IMAGES.healthRisk, "การตรวจพบอนุภาคไมโครพลาสติกและนาโนพลาสติกในเนื้อเยื่อหลอดเลือดของมนุษย์", "NEJM 2024 · Atherosclerotic Plaque Analysis")}
+          </div>
+        `
+      },
+
+      // SLIDE 8: Section 7 - Brain, Placenta, Whole-Body
+      {
+        part: "PART II · HUMAN HEALTH",
+        partColor: "#f43f5e",
+        time: "25–29 นาที",
+        ref: "Nature Medicine 2025 & Env Health 2026",
+        title: "7. สมอง รก ระบบสืบพันธุ์: การสัมผัสทั่วร่างกายที่กำลังถูกจับตา",
+        subtitle: "สิ่งที่งานวิจัยในมนุษย์ยืนยันจริง vs สิ่งที่ยังเป็นเพียงการพาดหัวข่าวเกินหลักฐาน",
+        image: CURRICULUM_IMAGES.thailandPlastic,
+        notes: "Nihart et al., Nature Medicine 2025 ตรวจพบพลาสติกในสมอง ตับ ไต แต่ปีเดียวกันมีข้อวิจารณ์เรื่องการปนเปื้อนของวิธีตรวจ Py-GC/MS ส่วน Systematic Review 2026 ใน Env Health (25 การศึกษา) พบสัญญาณในระบบหัวใจ สืบพันธุ์ ทางเดินอาหาร แต่ความเสี่ยง Bias ยังปานกลางถึงสูง ดังนั้นคำว่า 'พลาสติกทำให้เป็นอัลไซเมอร์หรือเป็นหมัน' ยังด่วนสรุปเกินไป",
+        render: (idx) => `
+          <div class="grid-2">
+            <div class="stagger-1" style="display:flex;flex-direction:column;gap:14px;">
+              <div class="card card-accent-top" style="border-top-color:#f43f5e;">
+                <h3>🧠 รายงานการตรวจพบในอวัยวะสำคัญ</h3>
+                <ul>
+                  <li><strong>สมอง ตับ ไต (Nature Medicine 2025):</strong> รายงานการตรวจพบพลาสติกในตัวอย่างชันสูตร แต่ถูกทักท้วงเรื่องข้อจำกัดของวิธี Py-GC/MS และการปนเปื้อนของอุปกรณ์ในห้องทดลอง</li>
+                  <li><strong>ระบบสืบพันธุ์และรก (Review 2026):</strong> พบอนุภาคในเนื้อเยื่อรก น้ำคร่ำ และน้ำอสุจิ สัมพันธ์เบื้องต้นกับคุณภาพสเปิร์ม แต่ยังไม่พิสูจน์ความเป็นเหตุและผล (Causality unproven)</li>
+                </ul>
+              </div>
+              <div class="card">
+                <h3>📚 Systematic Review ใน Environmental Health (2026)</h3>
+                <p>รวบรวม 25 การศึกษาที่ตรวจวัด MNPs ในมนุษย์ที่ยังมีชีวิต: พบสัญญาณสัมพันธ์ในระบบหัวใจ ทางเดินอาหาร และทางเดินหายใจ แต่ <strong>หลักฐานส่วนใหญ่ยังมีความเสี่ยง Confounding และ Measurement Bias สูง</strong></p>
+                <p style="margin-top:8px;color:#fbbf24;">👉 คำว่า <em>“Microplastics เป็นสาเหตุของอัลไซเมอร์ เบาหวาน หรือภาวะมีบุตรยาก”</em> ยังเป็นข้อสรุปที่ <strong>เกินหลักฐานทางการแพทย์ในปัจจุบัน</strong></p>
+              </div>
+            </div>
+            ${mediaBox(idx, CURRICULUM_IMAGES.thailandPlastic, "การแพร่กระจายของพลาสติกและมลพิษสู่สิ่งแวดล้อมและห่วงโซ่อาหารของมนุษย์", "Human Tissue Bioaccumulation Studies")}
+          </div>
+        `
+      },
+
+      // SLIDE 9: Section 8 - QA/QC Crisis in Science
+      {
+        part: "PART II · HUMAN HEALTH",
+        partColor: "#f43f5e",
+        time: "29–33 นาที",
+        ref: "PubMed Systematic Review 2026",
+        title: "8. The Dark Side of Science: วิกฤตความแม่นยำในการตรวจวัด",
+        subtitle: "ประเมิน 133 ชุดข้อมูลจาก 101 งานวิจัย: “ไม่มีชุดข้อมูลใดผ่านเกณฑ์ QA/QC ครบถ้วนทุกข้อ!”",
+        notes: "นี่คือจุดเน้นสำหรับ Critical Appraisal: ปัญหาการปนเปื้อนจากอุปกรณ์พลาสติกในแล็บ, เสื้อผ้าสังเคราะห์ของนักวิจัย, การไม่มี Procedural Blanks ทำให้ผลการตรวจในเลือดและเนื้อเยื่ออาจสูงเกินจริง (Overestimation) หรือตรวจอนุภาคนาโนไม่เจอ (Underestimation) ดังนั้นการตรวจเลือดหาไมโครพลาสติกในคลินิกเพื่อขายคอร์สจึงยังไม่สมเหตุสมผลทางการแพทย์",
+        render: () => `
+          <div class="stagger-1">
+            <table class="evidence-table">
+              <thead>
+                <tr>
+                  <th style="width:20%;">เทคนิคเครื่องมือ</th>
+                  <th style="width:40%;">สิ่งที่บอกเราได้ (What It Tells)</th>
+                  <th style="width:40%;">ข้อจำกัดสำคัญ (Major Limitations)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>µFTIR Spectroscopy</strong></td>
+                  <td>ระบุชนิดพอลิเมอร์ ขนาด และรูปร่างของอนุภาค</td>
+                  <td>มีขีดจำกัด ไม่สามารถตรวจอนุภาคระดับนาโนที่เล็กมาก (&lt; 10–20 µm) ได้ดี</td>
+                </tr>
+                <tr>
+                  <td><strong>Raman Spectroscopy</strong></td>
+                  <td>ตรวจอนุภาคขนาดเล็กได้ลึกถึงระดับไมครอนต่ำ</td>
+                  <td>สัญญาณรบกวนจากการเรืองแสง (Fluorescence) และการเตรียมตัวอย่างซับซ้อน</td>
+                </tr>
+                <tr>
+                  <td><strong>Py-GC/MS</strong></td>
+                  <td>บอกมวลรวม (Mass concentration) ของพอลิเมอร์ได้แม่นยำ</td>
+                  <td>ทำลายตัวอย่าง ไม่บอกจำนวนหรือรูปร่าง และมีสารในเลือดรบกวน (Matrix interference)</td>
+                </tr>
+                <tr>
+                  <td><strong>Electron Microscopy</strong></td>
+                  <td>เห็นภาพสัณฐานและพื้นผิวอนุภาคกำลังขยายสูง</td>
+                  <td>ภาพถ่ายเพียงอย่างเดียว ไม่สามารถยืนยันชนิดทางเคมีของพอลิเมอร์ได้ชัดเจน</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="callout danger stagger-2" style="margin-top:14px;">
+            🚫 <strong>Clinical Warning:</strong> ปัจจุบัน <strong>ยังไม่ควรใช้การตรวจ Microplastics ในเลือดหรือปัสสาวะเพื่อวินิจฉัยโรค หรือจัดคอร์สอาหารเสริมในคลินิก</strong> เพราะยังไม่มีค่าอ้างอิงมาตรฐาน (Clinical Reference Threshold) และวิธีตรวจยังมีความแปรปรวนสูงมาก
+          </div>
+        `
+      },
+
+      // SLIDE 10: Section 9 - Four Levels of Mitigation
+      {
+        part: "PART III · MITIGATION",
+        partColor: "#10b981",
+        time: "33–37 นาที",
+        ref: "Mitigation Hierarchy Framework",
+        title: "9. การจัดการ 4 ระดับ: The Four Levels of Mitigation",
+        subtitle: "แยกแยะการแก้ปัญหาระดับประชากร ออกจากการลดการสัมผัสส่วนบุคคลและกลไกชีวภาพ",
+        notes: "อธิบายพีระมิด 4 ระดับ: Level 1 สำคัญที่สุดในการลดภาระโลก Level 2 ดักจับทางวิศวกรรม Level 3 พฤติกรรมในบ้าน (ทำได้จริงวันนี้) และ Level 4 ชีวภาพ/อาหาร (กำลังศึกษา อย่าหวังพึ่งเป็นหลัก)",
+        render: () => `
+          <div class="grid-4 stagger-2">
+            <div class="card card-accent-top" style="border-top-color:#10b981;">
+              <span class="tag tag-green">LEVEL 1 (สูงสุด)</span>
+              <h3 style="margin-top:8px;">🛑 ป้องกันต้นทาง</h3>
+              <p><strong>Prevent Generation:</strong> ลดการผลิตบรรจุภัณฑ์ที่ไม่จำเป็น, ออกแบบยางรถยนต์ลดการสึกหรอ, ดักเม็ดพลาสติกโรงงาน</p>
+              <div style="font-size:0.75rem;color:#34d399;margin-top:8px;">★ สำคัญที่สุดต่อระดับประชากร</div>
+            </div>
+            <div class="card card-accent-top" style="border-top-color:#38bdf8;">
+              <span class="tag tag-blue">LEVEL 2</span>
+              <h3 style="margin-top:8px;">🚧 ดักจับก่อนสัมผัส</h3>
+              <p><strong>Capture at Points:</strong> ระบบบำบัดน้ำเสียขั้นสูง, เมมเบรนกรองน้ำ, แผ่นกรองดักเส้นใยในเครื่องซักผ้า</p>
+              <div style="font-size:0.75rem;color:#38bdf8;margin-top:8px;">★ อาศัยวิศวกรรมและกฎหมาย</div>
+            </div>
+            <div class="card card-accent-top" style="border-top-color:#fbbf24;">
+              <span class="tag tag-amber">LEVEL 3</span>
+              <h3 style="margin-top:8px;">🥣 ลดการนำเข้าตัว</h3>
+              <p><strong>Personal Intake:</strong> เลิกเวฟพลาสติก, ใช้ชามแก้ว, กรองน้ำดื่ม RO, ลดฝุ่นในบ้านด้วย HEPA</p>
+              <div style="font-size:0.75rem;color:#fbbf24;margin-top:8px;">★ ทำได้ทันทีในชีวิตประจำวัน</div>
+            </div>
+            <div class="card card-accent-top" style="border-top-color:#a855f7;">
+              <span class="tag tag-rose">LEVEL 4</span>
+              <h3 style="margin-top:8px;">🧬 ขับออกทางชีวภาพ</h3>
+              <p><strong>Biological Defense:</strong> ใยอาหารจากผักผลไม้, โพรไบโอติกส์บางสายพันธุ์, สารดักจับในลำไส้</p>
+              <div style="font-size:0.75rem;color:#c084fc;margin-top:8px;">★ เริ่มมีงานวิจัย ยังไม่มีข้อพิสูจน์รักษาโรค</div>
+            </div>
+          </div>
+          <div class="callout success stagger-3">
+            💡 <strong>กฎเหล็กการแพทย์ป้องกัน:</strong> อย่าพยายามกินอาหารเสริมเพื่อขับพิษ (Level 4) หากคุณยังคงนำอาหารร้อนจัดใส่ถุงพลาสติกและเวฟกล่องพลาสติกกินทุกวัน (Level 3)!
+          </div>
+        `
+      },
+
+      // SLIDE 11: Section 10 - Thailand Solutions at Source
+      {
+        part: "PART III · MITIGATION",
+        partColor: "#10b981",
+        time: "37–41 นาที",
+        ref: "EU Regulation 2025/2365 & แผนชาติไทย",
+        title: "10. Solutions at the Source: นโยบายที่ไทยต้องให้ความสำคัญ",
+        subtitle: "บทเรียนจาก EU Pellet Regulation 2025/2365 สู่แผนปฏิบัติการจัดการขยะพลาสติกของไทย",
+        image: CURRICULUM_IMAGES.pelletLeak,
+        notes: "เปรียบเทียบ: สหภาพยุโรปออกกฎหมาย EU 2025/2365 บังคับควบคุมการรั่วไหลของ Plastic Pellets มีผล ธ.ค. 2025 ขณะที่ไทยมีแผนปฏิบัติการระยะที่ 2 (2566–2570) แต่ต้องวัดที่ 'ปริมาณมลพิษที่ลดลงจริง' ไม่ใช่วัดแค่จำนวนกิจกรรมรณรงค์",
+        render: (idx) => `
+          <div class="grid-2">
+            <div class="stagger-1">
+              <table class="evidence-table">
+                <thead>
+                  <tr>
+                    <th>มาตรการระดับประเทศ</th>
+                    <th>เป้าหมายที่ลดได้จริง</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Extended Producer Responsibility (EPR)</strong></td>
+                    <td>บังคับให้ผู้ผลิตบรรจุภัณฑ์รับผิดชอบค่าใช้จ่ายในการเก็บรวบรวมและกำจัดหลังการบริโภค</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Plastic Pellet Containment</strong></td>
+                    <td>ระบบปิดป้องกันเม็ดพลาสติกรั่วไหลจากโรงงานลงท่อระบายน้ำ (ตามโมเดล EU 2025/2365)</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Advanced Wastewater Upgrades</strong></td>
+                    <td>เพิ่มระบบกรองตะกอนและเยื่อกรองในโรงบำบัดน้ำเสียเทศบาลเพื่อดักอนุภาคขนาดไมครอน</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Tyre Wear Standards</strong></td>
+                    <td>กำหนดมาตรฐานการสึกหรอของยางรถยนต์ และพัฒนาขนส่งสาธารณะเพื่อลดการใช้รถส่วนบุคคล</td>
+                  </tr>
+                </tbody>
+              </table>
+              <div class="callout warn" style="margin-top:12px;">
+                🎯 <strong>ตัวชี้วัดที่ถูกต้อง:</strong> แผนปฏิบัติการจัดการขยะพลาสติกของไทย ต้องวัดที่ <strong>“ปริมาณการรั่วไหลของอนุภาคสู่สิ่งแวดล้อมที่ลดลงจริง”</strong> ไม่ใช่วัดเพียงจำนวนโปสเตอร์หรือแคมเปญรณรงค์
+              </div>
+            </div>
+            ${mediaBox(idx, CURRICULUM_IMAGES.pelletLeak, "การควบคุมและตรวจสอบการรั่วไหลของเม็ดพลาสติกจากโรงงานอุตสาหกรรม", "Industrial Leakage Prevention & EU Standards")}
+          </div>
+        `
+      },
+
+      // SLIDE 12: Section 11 - Household Interventions
+      {
+        part: "PART III · MITIGATION",
+        partColor: "#10b981",
+        time: "41–45 นาที",
+        ref: "ACS Publications & EEA Evidence",
+        title: "11. Household Interventions: อะไรที่คุ้มค่าแก่การลงมือทำจริง?",
+        subtitle: "4 การปรับเปลี่ยนภายในบ้านที่มีหลักฐานทางฟิสิกส์และเคมีรองรับชัดเจน",
+        image: CURRICULUM_IMAGES.glassBox,
+        notes: "4 มาตรการในบ้านที่คุ้มค่าที่สุด: 1) เปลี่ยนเป็นแก้ว/เซรามิกเมื่อเจอความร้อน 2) กรองน้ำด้วย RO หรือ Ultrafiltration 3) ติดตั้งหรือใช้ถุงกรองดักเส้นใยผ้า 4) ใช้เครื่องดูดฝุ่น HEPA และเช็ดฝุ่นด้วยผ้าชื้น",
+        render: (idx) => `
+          <div class="grid-2">
+            <div class="stagger-1" style="display:grid;gap:12px;">
+              <div class="card card-accent-top">
+                <h3>🥣 1. ใช้ภาชนะทนความร้อน (แก้ว / เซรามิก / สแตนเลส)</h3>
+                <p>เลิกนำกล่องพลาสติกและถุงแกงเข้าไมโครเวฟ การทดลองใน *ACS Publications* ยืนยันว่าความร้อนและไขมันเร่งการหลุดลอกของอนุภาคขึ้นหลายร้อยเท่า</p>
+              </div>
+              <div class="card card-accent-top">
+                <h3>💧 2. ระบบกรองน้ำดื่ม (RO / Ultrafiltration)</h3>
+                <p>เมมเบรน RO มีขนาดรูกรองเล็กพอที่จะกักอนุภาคไมโครและนาโนพลาสติกตามกลไกทางฟิสิกส์ (ต้องเปลี่ยนไส้กรองตามรอบสม่ำเสมอ)</p>
+              </div>
+              <div class="card card-accent-top">
+                <h3>🧺 3. ดักจับ Microfibers จากการซักผ้า</h3>
+                <p>ใช้ตัวกรองเส้นใยภายนอกเครื่องซักผ้า และเก็บกากเส้นใยทิ้งถังขยะ ไม่ล้างทิ้งลงท่อระบายน้ำ</p>
+              </div>
+              <div class="card card-accent-top">
+                <h3>🧹 4. ควบคุมฝุ่นในบ้านด้วย HEPA & ผ้าชื้น</h3>
+                <p>ลดการสูดดมฝุ่นสิ่งทอสังเคราะห์ภายในห้องนอนด้วยการเช็ดทำความสะอาดแบบเปียก</p>
+              </div>
+            </div>
+            ${mediaBox(idx, CURRICULUM_IMAGES.glassBox, "การเปลี่ยนมาใช้ภาชนะแก้วและเซรามิกสำหรับการอุ่นอาหารและเก็บอาหารร้อน", "Glass & Ceramic Food Storage Solutions")}
+          </div>
+        `
+      },
+
+      // SLIDE 13: Section 12 - Biological Interventions 2025-2026
+      {
+        part: "PART III · MITIGATION",
+        partColor: "#10b981",
+        time: "45–49 นาที",
+        ref: "Nature Comm & Nature Nanotech 2026",
+        title: "12. Biological Interventions: งานวิจัยแนวหน้าปี 2025–2026",
+        subtitle: "การทดลองอาหารและสารดักจับอนุภาคในทางเดินอาหาร: สิ่งที่น่าตื่นเต้น vs ความจริงทางคลินิก",
+        image: CURRICULUM_IMAGES.hydrogel,
+        notes: "สรุปงานวิจัยใหม่: 1) High-fiber diet ลด nanoplastics ตกค้างในหนู 7 เท่า (Nature Comm 2026) 2) Alginate-Chitin hydrogel ดักจับพลาสติกด้วยประจุในลำไส้ (Nature Nanotech 2026) 3) Polyphenols RCT 98 คน ลดการอักเสบแต่ไม่ลดพลาสติกในอุจจาระ 4) เตือนเรื่อง Plasma Exchange: มีงานวิจัยทำในคนจริง แต่เครื่องมือพลาสติกในกระบวนการอาจปล่อยอนุภาคซ้ำ และยังไม่พิสูจน์ว่าลดโรค",
+        render: (idx) => `
+          <div class="grid-2">
+            <div class="stagger-1">
+              <table class="evidence-table">
+                <thead>
+                  <tr>
+                    <th>Intervention</th>
+                    <th>งานวิจัยที่น่าสนใจ</th>
+                    <th>ผลการทดลองและข้อจำกัด</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>High-fiber diet</strong></td>
+                    <td>*Nature Comm (2026)*</td>
+                    <td>ในหนูทดลอง ลดสัญญาณ nanoplastics ตกค้างในเนื้อเยื่อได้ราว <strong>7 เท่า</strong> (เร่งการขับถ่าย)</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Alginate–Chitin Scavenger</strong></td>
+                    <td>*Nature Nanotech (2026)*</td>
+                    <td>ใช้วัสดุเส้นใยและประจุดักจับอนุภาคในลำไส้หนู เร่งขับทิ้งก่อนซึมเข้าเลือด (Proof-of-concept)</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Composite Polyphenols</strong></td>
+                    <td>*Nature Comm (2026)*</td>
+                    <td>RCT 98 ราย: ลดสารอักเสบ IL-1β, IL-6 แต่ <em>ไม่พบการลดลงของอนุภาคในอุจจาระ</em></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Chitosan (Oral)</strong></td>
+                    <td>*J. Xenobiotics (2026)*</td>
+                    <td>Pilot 21 ราย พบระดับ MNP ในเลือดลดลง 26.3% แต่กลุ่มตัวอย่างเล็กมากและระยะสั้น</td>
+                  </tr>
+                </tbody>
+              </table>
+              <div class="callout danger" style="margin-top:12px;">
+                🚫 <strong>Therapeutic Plasma Exchange (การฟอกพลาสมาล้างพลาสติก?):</strong><br/>
+                แม้มีรายงานปี 2026 ว่าการฟอกพลาสมาอาจลดระดับ MNP ในเลือดได้ชั่วคราว แต่ <strong>ท่อและถุงพลาสติกในการแพทย์เองก็อาจปล่อยอนุภาคกลับสู่ร่างกาย</strong> และไม่มีข้อพิสูจน์ว่าลดโรค ห้ามทำโดยไม่มีข้อบ่งชี้ทางการแพทย์!
+              </div>
+            </div>
+            ${mediaBox(idx, CURRICULUM_IMAGES.hydrogel, "โครงสร้าง Alginate–Chitin Nanofiber นวัตกรรมดักจับอนุภาคพลาสติกในทางเดินอาหาร", "Nature Nanotechnology 2026 · Particle Sequestration")}
+          </div>
+        `
+      },
+
+      // SLIDE 14: Section 13 - 30-Day Practical Mitigation Plan
+      {
+        part: "PART IV · ACTION PLAN",
+        partColor: "#38bdf8",
+        time: "49–52 นาที",
+        ref: "Evidence-based Checklist",
+        title: "13. แผนปฏิบัติการ 30 วัน: ลดการสัมผัสโดยไม่ต้องพึ่งอาหารเสริมแพง",
+        subtitle: "คลิกเพื่อเช็กพฤติกรรมที่คุณทำได้จริงในชีวิตประจำวัน (Interactive Checklist)",
+        notes: "ให้ผู้เรียนเปิดเช็กลิสต์ในมือถือหรือคลิกบนสไลด์: แผนนี้เน้นการลดแหล่งรับสัมผัสที่ปรับเปลี่ยนได้ และส่งเสริมสุขภาพโดยรวม ไม่ได้อวดอ้างว่ากำจัดพลาสติกที่มีอยู่ในอวัยวะแล้ว แต่ตัดวงจรการสะสมเพิ่ม",
+        render: () => `
+          <div class="card card-accent-top stagger-1">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <h3>📋 Personal Microplastic Mitigation Checklist</h3>
+              <span id="checklistScore" class="tag tag-green">0 / 7 ข้อสำเร็จ</span>
+            </div>
+            <div class="checklist-wrap" id="checklistWrap">
+              <div class="check-item" onclick="toggleCheckItem(this)">
+                <div class="check-box">✓</div>
+                <div><strong>1. ตรวจสอบแหล่งน้ำดื่มและการบำรุงรักษา:</strong> เปลี่ยนไส้กรอง RO หรือ Carbon ตามรอบ ไม่ดื่มน้ำขวดตากแดด</div>
+              </div>
+              <div class="check-item" onclick="toggleCheckItem(this)">
+                <div class="check-box">✓</div>
+                <div><strong>2. เปลี่ยนภาชนะสำหรับอุ่นอาหารร้อน:</strong> ใช้ชามแก้วหรือเซรามิกเข้าไมโครเวฟ 100% เลิกเวฟกล่องพลาสติก</div>
+              </div>
+              <div class="check-item" onclick="toggleCheckItem(this)">
+                <div class="check-box">✓</div>
+                <div><strong>3. ลดฝุ่นในบ้านด้วยการทำความสะอาดแบบไม่ฟุ้งกระจาย:</strong> ใช้ผ้าชื้นเช็ดโต๊ะ/เตียง และดูดฝุ่นด้วยเครื่องกรอง HEPA</div>
+              </div>
+              <div class="check-item" onclick="toggleCheckItem(this)">
+                <div class="check-box">✓</div>
+                <div><strong>4. ลดการปล่อยเส้นใยจากการซักผ้า:</strong> ซักผ้าเต็มถัง ลดการปั่นแห้งรุนแรง และทิ้งกากใยผ้าลงถังขยะ</div>
+              </div>
+              <div class="check-item" onclick="toggleCheckItem(this)">
+                <div class="check-box">✓</div>
+                <div><strong>5. เพิ่ม Fiber จากอาหารจริงอย่างสม่ำเสมอ:</strong> รับประทานผัก ผลไม้ ธัญพืชไม่ขัดสี เพื่อเร่งการขับถ่ายในลำไส้</div>
+              </div>
+              <div class="check-item" onclick="toggleCheckItem(this)">
+                <div class="check-box">✓</div>
+                <div><strong>6. เพิ่มความหลากหลายของ Polyphenols:</strong> ชาเขียว ผลไม้ตระกูลเบอร์รี ผักหลากสี เพื่อช่วยลด Oxidative Stress</div>
+              </div>
+              <div class="check-item" onclick="toggleCheckItem(this)">
+                <div class="check-box">✓</div>
+                <div><strong>7. ลดพลาสติกแบบใช้ครั้งเดียว (Single-use):</strong> พกกระบอกน้ำสแตนเลสและปิ่นโตสำหรับใส่อาหารร้อน</div>
+              </div>
+            </div>
+          </div>
+          <div class="callout stagger-2" style="margin-top:14px;">
+            🎯 <strong>เป้าหมายของแผนนี้:</strong> ลดการรับสัมผัสสารปนเปื้อนใหม่เข้าสู่ร่างกาย และสนับสนุนให้ระบบกำจัดตามธรรมชาติของตับและลำไส้ทำงานได้เต็มประสิทธิภาพ
+          </div>
+        `
+      },
+
+      // SLIDE 15: Section 14 - Thailand 5 Policy Priorities
+      {
+        part: "PART IV · ACTION PLAN",
+        partColor: "#38bdf8",
+        time: "52–55 นาที",
+        ref: "National Policy Priorities (Nov 2026)",
+        title: "14. ห้าลำดับความสำคัญเชิงนโยบายสำหรับประเทศไทย",
+        subtitle: "การแก้ปัญหาระดับโครงสร้างเพื่อปกป้องสุขภาพประชาชนและระบบนิเวศอย่างยั่งยืน",
+        image: CURRICULUM_IMAGES.thailandPlastic,
+        notes: "5 นโยบายระดับชาติที่ต้องผลักดัน: 1) ป้องกันการรั่วไหลตั้งแต่ต้นทาง (EPR + Pellet leak) 2) เฝ้าระวังระบบน้ำดื่มและน้ำเสีย 3) ตรวจสุขภาพชุมชนรอบโรงงานขยะ 4) กำหนดมาตรฐานแล็บตรวจวัด 5) วัดผลที่ปริมาณมลพิษลดจริง และติดตามผลการเจรจาสนธิสัญญาพลาสติกโลก (UN Plastics Treaty)",
+        render: (idx) => `
+          <div class="grid-2">
+            <div class="stagger-1" style="display:grid;gap:10px;">
+              <div class="card card-accent-top">
+                <strong>1. Prevent Plastic Leakage at Source:</strong> ออกกฎหมาย EPR ให้ผู้ผลิตรับผิดชอบบรรจุภัณฑ์ และควบคุมเม็ดพลาสติกอุตสาหกรรม
+              </div>
+              <div class="card card-accent-top">
+                <strong>2. Protect Water Systems:</strong> ติดตั้งระบบตรวจวัด Microplastics ในน้ำดิบ น้ำประปา และน้ำเสียในเขตชุมชนหนาแน่น
+              </div>
+              <div class="card card-accent-top">
+                <strong>3. Monitor High-Risk Communities:</strong> ตรวจสุขภาพประชาชนรอบพื้นที่คัดแยกขยะ รีไซเคิล และเขตอุตสาหกรรม (Environmental Justice)
+              </div>
+              <div class="card card-accent-top">
+                <strong>4. Standardize Testing & QA/QC:</strong> กำหนดมาตรฐานห้องปฏิบัติการเพื่อป้องกันการรายงานผลคลาดเคลื่อนและการหลอกลวงทางการค้า
+              </div>
+              <div class="card card-accent-top">
+                <strong>5. Measure Actual Outcomes:</strong> ประเมินผลสัมฤทธิ์ที่ปริมาณพลาสติกลดลงจริง แทนการนับจำนวนกิจกรรมประชาสัมพันธ์
+              </div>
+            </div>
+            ${mediaBox(idx, CURRICULUM_IMAGES.thailandPlastic, "การบริโภคและการจัดการพลาสติกในไทย: จากความท้าทายสู่นโยบายเชิงรุก", "UNEP & Thailand Pollution Control Department 2026")}
+          </div>
+        `
+      },
+
+      // SLIDE 16: Section 15 - Top Research Questions
+      {
+        part: "PART IV · ACTION PLAN",
+        partColor: "#38bdf8",
+        time: "55–57 นาที",
+        ref: "Academic Research Roadmap",
+        title: "15. สามโจทย์วิจัยที่มีคุณค่าสูงสุดสำหรับประเทศไทย",
+        subtitle: "การสร้างองค์ความรู้ทางระบาดวิทยาและคลินิกที่ตอบโจทย์สุขภาวะของคนไทยโดยเฉพาะ",
+        notes: "3 งานวิจัยที่ไทยควรเร่งทำ: 1) Controlled feeding trial ดูว่าอาหารไทยไฟเบอร์สูงช่วยลดการดูดซึม MNP ได้จริงไหม 2) Prospective cohort ศึกษาภาระพลาสติกกับโรคหัวใจในคนไทย 3) Engineering trial ประเมินระบบกรองน้ำประปาราคาคุ้มค่า",
+        render: () => `
+          <div class="grid-3 stagger-2">
+            <div class="card card-accent-top">
+              <span class="tag tag-blue">โจทย์ที่ 1 · โภชนาการคลินิก</span>
+              <h3 style="margin-top:8px;">🥗 Fiber & MNP Absorption</h3>
+              <p><strong>Research Question:</strong> อาหารไทยที่มีใยอาหารสูง (High-fiber Thai Diet) ช่วยลดการดูดซึมและเร่งการขับถ่ายนาโนพลาสติกในมนุษย์ได้จริงหรือไม่?</p>
+              <p style="margin-top:10px;font-size:0.82rem;color:#38bdf8;">👉 Controlled feeding trial ขยายผลจากงานวิจัยสัตว์ทดลอง</p>
+            </div>
+            <div class="card card-accent-top">
+              <span class="tag tag-rose">โจทย์ที่ 2 · โรคหัวใจและหลอดเลือด</span>
+              <h3 style="margin-top:8px;">❤️ Cardiometabolic Cohort</h3>
+              <p><strong>Research Question:</strong> ปริมาณการสะสมไมโครพลาสติกในร่างกาย ทำนายการเกิดโรคหัวใจและหลอดเลือดในคนไทยอย่างเป็นอิสระจากปัจจัยอื่นได้หรือไม่?</p>
+              <p style="margin-top:10px;font-size:0.82rem;color:#fb7185;">👉 Prospective cohort study ควบคุม Confounding อย่างรัดกุม</p>
+            </div>
+            <div class="card card-accent-top">
+              <span class="tag tag-green">โจทย์ที่ 3 · วิศวกรรมน้ำประปา</span>
+              <h3 style="margin-top:8px;">🚰 Water Treatment Efficacy</h3>
+              <p><strong>Research Question:</strong> เทคโนโลยีบำบัดน้ำแบบใดที่สามารถดักจับ Microplastics ขนาดเล็กในลุ่มน้ำเจ้าพระยาได้อย่างคุ้มค่าทางเศรษฐศาสตร์?</p>
+              <p style="margin-top:10px;font-size:0.82rem;color:#34d399;">👉 Engineering field trial เพื่อสร้างผลกระทบระดับประชากร</p>
+            </div>
+          </div>
+        `
+      },
+
+      // SLIDE 17: Conclusion - Three Truths
+      {
+        part: "CONCLUSION",
+        partColor: "#38bdf8",
+        time: "57–60 นาที",
+        ref: "Executive Synthesis",
+        title: "บทสรุป: ความจริง 3 ประการเกี่ยวกับ Microplastics",
+        subtitle: "“The darkest side is not simply that plastic enters our bodies... but that society releases it faster than science can prove its harm.”",
+        image: CURRICULUM_IMAGES.cover,
+        notes: "ประโยคปิดคลาสที่ทรงพลัง: 1) การปนเปื้อนในสิ่งแวดล้อมเป็นเรื่องจริง 2) การเป็นสาเหตุของโรคยังรอการพิสูจน์ 3) การป้องกันต้นทางพัฒนาไปไกลกว่าการพยายามล้างพิษในร่างกาย",
+        render: (idx) => `
+          <div class="grid-2">
+            <div class="stagger-1" style="display:flex;flex-direction:column;justify-content:space-between;gap:16px;">
+              <div class="card card-accent-top">
+                <h3>📌 Three Grounded Truths</h3>
+                <div style="display:grid;gap:12px;margin-top:12px;">
+                  <div>
+                    <strong>1. Environmental contamination is established:</strong><br/>
+                    อนุภาคพลาสติกแพร่กระจายอยู่ในน้ำ อากาศ ดิน อาหาร และร่างกายมนุษย์จริงในทุกมุมโลก รวมถึงประเทศไทย
+                  </div>
+                  <div>
+                    <strong>2. Human disease causality remains uncertain:</strong><br/>
+                    สัญญาณความเสี่ยงในหลอดเลือดและสมองน่ากังวล แต่ยังไม่เพียงพอที่จะใช้ระบุความเสี่ยงเฉพาะบุคคล หรือใช้เป็นข้อบ่งชี้คอร์สการรักษาในคลินิก
+                  </div>
+                  <div>
+                    <strong>3. Prevention is more mature than detoxification:</strong><br/>
+                    เรามีวิธีลดการปล่อยและดักจับอนุภาคทางวิศวกรรมที่มีเหตุผลชัดเจน ขณะที่วิธีขับอนุภาคออกจากร่างกายยังอยู่ในขั้นทดลอง
+                  </div>
+                </div>
+              </div>
+              <div class="callout success" style="font-size:1.05rem;">
+                💬 <strong>Closing Thought:</strong><br/>
+                <em>“ด้านมืดที่สุดของไมโครพลาสติก ไม่ใช่แค่การที่มันเข้ามาอยู่ในร่างกายเรา... แต่คือการที่สังคมยังคงปล่อยอนุภาคที่ไม่ย่อยสลายเหล่านี้ ออกสู่โลกเร็วกว่าที่วิทยาศาสตร์การแพทย์จะตามทันผลกระทบระยะยาวของมัน”</em>
+              </div>
+            </div>
+            ${mediaBox(idx, CURRICULUM_IMAGES.cover, "The Dark Side of Microplastics: วิทยาศาสตร์ ความจริง และความรับผิดชอบร่วมกัน", "Thailand Evidence Review November 2026")}
+          </div>
+        `
+      },
+
+      // SLIDE 18: References & Medical Take-home
+      {
+        part: "KEY LITERATURE",
+        partColor: "#38bdf8",
+        time: "Q&A & REFERENCES",
+        ref: "Curated Scientific References",
+        title: "เอกสารอ้างอิงหลักสำหรับผู้สอน (Landmark Papers)",
+        subtitle: "ชุดงานวิจัยระดับเสาหลักสำหรับใช้ต่อยอดการสอนและการอภิปรายเชิงวิชาการ",
+        notes: "สำหรับแพทย์และผู้สอน: ให้น้ำหนักกับ Cardiovascular risk (NEJM 2024), Endocrine disruptors, Intestinal barrier และ Sequestration technologies โดยเน้นย้ำ Critical Appraisal เสมอ",
+        render: () => `
+          <div class="stagger-1">
+            <table class="evidence-table">
+              <thead>
+                <tr>
+                  <th style="width:30%;">Landmark Publication</th>
+                  <th style="width:40%;">หัวข้อหลักและผลการศึกษา (Key Focus)</th>
+                  <th style="width:30%;">วารสาร / แหล่งอ้างอิง</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Marfella et al. (2024)</strong></td>
+                  <td>Microplastics & Nanoplastics in Atherosclerotic Plaque and Cardiovascular Outcomes</td>
+                  <td><em>New England Journal of Medicine</em> (DOI: 10.1056/NEJMoa2309822)</td>
+                </tr>
+                <tr>
+                  <td><strong>Nature Medicine Review (2025)</strong></td>
+                  <td>Human Health Evidence, Bioaccumulation & Major Methodological Gaps</td>
+                  <td><em>Nature Medicine</em> (DOI: 10.1038/s41591-025-03902-5)</td>
+                </tr>
+                <tr>
+                  <td><strong>Systematic Review (2026)</strong></td>
+                  <td>Direct Human In Vivo Evidence: Evaluation of 25 Clinical Studies</td>
+                  <td><em>Environmental Health</em> (DOI: 10.1186/s12940-026-01282-y)</td>
+                </tr>
+                <tr>
+                  <td><strong>Dietary Fiber Study (2026)</strong></td>
+                  <td>Dietary Fiber Accelerates Nanoplastic Excretion and Attenuates Retention in Mice</td>
+                  <td><em>Nature Communications</em> (DOI: 10.1038/s41467-026-78675-7)</td>
+                </tr>
+                <tr>
+                  <td><strong>Alginate–Chitin Hydrogel (2026)</strong></td>
+                  <td>Micro-nanofiber Hydrogel for Gastrointestinal Microplastic Sequestration</td>
+                  <td><em>Nature Nanotechnology</em> (DOI: 10.1038/s41565-026-02266-2)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="callout success stagger-2" style="margin-top:16px;">
+            🎓 <strong>Teaching Summary:</strong> ให้ความสำคัญกับ Cardiovascular risk, Endocrine disruption, Gut barrier integrity และ Upstream engineering solutions — สามารถสื่อสารความจริงอย่างหนักแน่น โดยไม่ต้องพึ่งพาความตื่นตระหนกทางการตลาด
+          </div>
+        `
+      }
+    ];
+
+    // Presentation Engine
+    let currentSlide = 0;
+    let timerSeconds = 0;
+    let timerInterval = null;
+
+    function renderCurrentSlide() {
+      const s = SLIDES[currentSlide];
+      const root = document.getElementById("slideRoot");
+
+      document.documentElement.style.setProperty("--accent", s.partColor);
+      document.documentElement.style.setProperty("--accent-glow", s.partColor + "33");
+
+      document.getElementById("actPill").textContent = s.part;
+      document.getElementById("timeSlotLabel").textContent = `🕒 ช่วงเวลา: ${s.time}`;
+      document.getElementById("slideCounter").textContent = `${String(currentSlide + 1).padStart(2, "0")} / ${SLIDES.length}`;
+      document.getElementById("progressFill").style.width = `${((currentSlide + 1) / SLIDES.length) * 100}%`;
+      document.getElementById("notesContent").textContent = s.notes || "";
+
+      root.style.animation = "none";
+      void root.offsetWidth;
+      root.style.animation = "slideEnter 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards";
+
+      root.innerHTML = `
+        <div class="slide-meta stagger-1">
+          <span>SLIDE ${String(currentSlide + 1).padStart(2, "0")}</span>
+          <span>•</span>
+          <span>${s.part}</span>
+          <span class="ref-badge">${s.ref}</span>
+        </div>
+        <h1 class="slide-title stagger-1">${s.title}</h1>
+        <p class="slide-subtitle stagger-2">${s.subtitle}</p>
+        ${s.render(currentSlide)}
+      `;
+
+      // Restore checklist state if on Slide 14
+      if (currentSlide === 13) {
+        restoreChecklistState();
+      }
+
+      window.location.hash = `slide-${currentSlide + 1}`;
+    }
+
+    function nextSlide() {
+      if (currentSlide < SLIDES.length - 1) {
+        currentSlide++;
+        renderCurrentSlide();
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 0) {
+        currentSlide--;
+        renderCurrentSlide();
+      }
+    }
+
+    function goToSlide(index) {
+      currentSlide = Math.max(0, Math.min(SLIDES.length - 1, index));
+      renderCurrentSlide();
+      document.getElementById("overviewModal").classList.remove("open");
+    }
+
+    function toggleNotes() {
+      document.getElementById("notesDrawer").classList.toggle("open");
+    }
+
+    function toggleOverview() {
+      const modal = document.getElementById("overviewModal");
+      const grid = document.getElementById("overviewGrid");
+      if (!modal.classList.contains("open")) {
+        grid.innerHTML = SLIDES.map((s, i) => `
+          <div class="overview-item ${i === currentSlide ? "active" : ""}" onclick="goToSlide(${i})">
+            <div style="font-size:0.72rem;color:${s.partColor};font-weight:700;">SLIDE ${String(i + 1).padStart(2, "0")} · ${s.part}</div>
+            <div style="font-size:0.86rem;font-weight:600;margin-top:4px;color:#f8fafc;">${s.title}</div>
+          </div>
+        `).join("");
+      }
+      modal.classList.toggle("open");
+    }
+
+    function openImageManagerModal() {
+      const modal = document.getElementById("imageModal");
+      const input = document.getElementById("customImgInput");
+      const map = getCustomImages();
+      const s = SLIDES[currentSlide];
+      input.value = map[currentSlide] || s.image || "";
+      modal.classList.add("open");
+      input.focus();
+    }
+
+    function closeImageModal() {
+      document.getElementById("imageModal").classList.remove("open");
+    }
+
+    function saveSlideImage() {
+      const url = document.getElementById("customImgInput").value.trim();
+      const map = getCustomImages();
+      if (url) {
+        map[currentSlide] = url;
+      } else {
+        delete map[currentSlide];
+      }
+      localStorage.setItem("dark_microplastics_custom_images", JSON.stringify(map));
+      closeImageModal();
+      renderCurrentSlide();
+    }
+
+    function resetSlideImage() {
+      const map = getCustomImages();
+      delete map[currentSlide];
+      localStorage.setItem("dark_microplastics_custom_images", JSON.stringify(map));
+      closeImageModal();
+      renderCurrentSlide();
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
+      }
+    }
+
+    // Checklist Logic for Slide 14
+    function toggleCheckItem(el) {
+      el.classList.toggle("done");
+      saveChecklistState();
+    }
+
+    function saveChecklistState() {
+      const items = document.querySelectorAll("#checklistWrap .check-item");
+      const state = Array.from(items).map(item => item.classList.contains("done"));
+      localStorage.setItem("microplastics_30day_checklist", JSON.stringify(state));
+      updateChecklistScore();
+    }
+
+    function restoreChecklistState() {
+      try {
+        const state = JSON.parse(localStorage.getItem("microplastics_30day_checklist") || "[]");
+        const items = document.querySelectorAll("#checklistWrap .check-item");
+        items.forEach((item, idx) => {
+          if (state[idx]) item.classList.add("done");
+          else item.classList.remove("done");
+        });
+        updateChecklistScore();
+      } catch (e) {}
+    }
+
+    function updateChecklistScore() {
+      const doneCount = document.querySelectorAll("#checklistWrap .check-item.done").length;
+      const scoreBadge = document.getElementById("checklistScore");
+      if (scoreBadge) {
+        scoreBadge.textContent = `${doneCount} / 7 ข้อสำเร็จ`;
+      }
+    }
+
+    // Timer
+    document.getElementById("timerBadge").addEventListener("click", () => {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      } else {
+        timerInterval = setInterval(() => {
+          timerSeconds++;
+          const m = String(Math.floor(timerSeconds / 60)).padStart(2, "0");
+          const s = String(timerSeconds % 60).padStart(2, "0");
+          document.getElementById("timerText").textContent = `${m}:${s} / 60:00`;
+        }, 1000);
+      }
+    });
+
+    // Keyboard Navigation
+    window.addEventListener("keydown", (e) => {
+      if (document.getElementById("imageModal").classList.contains("open")) return;
+      if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") {
+        e.preventDefault();
+        nextSlide();
+      } else if (e.key === "ArrowLeft" || e.key === "PageUp") {
+        e.preventDefault();
+        prevSlide();
+      } else if (e.key === "n" || e.key === "N") {
+        toggleNotes();
+      } else if (e.key === "m" || e.key === "M") {
+        toggleOverview();
+      } else if (e.key === "f" || e.key === "F") {
+        toggleFullscreen();
+      } else if (e.key === "Escape") {
+        document.getElementById("overviewModal").classList.remove("open");
+        document.getElementById("notesDrawer").classList.remove("open");
+      }
+    });
+
+    // Hash initialization
+    window.addEventListener("DOMContentLoaded", () => {
+      const match = window.location.hash.match(/slide-(\d+)/);
+      if (match) {
+        const idx = parseInt(match[1], 10) - 1;
+        if (idx >= 0 && idx < SLIDES.length) currentSlide = idx;
+      }
+      renderCurrentSlide();
+    });
+  </script>
+</body>
+</html>

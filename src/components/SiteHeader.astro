@@ -47,9 +47,32 @@ const services = [
   { href: "/consult", icon: "🩺", title: "ปรึกษาส่วนตัว", desc: "พบหมอทิม 1:1 · เริ่ม 800 บาท" },
 ];
 
+const slides = [
+  {
+    href: "/dark-side-of-microplastics-slides.html",
+    icon: "🧬",
+    title: "The Dark Side of Microplastics",
+    desc: "เจาะลึกมลพิษพลาสติก & สุขภาพ · 18 สไลด์",
+    badge: "New",
+  },
+  {
+    href: "/microplastics-emf-slides.html",
+    icon: "⚡",
+    title: "Microplastics & EMF Pollution",
+    desc: "มลพิษพลาสติก & คลื่นแม่เหล็กไฟฟ้าในไทย · 15 สไลด์",
+  },
+  {
+    href: "/toxic-exposure-slides.html",
+    icon: "🫀",
+    title: "Toxic Exposure & Organ Aging",
+    desc: "สารพิษรอบตัว ชะลอวัยระดับเซลล์ · 30 สไลด์",
+  },
+];
+
 const norm = (p: string) => (p !== "/" ? p.replace(/\/$/, "") : p);
 const isActive = (href: string) => norm(href) === norm(current);
 const serviceActive = services.some((s) => isActive(s.href));
+const slideActive = slides.some((s) => isActive(s.href));
 
 const socialLinks = [
   { href: "https://www.facebook.com/dr.timdietclinic/", label: "Facebook", path: "M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" },
@@ -102,6 +125,38 @@ const CART_GLYPH = "M19 6h-2a5 5 0 00-10 0H5a2 2 0 00-2 2v12a2 2 0 002 2h14a2 2 
               <span class="dropdown-icon" aria-hidden="true">{s.icon}</span>
               <div>
                 <strong>{s.title}</strong>
+                <span>{s.desc}</span>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+
+      <div class="nav-dropdown">
+        <button
+          class="nav-dropdown-trigger"
+          type="button"
+          aria-expanded="false"
+          aria-current={slideActive ? "true" : undefined}
+        >
+          Slides
+          <svg class="nav-dropdown-arrow" width="10" height="10" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+        </button>
+        <div class="nav-dropdown-menu">
+          {slides.map((s) => (
+            <a
+              href={s.href}
+              class="dropdown-item"
+              aria-current={isActive(s.href) ? "page" : undefined}
+            >
+              <span class="dropdown-icon" aria-hidden="true">{s.icon}</span>
+              <div>
+                <strong>
+                  {s.title}
+                  {s.badge && <span class="dropdown-item-badge">{s.badge}</span>}
+                </strong>
                 <span>{s.desc}</span>
               </div>
             </a>
@@ -270,7 +325,7 @@ const CART_GLYPH = "M19 6h-2a5 5 0 00-10 0H5a2 2 0 00-2 2v12a2 2 0 002 2h14a2 2 
     top: calc(100% + 8px);
     left: 50%;
     transform: translateX(-50%) translateY(4px);
-    min-width: 240px;
+    min-width: 270px;
     background: var(--hdr-menu-bg);
     border: 1px solid var(--hdr-menu-border);
     border-radius: 12px;
@@ -326,6 +381,24 @@ const CART_GLYPH = "M19 6h-2a5 5 0 00-10 0H5a2 2 0 00-2 2v12a2 2 0 002 2h14a2 2 
 
   .top-bar[data-theme="dark"] .dropdown-item-vip strong {
     color: #fbbf24;
+  }
+
+  .dropdown-item-badge {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 1px 6px;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.2;
+    border-radius: 999px;
+    background: #0284c7;
+    color: #ffffff;
+    vertical-align: middle;
+  }
+
+  .top-bar[data-theme="dark"] .dropdown-item-badge {
+    background: #38bdf8;
+    color: #050813;
   }
 
   /* ── Social icons ── */

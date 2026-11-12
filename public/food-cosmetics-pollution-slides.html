@@ -1,0 +1,2542 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Food, Cosmetics & Environmental Pollution — BlockFrame Presentation</title>
+
+  <!-- Fonts: Inter + Space Grotesk + Noto Sans Thai (Weights 400-900) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+Thai:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ===========================================
+       CSS CUSTOM PROPERTIES (BLOCKFRAME TOKENS)
+       =========================================== */
+    :root {
+      --black: #000000;
+      --white: #FFFFFF;
+      --offwhite: #FFFDF5;
+      --pink: #FE90E8;
+      --blue: #C0F7FE;
+      --green: #99E885;
+      --yellow: #F7CB46;
+      --cream: #FFDC8B;
+
+      --border-primary: 4px solid var(--black);
+      --border-thin: 3px solid var(--black);
+      --border-atomic: 2px solid var(--black);
+
+      --shadow-default: 8px 8px 0px var(--black);
+      --shadow-small: 4px 4px 0px var(--black);
+      --shadow-hover: 6px 6px 0px var(--black);
+      --shadow-press: 2px 2px 0px var(--black);
+      --shadow-close-yellow: 12px 12px 0px var(--yellow);
+      --shadow-close-white: 6px 6px 0px var(--white);
+
+      --font-display: 'Inter', 'Noto Sans Thai', sans-serif;
+      --font-body: 'Inter', 'Noto Sans Thai', sans-serif;
+      --font-label: 'Space Grotesk', 'Noto Sans Thai', monospace;
+
+      --stage-bg: #000000;
+      --slide-bg: var(--offwhite);
+      --ease-snap: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* ===========================================
+       VIEWPORT BASE (MANDATORY FIXED 1920x1080 STAGE)
+       =========================================== */
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: var(--stage-bg, #000);
+      font-family: var(--font-body);
+      color: var(--black);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .deck-viewport {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      background: var(--stage-bg, #000);
+    }
+
+    .deck-stage {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      transform-origin: 0 0;
+      background: var(--slide-bg, #fff);
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      display: block;
+      visibility: hidden;
+      opacity: 0;
+      pointer-events: none;
+      background: var(--slide-bg, #fff);
+    }
+
+    .slide.active,
+    .slide.visible {
+      visibility: visible;
+      opacity: 1;
+      pointer-events: auto;
+      z-index: 1;
+    }
+
+    img,
+    video,
+    canvas,
+    svg {
+      max-width: 100%;
+      max-height: 100%;
+    }
+
+    .deck-controls {
+      position: fixed;
+      left: 50%;
+      bottom: 22px;
+      transform: translateX(-50%);
+      z-index: 1000;
+    }
+
+    @media print {
+      html,
+      body {
+        width: 1920px;
+        height: auto;
+        overflow: visible;
+        background: #fff;
+      }
+
+      .deck-viewport {
+        position: static;
+        overflow: visible;
+        background: #fff;
+      }
+
+      .deck-stage {
+        position: static;
+        width: auto;
+        height: auto;
+        transform: none !important;
+        background: none;
+      }
+
+      .slide {
+        position: relative;
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        width: 1920px;
+        height: 1080px;
+        break-after: page;
+        page-break-after: always;
+      }
+
+      .slide:last-child {
+        break-after: auto;
+        page-break-after: auto;
+      }
+
+      .deck-controls,
+      .bf-counter-pill,
+      .bf-nav-cluster,
+      .edit-hotzone,
+      .edit-toggle,
+      .notes-drawer,
+      .modal-backdrop {
+        display: none !important;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.2s !important;
+      }
+    }
+
+    /* ===========================================
+       SURFACE GROUNDS & TEXTURES
+       =========================================== */
+    /* Dot grid decorative overlay on light surfaces */
+    .has-dots::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle, var(--black) 1.5px, transparent 1.5px);
+      background-size: 28px 28px;
+      opacity: 0.22;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .slide-inner {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      height: 100%;
+      padding: 64px 76px 112px 76px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 28px;
+    }
+
+    /* ===========================================
+       TYPOGRAPHY HIERARCHY (BLOCKFRAME + THAI)
+       =========================================== */
+    .label-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .label-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .label-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: var(--border-thin);
+      box-shadow: var(--shadow-small);
+      padding: 8px 18px;
+      font-family: var(--font-label);
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      background: var(--white);
+      color: var(--black);
+      line-height: 1.1;
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 74px;
+      line-height: 1.06;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+      color: var(--black);
+    }
+
+    .slide-title {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 46px;
+      line-height: 1.16;
+      letter-spacing: -0.008em;
+      color: var(--black);
+    }
+
+    .slide-lead {
+      font-family: var(--font-label);
+      font-weight: 600;
+      font-size: 22px;
+      line-height: 1.44;
+      color: var(--black);
+      max-width: 1460px;
+    }
+
+    .en-caps {
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+    }
+
+    .mono-tag {
+      display: inline-block;
+      font-family: var(--font-label);
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      border: var(--border-atomic);
+      padding: 4px 10px;
+      background: var(--yellow);
+      color: var(--black);
+      line-height: 1.2;
+      vertical-align: middle;
+    }
+
+    /* ===========================================
+       BLOCKFRAME CARDS & CONTAINERS (0PX RADIUS)
+       =========================================== */
+    .bf-card {
+      background: var(--white);
+      border: var(--border-primary);
+      box-shadow: var(--shadow-default);
+      padding: 28px 32px;
+      position: relative;
+    }
+
+    .bf-card-sm {
+      background: var(--white);
+      border: var(--border-thin);
+      box-shadow: var(--shadow-small);
+      padding: 22px 26px;
+      position: relative;
+    }
+
+    .bf-card-flat {
+      background: var(--white);
+      border: var(--border-primary);
+      padding: 22px 26px;
+      position: relative;
+    }
+
+    .bf-card h3,
+    .bf-card-sm h3,
+    .bf-card-flat h3 {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 25px;
+      line-height: 1.24;
+      color: var(--black);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .bf-card p,
+    .bf-card-sm p,
+    .bf-card-flat p {
+      font-size: 20px;
+      line-height: 1.54;
+      font-weight: 500;
+      color: var(--black);
+    }
+
+    .bf-card ul,
+    .bf-card-sm ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .bf-card li,
+    .bf-card-sm li {
+      position: relative;
+      padding-left: 24px;
+      font-size: 20px;
+      line-height: 1.5;
+      font-weight: 500;
+      color: var(--black);
+    }
+
+    .bf-card li::before,
+    .bf-card-sm li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 10px;
+      width: 11px;
+      height: 11px;
+      background: var(--yellow);
+      border: var(--border-atomic);
+    }
+
+    /* ===========================================
+       GRIDS & LAYOUT HELPERS
+       =========================================== */
+    .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; }
+    .grid-2-wide { display: grid; grid-template-columns: 1.15fr 1fr; gap: 28px; }
+    .grid-2-chart { display: grid; grid-template-columns: 0.92fr 1.08fr; gap: 28px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 26px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 22px; }
+    .stack-gap { display: flex; flex-direction: column; gap: 22px; }
+
+    /* ===========================================
+       SIGNATURE DECORATIONS & STRUCTURAL PRIMITIVES
+       =========================================== */
+    .tilt-neg { transform: rotate(-2deg); }
+    .tilt-pos { transform: rotate(2deg); }
+
+    /* Decorative shapes placed directly on slide ground */
+    .deco-stripe {
+      position: absolute;
+      border: var(--border-thin);
+      background: repeating-linear-gradient(
+        45deg,
+        var(--black),
+        var(--black) 6px,
+        var(--green) 6px,
+        var(--green) 16px
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .deco-rect {
+      position: absolute;
+      border: var(--border-thin);
+      box-shadow: var(--shadow-small);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* 10-point Star Burst (two nested clip-paths give a solid 3px black border) */
+    .star-burst {
+      position: absolute;
+      background: var(--black);
+      clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+      pointer-events: none;
+      z-index: 4;
+    }
+
+    .star-burst-inner {
+      position: absolute;
+      inset: 5px;
+      background: var(--pink);
+      clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    }
+
+    /* Protruding yellow feature notch on top border */
+    .feature-deco {
+      width: 44px;
+      height: 44px;
+      border: var(--border-thin);
+      background: var(--yellow);
+      position: absolute;
+      top: -16px;
+      right: 24px;
+      display: grid;
+      place-items: center;
+      font-family: var(--font-label);
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--black);
+      z-index: 3;
+    }
+
+    /* L-shaped opposite corner brackets */
+    .corner-tl,
+    .corner-br {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      pointer-events: none;
+    }
+
+    .corner-tl {
+      top: 12px;
+      left: 12px;
+      border-top: var(--border-thin);
+      border-left: var(--border-thin);
+    }
+
+    .corner-br {
+      bottom: 12px;
+      right: 12px;
+      border-bottom: var(--border-thin);
+      border-right: var(--border-thin);
+    }
+
+    /* Icon Square & Numerical Bullet */
+    .icon-square {
+      width: 60px;
+      height: 60px;
+      border: var(--border-thin);
+      display: grid;
+      place-items: center;
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 26px;
+      text-transform: uppercase;
+      color: var(--black);
+      flex-shrink: 0;
+    }
+
+    .list-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .list-num {
+      width: 40px;
+      height: 40px;
+      border: var(--border-thin);
+      background: var(--yellow);
+      font-family: var(--font-label);
+      font-weight: 700;
+      font-size: 16px;
+      display: grid;
+      place-items: center;
+      color: var(--black);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    /* The only circular element permitted in BlockFrame */
+    .stat-deco-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: var(--border-atomic);
+      position: absolute;
+      top: 16px;
+      right: 16px;
+    }
+
+    .stat-number {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 56px;
+      line-height: 1;
+      color: var(--black);
+    }
+
+    /* Connected Step Flow (28x4 horizontal black bar connector) */
+    .step-track {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 28px;
+      align-items: stretch;
+      margin: 14px 0;
+    }
+
+    .step-card {
+      border: var(--border-thin);
+      box-shadow: var(--shadow-small);
+      padding: 16px 18px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .step-card.has-connector::after {
+      content: "";
+      position: absolute;
+      right: -31px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 28px;
+      height: 4px;
+      background: var(--black);
+    }
+
+    /* ===========================================
+       SPECIALIZED BLOCKFRAME MODULES
+       =========================================== */
+    .hero-frame {
+      background: var(--white);
+      border: var(--border-primary);
+      box-shadow: var(--shadow-default);
+      padding: 44px 48px;
+      position: relative;
+    }
+
+    .hero-tab {
+      position: absolute;
+      top: -24px;
+      right: 48px;
+      background: var(--yellow);
+      border: var(--border-thin);
+      box-shadow: var(--shadow-small);
+      padding: 10px 24px;
+      font-family: var(--font-label);
+      font-weight: 700;
+      font-size: 16px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transform: rotate(-3deg);
+      color: var(--black);
+    }
+
+    .bf-table-frame {
+      background: var(--white);
+      border: var(--border-primary);
+      box-shadow: var(--shadow-default);
+      overflow: hidden;
+    }
+
+    .bf-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 20px;
+    }
+
+    .bf-table th,
+    .bf-table td {
+      padding: 18px 24px;
+      border-bottom: var(--border-thin);
+      border-right: var(--border-thin);
+      text-align: left;
+      vertical-align: top;
+      line-height: 1.48;
+    }
+
+    .bf-table th:last-child,
+    .bf-table td:last-child {
+      border-right: none;
+    }
+
+    .bf-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .bf-table th {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 21px;
+      letter-spacing: 0.02em;
+    }
+
+    .code-chip {
+      font-family: var(--font-label);
+      font-weight: 700;
+      background: var(--yellow);
+      border: var(--border-atomic);
+      padding: 2px 8px;
+      font-size: 18px;
+      display: inline-block;
+    }
+
+    /* Proportional Progress / Ratio Bar */
+    .bf-bar-track {
+      height: 22px;
+      background: var(--offwhite);
+      border: var(--border-thin);
+      margin-top: 12px;
+      overflow: hidden;
+    }
+
+    .bf-bar-fill {
+      height: 100%;
+      border-right: var(--border-thin);
+    }
+
+    /* Caffeine SVG-style Horizontal Chart */
+    .chart-row {
+      display: grid;
+      grid-template-columns: 310px 1fr 98px;
+      align-items: center;
+      gap: 16px;
+      padding: 7px 0;
+    }
+
+    .chart-label {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--black);
+    }
+
+    .chart-track {
+      height: 26px;
+      background: var(--offwhite);
+      border: var(--border-thin);
+      display: flex;
+      align-items: stretch;
+    }
+
+    .chart-bar {
+      height: 100%;
+      border-right: var(--border-thin);
+    }
+
+    .chart-val {
+      font-family: var(--font-label);
+      font-weight: 700;
+      font-size: 18px;
+      text-align: right;
+    }
+
+    /* Interactive Yeast Overgrowth Cards (Slide 9) */
+    .tap-card {
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 360px;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .tap-card:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 10px 10px 0px var(--black);
+    }
+
+    .tap-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: var(--border-thin);
+      background: var(--yellow);
+      box-shadow: var(--shadow-small);
+      padding: 8px 14px;
+      font-family: var(--font-label);
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--black);
+      margin-top: 12px;
+      align-self: flex-start;
+    }
+
+    .tap-detail {
+      display: none;
+      margin-top: 14px;
+      padding: 14px 16px;
+      border: var(--border-thin);
+      background: var(--offwhite);
+      font-size: 18px;
+      line-height: 1.48;
+      font-weight: 600;
+    }
+
+    .tap-card.open .tap-detail {
+      display: block;
+    }
+
+    .tap-card.open .tap-btn {
+      background: var(--white);
+    }
+
+    .tap-btn .tap-open { display: none; }
+    .tap-card.open .tap-btn .tap-closed { display: none; }
+    .tap-card.open .tap-btn .tap-open { display: inline; }
+    .bar-full { border-right: none; }
+
+    /* Inverted Close Frame (Slide 18) */
+    .close-frame {
+      background: var(--black);
+      border: 4px solid var(--white);
+      box-shadow: var(--shadow-close-yellow);
+      padding: 44px 48px;
+      position: relative;
+      color: var(--white);
+    }
+
+    .close-frame .bf-card-sm {
+      border: 3px solid var(--white);
+      box-shadow: var(--shadow-close-white);
+    }
+
+    .close-title {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 54px;
+      line-height: 1.12;
+      color: var(--white);
+      letter-spacing: -0.015em;
+    }
+
+    .close-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      border: 3px solid var(--black);
+      background: var(--yellow);
+      color: var(--black);
+      padding: 14px 28px;
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 18px;
+      text-transform: uppercase;
+      box-shadow: var(--shadow-close-white);
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .close-btn:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 8px 8px 0px var(--white);
+    }
+
+    /* Surface & Fill Palette Utilities (must trail base component styles) */
+    .bg-offwhite { background: var(--offwhite); }
+    .bg-cream    { background: var(--cream); }
+    .bg-blue     { background: var(--blue); }
+    .bg-pink     { background: var(--pink); }
+    .bg-green    { background: var(--green); }
+    .bg-yellow   { background: var(--yellow); }
+    .bg-black    { background: var(--black); color: var(--white); }
+
+    .fill-white    { background: var(--white); }
+    .fill-offwhite { background: var(--offwhite); }
+    .fill-pink     { background: var(--pink); }
+    .fill-blue     { background: var(--blue); }
+    .fill-green    { background: var(--green); }
+    .fill-yellow   { background: var(--yellow); }
+    .fill-cream    { background: var(--cream); }
+
+    /* ===========================================
+       STAGGERED REVEAL ANIMATIONS
+       =========================================== */
+    .reveal {
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity 0.42s var(--ease-snap), transform 0.42s var(--ease-snap);
+    }
+
+    .slide.visible .reveal {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .slide.visible .tilt-neg.reveal { transform: rotate(-2deg); }
+    .slide.visible .tilt-pos.reveal { transform: rotate(2deg); }
+
+    .reveal.d1 { transition-delay: 0.04s; }
+    .reveal.d2 { transition-delay: 0.10s; }
+    .reveal.d3 { transition-delay: 0.16s; }
+    .reveal.d4 { transition-delay: 0.22s; }
+
+    /* ===========================================
+       PERSISTENT CHROME (OUTSIDE SLIDE STAGE)
+       =========================================== */
+    .bf-counter-pill {
+      position: fixed;
+      left: 24px;
+      bottom: 20px;
+      z-index: 1000;
+      border: var(--border-thin);
+      background: var(--white);
+      box-shadow: var(--shadow-small);
+      padding: 10px 18px;
+      font-family: var(--font-label);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--black);
+    }
+
+    .deck-controls {
+      bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .bf-btn {
+      height: 44px;
+      padding: 0 16px;
+      border: var(--border-thin);
+      background: var(--white);
+      box-shadow: var(--shadow-small);
+      font-family: var(--font-label);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--black);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+    }
+
+    .bf-btn:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: var(--shadow-hover);
+      background: var(--yellow);
+    }
+
+    .bf-btn:active {
+      transform: translate(2px, 2px);
+      box-shadow: var(--shadow-press);
+    }
+
+    .bf-btn.is-on {
+      background: var(--yellow);
+    }
+
+    .bf-nav-cluster {
+      position: fixed;
+      right: 24px;
+      bottom: 20px;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-btn {
+      width: 48px;
+      height: 48px;
+      border: var(--border-thin);
+      background: var(--white);
+      box-shadow: var(--shadow-small);
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 20px;
+      color: var(--black);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+    }
+
+    .nav-btn:hover:not(:disabled) {
+      transform: translate(-2px, -2px);
+      box-shadow: var(--shadow-hover);
+      background: var(--yellow);
+    }
+
+    .nav-btn:active:not(:disabled) {
+      transform: translate(2px, 2px);
+      box-shadow: var(--shadow-press);
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    /* Inline Editing Controls (JS-triggered hotzone with 400ms grace period) */
+    .edit-hotzone {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 96px;
+      height: 96px;
+      z-index: 10000;
+      cursor: pointer;
+    }
+
+    .edit-toggle {
+      position: fixed;
+      top: 18px;
+      left: 18px;
+      height: 44px;
+      padding: 0 16px;
+      border: var(--border-thin);
+      background: var(--yellow);
+      box-shadow: var(--shadow-small);
+      font-family: var(--font-label);
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--black);
+      cursor: pointer;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+      z-index: 10001;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .edit-toggle.show,
+    .edit-toggle.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .edit-save-btn {
+      display: none;
+    }
+
+    body.editing .edit-save-btn {
+      display: inline-flex;
+    }
+
+    body.editing [contenteditable="true"] {
+      outline: 2px dashed var(--black);
+      outline-offset: 2px;
+    }
+
+    /* Notes Drawer & Slide Index Modal */
+    .notes-drawer {
+      position: fixed;
+      right: 24px;
+      bottom: 84px;
+      width: 440px;
+      max-width: calc(100vw - 48px);
+      background: var(--white);
+      border: var(--border-primary);
+      box-shadow: var(--shadow-default);
+      padding: 20px 24px;
+      z-index: 1100;
+      display: none;
+    }
+
+    .notes-drawer.open {
+      display: block;
+    }
+
+    .notes-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+      border-bottom: var(--border-thin);
+      font-family: var(--font-label);
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .notes-drawer p {
+      font-size: 15px;
+      line-height: 1.6;
+      font-weight: 500;
+      color: var(--black);
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.72);
+      z-index: 1200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-sheet {
+      width: 100%;
+      max-width: 1060px;
+      max-height: 84vh;
+      overflow-y: auto;
+      background: var(--offwhite);
+      border: var(--border-primary);
+      box-shadow: var(--shadow-close-yellow);
+      padding: 28px;
+    }
+
+    .index-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 20px;
+    }
+
+    .index-item {
+      border: var(--border-thin);
+      background: var(--white);
+      box-shadow: var(--shadow-small);
+      padding: 14px 16px;
+      cursor: pointer;
+      transition: transform 0.12s ease, background 0.12s ease;
+    }
+
+    .index-item:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: var(--shadow-hover);
+      background: var(--blue);
+    }
+
+    .index-item.active {
+      background: var(--yellow);
+    }
+
+    @media (max-width: 760px) {
+      .index-grid {
+        grid-template-columns: 1fr;
+      }
+      .deck-controls {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Inline Editor Hotzone (top-left) -->
+  <div class="edit-hotzone" title="ชี้หรือคลิกเพื่อแก้ไขข้อความบนสไลด์ (E)"></div>
+  <button class="edit-toggle" id="editToggle" type="button">✏️ EDIT MODE (E)</button>
+
+  <!-- Fixed 1920x1080 Viewport Stage -->
+  <div class="deck-viewport">
+    <main class="deck-stage" id="deckStage">
+
+      <!-- =========================================================
+           SLIDE 01: COVER & TODAY'S TOPICS (Cream + Dot Grid + Hero)
+           ========================================================= -->
+      <section class="slide bg-cream has-dots active visible"
+        data-section="00 · TODAY'S TOPICS"
+        data-title="Food, Cosmetics & Environmental Pollution"
+        data-notes="ภาพรวมบทเรียน 3 ส่วนหลัก: 1) นิยามของยา อาหาร เครื่องสำอางตามกฎหมาย อย. ไทย 2) มลพิษในอาหาร (Organophosphate, กรด-ด่าง, อาหารที่ควรเลี่ยง, คาเฟอีน/CYP1A2, การปรุงอาหาร) 3) สารเคมีในเครื่องสำอาง (SLS, Nanoparticles, ยาทาเล็บ)">
+        <div class="deco-stripe" style="width:170px;height:66px;top:40px;right:76px;transform:rotate(4deg);"></div>
+        <div class="star-burst" style="width:94px;height:94px;bottom:108px;left:44px;transform:rotate(-10deg);">
+          <div class="star-burst-inner"></div>
+        </div>
+        <div class="slide-inner">
+          <div class="hero-frame reveal d1">
+            <div class="corner-tl"></div>
+            <div class="corner-br"></div>
+            <div class="hero-tab">TODAY'S TOPICS · 03 MODULES</div>
+            <div class="label-group" style="margin-bottom:20px;">
+              <span class="label-pill fill-pink">00 · CURRICULUM OVERVIEW</span>
+              <span class="label-pill fill-blue">THAI FDA · NUTRITION · COSMETICS</span>
+            </div>
+            <h1 class="hero-title">FOOD, COSMETICS &amp; ENVIRONMENTAL POLLUTION</h1>
+            <p class="slide-lead" style="margin-top:16px;">
+              นิยามตามกฎหมาย อย. ไทย, มลพิษและสมดุลกรด-ด่างในอาหาร และความจริงเรื่องสารเคมีอันตรายในเวชสำอาง
+            </p>
+          </div>
+
+          <div class="grid-3 reveal d2">
+            <div class="bf-card-sm fill-blue">
+              <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px;">
+                <div class="icon-square fill-white">01</div>
+                <h3 style="margin:0;"><span class="en-caps">DEFINITION &amp; CLAIMS</span></h3>
+              </div>
+              <p style="font-size:18.5px;">ความแตกต่างตามกฎหมาย อย. ไทย ระหว่าง <strong>ยา อาหาร เครื่องสำอาง</strong> ข้อบังคับโฆษณา และคำเตือนอาหารเสริม</p>
+            </div>
+            <div class="bf-card-sm fill-green">
+              <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px;">
+                <div class="icon-square fill-white">02</div>
+                <h3 style="margin:0;"><span class="en-caps">FOOD POLLUTION</span></h3>
+              </div>
+              <p style="font-size:18.5px;">พิษเฉียบพลัน <span class="en-caps">OP</span>, สมดุลกรด-ด่าง, นม-น้ำตาล-แอลกอฮอล์, คาเฟอีน &amp; ยีน <span class="en-caps">CYP1A2</span> และ 3 ปีศาจปิ้งย่าง</p>
+            </div>
+            <div class="bf-card-sm fill-pink">
+              <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px;">
+                <div class="icon-square fill-white">03</div>
+                <h3 style="margin:0;"><span class="en-caps">COSMECEUTICALS</span></h3>
+              </div>
+              <p style="font-size:18.5px;">สารชะล้าง <span class="en-caps">SLS</span>, อนุภาคนาโนกันแดด (<span class="en-caps">ZnO/TiO₂</span>) และ 4 สารพิษยาทาเล็บ (<span class="en-caps">TPO</span> ถูก EU แบนปี 2025)</p>
+            </div>
+          </div>
+
+          <div class="bf-card-flat fill-white reveal d3" style="padding:16px 26px;">
+            <p style="font-size:19.5px;"><strong>แนวคิดหลัก:</strong> การดูแลสุขภาพระดับเซลล์เริ่มจากการคัดกรองทั้ง <strong>สิ่งที่นำเข้าสู่ร่างกาย (Ingestion)</strong> และ <strong>สิ่งที่สัมผัสและสูดดม (Topical &amp; Inhalation)</strong></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 02: THAI FDA DEFINITIONS — DRUG & FOOD (Blue)
+           ========================================================= -->
+      <section class="slide bg-blue"
+        data-section="01 · THAI FDA DEFINITIONS"
+        data-title="นิยามตามกฎหมาย (Thai FDA): ยา และ อาหาร"
+        data-notes="เน้นย้ำความแตกต่าง: ยามีวัตถุประสงค์เพื่อบำบัด/รักษา/เปลี่ยนแปลงโครงสร้างร่างกาย ส่วนอาหารคือเครื่องค้ำจุนชีวิตที่ไม่รวมยาและวัตถุออกฤทธิ์ต่อจิตและประสาท">
+        <div class="deco-rect fill-pink" style="width:92px;height:92px;top:44px;right:82px;transform:rotate(11deg);"></div>
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-yellow">01 · THAI FDA REGULATION</span>
+              <span class="label-pill fill-white">DRUG VS FOOD</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">นิยามตามกฎหมาย (<span class="en-caps">THAI FDA</span>): ยา และ อาหาร</h1>
+            <p class="slide-lead" style="margin-top:8px;">เส้นแบ่งทางกฎหมายที่กำหนดขอบเขตการขึ้นทะเบียน การผลิต และความปลอดภัยของผู้บริโภค</p>
+          </div>
+
+          <div class="grid-2 reveal d2">
+            <div class="bf-card">
+              <div class="feature-deco">RX</div>
+              <h3>
+                <span>ยา (<span class="en-caps">DRUG</span>)</span>
+                <span class="mono-tag fill-pink">4 นิยามหลัก</span>
+              </h3>
+              <div class="stack-gap" style="gap:16px;">
+                <div class="list-row">
+                  <div class="list-num">01</div>
+                  <p>วัตถุที่รับรองไว้ใน <strong>ตำรายาที่รัฐมนตรีประกาศ</strong></p>
+                </div>
+                <div class="list-row">
+                  <div class="list-num">02</div>
+                  <p>วัตถุที่มุ่งหมายสำหรับใช้ในการ <strong>วินิจฉัย บำบัด บรรเทา รักษา หรือป้องกันโรค</strong> หรือความเจ็บป่วยของมนุษย์หรือสัตว์</p>
+                </div>
+                <div class="list-row">
+                  <div class="list-num">03</div>
+                  <p>วัตถุที่เป็น <strong>เภสัชเคมีภัณฑ์</strong> หรือเภสัชเคมีภัณฑ์กึ่งสำเร็จรูป</p>
+                </div>
+                <div class="list-row">
+                  <div class="list-num">04</div>
+                  <p>วัตถุที่มุ่งหมายสำหรับให้เกิดผลแก่ <strong>สุขภาพ โครงสร้าง หรือการกระทำหน้าที่ใด ๆ</strong> ของร่างกายมนุษย์หรือสัตว์</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="bf-card">
+              <div class="corner-br"></div>
+              <h3>
+                <span>อาหาร (<span class="en-caps">FOOD</span>)</span>
+                <span class="mono-tag fill-green">ของกิน / ค้ำจุนชีวิต</span>
+              </h3>
+              <div class="stack-gap" style="gap:18px;">
+                <div class="bf-card-sm fill-offwhite">
+                  <p style="margin-bottom:10px;"><strong>1. ของกินหรือเครื่องค้ำจุนชีวิต:</strong> วัตถุทุกชนิดที่คน <strong>กิน ดื่ม อม หรือนำเข้าสู่ร่างกาย</strong> ไม่ว่าด้วยวิธีใด ๆ หรือในรูปลักษณะใด ๆ</p>
+                  <div class="bf-card-flat fill-pink" style="padding:12px 16px;border-width:3px;">
+                    <p style="font-size:18.5px;font-weight:700;">* แต่ไม่รวมถึง: ยา, วัตถุออกฤทธิ์ต่อจิตและประสาท หรือยาเสพติดให้โทษ</p>
+                  </div>
+                </div>
+                <div class="bf-card-sm fill-offwhite">
+                  <p><strong>2. ส่วนผสมในการผลิตอาหาร:</strong> วัตถุที่มุ่งหมายสำหรับใช้ หรือใช้เป็นส่วนผสมในการผลิตอาหาร รวมถึง <strong>วัตถุเจือปนอาหาร สี และเครื่องปรุงแต่งกลิ่นรส</strong></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 03: COSMETICS & ADVERTISING CLAIMS (Offwhite + Dots)
+           ========================================================= -->
+      <section class="slide bg-offwhite has-dots"
+        data-section="01 · THAI FDA DEFINITIONS"
+        data-title="นิยามเครื่องสำอาง และข้อบังคับการกล่าวอ้าง (Claims)"
+        data-notes="จุดสำคัญทางกฎหมาย: หากอาหารหรือเครื่องสำอางมีการกล่าวอ้างสรรพคุณทางยาที่เฉพาะเจาะจง กฎหมายจะถือว่าผลิตภัณฑ์นั้นเป็น 'ยา' ที่ไม่ได้ขึ้นทะเบียนทันที">
+        <div class="star-burst" style="width:88px;height:88px;top:42px;right:80px;transform:rotate(12deg);">
+          <div class="star-burst-inner" style="background:var(--yellow);"></div>
+        </div>
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-pink">01 · THAI FDA REGULATION</span>
+              <span class="label-pill fill-blue">COSMETICS &amp; ADVERTISING CLAIMS</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">นิยามเครื่องสำอาง และข้อบังคับการกล่าวอ้าง (<span class="en-caps">CLAIMS</span>)</h1>
+            <p class="slide-lead" style="margin-top:8px;">เหตุใดผลิตภัณฑ์เสริมอาหารและเครื่องสำอางจึงห้ามโฆษณาสรรพคุณทางยาที่เฉพาะเจาะจง</p>
+          </div>
+
+          <div class="grid-2-wide reveal d2">
+            <div class="bf-card">
+              <div class="corner-tl"></div>
+              <div class="corner-br"></div>
+              <h3 style="padding-left:18px;"><span>เครื่องสำอาง (<span class="en-caps">COSMETICS</span>)</span></h3>
+              <ul>
+                <li>วัตถุที่มุ่งหมายสำหรับใช้ <strong>ทา ถู นวด โรย พ่น หยอด ใส่ อบ</strong> หรือกระทำด้วยวิธีอื่นใด ต่อส่วนหนึ่งส่วนใดของร่างกาย เพื่อ <strong>ความสะอาด ความสวยงาม หรือส่งเสริมให้เกิดความสวยงาม</strong></li>
+                <li>รวมตลอดทั้ง <strong>เครื่องประทินผิวต่าง ๆ ด้วย</strong> <em>(ไม่รวมเครื่องประดับและเครื่องแต่งตัว)</em></li>
+                <li>รวมถึงวัตถุที่มุ่งหมายสำหรับใช้เป็น <strong>ส่วนผสมในการผลิตเครื่องสำอาง</strong> และวัตถุอื่นที่กำหนดโดยกฎกระทรวง</li>
+              </ul>
+            </div>
+
+            <div class="stack-gap">
+              <div class="bf-card fill-blue">
+                <h3><span>ข้อบังคับการกล่าวอ้าง (<span class="en-caps">CLAIMS</span>)</span></h3>
+                <p>หากผลิตภัณฑ์มีการกล่าวอ้างสรรพคุณทางยาที่เฉพาะเจาะจง (เช่น รักษาฝ้าถาวร ลดระดับน้ำตาล) <strong>ผลิตภัณฑ์นั้นจะไม่ถือเป็นอาหารหรือเครื่องสำอางอีกต่อไป</strong> แต่เข้าข่าย <strong>"ยา"</strong> ทันที</p>
+              </div>
+              <div class="bf-card fill-yellow tilt-neg">
+                <div class="stat-deco-dot fill-pink"></div>
+                <h3><span>คำเตือนบังคับ: ผลิตภัณฑ์เสริมอาหาร</span></h3>
+                <p style="margin-bottom:14px;">ต้องแสดงข้อความคำเตือนในสื่อโฆษณาและบนฉลากอย่างชัดเจนว่า:</p>
+                <div class="bf-card-flat fill-white" style="padding:16px 20px;border-width:3px;">
+                  <p style="font-weight:800;font-size:23px;">"ไม่มีผลในการป้องกัน หรือรักษาโรค"</p>
+                  <p style="font-family:var(--font-label);font-size:16px;font-weight:700;margin-top:4px;text-transform:uppercase;">(NO EFFECT TO CURE OR PREVENT DISEASE)</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 04: 2.1 ACUTE TOXIDROME MECHANISM (Cream)
+           ========================================================= -->
+      <section class="slide bg-cream"
+        data-section="02 · FOOD POLLUTION"
+        data-title="2.1 ภาวะเป็นพิษเฉียบพลัน: Formaldehyde & Organophosphate"
+        data-notes="ตัวอย่างที่พบบ่อยในตลาดสดไทย: ฟอร์มาลดีไฮด์ในผักกาดขาวและอาหารทะเล และยาฆ่าแมลง Organophosphate ซึ่งจับกับเอนไซม์ AChE แบบถาวรทำให้ Acetylcholine ล้นซินแนปส์">
+        <div class="deco-stripe" style="width:150px;height:56px;top:44px;right:76px;transform:rotate(-3deg);"></div>
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-yellow">02 · FOOD POLLUTION</span>
+              <span class="label-pill fill-white">2.1 ACUTE TOXIDROME</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">2.1 ภาวะเป็นพิษเฉียบพลัน: <span class="en-caps">FORMALDEHYDE &amp; ORGANOPHOSPHATE</span></h1>
+            <p class="slide-lead" style="margin-top:8px;">การปนเปื้อนสารเคมีในผักสดและกลไกระดับซินแนปส์ของยาฆ่าแมลงกลุ่ม <span class="en-caps">Organophosphate</span></p>
+          </div>
+
+          <div class="grid-2 reveal d2">
+            <div class="bf-card">
+              <h3><span>แหล่งปนเปื้อนเฉียบพลันที่พบได้</span></h3>
+              <ul>
+                <li><strong>ฟอร์มาลดีไฮด์ (<span class="en-caps">Formaldehyde</span>):</strong> การลักลอบแช่เพื่อคงความสดใน <strong>ผักกาดขาว</strong> หรืออาหารทะเลบางชนิด</li>
+                <li><strong>ยาฆ่าแมลงกลุ่ม <span class="en-caps">Organophosphate</span>:</strong> ตกค้างในผักผลไม้ที่เก็บเกี่ยวก่อนครบระยะปลอดภัย</li>
+              </ul>
+              <div class="bf-card-sm fill-green" style="margin-top:22px;">
+                <p style="font-size:19px;"><strong>คำแนะนำเบื้องต้น:</strong> การล้างผักด้วยน้ำไหลผ่านหรือแช่เบกกิ้งโซดาช่วยลดการตกค้างที่ผิวได้ดี แต่หากเกิดพิษเฉียบพลันต้องรักษาด้วยยาต้านพิษจำเพาะ</p>
+              </div>
+            </div>
+
+            <div class="bf-card fill-white">
+              <div class="feature-deco">⚡</div>
+              <h3><span>กลไกพิษของ <span class="en-caps">ORGANOPHOSPHATE</span></span></h3>
+              <p style="margin-bottom:14px;">ยับยั้งเอนไซม์ <strong><span class="en-caps">Acetylcholinesterase (AChE)</span></strong> แบบถาวร (<span class="en-caps">Irreversibly</span>)</p>
+
+              <div class="step-track">
+                <div class="step-card fill-yellow has-connector">
+                  <span class="mono-tag fill-white" style="align-self:flex-start;">STEP 01</span>
+                  <strong style="font-size:20px;margin-top:6px;">OP ยับยั้ง AChE</strong>
+                  <span style="font-size:16.5px;font-weight:500;">เอนไซม์ไม่สลายสารสื่อประสาท</span>
+                </div>
+                <div class="step-card fill-blue has-connector">
+                  <span class="mono-tag fill-white" style="align-self:flex-start;">STEP 02</span>
+                  <strong style="font-size:20px;margin-top:6px;">ACh สะสมสูงเกิน</strong>
+                  <span style="font-size:16.5px;font-weight:500;">ล้นใน Synaptic cleft</span>
+                </div>
+                <div class="step-card fill-pink">
+                  <span class="mono-tag fill-white" style="align-self:flex-start;">STEP 03</span>
+                  <strong style="font-size:20px;margin-top:6px;">Overstimulation</strong>
+                  <span style="font-size:16.5px;font-weight:500;">กระตุ้นตัวรับมากผิดปกติ</span>
+                </div>
+              </div>
+
+              <div class="bf-card-flat fill-cream" style="margin-top:14px;padding:16px 20px;border-width:3px;">
+                <p style="font-size:19px;">ส่งผลกระตุ้นทั้งตัวรับ <strong>Muscarinic (M₁–M₅)</strong> และ <strong>Nicotinic (Nₙ, Nₘ)</strong> พร้อมกันทั่วร่างกาย</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 05: CHOLINERGIC TOXIDROME & ANTIDOTES (Pink)
+           ========================================================= -->
+      <section class="slide bg-pink has-dots"
+        data-section="02 · FOOD POLLUTION"
+        data-title="อาการพิษ Cholinergic Toxidrome และยาต้านพิษ (Antidotes)"
+        data-notes="จำง่ายๆ: Muscarinic เด่นเรื่องสารคัดหลั่ง (SLUDGE) รูม่านตาหดเล็ก หัวใจช้า; ส่วน Nicotinic เด่นเรื่องกล้ามเนื้อกระตุก อ่อนแรง ความดันสูง หัวใจเร็ว; ยาแก้พิษคือ Atropine + 2-PAM (ต้องให้ 2-PAM ก่อนเกิด Organophosphate Aging)">
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-white">02 · ACUTE TOXIDROME</span>
+              <span class="label-pill fill-yellow">SLUDGE · MT_WTF · ANTIDOTES</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">อาการพิษ <span class="en-caps">CHOLINERGIC TOXIDROME</span> และยาต้านพิษ (<span class="en-caps">ANTIDOTES</span>)</h1>
+            <p class="slide-lead" style="margin-top:8px;">แยกกลุ่มอาการ <span class="en-caps">Muscarinic (SLUDGE)</span> และ <span class="en-caps">Nicotinic (MT_WTF)</span> เพื่อกู้ชีพให้ทันก่อนเกิด <span class="en-caps">Aging</span></p>
+          </div>
+
+          <div class="grid-2 reveal d2">
+            <div class="bf-card">
+              <h3>
+                <span><span class="en-caps">MUSCARINIC</span> (M₁–M₅)</span>
+                <span class="mono-tag fill-pink">SLUDGE SYNDROME</span>
+              </h3>
+              <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:18px;">
+                <div class="bf-card-flat fill-cream" style="padding:12px 16px;border-width:3px;"><strong>S</strong> — Salivation (น้ำลายไหล)</div>
+                <div class="bf-card-flat fill-cream" style="padding:12px 16px;border-width:3px;"><strong>L</strong> — Lacrimation (น้ำตาไหล)</div>
+                <div class="bf-card-flat fill-blue" style="padding:12px 16px;border-width:3px;"><strong>U</strong> — Urination (ปัสสาวะราด)</div>
+                <div class="bf-card-flat fill-blue" style="padding:12px 16px;border-width:3px;"><strong>D</strong> — Defecation / Diarrhea</div>
+                <div class="bf-card-flat fill-offwhite" style="padding:12px 16px;border-width:3px;"><strong>G</strong> — GI cramps / upset</div>
+                <div class="bf-card-flat fill-offwhite" style="padding:12px 16px;border-width:3px;"><strong>E</strong> — Emesis (อาเจียน)</div>
+              </div>
+              <div class="bf-card-sm fill-yellow">
+                <p style="font-size:19.5px;"><strong>อาการร่วมสำคัญ:</strong> รูม่านตาหดเล็ก (<strong>Pupil constriction</strong>) และหัวใจเต้นช้า (<strong>↓ Heart rate</strong>)</p>
+              </div>
+            </div>
+
+            <div class="stack-gap">
+              <div class="bf-card fill-white">
+                <h3>
+                  <span><span class="en-caps">NICOTINIC</span> (Nₙ, Nₘ)</span>
+                  <span class="mono-tag fill-blue">MT_WTF</span>
+                </h3>
+                <p style="font-size:19.5px;"><strong>MT_WTF:</strong> Mydriasis (ม่านตาขยาย), Tachycardia (หัวใจเร็ว), Muscle Weakness (กล้ามเนื้ออ่อนแรง), Twitching, Fasciculation (กล้ามเนื้อเต้นพริ้ว), High BP (ความดันสูง) และ Paralysis (อัมพาต)</p>
+              </div>
+              <div class="bf-card fill-green">
+                <div class="corner-br"></div>
+                <h3><span>การรักษาด้วยยาต้านพิษ (<span class="en-caps">ANTIDOTES</span>)</span></h3>
+                <ul>
+                  <li><strong>Atropine:</strong> ยับยั้งที่ตัวรับ Muscarinic receptors (ช่วยลดสารคัดหลั่งในปอดและทางเดินหายใจ)</li>
+                  <li><strong>Pralidoxime (2-PAM):</strong> ป้องกันภาวะ <strong>Organophosphate Aging</strong> (พันธะฟอสเฟตจับแน่นกับ AChE จนแยกไม่ออก) และช่วยฟื้นฟูเอนไซม์ AChE</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 06: 2.2 ACID VS ALKALINE BIOLOGY (Offwhite + Stripe)
+           ========================================================= -->
+      <section class="slide bg-offwhite"
+        data-section="02 · FOOD POLLUTION"
+        data-title="2.2 สมดุลกรด-ด่าง (Acid vs Alkaline): ผลต่อเนื้อเยื่อและร่างกาย"
+        data-notes="ตารางเปรียบเทียบภาวะด่าง vs ภาวะกรดตามเนื้อหาบทเรียน พร้อมระบุจุดวิกฤตเมื่อเลือดมี pH 6.9 และอาการเรื้อรังของภาวะความเป็นกรดในร่างกาย">
+        <div class="deco-stripe" style="width:180px;height:54px;top:40px;right:76px;transform:rotate(3deg);"></div>
+        <div class="slide-inner" style="gap:20px;">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-green">02 · FOOD POLLUTION</span>
+              <span class="label-pill fill-white">2.2 ACID &amp; ALKALINE BIOLOGY</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">2.2 สมดุลกรด-ด่าง (<span class="en-caps">ACID VS ALKALINE</span>): ผลต่อเนื้อเยื่อและร่างกาย</h1>
+            <p class="slide-lead" style="margin-top:6px;">เปรียบเทียบสภาพเนื้อเยื่อ ระดับ pH ต่อเซลล์มะเร็ง ระบบประสาท และผลเสียของภาวะความเป็นกรด</p>
+          </div>
+
+          <div class="bf-table-frame reveal d2">
+            <table class="bf-table">
+              <thead>
+                <tr>
+                  <th style="width:20%;background:var(--cream);">คุณสมบัติ / ผลกระทบ</th>
+                  <th style="width:40%;background:var(--green);">ภาวะด่าง (ALKALINE)</th>
+                  <th style="width:40%;background:var(--pink);">ภาวะกรด (ACID)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>สภาพเนื้อเยื่อ</strong></td>
+                  <td>เนื้อเยื่อที่แข็งแรงมีฤทธิ์เป็นด่าง</td>
+                  <td>เนื้อเยื่อมะเร็งมีฤทธิ์เป็นกรด</td>
+                </tr>
+                <tr>
+                  <td><strong>ผลต่อเซลล์มะเร็ง</strong></td>
+                  <td><span class="code-chip">pH &gt; 7.4</span> เซลล์มะเร็งสงบนิ่ง &nbsp;·&nbsp; <span class="code-chip">pH = 8.5</span> เซลล์มะเร็งตาย</td>
+                  <td>ดึงดูดความเจ็บป่วย โรคเรื้อรัง มะเร็ง และความชรา</td>
+                </tr>
+                <tr>
+                  <td><strong>ระบบประสาท</strong></td>
+                  <td>กระตุ้นการทำงานของระบบประสาท</td>
+                  <td>ยับยั้งการทำงานของระบบประสาท</td>
+                </tr>
+                <tr>
+                  <td><strong>ผลกระทบอื่น ๆ</strong></td>
+                  <td>การอาบน้ำเย็น (<span class="en-caps">Cold showers</span>) ช่วยให้เลือดเป็นด่าง</td>
+                  <td>การอาบน้ำร้อนทำให้เลือดเป็นกรด, เพิ่ม WBC, ลด RBC, ท้องผูก</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="bf-card-sm fill-yellow reveal d3">
+            <p style="font-size:19.5px;"><strong>ผลเสียของภาวะความเป็นกรด (Acidity Causes):</strong> ลดการดูดซึมสารอาหาร, ลดการสร้างพลังงานและการซ่อมแซมเซลล์, ลดการขับโลหะหนัก · ก่อโรคกระดูกพรุน, ข้ออักเสบ, กรดไหลย้อน, ท้องอืด, บวมน้ำ, นอนไม่หลับ, ไมเกรน, อ่อนเพลียเรื้อรัง และหากเลือดมี <span class="code-chip" style="background:var(--white);">pH = 6.9</span> อาจเกิดภาวะโคม่าและเสียชีวิตได้</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 07: ACID VS ALKALINE RATIO & FOOD LIST (Green)
+           ========================================================= -->
+      <section class="slide bg-green has-dots"
+        data-section="02 · FOOD POLLUTION"
+        data-title="สัดส่วนอาหารที่แนะนำ และตัวอย่างอาหารฤทธิ์ด่าง vs กรด"
+        data-notes="ย้ำสัดส่วน 60:40 สำหรับคนทั่วไป และ 80:20 (4:1) สำหรับฟื้นฟูสุขภาพหรือผู้ที่ออกกำลังกายหนัก พร้อมแยกรายการอาหารให้ชัดเจน">
+        <div class="slide-inner" style="gap:22px;">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-white">02 · ACID &amp; ALKALINE RATIO</span>
+              <span class="label-pill fill-yellow">60:40 MAINTAIN · 80:20 RESTORE</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">สัดส่วนอาหารที่แนะนำ และตัวอย่างอาหารฤทธิ์ด่าง <span class="en-caps">VS</span> กรด</h1>
+          </div>
+
+          <div class="grid-2 reveal d2">
+            <div class="bf-card-sm fill-white tilt-neg" style="padding:20px 26px;">
+              <div class="stat-deco-dot fill-green"></div>
+              <div style="display:flex;justify-content:space-between;align-items:flex-end;padding-right:24px;">
+                <div>
+                  <span class="mono-tag fill-blue">MAINTAIN HEALTH</span>
+                  <p style="font-weight:800;font-size:21px;margin-top:6px;">รักษาสุขภาพทั่วไป</p>
+                </div>
+                <div class="stat-number" style="font-size:44px;">60 : 40</div>
+              </div>
+              <div class="bf-bar-track">
+                <div class="bf-bar-fill fill-green" style="width:60%;"></div>
+              </div>
+            </div>
+
+            <div class="bf-card-sm fill-yellow tilt-pos" style="padding:20px 26px;">
+              <div class="stat-deco-dot fill-pink"></div>
+              <div style="display:flex;justify-content:space-between;align-items:flex-end;padding-right:24px;">
+                <div>
+                  <span class="mono-tag fill-white">RESTORE HEALTH (4:1)</span>
+                  <p style="font-weight:800;font-size:21px;margin-top:6px;">ฟื้นฟูสุขภาพ / ออกกำลังกายหนัก</p>
+                </div>
+                <div class="stat-number" style="font-size:44px;">80 : 20</div>
+              </div>
+              <div class="bf-bar-track">
+                <div class="bf-bar-fill fill-pink" style="width:80%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid-2 reveal d3">
+            <div class="bf-card" style="padding:24px 28px;">
+              <h3>
+                <span>อาหารฤทธิ์ด่าง (<span class="en-caps">ALKALINE-FORMING</span>)</span>
+                <span class="mono-tag fill-green">60–80%</span>
+              </h3>
+              <ul style="gap:10px;">
+                <li style="font-size:19px;"><strong>ผักและสาหร่าย:</strong> กระเทียม, หน่อไม้ฝรั่ง, บรอกโคลี, เคล, ผักโขม, สาหร่ายทะเล (Spirulina, Chlorella, Kombu, Nori, Wakame), ต้นอ่อนข้าวสาลี (Wheat grass)</li>
+                <li style="font-size:19px;"><strong>ผลไม้:</strong> แอปเปิล, อะโวคาโด, กล้วย, ตระกูลเบอร์รี, มะนาว (Lemon/Lime), แตงโม, มะเขือเทศ</li>
+                <li style="font-size:19px;"><strong>โปรตีนและอื่น ๆ:</strong> ไข่ลวก (Poached eggs), อกไก่, โยเกิร์ต, อัลมอนด์, เมล็ดแฟลกซ์, เต้าหู้หมัก/เทมเป้, ACV, ชาเขียว, คอมบูชา, น้ำแร่</li>
+              </ul>
+            </div>
+
+            <div class="bf-card" style="padding:24px 28px;">
+              <h3>
+                <span>อาหารฤทธิ์กรด (<span class="en-caps">ACID-FORMING</span>)</span>
+                <span class="mono-tag fill-pink">20–40%</span>
+              </h3>
+              <ul style="gap:10px;">
+                <li style="font-size:19px;"><strong>โปรตีนสัตว์และนม:</strong> เนื้อวัว, เนื้อหมู, ปลา, อาหารทะเล, ชีส, นมวัว, เนย</li>
+                <li style="font-size:19px;"><strong>ธัญพืชและถั่ว:</strong> ข้าวทุกชนิด, ข้าวสาลี, พาสต้า, ขนมปัง, ถั่วลิสง, ถั่วเหลือง, นมถั่วเหลือง</li>
+                <li style="font-size:19px;"><strong>ไขมันและอื่น ๆ:</strong> น้ำมันพืชผ่านกรรมวิธี, มาการีน, ช็อกโกแลต, แอลกอฮอล์, น้ำตาล, สารเคมี/ยาฆ่าแมลง</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 08: 2.3 FOOD TO AVOID (1): MILK & PRESERVED (Blue)
+           ========================================================= -->
+      <section class="slide bg-blue"
+        data-section="02 · FOOD TO AVOID"
+        data-title="2.3 อาหารที่ควรหลีกเลี่ยง (1): ผลิตภัณฑ์จากนม & อาหารหมักดอง"
+        data-notes="เน้นกลไกของนมวัว: ฟอสฟอรัสสูงกว่านมคน 5 เท่า จับ Ca ทำให้ดูดซึมไม่ได้ และกรดอะมิโนทำเลือดเป็นกรดดึง Mg/Ca ออกจากกระดูกทิ้งทางปัสสาวะ">
+        <div class="deco-rect fill-yellow" style="width:110px;height:68px;top:44px;right:82px;transform:rotate(-8deg);"></div>
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-pink">02 · FOOD TO AVOID</span>
+              <span class="label-pill fill-white">PROCESSED LIMIT ≤ 1 DAY / WEEK</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">2.3 อาหารที่ควรหลีกเลี่ยง (1): ผลิตภัณฑ์จากนม &amp; อาหารหมักดอง</h1>
+            <p class="slide-lead" style="margin-top:8px;">คำแนะนำหลัก: อาหารแปรรูปควรรับประทานเฉพาะวันสำคัญ หรือไม่เกิน 1 วัน/สัปดาห์</p>
+          </div>
+
+          <div class="grid-2 reveal d2">
+            <div class="bf-card">
+              <div class="feature-deco">5×</div>
+              <h3><span>1. ผลิตภัณฑ์จากนม (<span class="en-caps">MILK PRODUCTS</span>)</span></h3>
+              <div class="bf-card-flat fill-cream" style="padding:12px 16px;border-width:3px;margin-bottom:16px;">
+                <p style="font-size:19px;"><strong>ควรเลี่ยงมากที่สุด:</strong> ชีส, นมสด, บัตเตอร์มิลก์<br/><span style="font-size:17.5px;">(กลุ่มหมัก เช่น โยเกิร์ต คอตเทจชีส มีปัญหาน้อยกว่า)</span></p>
+              </div>
+              <div class="stack-gap" style="gap:14px;">
+                <div class="list-row">
+                  <div class="list-num">01</div>
+                  <p>ผู้ใหญ่ส่วนใหญ่ <strong>ขาดเอนไซม์ย่อยนม</strong> (Lactase deficiency)</p>
+                </div>
+                <div class="list-row">
+                  <div class="list-num">02</div>
+                  <p>นมวัวมี <strong>ฟอสฟอรัสสูงกว่านมคนถึง 5 เท่า</strong> ซึ่งจะจับตัวกับแคลเซียมทำให้ดูดซึมไม่ได้</p>
+                </div>
+                <div class="list-row">
+                  <div class="list-num">03</div>
+                  <p>กรดอะมิโนในนมทำให้เลือดเป็นกรด ร่างกายต้อง <strong>สูญเสีย Mg และ Ca ทางปัสสาวะ</strong> และตกค้างในทางเดินอาหาร</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="stack-gap">
+              <div class="bf-card">
+                <div class="corner-br"></div>
+                <h3><span>4. อาหารแปรรูป &amp; อาหารหมักดอง (<span class="en-caps">PRESERVED FOOD</span>)</span></h3>
+                <ul>
+                  <li><strong>สารกันบูด (<span class="en-caps">Preservatives</span>):</strong> ทำลายจุลินทรีย์ดีในลำไส้ และกระตุ้นภาวะ <em>Yeast Overgrowth</em></li>
+                  <li><strong>ความไม่สดใหม่:</strong> เพิ่มความเสี่ยงการปนเปื้อนของเชื้อจุลินทรีย์และสารพิษสะสม</li>
+                </ul>
+              </div>
+              <div class="bf-card fill-yellow tilt-pos">
+                <div class="stat-deco-dot fill-pink"></div>
+                <span class="mono-tag fill-white" style="margin-bottom:10px;">WEEKLY RULE</span>
+                <div class="stat-number" style="font-size:48px;">≤ 1 วัน / สัปดาห์</div>
+                <p style="margin-top:8px;font-weight:700;">อาหารแปรรูปทุกชนิดควรจำกัดเฉพาะวันสำคัญ หรือไม่เกิน 1 วัน/สัปดาห์ เพื่อลดภาระการอักเสบของลำไส้และตับ</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 09: 2.3 FOOD TO AVOID (2): SUGAR & YEAST (Yellow + Interactive)
+           ========================================================= -->
+      <section class="slide bg-yellow has-dots"
+        data-section="02 · FOOD TO AVOID"
+        data-title="2.3 อาหารที่ควรหลีกเลี่ยง (2): น้ำตาล ของหวาน และ Yeast Overgrowth"
+        data-notes="น้ำตาลเพิ่ม TG ลด HDL เพิ่มภาวะดื้ออินซูลิน เกิด ROS & AGEs ก่อโรคเสื่อมตามวัย พร้อมอธิบายอาการ Yeast Overgrowth ทั้ง 4 ระบบ">
+        <div class="slide-inner" style="gap:22px;">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-white">02 · FOOD TO AVOID</span>
+              <span class="label-pill fill-pink">YEAST OVERGROWTH · 4 SYSTEMS (CLICK CARDS)</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">2.3 อาหารที่ควรหลีกเลี่ยง (2): น้ำตาล ของหวาน &amp; <span class="en-caps">YEAST OVERGROWTH</span></h1>
+          </div>
+
+          <div class="bf-card fill-white reveal d2" style="padding:20px 28px;">
+            <h3 style="margin-bottom:8px;"><span>2. น้ำตาลและของหวาน (<span class="en-caps">SUGAR &amp; SWEETS</span>)</span> <span class="mono-tag fill-pink">ROS &amp; AGEs</span></h3>
+            <p style="font-size:19.5px;"><strong>เลี่ยง:</strong> อาหารแปรรูป ช็อกโกแลต น้ำอัดลม เค้ก ไอศกรีม · กระตุ้นเชื้อรา/ยีสต์ (<em>Yeast Overgrowth</em>) · สารกันบูดทำลาย <em>Intestinal flora</em> · เพิ่มไตรกลีเซอไรด์ ลด HDL เพิ่มภาวะดื้ออินซูลิน · ก่ออนุมูลอิสระ (<strong>ROS</strong>) และสาร <strong>AGEs</strong> ต้นเหตุเบาหวาน หลอดเลือดหัวใจ สมองเสื่อม ไขมันพอกตับ และมะเร็ง</p>
+          </div>
+
+          <div class="grid-4 reveal d3">
+            <div class="bf-card tap-card fill-white" onclick="if(!document.body.classList.contains('editing'))this.classList.toggle('open')">
+              <div class="feature-deco fill-pink">GI</div>
+              <div>
+                <h3 style="margin-top:8px;"><span>ทางเดินอาหาร</span></h3>
+                <p style="font-size:18.5px;">อาการบ่งชี้สมดุลลำไส้เสียและเชื้อราสะสม</p>
+                <div class="tap-detail">ท้องเสีย, ท้องผูก, ลำไส้แปรปรวน (IBS), ท้องอืด, มีกลิ่นปาก, ลิ้นเป็นฝ้า</div>
+              </div>
+              <span class="tap-btn"><span class="tap-closed">+ คลิกดูรายละเอียด</span><span class="tap-open">− ซ่อนรายละเอียด</span></span>
+            </div>
+
+            <div class="bf-card tap-card fill-blue" onclick="if(!document.body.classList.contains('editing'))this.classList.toggle('open')">
+              <div class="feature-deco fill-yellow">🧠</div>
+              <div>
+                <h3 style="margin-top:8px;"><span>ระบบประสาท</span></h3>
+                <p style="font-size:18.5px;">ผลต่อพลังงานสมอง อารมณ์ และอาการปวดศีรษะ</p>
+                <div class="tap-detail">อ่อนเพลียเรื้อรัง, ซึมเศร้า, ปวดหัว/ไมเกรน, สมองล้า (Brain fog), อารมณ์แปรปรวน</div>
+              </div>
+              <span class="tap-btn"><span class="tap-closed">+ คลิกดูรายละเอียด</span><span class="tap-open">− ซ่อนรายละเอียด</span></span>
+            </div>
+
+            <div class="bf-card tap-card fill-green" onclick="if(!document.body.classList.contains('editing'))this.classList.toggle('open')">
+              <div class="feature-deco fill-pink">🛡️</div>
+              <div>
+                <h3 style="margin-top:8px;"><span>ภูมิคุ้มกัน &amp; ผิวหนัง</span></h3>
+                <p style="font-size:18.5px;">ภาวะอักเสบเรื้อรัง อาการแพ้ และเชื้อราภายนอก</p>
+                <div class="tap-detail">ภูมิแพ้, หอบหืด, โรคแพ้ภูมิตัวเอง, เชื้อราที่ผิวหนัง/เล็บ, สิว, ผื่นแพ้</div>
+              </div>
+              <span class="tap-btn"><span class="tap-closed">+ คลิกดูรายละเอียด</span><span class="tap-open">− ซ่อนรายละเอียด</span></span>
+            </div>
+
+            <div class="bf-card tap-card fill-cream" onclick="if(!document.body.classList.contains('editing'))this.classList.toggle('open')">
+              <div class="feature-deco fill-blue">⚡</div>
+              <div>
+                <h3 style="margin-top:8px;"><span>ผู้หญิงและเด็ก</span></h3>
+                <p style="font-size:18.5px;">ความผิดปกติเฉพาะกลุ่มจากการโตเกินของยีสต์</p>
+                <div class="tap-detail">ช่องคลอดอักเสบซ้ำซาก, ปวดประจำเดือน, สมาธิสั้น (ADHD) ในเด็ก</div>
+              </div>
+              <span class="tap-btn"><span class="tap-closed">+ คลิกดูรายละเอียด</span><span class="tap-open">− ซ่อนรายละเอียด</span></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 10: 2.3 FOOD TO AVOID (3): ALCOHOL 2025 (Offwhite + Dots)
+           ========================================================= -->
+      <section class="slide bg-offwhite has-dots"
+        data-section="02 · FOOD TO AVOID"
+        data-title="2.3 อาหารที่ควรหลีกเลี่ยง (3): แอลกอฮอล์ และแนวทางปี 2025"
+        data-notes="เน้นย้ำแนวทาง 2025: อย่าดื่มไวน์เพื่อเอา Resveratrol ให้กินองุ่นแดง บลูเบอร์รี แครนเบอร์รี ถั่วลิสง โกโก้แทน พร้อมอธิบาย Alcohol Pathway จาก Ethanol เป็น Acetaldehyde ที่ทำลาย DNA">
+        <div class="star-burst" style="width:90px;height:90px;top:38px;right:76px;transform:rotate(-8deg);">
+          <div class="star-burst-inner"></div>
+        </div>
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-pink">02 · FOOD TO AVOID</span>
+              <span class="label-pill fill-yellow">2025 IARC / WHO / NCI: GROUP 1 CARCINOGEN</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">2.3 อาหารที่ควรหลีกเลี่ยง (3): แอลกอฮอล์ และแนวทางปี 2025</h1>
+            <p class="slide-lead" style="margin-top:8px;">เอทานอลคือสารก่อมะเร็ง <span class="en-caps">Group 1</span> และ <strong>ไม่มีระดับการดื่มที่ปลอดภัยต่อสุขภาพ (<span class="en-caps">Zero Safe Level</span>)</strong></p>
+          </div>
+
+          <div class="grid-2 reveal d2">
+            <div class="stack-gap">
+              <div class="bf-card">
+                <h3><span>แนวทางสุขภาพปี 2025 (<span class="en-caps">IARC / WHO / NCI</span>)</span></h3>
+                <ul>
+                  <li>ควรเลี่ยงเบียร์และเหล้าดีกรีสูง (ไวน์คุณภาพดี/แชมเปญมีปัญหาน้อยกว่าเล็กน้อย <strong>แต่ไม่แนะนำ</strong>)</li>
+                  <li><strong>ไม่มีระดับที่ปลอดภัย:</strong> เอทานอลเป็น <strong>สารก่อมะเร็งกลุ่มที่ 1</strong></li>
+                  <li>รับ <strong>Resveratrol</strong> จากอาหารจริงแทน: องุ่นแดง, บลูเบอร์รี, แครนเบอร์รี, ถั่วลิสง, โกโก้</li>
+                </ul>
+              </div>
+
+              <div class="bf-card fill-cream">
+                <h3><span><span class="en-caps">ALCOHOL METABOLIC PATHWAY</span></span></h3>
+                <div class="step-track" style="margin:6px 0 12px 0;">
+                  <div class="step-card fill-white has-connector" style="padding:12px 14px;">
+                    <span class="mono-tag fill-blue">INPUT</span>
+                    <strong style="font-size:21px;margin-top:4px;">Ethanol</strong>
+                  </div>
+                  <div class="step-card fill-pink has-connector" style="padding:12px 14px;">
+                    <span class="mono-tag fill-white">ADH / CYP2E1</span>
+                    <strong style="font-size:20px;margin-top:4px;">Acetaldehyde</strong>
+                    <span style="font-size:15px;font-weight:700;">(สารพิษ/ก่อมะเร็ง)</span>
+                  </div>
+                  <div class="step-card fill-green" style="padding:12px 14px;">
+                    <span class="mono-tag fill-white">ALDH</span>
+                    <strong style="font-size:21px;margin-top:4px;">Acetate</strong>
+                  </div>
+                </div>
+                <p style="font-size:19px;">ก่อให้เกิด <strong>ROS</strong>, <strong>DNA Adducts</strong> (ทำลายสาย DNA), และความผิดปกติของ <strong>DNA Methylation</strong></p>
+              </div>
+            </div>
+
+            <div class="bf-card fill-white">
+              <div class="corner-br"></div>
+              <h3><span>กลไกทำลายฮอร์โมนและอวัยวะ</span></h3>
+              <ul>
+                <li><strong>ฮอร์โมนแปรปรวน:</strong> เพิ่มการเปลี่ยน <em>Androgens → Estrogens</em> ในตับ, ลด <strong>Melatonin (20%)</strong> และ Growth Hormone, ลด Free T₃, T₄ และเพิ่ม Cortisol</li>
+                <li><strong>ความเสี่ยงเฉพาะในเพศชาย:</strong> เพิ่มระดับ <em>Estradiol</em> และเพิ่มความเสี่ยง <strong>มะเร็งต่อมลูกหมาก</strong></li>
+                <li><strong>มะเร็งและอวัยวะเสียหาย:</strong> มะเร็งปากมดลูก (รบกวน Retinoic acid), มะเร็งตับ (HCC), ตับอ่อนอักเสบ, ภาวะลำไส้รั่ว (Gut leakiness) และสมองเสื่อม</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 11: 2.4 CAFFEINE: HORMONES & BAR CHART (Pink)
+           ========================================================= -->
+      <section class="slide bg-pink"
+        data-section="02 · CAFFEINE & WATER"
+        data-title="2.4 คาเฟอีน: ผลกระทบต่อฮอร์โมน และปริมาณในเครื่องดื่ม"
+        data-notes="เปรียบเทียบปริมาณคาเฟอีนตั้งแต่กาแฟดริป 115 mg ไปจนถึงเค้กช็อกโกแลต 25 mg เพื่อให้ผู้เรียนประเมินปริมาณรวมต่อวันได้">
+        <div class="deco-stripe" style="width:150px;height:54px;top:40px;right:76px;"></div>
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-white">02 · CAFFEINE &amp; WATER</span>
+              <span class="label-pill fill-yellow">-35% MELATONIN · ENDOCRINE IMPACT</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">2.4 คาเฟอีน: ผลกระทบต่อฮอร์โมน และปริมาณในเครื่องดื่ม</h1>
+            <p class="slide-lead" style="margin-top:8px;">คาเฟอีนไม่ได้แค่กระตุ้นให้ตื่น แต่ลดเมลาโทนินลง 35% และกระทบสมดุลฮอร์โมนเพศและต่อมลูกหมาก</p>
+          </div>
+
+          <div class="grid-2-chart reveal d2">
+            <div class="bf-card fill-white">
+              <div class="stat-deco-dot fill-pink"></div>
+              <h3><span>ผลต่อระบบฮอร์โมน (<span class="en-caps">HORMONES</span>)</span></h3>
+              <ul>
+                <li>ลดการสร้าง <strong>Melatonin ลง 35%</strong></li>
+                <li>ลดฮอร์โมน <strong>T₃</strong> และ <strong>Growth Hormone</strong></li>
+                <li>เพิ่ม <strong>Cortisol</strong>, Adrenaline (ขณะออกกำลังกาย), ภาวะดื้ออินซูลิน และคอเลสเตอรอลรวม</li>
+                <li><strong>ผลเฉพาะในผู้ชาย:</strong> เพิ่ม Estradiol, เพิ่มความเสี่ยง <strong>ต่อมลูกหมากโต (BPH)</strong> และค่า PSA, ลด Bioavailable Testosterone</li>
+              </ul>
+            </div>
+
+            <div class="bf-card fill-white">
+              <h3><span>ปริมาณคาเฟอีนในอาหารและเครื่องดื่ม (<span class="en-caps">MG</span>)</span></h3>
+              <div class="chart-row">
+                <div class="chart-label">กาแฟดริป (150 ml)</div>
+                <div class="chart-track"><div class="chart-bar bar-full fill-pink" style="width:100%;"></div></div>
+                <div class="chart-val">115 mg</div>
+              </div>
+              <div class="chart-row">
+                <div class="chart-label">เอสเพรสโซ (60 ml)</div>
+                <div class="chart-track"><div class="chart-bar fill-pink" style="width:87%;"></div></div>
+                <div class="chart-val">100 mg</div>
+              </div>
+              <div class="chart-row">
+                <div class="chart-label">กาแฟสำเร็จรูป (150 ml)</div>
+                <div class="chart-track"><div class="chart-bar fill-yellow" style="width:52%;"></div></div>
+                <div class="chart-val">60 mg</div>
+              </div>
+              <div class="chart-row">
+                <div class="chart-label">ชาดำ (150 ml)</div>
+                <div class="chart-track"><div class="chart-bar fill-yellow" style="width:43%;"></div></div>
+                <div class="chart-val">50 mg</div>
+              </div>
+              <div class="chart-row">
+                <div class="chart-label">โคคา-โคลา (360 ml)</div>
+                <div class="chart-track"><div class="chart-bar fill-blue" style="width:40%;"></div></div>
+                <div class="chart-val">46 mg</div>
+              </div>
+              <div class="chart-row">
+                <div class="chart-label">เป๊ปซี่ (360 ml)</div>
+                <div class="chart-track"><div class="chart-bar fill-blue" style="width:33%;"></div></div>
+                <div class="chart-val">38 mg</div>
+              </div>
+              <div class="chart-row">
+                <div class="chart-label">ชาเขียว (150 ml)</div>
+                <div class="chart-track"><div class="chart-bar fill-green" style="width:26%;"></div></div>
+                <div class="chart-val">30 mg</div>
+              </div>
+              <div class="chart-row">
+                <div class="chart-label">เค้กช็อกโกแลต</div>
+                <div class="chart-track"><div class="chart-bar fill-cream" style="width:22%;"></div></div>
+                <div class="chart-val">25 mg</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 12: PRECISION MEDICINE CYP1A2 & WATER (Cream)
+           ========================================================= -->
+      <section class="slide bg-cream has-dots"
+        data-section="02 · CAFFEINE & WATER"
+        data-title="เวชศาสตร์แม่นยำ: ยีน CYP1A2 (rs762551) และความสำคัญของน้ำ"
+        data-notes="ยีน CYP1A2 สลายคาเฟอีน Aflatoxin B1 พาราเซตามอล เมลาโทนิน และเอสโตรเจน ส่วนน้ำแนะนำ 2.2 ลิตร (หญิง) / 2.9 ลิตร (ชาย)">
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-blue">02 · PRECISION MEDICINE</span>
+              <span class="label-pill fill-white">CYP1A2 (RS762551) &amp; HYDRATION</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">เวชศาสตร์แม่นยำ: ยีน <span class="en-caps">CYP1A2 (RS762551)</span> และความสำคัญของน้ำ</h1>
+            <p class="slide-lead" style="margin-top:8px;">ทำไมคนหนึ่งดื่มกาแฟแล้วหลับสบาย แต่อีกคนใจสั่น — พร้อมเป้าหมายปริมาณน้ำที่ร่างกายต้องการต่อวัน</p>
+          </div>
+
+          <div class="grid-2 reveal d2">
+            <div class="bf-card fill-white">
+              <h3><span>ยีน <span class="en-caps">CYP1A2 (RS762551)</span></span> <span class="mono-tag fill-blue">PHARMACOGENOMICS</span></h3>
+              <p style="font-size:18.5px;margin-bottom:14px;"><strong>สารตั้งต้นที่ย่อยสลาย:</strong> คาเฟอีน, Aflatoxin B1, พาราเซตามอล, เมลาโทนิน, เมตาบอไลต์เอสโตรเจน</p>
+              <div class="stack-gap" style="gap:10px;margin-bottom:16px;">
+                <div class="bf-card-flat fill-green" style="padding:10px 16px;border-width:3px;"><span class="mono-tag fill-white">AA</span> &nbsp;<strong>เผาผลาญเร็วมาก</strong> (Fast metabolizer)</div>
+                <div class="bf-card-flat fill-yellow" style="padding:10px 16px;border-width:3px;"><span class="mono-tag fill-white">AC</span> &nbsp;<strong>เผาผลาญปานกลาง</strong> (Intermediate)</div>
+                <div class="bf-card-flat fill-pink" style="padding:10px 16px;border-width:3px;"><span class="mono-tag fill-white">CC</span> &nbsp;<strong>เผาผลาญช้า</strong> (Slow — เสี่ยงผลกระทบจากคาเฟอีนสูง)</div>
+              </div>
+              <ul style="gap:8px;">
+                <li style="font-size:18.5px;"><strong>Inhibitors (ตัวยับยั้ง):</strong> ขมิ้นชัน (Curcumin), คาโมมายล์, แดนดิไลออน, เปปเปอร์มินต์, ยา Ciprofloxacin, Cimetidine</li>
+                <li style="font-size:18.5px;"><strong>Inducers (ตัวกระตุ้น):</strong> ควันบุหรี่, สาร PAHs, ผักตระกูลกะหล่ำ (บรอกโคลี, กะหล่ำปลี, เคล)</li>
+              </ul>
+            </div>
+
+            <div class="bf-card fill-white">
+              <h3><span>ความสำคัญของน้ำ (<span class="en-caps">WATER INTAKE</span>)</span></h3>
+              <div class="grid-2" style="gap:18px;margin-bottom:20px;">
+                <div class="bf-card-sm fill-pink tilt-neg" style="text-align:center;">
+                  <div class="stat-deco-dot fill-white"></div>
+                  <div style="font-family:var(--font-label);font-weight:700;font-size:14px;">ผู้หญิงอย่างน้อย</div>
+                  <div class="stat-number" style="font-size:48px;margin-top:6px;">2.2 L</div>
+                  <div style="font-weight:700;font-size:17px;margin-top:4px;">ลิตร / วัน</div>
+                </div>
+                <div class="bf-card-sm fill-blue tilt-pos" style="text-align:center;">
+                  <div class="stat-deco-dot fill-yellow"></div>
+                  <div style="font-family:var(--font-label);font-weight:700;font-size:14px;">ผู้ชายอย่างน้อย</div>
+                  <div class="stat-number" style="font-size:48px;margin-top:6px;">2.9 L</div>
+                  <div style="font-weight:700;font-size:17px;margin-top:4px;">ลิตร / วัน</div>
+                </div>
+              </div>
+              <ul>
+                <li><strong>ภาวะขาดน้ำเพียง 2% ของน้ำหนักตัว:</strong> ทำให้สมรรถภาพการทำงานของร่างกายลดลงทันที</li>
+                <li><strong>ขาดน้ำเรื้อรัง (<span class="en-caps">Chronic Dehydration</span>):</strong> เพิ่มความเสี่ยงนิ่วในทางเดินปัสสาวะ, มะเร็ง (เต้านม, ลำไส้ใหญ่, ทางเดินปัสสาวะ) และโรคอ้วนในเด็ก</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 13: 2.5 COOKING METHODS & 3 DEVILS (Offwhite)
+           ========================================================= -->
+      <section class="slide bg-offwhite"
+        data-section="02 · COOKING CARCINOGENS"
+        data-title="2.5 อุณหภูมิการปรุงอาหาร และ “3 ปีศาจ” ในอาหารรมควัน-ปิ้งย่าง"
+        data-notes="แยกให้ชัดระหว่างวิธีปรุงปลอดภัย (สด, นึ่ง, ต้ม, หม้ออัดแรงดัน, ตุ๋นไฟอ่อน) กับวิธีเสี่ยง และระบุกลไกเกิด PAHs, HCAs, NOCs">
+        <div class="deco-rect fill-pink" style="width:94px;height:64px;top:38px;right:78px;transform:rotate(6deg);"></div>
+        <div class="slide-inner" style="gap:20px;">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-yellow">02 · COOKING CARCINOGENS</span>
+              <span class="label-pill fill-pink">70–100°C SAFE · 170–1200°C TOXIC</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">2.5 อุณหภูมิการปรุงอาหาร และ “3 ปีศาจ” ในอาหารรมควัน-ปิ้งย่าง</h1>
+            <p class="slide-lead" style="margin-top:6px;">อุณหภูมิสูงเกิน 170–1200°C ก่อสารทำลายสาย DNA โดยตรงและเร่งการอักเสบเรื้อรังในลำไส้</p>
+          </div>
+
+          <div class="grid-2 reveal d2">
+            <div class="bf-card-sm fill-green">
+              <h3 style="margin-bottom:8px;"><span>✅ อุณหภูมิปลอดภัย (แนะนำ)</span></h3>
+              <p style="font-size:19.5px;">ทานสด · นึ่ง (70–90°C) · ต้ม (100°C) · หม้ออัดแรงดัน · ตุ๋นไฟอ่อนโดยไม่ใช้น้ำมัน/เนย</p>
+            </div>
+            <div class="bf-card-sm fill-pink">
+              <h3 style="margin-bottom:8px;"><span>⚠️ อุณหภูมิเสี่ยงสารพิษ (ควรเลี่ยง)</span></h3>
+              <p style="font-size:19.5px;">ผัดไฟแรง (170°C) · ย่าง/ทอด (250°C น้ำมันออกซิไดซ์) · ปิ้งย่าง/รมควัน (500–1200°C ก่อสารก่อมะเร็งสูง)</p>
+            </div>
+          </div>
+
+          <div class="grid-3 reveal d3">
+            <div class="bf-card fill-white">
+              <div class="feature-deco">01</div>
+              <span class="mono-tag fill-yellow" style="margin-bottom:10px;">DEVIL 01</span>
+              <h3><span class="en-caps">PAHs</span></h3>
+              <p style="font-family:var(--font-label);font-size:16px;font-weight:700;margin-bottom:8px;">Polycyclic Aromatic Hydrocarbons</p>
+              <p style="font-size:19px;">เกิดจากไขมันและน้ำจากเนื้อสัตว์หยดลงบนถ่านร้อน เกิดเป็นควันลอยขึ้นมาเกาะที่ผิวเนื้อสัตว์</p>
+            </div>
+            <div class="bf-card fill-white">
+              <div class="feature-deco fill-blue">02</div>
+              <span class="mono-tag fill-yellow" style="margin-bottom:10px;">DEVIL 02</span>
+              <h3><span class="en-caps">HCAs</span></h3>
+              <p style="font-family:var(--font-label);font-size:16px;font-weight:700;margin-bottom:8px;">Heterocyclic Amines</p>
+              <p style="font-size:19px;">เกิดจากกรดอะมิโนและน้ำตาลในเนื้อสัตว์ทำปฏิกิริยากันภายใต้อุณหภูมิสูง</p>
+            </div>
+            <div class="bf-card fill-white">
+              <div class="feature-deco fill-pink">03</div>
+              <span class="mono-tag fill-yellow" style="margin-bottom:10px;">DEVIL 03</span>
+              <h3><span class="en-caps">NOCs</span></h3>
+              <p style="font-family:var(--font-label);font-size:16px;font-weight:700;margin-bottom:8px;">N-Nitroso Compounds</p>
+              <p style="font-size:19px;">เกิดจากสารไนไตรต์ในกระบวนการหมัก/ถนอมอาหารทำปฏิกิริยากับโปรตีนในเนื้อสัตว์หรือในทางเดินอาหาร</p>
+            </div>
+          </div>
+
+          <div class="bf-card-flat fill-cream reveal d4" style="padding:14px 24px;">
+            <p style="font-size:19.5px;"><strong>ผลกระทบทางคลินิก:</strong> สารทั้ง 3 กลุ่ม <strong>ทำลายสาย DNA โดยตรง</strong> เพิ่มความเสี่ยงการอักเสบเรื้อรังในลำไส้ มะเร็งกระเพาะอาหาร และมะเร็งลำไส้ใหญ่</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 14: 3.1 SURFACTANTS SLS (Blue)
+           ========================================================= -->
+      <section class="slide bg-blue has-dots"
+        data-section="03 · COSMETICS POLLUTION"
+        data-title="3.1 สารลดแรงตึงผิว: Sodium Lauryl Sulfate (SLS)"
+        data-notes="เน้นข้อเท็จจริงทางการแพทย์: SLS ไม่ได้ก่อมะเร็งตามข่าวลือ แต่เป็น Irritant ที่ระดับ ≥ 2% ทำให้เกิดสิวอุดตันหรือผมร่วง ปลอดภัยในผลิตภัณฑ์ล้างออก (Rinse-off) ส่วน Leave-on ไม่ควรเกิน 1%">
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-white">03 · COSMETICS POLLUTION</span>
+              <span class="label-pill fill-green">3.1 SURFACTANTS · SLS EVIDENCE</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">3.1 สารลดแรงตึงผิว: <span class="en-caps">SODIUM LAURYL SULFATE (SLS)</span></h1>
+            <p class="slide-lead" style="margin-top:8px;">แยกแยะข่าวลือเรื่องมะเร็ง ออกจากข้อเท็จจริงทางการแพทย์เรื่องการระคายเคืองและขีดจำกัดความเข้มข้น</p>
+          </div>
+
+          <div class="grid-2 reveal d2">
+            <div class="bf-card fill-white">
+              <div class="corner-tl"></div>
+              <div class="corner-br"></div>
+              <h3 style="padding-left:18px;"><span>บทบาทและข้อเท็จจริงทางการแพทย์</span></h3>
+              <p style="margin-bottom:16px;">สารชะล้างที่นิยมในสบู่เหลวและแชมพู ช่วยขจัดความมันและสิ่งสกปรก</p>
+              <ul>
+                <li><strong>ไม่ก่อมะเร็งตามข่าวลือ:</strong> ไม่มีหลักฐานว่าเป็นสารก่อมะเร็ง</li>
+                <li><strong>ฤทธิ์ระคายเคือง (<span class="en-caps">Irritant</span>):</strong> ก่อให้เกิดการระคายเคืองต่อผิวหนังและดวงตา</li>
+                <li>ที่ความเข้มข้น <span class="code-chip">≥ 2%</span> อาจทำให้เกิด <strong>สิวอุดตัน (<span class="en-caps">Comedone</span>)</strong> หรือ <strong>ผมร่วง</strong> ได้</li>
+              </ul>
+            </div>
+
+            <div class="stack-gap">
+              <div class="bf-card fill-green tilt-neg">
+                <div class="stat-deco-dot fill-white"></div>
+                <span class="mono-tag fill-white" style="margin-bottom:10px;">RINSE-OFF PRODUCTS</span>
+                <h3><span>ผลิตภัณฑ์ที่ใช้แล้วล้างออกทันที</span></h3>
+                <p>เช่น สบู่เหลว แชมพู โฟมล้างหน้า — <strong>ปลอดภัย</strong> หากล้างออกสะอาดและไม่เกิดอาการแพ้</p>
+              </div>
+              <div class="bf-card fill-yellow tilt-pos">
+                <div class="stat-deco-dot fill-pink"></div>
+                <span class="mono-tag fill-white" style="margin-bottom:10px;">LEAVE-ON LIMIT</span>
+                <div style="display:flex;align-items:baseline;gap:14px;margin-bottom:8px;">
+                  <div class="stat-number" style="font-size:48px;">≤ 1%</div>
+                  <h3 style="margin:0;"><span>ผลิตภัณฑ์ที่ทาทิ้งไว้บนผิว</span></h3>
+                </div>
+                <p>ควรมีความเข้มข้นของ SLS <strong>ไม่เกิน 1%</strong> เพื่อป้องกันการระคายเคืองสะสมและสิวอุดตัน</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 15: 3.2 NANOMATERIALS IN SUNSCREEN (Green)
+           ========================================================= -->
+      <section class="slide bg-green"
+        data-section="03 · COSMETICS POLLUTION"
+        data-title="3.2 อนุภาคนาโนในเครื่องสำอาง (Nanomaterials in Sunscreen)"
+        data-notes="อนุภาคนาโน 10-200 nm ในครีมกันแดดสามารถซึมผ่านผิวหนังที่ปกติเข้าสู่กระแสเลือดได้ พบความเสี่ยง Neurotoxicity, Cytotoxicity และทำลายเซลล์สืบพันธุ์เพศชาย">
+        <div class="star-burst" style="width:86px;height:86px;top:40px;right:78px;transform:rotate(14deg);">
+          <div class="star-burst-inner" style="background:var(--blue);"></div>
+        </div>
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-white">03 · COSMETICS POLLUTION</span>
+              <span class="label-pill fill-pink">3.2 NANOMATERIALS (10–200 NM)</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">3.2 อนุภาคนาโนในเครื่องสำอาง (<span class="en-caps">NANOMATERIALS IN SUNSCREEN</span>)</h1>
+            <p class="slide-lead" style="margin-top:8px;">เมื่ออนุภาค <span class="en-caps">Zinc Oxide (ZnO)</span> และ <span class="en-caps">Titanium Dioxide (TiO₂)</span> มีขนาดเล็กเพียง 10–200 nm</p>
+          </div>
+
+          <div class="grid-2 reveal d2">
+            <div class="bf-card fill-white">
+              <h3><span>แหล่งที่มาและการซึมผ่าน</span> <span class="mono-tag fill-yellow">SUNSCREEN</span></h3>
+              <p style="margin-bottom:20px;">พบในรูปแบบอนุภาคนาโนของ <strong>Zinc Oxide (ZnO)</strong> และ <strong>Titanium Dioxide (TiO₂)</strong> ขนาด <span class="code-chip">10–200 nm</span> ในครีมกันแดด</p>
+              <div class="step-track">
+                <div class="step-card fill-yellow has-connector">
+                  <span class="mono-tag fill-white" style="align-self:flex-start;">SIZE</span>
+                  <strong style="font-size:20px;margin-top:6px;">10–200 nm</strong>
+                </div>
+                <div class="step-card fill-blue has-connector">
+                  <span class="mono-tag fill-white" style="align-self:flex-start;">PENETRATION</span>
+                  <strong style="font-size:19px;margin-top:6px;">ซึมผ่านผิวหนังปกติ</strong>
+                </div>
+                <div class="step-card fill-pink">
+                  <span class="mono-tag fill-white" style="align-self:flex-start;">SYSTEMIC</span>
+                  <strong style="font-size:19px;margin-top:6px;">เข้าสู่กระแสเลือด</strong>
+                </div>
+              </div>
+              <div class="bf-card-flat fill-offwhite" style="margin-top:20px;padding:14px 18px;border-width:3px;">
+                <p style="font-size:18.5px;"><strong>ข้อควรระวัง:</strong> แม้ผิวหนังชั้นนอกจะสมบูรณ์ อนุภาคขนาดนาโนสามารถแทรกซึมและแพร่กระจายทั่วร่างกายได้</p>
+              </div>
+            </div>
+
+            <div class="bf-card fill-white">
+              <div class="feature-deco fill-pink">🔬</div>
+              <h3><span>ความเสี่ยงที่พบในงานวิจัย</span></h3>
+              <ul style="margin-bottom:20px;">
+                <li><strong><span class="en-caps">Neurotoxicity</span>:</strong> ความเป็นพิษต่อเซลล์ประสาท</li>
+                <li><strong><span class="en-caps">Cytotoxicity</span>:</strong> ความเป็นพิษและการอักเสบระดับเซลล์</li>
+                <li><strong>ผลต่อระบบสืบพันธุ์เพศชาย:</strong> ทำลายเซลล์ <em>Sertoli cells</em> และ <em>Spermatogenic cells</em></li>
+              </ul>
+              <div class="bf-card-sm fill-cream">
+                <p style="font-size:19px;"><strong>คำแนะนำ:</strong> เลือกครีมกันแดดแบบ <strong>Non-nano</strong> (ขนาดอนุภาคใหญ่กว่า 100 nm และไม่เคลือบสารซึมลงชั้นผิว) เพื่อสะท้อนรังสี UV บนผิวชั้นนอกเท่านั้น</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 16: 3.3 NAIL POLISH (1): TOLUENE & DBP (Yellow)
+           ========================================================= -->
+      <section class="slide bg-yellow has-dots"
+        data-section="03 · COSMETICS POLLUTION"
+        data-title="3.3 สารเคมีอันตรายในยาทาเล็บ (1): Toluene & DBP"
+        data-notes="เจาะลึก Toluene (เป้าหมายคือ CNS: ระยะสั้นเวียนหัว/ชัก ระยะยาวทำลายสมองถาวร) และ DBP (Endocrine disruptor ที่ทำลายทั้งอวัยวะเพศชายและคุณภาพไข่หญิง)">
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-white">03 · COSMETICS POLLUTION</span>
+              <span class="label-pill fill-pink">3.3 NAIL POLISH TOXINS (1/2)</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">3.3 สารเคมีอันตรายในยาทาเล็บ (1): <span class="en-caps">TOLUENE &amp; DBP</span></h1>
+            <p class="slide-lead" style="margin-top:8px;">การได้รับสารพิษทั้งจากการสัมผัสทางผิวหนังและการสูดดมไอระเหยในร้านทำเล็บ</p>
+          </div>
+
+          <div class="grid-2 reveal d2">
+            <div class="bf-card fill-white">
+              <div class="stat-deco-dot fill-pink"></div>
+              <h3>
+                <span><span class="en-caps">TOLUENE</span> (โทลูอีน)</span>
+                <span class="mono-tag fill-pink">TARGET: CNS</span>
+              </h3>
+              <p style="margin-bottom:14px;">ตัวทำละลายระเหยง่าย ทำลาย <strong>ระบบประสาทส่วนกลาง (CNS)</strong></p>
+              <ul>
+                <li><strong>ระยะสั้น:</strong> ปวดหัว เวียนหัว คลื่นไส้ สับสน คล้ายคนเมา หากสูดดมปริมาณมากอาจเกิดอาการ <strong>ชัก หมดสติ หรือหัวใจเต้นผิดจังหวะเฉียบพลัน</strong></li>
+                <li><strong>ระยะยาว:</strong> <strong>สมองถูกทำลายถาวร</strong> ความจำเสื่อม สูญเสียการได้ยินและการมองเห็นสี รวมถึงรบกวนภูมิคุ้มกันและฮอร์โมนต่อมใต้สมอง</li>
+              </ul>
+            </div>
+
+            <div class="bf-card fill-white">
+              <div class="stat-deco-dot fill-blue"></div>
+              <h3>
+                <span><span class="en-caps">DIBUTYL PHTHALATE (DBP)</span></span>
+                <span class="mono-tag fill-blue">ENDOCRINE DISRUPTOR</span>
+              </h3>
+              <p style="margin-bottom:14px;">เข้าสู่ร่างกายได้ทั้งทาง <strong>ผิวหนัง การกิน และการสูดดม</strong></p>
+              <ul>
+                <li><strong>ระบบสืบพันธุ์:</strong> เพิ่มความเสี่ยงมะเร็งอัณฑะ ขัดขวางการพัฒนาอวัยวะเพศชาย และ <strong>ลดคุณภาพของไข่ในผู้หญิง</strong></li>
+                <li><strong>ระบบอื่น ๆ:</strong> สมาธิสั้น (ADHD), ภาวะซึมเศร้า, ไทรอยด์ต่ำ, หอบหืด และโรคอ้วน</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 17: 3.3 NAIL POLISH (2): FORMALDEHYDE & TPO (Pink)
+           ========================================================= -->
+      <section class="slide bg-pink"
+        data-section="03 · COSMETICS POLLUTION"
+        data-title="3.3 สารเคมีอันตรายในยาทาเล็บ (2): Formaldehyde & TPO"
+        data-notes="Formaldehyde ที่ระดับ 2-6 ppm เพิ่มเสี่ยงมะเร็งโพรงจมูกและลูคีเมีย ส่วน TPO (Trimethylbenzoyl Diphenylphosphine Oxide) ในยาทาเล็บเจลถูก EU แบนเมื่อ 1 ก.ย. 2025">
+        <div class="deco-stripe" style="width:170px;height:54px;top:40px;right:76px;transform:rotate(-3deg);"></div>
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-white">03 · COSMETICS POLLUTION</span>
+              <span class="label-pill fill-yellow">3.3 NAIL POLISH TOXINS (2/2) · EU BAN 2025</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">3.3 สารเคมีอันตรายในยาทาเล็บ (2): <span class="en-caps">FORMALDEHYDE &amp; TPO</span></h1>
+            <p class="slide-lead" style="margin-top:8px;">สารก่อมะเร็งจากไอระเหย และสาร <span class="en-caps">TPO</span> ในยาทาเล็บเจลที่สหภาพยุโรปประกาศแบน 1 กันยายน 2025</p>
+          </div>
+
+          <div class="grid-2 reveal d2">
+            <div class="bf-card fill-white">
+              <div class="corner-br"></div>
+              <h3>
+                <span><span class="en-caps">FORMALDEHYDE</span></span>
+                <span class="mono-tag fill-blue">VOC · VOLATILE ORGANIC</span>
+              </h3>
+              <p style="margin-bottom:16px;">สารอินทรีย์ระเหยง่าย มีกลิ่นฉุนรุนแรง</p>
+              <ul>
+                <li><strong>ผลเฉียบพลัน:</strong> ระคายเคืองตา จมูก และทางเดินหายใจ</li>
+                <li><strong>สัมผัสระดับ <span class="code-chip">2–6 ppm</span>:</strong> เพิ่มความเสี่ยง <strong>มะเร็งโพรงจมูก (<span class="en-caps">Nasopharyngeal CA</span>)</strong> และ <strong>มะเร็งเม็ดเลือดขาวชนิดไมอีลอยด์ (<span class="en-caps">Myeloid leukemia</span>)</strong></li>
+              </ul>
+            </div>
+
+            <div class="bf-card fill-white">
+              <div class="hero-tab" style="top:-22px;right:24px;transform:rotate(-2deg);">EU BAN · 1 SEP 2025</div>
+              <h3 style="margin-bottom:6px;"><span><span class="en-caps">TPO</span> (ยาทาเล็บเจล)</span></h3>
+              <p style="font-family:var(--font-label);font-size:16px;font-weight:700;margin-bottom:14px;">Trimethylbenzoyl Diphenylphosphine Oxide</p>
+              <ul style="margin-bottom:18px;">
+                <li>พบได้บ่อยใน <strong>ยาทาเล็บเจล</strong> (ใช้เป็นตัวเร่งการแข็งตัวใต้แสง UV)</li>
+                <li><strong>ผลกระทบ:</strong> ก่อการระคายเคือง รบกวนระบบสืบพันธุ์ และเพิ่มความเสี่ยงการเกิดเนื้องอก/มะเร็ง (<strong>Neoplasia</strong>) หากสัมผัสเรื้อรัง</li>
+              </ul>
+              <div class="bf-card-sm fill-yellow">
+                <p style="font-size:19px;"><strong>มาตรการกำกับดูแล:</strong> สหภาพยุโรป (EU) ประกาศ <strong>แบนสาร TPO ตั้งแต่วันที่ 1 กันยายน 2025</strong> เนื่องจากจัดเป็นสารที่เป็นพิษต่อระบบสืบพันธุ์</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 18: SUMMARY / INVERTED BLACK CLOSE FRAME
+           ========================================================= -->
+      <section class="slide bg-black"
+        data-section="SUMMARY"
+        data-title="บทสรุป: แนวทางเลือกกิน เลือกใช้ อย่างรู้เท่าทัน"
+        data-notes="บทสรุปทิ้งท้ายสำหรับผู้เรียน 3 ข้อ: 1) อ่านฉลากและรู้ทันคำโฆษณาเกินจริง 2) ทานอาหารฤทธิ์ด่าง 60-80% ปรุงด้วยความร้อนต่ำ ดื่มน้ำให้พอ และเลี่ยง 4 กลุ่มอาหารเสี่ยง 3) เช็กฉลากเครื่องสำอาง หลีกเลี่ยง Non-safe Nail Polish และ Nano-sunscreen">
+        <div class="star-burst" style="width:110px;height:110px;top:42px;right:78px;background:var(--white);transform:rotate(10deg);">
+          <div class="star-burst-inner" style="background:var(--pink);"></div>
+        </div>
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-yellow">SUMMARY · ACTION CHECKLIST</span>
+              <span class="label-pill fill-pink">03 CORE TAKEAWAYS</span>
+            </div>
+          </div>
+
+          <div class="close-frame reveal d2">
+            <h1 class="close-title">บทสรุป: แนวทางเลือกกิน เลือกใช้ อย่างรู้เท่าทัน</h1>
+            <p style="font-family:var(--font-label);font-size:21px;color:var(--cream);margin:12px 0 28px 0;">
+              สรุปหลักปฏิบัติที่จับต้องได้จากทั้ง 3 บทเรียน (กฎหมาย อย. · มลพิษอาหาร · เวชสำอาง)
+            </p>
+
+            <div class="grid-3">
+              <div class="bf-card-sm fill-blue" style="color:var(--black);">
+                <span class="mono-tag fill-white" style="margin-bottom:10px;">01 · LAW &amp; LABELS</span>
+                <h3><span>ฉลาดอ่านฉลาก</span></h3>
+                <p style="font-size:19px;">แยกแยะนิยาม <strong>ยา vs อาหาร vs เครื่องสำอาง</strong> ให้ขาด อาหารเสริมต้องมีคำเตือน <em>"ไม่มีผลในการป้องกัน หรือรักษาโรค"</em> เสมอ</p>
+              </div>
+              <div class="bf-card-sm fill-green" style="color:var(--black);">
+                <span class="mono-tag fill-white" style="margin-bottom:10px;">02 · FOOD &amp; WATER</span>
+                <h3><span>เลือกกิน &amp; ปรุงสะอาด</span></h3>
+                <p style="font-size:19px;">รักษาสัดส่วนอาหาร <strong>ด่าง 60–80%</strong> ลดน้ำตาล นมวัว แอลกอฮอล์ และปิ้งย่างรมควัน (PAHs/HCAs/NOCs) ดื่มน้ำ 2.2–2.9 ลิตร/วัน</p>
+              </div>
+              <div class="bf-card-sm fill-cream" style="color:var(--black);">
+                <span class="mono-tag fill-white" style="margin-bottom:10px;">03 · COSMECEUTICALS</span>
+                <h3><span>คัดกรองสารพิษเครื่องสำอาง</span></h3>
+                <p style="font-size:19px;">ใช้ SLS เฉพาะแบบล้างออก, เลี่ยงกันแดด <strong>Nano-ZnO/TiO₂</strong> และเช็กยาทาเล็บให้ปลอด <strong>Toluene, DBP, Formaldehyde และ TPO</strong></p>
+              </div>
+            </div>
+
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:28px;flex-wrap:wrap;gap:16px;">
+              <p style="font-size:21px;font-weight:700;color:var(--white);">
+                ขอบคุณทุกท่านที่ร่วมเรียนรู้ — “ความเข้าใจสารรอบตัว คือเกราะป้องกันสุขภาพที่ยั่งยืน”
+              </p>
+              <button class="close-btn" type="button" onclick="window.presentation.goToSlide(0)">↺ START OVER</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- =========================================================
+       OUTSIDE-STAGE PRESENTATION CHROME
+       ========================================================= -->
+  <div class="bf-counter-pill" id="slideCounter">01 / 18</div>
+
+  <div class="deck-controls" aria-label="Presentation utilities">
+    <button class="bf-btn" id="timerBtn" type="button" title="จับเวลาบรรยาย">⏱ <span id="timerText">00:00</span></button>
+    <button class="bf-btn" id="notesBtn" type="button" onclick="window.presentation.toggleNotes()" title="บทพูดผู้สอน (N)">📝 NOTES (N)</button>
+    <button class="bf-btn" id="indexBtn" type="button" onclick="window.presentation.toggleOverview()" title="สารบัญสไลด์ (M)">📑 INDEX (M)</button>
+    <button class="bf-btn edit-save-btn" id="saveBtn" type="button" onclick="window.editor.exportHtml()" title="ดาวน์โหลดไฟล์ HTML ที่แก้ไขแล้ว (Ctrl+S)">💾 SAVE HTML</button>
+    <a class="bf-btn" href="/" title="กลับหน้าแรก">← HOME</a>
+    <button class="bf-btn" type="button" onclick="window.presentation.toggleFullscreen()" title="เต็มจอ (F)">⛶</button>
+  </div>
+
+  <div class="bf-nav-cluster" aria-label="Slide navigation">
+    <button class="nav-btn" id="prevBtn" type="button" onclick="window.presentation.prev()" title="สไลด์ก่อนหน้า (←)">←</button>
+    <button class="nav-btn" id="nextBtn" type="button" onclick="window.presentation.next()" title="สไลด์ถัดไป (→ / Space)">→</button>
+  </div>
+
+  <!-- Instructor Notes Drawer -->
+  <aside class="notes-drawer" id="notesDrawer" aria-live="polite">
+    <div class="notes-header">
+      <span>INSTRUCTOR NOTES</span>
+      <button class="bf-btn" style="height:28px;padding:0 10px;font-size:12px;" type="button" onclick="window.presentation.toggleNotes()">✕ CLOSE</button>
+    </div>
+    <p id="notesContent"></p>
+  </aside>
+
+  <!-- Slide Overview Index Modal -->
+  <div class="modal-backdrop" id="overviewModal" onclick="if(event.target===this)window.presentation.toggleOverview()">
+    <div class="modal-sheet">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
+        <h2 style="font-family:var(--font-display);font-weight:900;font-size:26px;">สารบัญสไลด์ทั้งหมด (18 SLIDES · BLOCKFRAME)</h2>
+        <button class="bf-btn" type="button" onclick="window.presentation.toggleOverview()">✕ CLOSE</button>
+      </div>
+      <div class="index-grid" id="overviewGrid"></div>
+    </div>
+  </div>
+
+  <script>
+    /* ===========================================
+       SLIDE PRESENTATION CONTROLLER (FIXED 1920x1080)
+       =========================================== */
+    class SlidePresentation {
+      constructor() {
+        this.slides = Array.from(document.querySelectorAll('.slide'));
+        this.stage = document.getElementById('deckStage');
+        this.currentSlide = 0;
+        this.wheelLock = false;
+        this.touchStartX = null;
+        this.timerSeconds = 0;
+        this.timerInterval = null;
+
+        this.setupStageScale();
+        this.setupKeyboardNav();
+        this.setupTouchNav();
+        this.setupWheelNav();
+        this.setupTimer();
+        this.loadInitialHash();
+      }
+
+      setupStageScale() {
+        const viewport = document.querySelector('.deck-viewport');
+        const scale = () => {
+          const vw = viewport && viewport.clientWidth ? Math.min(viewport.clientWidth, window.innerWidth) : window.innerWidth;
+          const vh = viewport && viewport.clientHeight ? Math.min(viewport.clientHeight, window.innerHeight) : window.innerHeight;
+          const factor = Math.min(vw / 1920, vh / 1080);
+          const x = (vw - 1920 * factor) / 2;
+          const y = (vh - 1080 * factor) / 2;
+          this.stage.style.transform = `translate(${x}px, ${y}px) scale(${factor})`;
+        };
+        scale();
+        window.addEventListener('resize', scale);
+        if (window.ResizeObserver && viewport) {
+          new ResizeObserver(scale).observe(viewport);
+        }
+      }
+
+      loadInitialHash() {
+        const m = window.location.hash.match(/^#slide-(\d+)$/);
+        const startIdx = m ? Math.max(0, Math.min(this.slides.length - 1, parseInt(m[1], 10) - 1)) : 0;
+        this.goToSlide(startIdx, false);
+      }
+
+      goToSlide(index, updateHash = true) {
+        this.currentSlide = Math.max(0, Math.min(index, this.slides.length - 1));
+        this.slides.forEach((slide, i) => {
+          const active = i === this.currentSlide;
+          slide.classList.toggle('active', active);
+          slide.classList.toggle('visible', active);
+        });
+
+        const currentEl = this.slides[this.currentSlide];
+        document.getElementById('slideCounter').textContent =
+          `${String(this.currentSlide + 1).padStart(2, '0')} / ${this.slides.length}`;
+        document.getElementById('notesContent').textContent = currentEl.dataset.notes || '';
+        document.getElementById('prevBtn').disabled = this.currentSlide === 0;
+        document.getElementById('nextBtn').disabled = this.currentSlide === this.slides.length - 1;
+        document.getElementById('overviewModal').classList.remove('open');
+
+        if (updateHash) {
+          history.replaceState(null, '', `#slide-${this.currentSlide + 1}`);
+        }
+      }
+
+      next() {
+        if (this.currentSlide < this.slides.length - 1) {
+          this.goToSlide(this.currentSlide + 1);
+        }
+      }
+
+      prev() {
+        if (this.currentSlide > 0) {
+          this.goToSlide(this.currentSlide - 1);
+        }
+      }
+
+      toggleNotes() {
+        const drawer = document.getElementById('notesDrawer');
+        const btn = document.getElementById('notesBtn');
+        const isOpen = drawer.classList.toggle('open');
+        btn.classList.toggle('is-on', isOpen);
+      }
+
+      toggleOverview() {
+        const modal = document.getElementById('overviewModal');
+        const grid = document.getElementById('overviewGrid');
+        if (!modal.classList.contains('open')) {
+          grid.innerHTML = this.slides.map((s, i) => `
+            <div class="index-item ${i === this.currentSlide ? 'active' : ''}" onclick="window.presentation.goToSlide(${i})">
+              <div style="font-family:var(--font-label);font-size:12px;font-weight:700;letter-spacing:0.06em;">SLIDE ${String(i + 1).padStart(2, '0')} · ${s.dataset.section || ''}</div>
+              <div style="font-size:15px;font-weight:800;margin-top:6px;">${s.dataset.title || ''}</div>
+            </div>
+          `).join('');
+        }
+        modal.classList.toggle('open');
+      }
+
+      toggleFullscreen() {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(() => {});
+        } else {
+          document.exitFullscreen().catch(() => {});
+        }
+      }
+
+      setupTimer() {
+        const timerBtn = document.getElementById('timerBtn');
+        timerBtn.addEventListener('click', () => {
+          if (this.timerInterval) {
+            clearInterval(this.timerInterval);
+            this.timerInterval = null;
+            timerBtn.classList.remove('is-on');
+          } else {
+            timerBtn.classList.add('is-on');
+            this.timerInterval = setInterval(() => {
+              this.timerSeconds++;
+              const m = String(Math.floor(this.timerSeconds / 60)).padStart(2, '0');
+              const s = String(this.timerSeconds % 60).padStart(2, '0');
+              document.getElementById('timerText').textContent = `${m}:${s}`;
+            }, 1000);
+          }
+        });
+      }
+
+      setupKeyboardNav() {
+        window.addEventListener('keydown', (e) => {
+          const isEditing = e.target && (
+            e.target.isContentEditable ||
+            e.target.tagName === 'INPUT' ||
+            e.target.tagName === 'TEXTAREA'
+          );
+
+          if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') {
+            if (document.body.classList.contains('editing')) {
+              e.preventDefault();
+              window.editor.exportHtml();
+            }
+            return;
+          }
+
+          if (isEditing) return;
+
+          if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+            e.preventDefault();
+            this.next();
+          } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+            e.preventDefault();
+            this.prev();
+          } else if (e.key === 'Home') {
+            e.preventDefault();
+            this.goToSlide(0);
+          } else if (e.key === 'End') {
+            e.preventDefault();
+            this.goToSlide(this.slides.length - 1);
+          } else if (e.key === 'n' || e.key === 'N') {
+            this.toggleNotes();
+          } else if (e.key === 'm' || e.key === 'M') {
+            this.toggleOverview();
+          } else if (e.key === 'f' || e.key === 'F') {
+            this.toggleFullscreen();
+          } else if (e.key === 'Escape') {
+            document.getElementById('overviewModal').classList.remove('open');
+            document.getElementById('notesDrawer').classList.remove('open');
+            document.getElementById('notesBtn').classList.remove('is-on');
+          }
+        });
+
+        window.addEventListener('hashchange', () => this.loadInitialHash());
+      }
+
+      setupTouchNav() {
+        window.addEventListener('touchstart', (e) => {
+          if (e.touches.length === 1) {
+            this.touchStartX = e.touches[0].clientX;
+          }
+        }, { passive: true });
+
+        window.addEventListener('touchend', (e) => {
+          if (this.touchStartX === null || e.changedTouches.length === 0) return;
+          const dx = e.changedTouches[0].clientX - this.touchStartX;
+          this.touchStartX = null;
+          if (Math.abs(dx) > 50) {
+            if (dx < 0) this.next();
+            else this.prev();
+          }
+        }, { passive: true });
+      }
+
+      setupWheelNav() {
+        window.addEventListener('wheel', (e) => {
+          if (document.getElementById('overviewModal').classList.contains('open')) return;
+          if (this.wheelLock || Math.abs(e.deltaY) < 28) return;
+          this.wheelLock = true;
+          if (e.deltaY > 0) this.next();
+          else this.prev();
+          setTimeout(() => { this.wheelLock = false; }, 380);
+        }, { passive: true });
+      }
+    }
+
+    /* ===========================================
+       INLINE TEXT EDITOR (HOVER HOTZONE + E KEY)
+       =========================================== */
+    class InlineEditor {
+      constructor() {
+        this.isActive = false;
+        this.storageKey = 'blockframe_food_cosmetics_v1';
+        this.hotzone = document.querySelector('.edit-hotzone');
+        this.editToggle = document.getElementById('editToggle');
+        this.hideTimeout = null;
+
+        this.restoreSaved();
+        this.bindControls();
+      }
+
+      restoreSaved() {
+        try {
+          const saved = localStorage.getItem(this.storageKey);
+          if (saved) {
+            const data = JSON.parse(saved);
+            document.querySelectorAll('.slide').forEach((slide, idx) => {
+              if (typeof data[idx] === 'string') {
+                slide.innerHTML = data[idx];
+              }
+            });
+          }
+        } catch (_) {}
+      }
+
+      persist() {
+        try {
+          const snapshot = Array.from(document.querySelectorAll('.slide')).map((s) => s.innerHTML);
+          localStorage.setItem(this.storageKey, JSON.stringify(snapshot));
+        } catch (_) {}
+      }
+
+      toggleEditMode() {
+        this.isActive = !this.isActive;
+        document.body.classList.toggle('editing', this.isActive);
+        this.editToggle.classList.toggle('active', this.isActive);
+        this.editToggle.textContent = this.isActive ? '✅ DONE EDITING (E)' : '✏️ EDIT MODE (E)';
+
+        document.querySelectorAll('.slide h1, .slide h3, .slide p, .slide li, .slide td, .slide th, .slide .stat-number, .slide .chart-label, .slide .chart-val').forEach((el) => {
+          if (this.isActive) {
+            el.setAttribute('contenteditable', 'true');
+          } else {
+            el.removeAttribute('contenteditable');
+          }
+        });
+
+        if (!this.isActive) {
+          this.persist();
+        }
+      }
+
+      exportHtml() {
+        const wasEditing = this.isActive;
+        if (wasEditing) this.toggleEditMode();
+        const blob = new Blob(['<!DOCTYPE html>\n' + document.documentElement.outerHTML], { type: 'text/html;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'food-cosmetics-pollution-slides.html';
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+
+      bindControls() {
+        this.editToggle.addEventListener('click', () => this.toggleEditMode());
+        this.hotzone.addEventListener('click', () => this.toggleEditMode());
+
+        this.hotzone.addEventListener('mouseenter', () => {
+          clearTimeout(this.hideTimeout);
+          this.editToggle.classList.add('show');
+        });
+        this.hotzone.addEventListener('mouseleave', () => {
+          this.hideTimeout = setTimeout(() => {
+            if (!this.isActive) this.editToggle.classList.remove('show');
+          }, 400);
+        });
+        this.editToggle.addEventListener('mouseenter', () => {
+          clearTimeout(this.hideTimeout);
+        });
+        this.editToggle.addEventListener('mouseleave', () => {
+          this.hideTimeout = setTimeout(() => {
+            if (!this.isActive) this.editToggle.classList.remove('show');
+          }, 400);
+        });
+
+        document.addEventListener('keydown', (e) => {
+          if ((e.key === 'e' || e.key === 'E') && !(e.target && e.target.getAttribute && e.target.getAttribute('contenteditable'))) {
+            this.toggleEditMode();
+          }
+        });
+
+        document.getElementById('deckStage').addEventListener('input', () => {
+          if (this.isActive) this.persist();
+        });
+      }
+    }
+
+    window.presentation = new SlidePresentation();
+    window.editor = new InlineEditor();
+  </script>
+</body>
+</html>

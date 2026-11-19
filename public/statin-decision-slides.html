@@ -1,0 +1,2956 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ไม่อยากกินยาลดไขมัน ต้องทำยังไง — BlockFrame Presentation</title>
+
+  <!-- Fonts: Inter + Space Grotesk + Noto Sans Thai (Weights 400-900) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+Thai:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ===========================================
+       CSS CUSTOM PROPERTIES (BLOCKFRAME TOKENS)
+       =========================================== */
+    :root {
+      --black: #000000;
+      --white: #FFFFFF;
+      --offwhite: #FFFDF5;
+      --pink: #FE90E8;
+      --blue: #C0F7FE;
+      --green: #99E885;
+      --yellow: #F7CB46;
+      --cream: #FFDC8B;
+
+      --border-primary: 4px solid var(--black);
+      --border-thin: 3px solid var(--black);
+      --border-atomic: 2px solid var(--black);
+
+      --shadow-default: 8px 8px 0px var(--black);
+      --shadow-small: 4px 4px 0px var(--black);
+      --shadow-hover: 6px 6px 0px var(--black);
+      --shadow-press: 2px 2px 0px var(--black);
+      --shadow-close-yellow: 12px 12px 0px var(--yellow);
+      --shadow-close-white: 6px 6px 0px var(--white);
+
+      --font-display: 'Inter', 'Noto Sans Thai', sans-serif;
+      --font-body: 'Inter', 'Noto Sans Thai', sans-serif;
+      --font-label: 'Space Grotesk', 'Noto Sans Thai', monospace;
+
+      --stage-bg: #000000;
+      --slide-bg: var(--offwhite);
+      --ease-snap: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* ===========================================
+       VIEWPORT BASE (MANDATORY FIXED 1920x1080 STAGE)
+       =========================================== */
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: var(--stage-bg, #000);
+      font-family: var(--font-body);
+      color: var(--black);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .deck-viewport {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      background: var(--stage-bg, #000);
+    }
+
+    .deck-stage {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      transform-origin: 0 0;
+      background: var(--slide-bg, #fff);
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      display: block;
+      visibility: hidden;
+      opacity: 0;
+      pointer-events: none;
+      background: var(--slide-bg, #fff);
+    }
+
+    .slide.active,
+    .slide.visible {
+      visibility: visible;
+      opacity: 1;
+      pointer-events: auto;
+      z-index: 1;
+    }
+
+    img,
+    video,
+    canvas,
+    svg {
+      max-width: 100%;
+      max-height: 100%;
+    }
+
+    .deck-controls {
+      position: fixed;
+      left: 50%;
+      bottom: 22px;
+      transform: translateX(-50%);
+      z-index: 1000;
+    }
+
+    @media print {
+      html,
+      body {
+        width: 1920px;
+        height: auto;
+        overflow: visible;
+        background: #fff;
+      }
+
+      .deck-viewport {
+        position: static;
+        overflow: visible;
+        background: #fff;
+      }
+
+      .deck-stage {
+        position: static;
+        width: auto;
+        height: auto;
+        transform: none !important;
+        background: none;
+      }
+
+      .slide {
+        position: relative;
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        width: 1920px;
+        height: 1080px;
+        break-after: page;
+        page-break-after: always;
+      }
+
+      .slide:last-child {
+        break-after: auto;
+        page-break-after: auto;
+      }
+
+      .deck-controls,
+      .bf-counter-pill,
+      .bf-nav-cluster,
+      .edit-hotzone,
+      .edit-toggle,
+      .notes-drawer,
+      .modal-backdrop {
+        display: none !important;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.2s !important;
+      }
+    }
+
+    /* ===========================================
+       SURFACE GROUNDS & TEXTURES
+       =========================================== */
+    .has-dots::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle, var(--black) 1.5px, transparent 1.5px);
+      background-size: 28px 28px;
+      opacity: 0.22;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .slide-inner {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      height: 100%;
+      padding: 54px 72px 104px 72px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 24px;
+    }
+
+    /* ===========================================
+       TYPOGRAPHY HIERARCHY (BLOCKFRAME + THAI)
+       =========================================== */
+    .label-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .label-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .label-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: var(--border-thin);
+      box-shadow: var(--shadow-small);
+      padding: 8px 18px;
+      font-family: var(--font-label);
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      background: var(--white);
+      color: var(--black);
+      line-height: 1.15;
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 72px;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      color: var(--black);
+    }
+
+    .slide-title {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 44px;
+      line-height: 1.16;
+      letter-spacing: -0.008em;
+      color: var(--black);
+    }
+
+    .slide-lead {
+      font-family: var(--font-label);
+      font-weight: 600;
+      font-size: 21px;
+      line-height: 1.44;
+      color: var(--black);
+      max-width: 1520px;
+    }
+
+    .en-caps {
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+    }
+
+    .mono-tag {
+      display: inline-block;
+      font-family: var(--font-label);
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      border: var(--border-atomic);
+      padding: 4px 10px;
+      background: var(--yellow);
+      color: var(--black);
+      line-height: 1.2;
+      vertical-align: middle;
+    }
+
+    /* ===========================================
+       BLOCKFRAME CARDS & CONTAINERS (0PX RADIUS)
+       =========================================== */
+    .bf-card {
+      background: var(--white);
+      border: var(--border-primary);
+      box-shadow: var(--shadow-default);
+      padding: 26px 30px;
+      position: relative;
+    }
+
+    .bf-card-sm {
+      background: var(--white);
+      border: var(--border-thin);
+      box-shadow: var(--shadow-small);
+      padding: 20px 24px;
+      position: relative;
+    }
+
+    .bf-card-flat {
+      background: var(--white);
+      border: var(--border-primary);
+      padding: 18px 26px;
+      position: relative;
+    }
+
+    .bf-card h3,
+    .bf-card-sm h3,
+    .bf-card-flat h3 {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 24px;
+      line-height: 1.24;
+      color: var(--black);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .bf-card p,
+    .bf-card-sm p,
+    .bf-card-flat p {
+      font-size: 19px;
+      line-height: 1.52;
+      font-weight: 500;
+      color: var(--black);
+    }
+
+    .bf-card ul,
+    .bf-card-sm ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+    }
+
+    .bf-card li,
+    .bf-card-sm li {
+      position: relative;
+      padding-left: 24px;
+      font-size: 19px;
+      line-height: 1.48;
+      font-weight: 500;
+      color: var(--black);
+    }
+
+    .bf-card li::before,
+    .bf-card-sm li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 9px;
+      width: 11px;
+      height: 11px;
+      background: var(--yellow);
+      border: var(--border-atomic);
+    }
+
+    /* ===========================================
+       GRIDS & LAYOUT HELPERS
+       =========================================== */
+    .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 26px; }
+    .grid-2-wide { display: grid; grid-template-columns: 1.15fr 1fr; gap: 26px; }
+    .grid-2-chart { display: grid; grid-template-columns: 0.92fr 1.08fr; gap: 26px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; }
+    .stack-gap { display: flex; flex-direction: column; gap: 18px; }
+
+    /* ===========================================
+       SIGNATURE DECORATIONS & STRUCTURAL PRIMITIVES
+       =========================================== */
+    .tilt-neg { transform: rotate(-2deg); }
+    .tilt-pos { transform: rotate(2deg); }
+
+    .deco-stripe {
+      position: absolute;
+      border: var(--border-thin);
+      background: repeating-linear-gradient(
+        45deg,
+        var(--black),
+        var(--black) 6px,
+        var(--green) 6px,
+        var(--green) 16px
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .deco-rect {
+      position: absolute;
+      border: var(--border-thin);
+      box-shadow: var(--shadow-small);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .star-burst {
+      position: absolute;
+      background: var(--black);
+      clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+      pointer-events: none;
+      z-index: 4;
+    }
+
+    .star-burst-inner {
+      position: absolute;
+      inset: 5px;
+      background: var(--pink);
+      clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    }
+
+    .feature-deco {
+      width: 48px;
+      height: 44px;
+      border: var(--border-thin);
+      background: var(--yellow);
+      position: absolute;
+      top: -16px;
+      right: 24px;
+      display: grid;
+      place-items: center;
+      font-family: var(--font-label);
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--black);
+      z-index: 3;
+    }
+
+    .bf-card:has(.feature-deco) > h3,
+    .bf-card-sm:has(.feature-deco) > h3 {
+      padding-right: 60px;
+    }
+
+    .corner-tl,
+    .corner-br {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      pointer-events: none;
+    }
+
+    .corner-tl {
+      top: 12px;
+      left: 12px;
+      border-top: var(--border-thin);
+      border-left: var(--border-thin);
+    }
+
+    .corner-br {
+      bottom: 12px;
+      right: 12px;
+      border-bottom: var(--border-thin);
+      border-right: var(--border-thin);
+    }
+
+    .icon-square {
+      width: 54px;
+      height: 54px;
+      border: var(--border-thin);
+      display: grid;
+      place-items: center;
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 24px;
+      text-transform: uppercase;
+      color: var(--black);
+      flex-shrink: 0;
+    }
+
+    .list-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .list-num {
+      width: 40px;
+      height: 40px;
+      border: var(--border-thin);
+      background: var(--yellow);
+      font-family: var(--font-label);
+      font-weight: 700;
+      font-size: 16px;
+      display: grid;
+      place-items: center;
+      color: var(--black);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    /* The only circular element permitted in BlockFrame */
+    .stat-deco-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: var(--border-atomic);
+      position: absolute;
+      top: 16px;
+      right: 16px;
+    }
+
+    .stat-number {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 54px;
+      line-height: 1.05;
+      color: var(--black);
+    }
+
+    /* Connected Step Flow (28x4 horizontal black bar connector) */
+    .step-track {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 28px;
+      align-items: stretch;
+      margin: 4px 0;
+    }
+
+    .step-card {
+      background: var(--white);
+      border: var(--border-thin);
+      box-shadow: var(--shadow-small);
+      padding: 20px 22px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .step-card.has-connector::after {
+      content: "";
+      position: absolute;
+      right: -31px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 28px;
+      height: 4px;
+      background: var(--black);
+    }
+
+    /* ===========================================
+       SPECIALIZED BLOCKFRAME MODULES
+       =========================================== */
+    .hero-frame {
+      background: var(--white);
+      border: var(--border-primary);
+      box-shadow: var(--shadow-default);
+      padding: 40px 46px;
+      position: relative;
+    }
+
+    .hero-tab {
+      position: absolute;
+      top: -22px;
+      right: 44px;
+      background: var(--yellow);
+      border: var(--border-thin);
+      box-shadow: var(--shadow-small);
+      padding: 10px 22px;
+      font-family: var(--font-label);
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transform: rotate(-3deg);
+      color: var(--black);
+    }
+
+    .bf-table-frame {
+      background: var(--white);
+      border: var(--border-primary);
+      box-shadow: var(--shadow-default);
+      overflow: hidden;
+    }
+
+    .bf-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 19px;
+    }
+
+    .bf-table th,
+    .bf-table td {
+      padding: 14px 20px;
+      border-bottom: var(--border-thin);
+      border-right: var(--border-thin);
+      text-align: left;
+      vertical-align: top;
+      line-height: 1.44;
+    }
+
+    .bf-table th:last-child,
+    .bf-table td:last-child {
+      border-right: none;
+    }
+
+    .bf-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .bf-table th {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 20px;
+      letter-spacing: 0.02em;
+    }
+
+    .bf-table-compact th,
+    .bf-table-compact td {
+      padding: 12px 18px;
+      font-size: 18px;
+      line-height: 1.4;
+    }
+
+    .code-chip {
+      font-family: var(--font-label);
+      font-weight: 700;
+      background: var(--yellow);
+      border: var(--border-atomic);
+      padding: 2px 8px;
+      font-size: 17px;
+      display: inline-block;
+    }
+
+    /* Horizontal Bar Chart */
+    .chart-row {
+      display: grid;
+      grid-template-columns: 320px 1fr 155px;
+      align-items: center;
+      gap: 16px;
+      padding: 8px 0;
+    }
+
+    .chart-label {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--black);
+    }
+
+    .chart-track {
+      height: 28px;
+      background: var(--offwhite);
+      border: var(--border-thin);
+      display: flex;
+      align-items: stretch;
+    }
+
+    .chart-bar {
+      height: 100%;
+      border-right: var(--border-thin);
+    }
+
+    .chart-val {
+      font-family: var(--font-label);
+      font-weight: 700;
+      font-size: 18px;
+      text-align: right;
+    }
+
+    .bar-full { border-right: none; }
+
+    /* Interactive Cause Inspector Cards (Slide 05) */
+    .cause-card {
+      background: var(--white);
+      border: var(--border-thin);
+      box-shadow: var(--shadow-small);
+      padding: 18px 22px;
+      cursor: pointer;
+      position: relative;
+      text-align: left;
+      transition: transform 0.14s ease, box-shadow 0.14s ease, background 0.14s ease;
+    }
+
+    .cause-card:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .cause-card.selected {
+      background: var(--yellow);
+      border: var(--border-primary);
+      box-shadow: var(--shadow-default);
+      transform: translate(-2px, -2px);
+    }
+
+    .cause-detail-box {
+      min-height: 186px;
+      display: grid;
+      grid-template-columns: 1.15fr 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    /* Inverted Close Frame (Slide 20) */
+    .close-frame {
+      background: var(--black);
+      border: 4px solid var(--white);
+      box-shadow: var(--shadow-close-yellow);
+      padding: 40px 44px;
+      position: relative;
+      color: var(--white);
+    }
+
+    .close-frame .bf-card-sm {
+      border: 3px solid var(--white);
+      box-shadow: var(--shadow-close-white);
+    }
+
+    .close-title {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 50px;
+      line-height: 1.14;
+      color: var(--white);
+      letter-spacing: -0.015em;
+    }
+
+    .close-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      border: 3px solid var(--black);
+      background: var(--yellow);
+      color: var(--black);
+      padding: 14px 28px;
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 18px;
+      text-transform: uppercase;
+      box-shadow: var(--shadow-close-white);
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .close-btn:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 8px 8px 0px var(--white);
+    }
+
+    /* Surface & Fill Palette Utilities (MUST trail all base component styles) */
+    .bg-offwhite { background: var(--offwhite); }
+    .bg-cream    { background: var(--cream); }
+    .bg-blue     { background: var(--blue); }
+    .bg-pink     { background: var(--pink); }
+    .bg-green    { background: var(--green); }
+    .bg-yellow   { background: var(--yellow); }
+    .bg-black    { background: var(--black); color: var(--white); }
+
+    .fill-white    { background: var(--white); }
+    .fill-offwhite { background: var(--offwhite); }
+    .fill-pink     { background: var(--pink); }
+    .fill-blue     { background: var(--blue); }
+    .fill-green    { background: var(--green); }
+    .fill-yellow   { background: var(--yellow); }
+    .fill-cream    { background: var(--cream); }
+
+    /* ===========================================
+       STAGGERED REVEAL ANIMATIONS
+       =========================================== */
+    .reveal {
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity 0.42s var(--ease-snap), transform 0.42s var(--ease-snap);
+    }
+
+    .slide.visible .reveal {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .slide.visible .tilt-neg.reveal { transform: rotate(-2deg); }
+    .slide.visible .tilt-pos.reveal { transform: rotate(2deg); }
+
+    .reveal.d1 { transition-delay: 0.04s; }
+    .reveal.d2 { transition-delay: 0.10s; }
+    .reveal.d3 { transition-delay: 0.16s; }
+    .reveal.d4 { transition-delay: 0.22s; }
+
+    /* ===========================================
+       PERSISTENT CHROME (OUTSIDE SLIDE STAGE)
+       =========================================== */
+    .bf-counter-pill {
+      position: fixed;
+      left: 24px;
+      bottom: 20px;
+      z-index: 1000;
+      border: var(--border-thin);
+      background: var(--white);
+      box-shadow: var(--shadow-small);
+      padding: 10px 18px;
+      font-family: var(--font-label);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--black);
+    }
+
+    .deck-controls {
+      bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .bf-btn {
+      height: 44px;
+      padding: 0 16px;
+      border: var(--border-thin);
+      background: var(--white);
+      box-shadow: var(--shadow-small);
+      font-family: var(--font-label);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--black);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+    }
+
+    .bf-btn:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: var(--shadow-hover);
+      background: var(--yellow);
+    }
+
+    .bf-btn:active {
+      transform: translate(2px, 2px);
+      box-shadow: var(--shadow-press);
+    }
+
+    .bf-btn.is-on {
+      background: var(--yellow);
+    }
+
+    .bf-nav-cluster {
+      position: fixed;
+      right: 24px;
+      bottom: 20px;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-btn {
+      width: 48px;
+      height: 48px;
+      border: var(--border-thin);
+      background: var(--white);
+      box-shadow: var(--shadow-small);
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 20px;
+      color: var(--black);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+    }
+
+    .nav-btn:hover:not(:disabled) {
+      transform: translate(-2px, -2px);
+      box-shadow: var(--shadow-hover);
+      background: var(--yellow);
+    }
+
+    .nav-btn:active:not(:disabled) {
+      transform: translate(2px, 2px);
+      box-shadow: var(--shadow-press);
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    /* Inline Editing Controls (JS-triggered hotzone with 400ms grace period) */
+    .edit-hotzone {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 96px;
+      height: 96px;
+      z-index: 10000;
+      cursor: pointer;
+    }
+
+    .edit-toggle {
+      position: fixed;
+      top: 18px;
+      left: 18px;
+      height: 44px;
+      padding: 0 16px;
+      border: var(--border-thin);
+      background: var(--yellow);
+      box-shadow: var(--shadow-small);
+      font-family: var(--font-label);
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--black);
+      cursor: pointer;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+      z-index: 10001;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .edit-toggle.show,
+    .edit-toggle.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .edit-save-btn {
+      display: none;
+    }
+
+    body.editing .edit-save-btn {
+      display: inline-flex;
+    }
+
+    body.editing [contenteditable="true"] {
+      outline: 2px dashed var(--black);
+      outline-offset: 2px;
+    }
+
+    /* Upgraded Speaker Script Drawer & Slide Index Modal */
+    .notes-drawer {
+      position: fixed;
+      right: 24px;
+      bottom: 84px;
+      width: 540px;
+      max-width: calc(100vw - 48px);
+      max-height: 62vh;
+      overflow-y: auto;
+      background: var(--white);
+      border: var(--border-primary);
+      box-shadow: var(--shadow-default);
+      padding: 20px 24px;
+      z-index: 1100;
+      display: none;
+    }
+
+    .notes-drawer.open {
+      display: block;
+    }
+
+    .notes-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: var(--border-thin);
+      font-family: var(--font-label);
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .notes-drawer p {
+      font-size: 15.5px;
+      line-height: 1.65;
+      font-weight: 500;
+      color: var(--black);
+      white-space: pre-line;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.72);
+      z-index: 1200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-sheet {
+      width: 100%;
+      max-width: 1140px;
+      max-height: 84vh;
+      overflow-y: auto;
+      background: var(--offwhite);
+      border: var(--border-primary);
+      box-shadow: var(--shadow-close-yellow);
+      padding: 28px;
+    }
+
+    .index-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 20px;
+    }
+
+    .index-item {
+      border: var(--border-thin);
+      background: var(--white);
+      box-shadow: var(--shadow-small);
+      padding: 14px 16px;
+      cursor: pointer;
+      transition: transform 0.12s ease, background 0.12s ease;
+    }
+
+    .index-item:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: var(--shadow-hover);
+      background: var(--blue);
+    }
+
+    .index-item.active {
+      background: var(--yellow);
+    }
+
+    @media (max-width: 760px) {
+      .index-grid {
+        grid-template-columns: 1fr;
+      }
+      .deck-controls {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Inline Editor Hotzone (top-left) -->
+  <div class="edit-hotzone" title="ชี้หรือคลิกเพื่อแก้ไขข้อความบนสไลด์ (E)"></div>
+  <button class="edit-toggle" id="editToggle" type="button">✏️ EDIT MODE (E)</button>
+
+  <!-- Fixed 1920x1080 Viewport Stage -->
+  <div class="deck-viewport">
+    <main class="deck-stage" id="deckStage">
+
+      <!-- =========================================================
+           SLIDE 01: COVER & 4-PART ROADMAP (Cream + Dot Grid + Hero)
+           ========================================================= -->
+      <section class="slide bg-cream has-dots active visible"
+        data-section="00 · OVERVIEW"
+        data-title="ไม่อยากกินยาลดไขมัน ต้องทำยังไง?"
+        data-duration="00:00–02:00"
+        data-notes="สวัสดีทุกท่านครับ คำถามยอดฮิตที่ผมถูกถามแทบทุกวันในคลินิกก็คือ ‘หมอครับ ผลตรวจ LDL สูง แต่ยังไม่อยากกินยาลดไขมันไปตลอดชีวิต ต้องทำยังไงดี?’
+
+ในฐานะแพทย์เวชศาสตร์ชะลอวัยและ Functional Medicine วันนี้ผมอยากพาทุกท่านมาวางกรอบคิดใหม่ทั้งหมดครับ เราจะไม่ตัดสินใจจากตัวเลข LDL-C เพียงตัวเดียว แต่เราจะดูทั้งจำนวนอนุภาค การอักเสบของผนังหลอดเลือด การส่องดูหลอดเลือดจริงด้วย Imaging สารธรรมชาติที่ช่วยลด ApoB และการอักเสบ ไปจนถึงหลักฐานงานวิจัยเรื่องการลดขนาดคราบพลัค เพื่อที่คุณจะได้เลือกแนวทางที่ปลอดภัยกับหลอดเลือดและตรงกับชีวิตคุณมากที่สุดครับ">
+        <div class="deco-stripe" style="width:170px;height:66px;top:36px;right:72px;transform:rotate(4deg);"></div>
+        <div class="star-burst" style="width:92px;height:92px;bottom:98px;left:36px;transform:rotate(-10deg);">
+          <div class="star-burst-inner"></div>
+        </div>
+        <div class="slide-inner">
+          <div class="hero-frame reveal d1">
+            <div class="corner-tl"></div>
+            <div class="corner-br"></div>
+            <div class="hero-tab">FUNCTIONAL MEDICINE · 20 SLIDES</div>
+            <div class="label-group" style="margin-bottom:18px;">
+              <span class="label-pill fill-pink">00 · STATIN DECISION FRAMEWORK</span>
+              <span class="label-pill fill-blue">BEYOND LDL · INFLAMMATION · IMAGING · PLAQUE</span>
+            </div>
+            <h1 class="hero-title">ไม่อยากกินยาลดไขมัน ต้องทำยังไง?</h1>
+            <p class="slide-lead" style="margin-top:14px;">
+              เกณฑ์ตัดสินใจเรื่อง <strong>Statin</strong> แบบ Functional Medicine — ทำไม <span class="en-caps">LDL</span> อย่างเดียวไม่พอ, การอักเสบ, <span class="en-caps">Imaging</span>, สารธรรมชาติ และทางเลือกลดคราบพลัค
+            </p>
+          </div>
+
+          <div class="grid-4 reveal d2">
+            <div class="bf-card-sm fill-blue">
+              <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+                <div class="icon-square fill-white">01</div>
+                <h3 style="margin:0;font-size:21px;"><span class="en-caps">BEYOND LDL</span></h3>
+              </div>
+              <p style="font-size:17.5px;">ทำไม <strong>LDL-C ตัวเดียวไม่พอ</strong> ความสำคัญของ ApoB และภาวะดื้ออินซูลิน</p>
+            </div>
+            <div class="bf-card-sm fill-pink">
+              <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+                <div class="icon-square fill-white">02</div>
+                <h3 style="margin:0;font-size:21px;"><span class="en-caps">INFLAMMATION</span></h3>
+              </div>
+              <p style="font-size:17.5px;"><strong>6 ต้นเหตุอักเสบ</strong>: โลหะหนัก มลพิษ อาหาร ความเครียด นั่งนาน และตัวกระตุ้นแฝง</p>
+            </div>
+            <div class="bf-card-sm fill-green">
+              <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+                <div class="icon-square fill-white">03</div>
+                <h3 style="margin:0;font-size:21px;"><span class="en-caps">LAB &amp; IMAGING</span></h3>
+              </div>
+              <p style="font-size:17.5px;">เจาะเลือดลึก + ส่องหลอดเลือดจริงด้วย <strong>Ultrasound / CAC / CCTA</strong> และเมทริกซ์ 4 ช่อง</p>
+            </div>
+            <div class="bf-card-sm fill-yellow">
+              <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+                <div class="icon-square fill-white">04</div>
+                <h3 style="margin:0;font-size:21px;"><span class="en-caps">ACTION &amp; PLAQUE</span></h3>
+              </div>
+              <p style="font-size:17.5px;">ไลฟ์สไตล์ Adaptogens สารลด ApoB และวิจัยลดพลัค: <strong>Statin vs Chelation</strong></p>
+            </div>
+          </div>
+
+          <div class="bf-card-flat fill-white reveal d3" style="padding:15px 26px;">
+            <p style="font-size:19px;"><strong>เป้าหมายที่แท้จริง:</strong> ไม่ใช่แค่การ "กดตัวเลขบนใบตรวจให้สวย" แต่คือ <strong>การป้องกันไม่ให้ผนังหลอดเลือดอักเสบ ตีบ หรือเกิดคราบพลัคแตกฉับพลัน</strong></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 02: PATIENT CONCERNS VS FUNCTIONAL STANCE (Blue)
+           ========================================================= -->
+      <section class="slide bg-blue"
+        data-section="01 · NEW PARADIGM"
+        data-title="ความกังวลของคนไข้ vs จุดยืน Functional Medicine"
+        data-duration="02:00–04:00"
+        data-notes="ก่อนจะไปดูตัวเลขและงานวิจัย ผมอยากรับฟังมุมมองของคนไข้ก่อนครับ หลายคนไม่ได้ดื้อหรือไม่รักสุขภาพ แต่มีเหตุผลที่ไม่อยากรีบกิน Statin เช่น กังวลว่าต้องกินตลอดชีวิต กลัวปวดกล้ามเนื้อหรืออ่อนเพลียเพราะยาไปลดระดับ CoQ10 หรือกังวลเรื่องค่าน้ำตาล HbA1c ที่อาจขยับขึ้นในคนที่มีภาวะดื้ออินซูลิน
+
+ในมุม Functional Medicine ผมไม่ได้เป็นสายแอนตี้ยา และก็ไม่ใช่สายแจกยาให้ทุกคนที่ LDL แตะ 130 เช่นกันครับ แต่เราใช้หลัก Risk-Based Precision Medicine คือประเมินให้ชัดก่อนว่า ‘หลอดเลือดของคุณกำลังอักเสบหรือมีคราบพลัคจริงไหม’ เพื่อไม่ให้คนที่ความเสี่ยงต่ำต้องรับภาระยาเกินจำเป็น และไม่ปล่อยให้คนที่เสี่ยงสูงพลาดโอกาสป้องกันหัวใจขาดเลือด เดี๋ยวสไลด์ถัดไปมาดูว่าทำไม LDL ตัวเดียวจึงตอบคำถามนี้ไม่ได้ครับ">
+        <div class="deco-rect fill-pink" style="width:88px;height:88px;top:40px;right:74px;transform:rotate(10deg);"></div>
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-yellow">01 · CLINICAL STANCE</span>
+              <span class="label-pill fill-white">BEYOND BINARY THINKING</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">ความกังวลของคนไข้ <span class="en-caps">VS</span> จุดยืน <span class="en-caps">FUNCTIONAL MEDICINE</span></h1>
+            <p class="slide-lead" style="margin-top:8px;">เราไม่ได้มอง Statin เป็น "ผู้ร้าย" หรือ "ยาวิเศษที่ทุกคนต้องกิน" แต่วางยาไว้บนตาชั่งของหลักฐานและความเสี่ยงรายบุคคล</p>
+          </div>
+
+          <div class="grid-2 reveal d2">
+            <div class="bf-card">
+              <div class="feature-deco">?</div>
+              <h3>
+                <span>4 เหตุผลที่คนไข้ไม่อยากกิน Statin</span>
+                <span class="mono-tag fill-pink">PATIENT REALITY</span>
+              </h3>
+              <div class="stack-gap" style="gap:15px;">
+                <div class="list-row">
+                  <div class="list-num">01</div>
+                  <p><strong>ต้องกินยาต่อเนื่องระยะยาว:</strong> ไม่อยากพึ่งพายาเคมีตลอดชีวิตถ้ายังปรับต้นเหตุได้</p>
+                </div>
+                <div class="list-row">
+                  <div class="list-num">02</div>
+                  <p><strong>ผลข้างเคียงกล้ามเนื้อ &amp; พลังงาน:</strong> อาการปวดเมื่อย ล้า (SAMS) และยารบกวนวิถีสร้าง <strong>CoQ10</strong> ในไมโทคอนเดรีย</p>
+                </div>
+                <div class="list-row">
+                  <div class="list-num">03</div>
+                  <p><strong>ความเสี่ยงเมแทบอลิซึม:</strong> ในกลุ่มเสี่ยงเบาหวาน ขนาดยาสูงสัมพันธ์กับระดับน้ำตาล/HbA1c ที่อาจเพิ่มขึ้นเล็กน้อย</p>
+                </div>
+                <div class="list-row">
+                  <div class="list-num">04</div>
+                  <p><strong>รู้สึกแข็งแรงดี:</strong> ออกกำลังกาย กินคลีน น้ำตาลต่ำ แต่ผล LDL ยังสูงจึงตั้งคำถามว่าเสี่ยงจริงหรือไม่</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="bf-card">
+              <div class="feature-deco fill-green">FM</div>
+              <h3>
+                <span>หลักคิด Functional Medicine</span>
+                <span class="mono-tag fill-blue">PRECISION DECISION</span>
+              </h3>
+              <ul>
+                <li><strong>ไม่แอนตี้ยา:</strong> เมื่อพบคราบพลัคอันตรายหรือเคยมีโรคหลอดเลือด ยาคือกุญแจช่วยชีวิตที่มีหลักฐานแข็งแรงที่สุด</li>
+                <li><strong>ไม่รักษาแค่ตัวเลข:</strong> ไม่สั่งยาอัตโนมัติจากค่า LDL-C เพียงบรรทัดเดียวโดยไม่ดูบริบทการอักเสบและอินซูลิน</li>
+                <li><strong>ตรวจให้เห็นหลอดเลือดจริง:</strong> ใช้ Biomarkers + Imaging แยกคนที่ "เสี่ยงแท้" ออกจากคนที่ "ไขมันสูงแต่หลอดเลือดสะอาด"</li>
+                <li><strong>แก้ที่ต้นเหตุเสมอ:</strong> ต่อให้ต้องใช้ยา ก็ต้องดับไฟอักเสบและลดสารพิษควบคู่กัน</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="bf-card-sm fill-yellow reveal d3" style="padding:16px 26px;">
+            <p style="font-size:19px;"><strong>กฎเหล็กความปลอดภัย:</strong> หากคุณเคยเป็นโรคหลอดเลือดหัวใจ สโตรก ทำบอลลูน/ใส่ขดลวด หรือเป็นเบาหวาน <strong>ห้ามหยุดยาลดไขมันเองกะทันหัน</strong> ต้องปรับแผนร่วมกับแพทย์ประจำตัวเสมอ</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 03: WHY LDL-C ALONE IS INSUFFICIENT (Offwhite + Dots)
+           ========================================================= -->
+      <section class="slide bg-offwhite has-dots"
+        data-section="01 · BEYOND LDL"
+        data-title="ทำไม 'LDL-C อย่างเดียว' ไม่พอที่จะตัดสินใจ?"
+        data-duration="04:00–06:30"
+        data-notes="ทีนี้เรามาดูกันชัดๆ ว่าทำไมในมุม Functional Medicine ผมถึงบอกว่าค่า LDL-C อย่างเดียวไม่พอ
+
+อย่างแรก ค่า LDL-C ตามใบตรวจสุขภาพทั่วไปวัดแค่น้ำหนักคอเลสเตอรอลรวมที่อยู่ในอนุภาค LDL แต่สิ่งที่ชนผนังหลอดเลือดจริงๆ คือ ‘จำนวนอนุภาค’ หรือ ApoB และสภาพว่าไขมันนั้นถูกออกซิไดซ์จนบูดเสีย (oxLDL) หรือยัง
+
+อย่างที่สอง การเกิดคราบพลัคต้องอาศัย ‘2 ขา’ เสมอครับ ขาแรกคืออนุภาคไขมัน ApoB และขาที่สองคือ ‘ผนังหลอดเลือดที่บาดเจ็บและอักเสบ’ ถ้าผนังหลอดเลือดเรียบลื่น ไม่อักเสบ โอกาสที่ไขมันจะแทรกตัวเข้าไปสะสมก็น้อยลงมาก ลองเทียบเคส A กับเคส B ด้านล่างครับ: เคส A มี LDL แค่ 95 ดูสวยมาก แต่ hs-CRP พุ่ง 4.2 น้ำตาลสะสม 6.4 และสูบบุหรี่ เคสนี้หลอดเลือดเสี่ยงกว่าเคส B ที่ LDL 155 แต่ไม่มีการอักเสบเลยและหินปูนหัวใจเป็นศูนย์อย่างชัดเจน แล้วเรื่องการอักเสบมีหลักฐานใหญ่แค่ไหน ไปดูสไลด์ถัดไปครับ">
+        <div class="deco-rect fill-blue" style="width:78px;height:78px;top:40px;right:72px;transform:rotate(-8deg);"></div>
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-pink">01 · PATHOPHYSIOLOGY</span>
+              <span class="label-pill fill-white">MASS VS PARTICLE VS VESSEL WALL</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">ทำไม "<span class="en-caps">LDL-C</span> อย่างเดียว" ไม่พอที่จะตัดสินใจ?</h1>
+            <p class="slide-lead" style="margin-top:6px;">การอุดตันของหลอดเลือดไม่ได้ขึ้นกับ "น้ำหนักไขมันในถุง" แต่ขึ้นกับจำนวนอนุภาคและสภาพผนังหลอดเลือด</p>
+          </div>
+
+          <div class="step-track reveal d2">
+            <div class="step-card fill-blue has-connector">
+              <span class="mono-tag fill-white" style="align-self:flex-start;">01 · MEASUREMENT GAP</span>
+              <h3 style="margin:6px 0 4px 0;font-size:23px;">LDL-C = แค่มวลรวม</h3>
+              <p style="font-size:18px;">ไม่บอกจำนวนอนุภาคก่อพลัคทั้งหมด (<span class="en-caps">ApoB</span>) และไม่บอกว่าอนุภาคนั้นเล็ก-แทรกซึมง่าย (<span class="en-caps">sdLDL</span>) หรือถูกออกซิไดซ์ (<span class="en-caps">oxLDL</span>) แล้ว</p>
+            </div>
+            <div class="step-card fill-pink has-connector">
+              <span class="mono-tag fill-white" style="align-self:flex-start;">02 · TWO-HIT MODEL</span>
+              <h3 style="margin:6px 0 4px 0;font-size:23px;">พลัคเกิดจาก "2 ขา"</h3>
+              <p style="font-size:18px;">อนุภาค <span class="en-caps">ApoB</span> เป็นเพียง "รถขนส่ง" แต่ถ้า<strong>ผนังหลอดเลือดบาดเจ็บ อักเสบ หรือไกลเคต</strong> เม็ดเลือดขาวจึงจะจับมากลายเป็นคราบพลัค</p>
+            </div>
+            <div class="step-card fill-green">
+              <span class="mono-tag fill-white" style="align-self:flex-start;">03 · DISCORDANCE</span>
+              <h3 style="margin:6px 0 4px 0;font-size:23px;">บริบทเปลี่ยน ผลเปลี่ยน</h3>
+              <p style="font-size:18px;">คนไข้ที่มี <span class="en-caps">LDL</span> เท่ากันเป๊ะ แต่ภาวะดื้ออินซูลิน โลหะหนัก และการอักเสบต่างกัน มีความเสี่ยงหัวใจต่างกันมาก</p>
+            </div>
+          </div>
+
+          <div class="grid-2 reveal d3">
+            <div class="bf-card fill-cream">
+              <h3>
+                <span>เคส A: LDL ดูดี…แต่เสี่ยงสูงมาก</span>
+                <span class="mono-tag fill-pink">HIDDEN DANGER</span>
+              </h3>
+              <p style="font-size:18.5px;"><strong>ผลตรวจ:</strong> <span class="code-chip">LDL 95 mg/dL</span> + <span class="code-chip">hs-CRP 4.2 mg/L</span> + <span class="code-chip">HbA1c 6.4%</span> + สูบบุหรี่<br />
+              <strong>ความจริงทางชีวภาพ:</strong> ผนังหลอดเลือดอักเสบต่อเนื่อง ไขมันถูกออกซิไดซ์ง่าย อนุภาค ApoB สูงแบบซ่อนเร้น → <strong>ห้ามประมาทเด็ดขาด</strong></p>
+            </div>
+            <div class="bf-card fill-white">
+              <h3>
+                <span>เคส B: LDL สูง…แต่บริบทอาจเสี่ยงต่ำ</span>
+                <span class="mono-tag fill-green">INVESTIGATE MORE</span>
+              </h3>
+              <p style="font-size:18.5px;"><strong>ผลตรวจ:</strong> <span class="code-chip">LDL 155 mg/dL</span> + <span class="code-chip">hs-CRP 0.3 mg/L</span> + <span class="code-chip">TG/HDL 0.9</span> + <span class="code-chip">CAC = 0</span><br />
+              <strong>ความจริงทางชีวภาพ:</strong> อินซูลินไว ผนังหลอดเลือดไม่ติดไฟ ตรวจไม่พบหินปูน → <strong>มีพื้นที่ติดตามและดูแลเชิงลึกก่อนตัดสินใจกินยา</strong></p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 04: THE INFLAMMATION PARADOX (Pink + Data Chart)
+           ========================================================= -->
+      <section class="slide bg-pink"
+        data-section="01 · INFLAMMATION PARADOX"
+        data-title="The Inflammation Paradox: LDL ดี ≠ ปลอดภัยเสมอไป"
+        data-duration="06:30–09:00"
+        data-notes="หลักฐานสำคัญที่ยืนยันว่าเราดู LDL อย่างเดียวไม่ได้ มาจากงานวิจัยขนาดใหญ่ของ Dr. Paul Ridker ที่ตีพิมพ์ในวารสาร The Lancet ปี 2023 ซึ่งรวบรวมผู้ป่วยถึง 31,245 คนจาก 3 การทดลองคลินิกระดับโลกที่ทุกคนได้รับยา Statin อยู่แล้ว
+
+ผลออกมาชัดมากครับ ในคนที่ได้ยา Statin จนกด LDL ลงมาได้แล้ว กลุ่มที่มีค่าการอักเสบ hs-CRP สูงที่สุดเทียบกับกลุ่มต่ำที่สุด มีอัตราการเสียชีวิตจากโรคหัวใจและหลอดเลือดสูงกว่าเกือบ 2.6 เท่า (5.4% vs 2.1%) และอัตราเสียชีวิตทุกสาเหตุพุ่งจาก 4.4% เป็น 9.8% ในขณะที่ค่า LDL ที่ต่างกันในกลุ่มนี้กลับแยกความเสี่ยงเหตุการณ์หัวใจได้น้อยกว่ามาก (p = 0.11 สำหรับ MACE)
+
+นี่คือเหตุผลที่ผมเน้นคำว่า ‘การอักเสบ’ เพราะต่อให้ LDL คุณต่ำสวยแค่ไหน ถ้าไฟอักเสบยังไม่ดับ คุณก็ยังไม่ปลอดภัยเสมอไป คำถามสำคัญคือ: แล้วไฟอักเสบในหลอดเลือดมาจากไหนบ้าง? มาดูสไลด์ต่อไปครับ">
+        <div class="deco-stripe" style="width:160px;height:56px;top:36px;right:72px;transform:rotate(-3deg);"></div>
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-yellow">01 · EVIDENCE CHECK · LANCET 2023</span>
+              <span class="label-pill fill-white">RIDKER ET AL. · N = 31,245 ON STATIN</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title"><span class="en-caps">THE INFLAMMATION PARADOX</span>: <span class="en-caps">LDL</span> ดี ≠ ปลอดภัยเสมอไป</h1>
+            <p class="slide-lead" style="margin-top:6px;">ข้อมูลผู้ป่วย 31,245 รายใน PROMINENT, REDUCE-IT &amp; STRENGTH พิสูจน์ว่า "ไฟอักเสบหลงเหลือ (<span class="en-caps">hs-CRP</span>)" ทำนายการเสียชีวิตแรงกว่า <span class="en-caps">LDL-C</span></p>
+          </div>
+
+          <div class="grid-2-chart reveal d2">
+            <div class="stack-gap">
+              <div class="bf-card-sm fill-yellow tilt-neg">
+                <div class="stat-deco-dot fill-pink"></div>
+                <span class="mono-tag fill-white" style="margin-bottom:8px;">POOLED STATIN COHORT</span>
+                <div class="stat-number">31,245</div>
+                <p style="font-size:18.5px;margin-top:8px;"><strong>ผู้ป่วยที่กิน Statin อยู่แล้ว</strong> เปรียบเทียบ Quartile สูงสุด vs ต่ำสุดของ <span class="en-caps">hs-CRP</span> กับ <span class="en-caps">LDL-C</span> (<em>Lancet</em>, มี.ค. 2023)</p>
+              </div>
+              <div class="bf-card-sm fill-white tilt-pos">
+                <div class="stat-deco-dot fill-green"></div>
+                <span class="mono-tag fill-blue" style="margin-bottom:8px;">CV DEATH JUMP (Q4 VS Q1 HS-CRP)</span>
+                <div class="stat-number">&gt; 2.5×</div>
+                <p style="font-size:18.5px;margin-top:8px;">อัตราตายจากโรคหัวใจพุ่งจาก <strong>2.1% → 5.4%</strong> เมื่อ hs-CRP สูง แม้ได้รับยาลดไขมันอยู่แล้ว (<em>p</em> &lt; 0.0001)</p>
+              </div>
+            </div>
+
+            <div class="bf-card fill-white">
+              <h3>
+                <span>อัตราเหตุการณ์: กลุ่มสูงสุด (Q4) VS ต่ำสุด (Q1)</span>
+                <span class="mono-tag fill-green">DATA BAR (SCALE 16%)</span>
+              </h3>
+              <div class="chart-row">
+                <div class="chart-label">hs-CRP สูงสุด → CV Death (vs 2.1%)</div>
+                <div class="chart-track"><div class="chart-bar fill-pink" style="width:33.7%;"></div></div>
+                <div class="chart-val">5.4% <span style="font-size:14px;">(p&lt;.0001)</span></div>
+              </div>
+              <div class="chart-row">
+                <div class="chart-label">hs-CRP สูงสุด → ตายทุกสาเหตุ (vs 4.4%)</div>
+                <div class="chart-track"><div class="chart-bar fill-pink" style="width:61.2%;"></div></div>
+                <div class="chart-val">9.8% <span style="font-size:14px;">(p&lt;.0001)</span></div>
+              </div>
+              <div class="chart-row">
+                <div class="chart-label">hs-CRP สูงสุด → MACE (vs 12.6%)</div>
+                <div class="chart-track"><div class="chart-bar fill-yellow" style="width:93.7%;"></div></div>
+                <div class="chart-val">15.0% <span style="font-size:14px;">(p&lt;.0001)</span></div>
+              </div>
+              <div class="chart-row">
+                <div class="chart-label">LDL-C สูงสุด → CV Death (vs 3.5%)</div>
+                <div class="chart-track"><div class="chart-bar fill-blue" style="width:23.7%;"></div></div>
+                <div class="chart-val">3.8% <span style="font-size:14px;">(p=.0086)</span></div>
+              </div>
+              <div class="chart-row">
+                <div class="chart-label">LDL-C สูงสุด → MACE (vs 13.6%)</div>
+                <div class="chart-track"><div class="chart-bar fill-cream" style="width:81.2%;"></div></div>
+                <div class="chart-val">13.0% <span style="font-size:14px;">(NS p=.11)</span></div>
+              </div>
+              <div class="bf-card-sm fill-yellow" style="margin-top:14px;padding:12px 18px;">
+                <p style="font-size:18px;"><strong>Residual Inflammatory Risk:</strong> การกด LDL อย่างเดียวไม่ดับไฟอักเสบ — การจัดการ 2 เสา (ไขมัน + การอักเสบ) จึงสำคัญที่สุด</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 05: 6 CAUSES OF VASCULAR INFLAMMATION (Interactive)
+           ========================================================= -->
+      <section class="slide bg-yellow has-dots"
+        data-section="02 · ROOT CAUSES"
+        data-title="6 ต้นเหตุใหญ่ของการอักเสบในหลอดเลือด"
+        data-duration="09:00–11:30"
+        data-notes="เมื่อเรารู้แล้วว่าการอักเสบคือตัวการหลัก แล้วในชีวิตประจำวันเรามีอะไรบ้างที่ทำให้ผนังหลอดเลือดอักเสบ?
+
+บนสไลด์นี้ผมสรุป 6 ต้นเหตุสำคัญที่พบบ่อยในคนไทยครับ คุณสามารถคลิกดูรายละเอียดทีละช่องได้เลย:
+หนึ่ง โลหะหนักสะสม เช่น ตะกั่ว แคดเมียม ปรอท
+สอง มลพิษและสารเคมีรอบตัว ตั้งแต่ฝุ่น PM2.5 ไปจนถึงไมโครพลาสติก
+สาม อาหารการกินที่กระตุ้นน้ำตาล อินซูลิน และไขมันทรานส์/ออกซิไดซ์
+สี่ ความเครียดเรื้อรังที่ค้างฮอร์โมนคอร์ติซอลและอะดรีนาลีน
+ห้า การนั่งนาน ไม่ขยับตัว ไม่ออกกำลังกาย จนหลอดเลือดขาด Nitric Oxide
+และหก ตัวกระตุ้นแฝงที่มักถูกมองข้าม เช่น นอนกรนหยุดหายใจ โรคเหงือก ลำไส้รั่ว และไทรอยด์ต่ำ
+
+ในอีก 3 สไลด์ถัดไป ผมจะพาเจาะลึกทีละกลุ่มว่าพวกมันเข้าไปทำร้ายหลอดเลือดได้อย่างไรครับ">
+        <div class="deco-rect fill-pink" style="width:86px;height:86px;top:38px;right:72px;transform:rotate(9deg);"></div>
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-white">02 · VASCULAR INFLAMMATION</span>
+              <span class="label-pill fill-pink">CLICK CARD TO INSPECT MECHANISM</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">6 ต้นเหตุใหญ่ของการอักเสบในหลอดเลือด</h1>
+            <p class="slide-lead" style="margin-top:6px;">ทำไมผนังหลอดเลือดถึงบาดเจ็บและดูดจับอนุภาคไขมันเข้ามาสะสม (คลิกแต่ละการ์ดเพื่อดูกลไกและวิธีคัดกรอง)</p>
+          </div>
+
+          <div class="grid-3 reveal d2">
+            <div class="cause-card selected" role="button" tabindex="0" data-cause="0" onclick="window.presentation.selectInflame(0)" onkeydown="if(event.key==='Enter'||event.key===' ')window.presentation.selectInflame(0)">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                <span class="mono-tag fill-white">CAUSE 01</span>
+                <span style="font-size:22px;">🪨</span>
+              </div>
+              <h3 style="margin-bottom:4px;font-size:22px;">1. โลหะหนักสะสม</h3>
+              <p style="font-size:17px;">ตะกั่ว (Pb), แคดเมียม (Cd), ปรอท (Hg), สารหนู (As)</p>
+            </div>
+            <div class="cause-card" role="button" tabindex="0" data-cause="1" onclick="window.presentation.selectInflame(1)" onkeydown="if(event.key==='Enter'||event.key===' ')window.presentation.selectInflame(1)">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                <span class="mono-tag fill-blue">CAUSE 02</span>
+                <span style="font-size:22px;">🌫️</span>
+              </div>
+              <h3 style="margin-bottom:4px;font-size:22px;">2. มลพิษ &amp; สารเคมี</h3>
+              <p style="font-size:17px;">PM2.5, ไมโครพลาสติก, ควันบุหรี่, สารปนเปื้อน</p>
+            </div>
+            <div class="cause-card" role="button" tabindex="0" data-cause="2" onclick="window.presentation.selectInflame(2)" onkeydown="if(event.key==='Enter'||event.key===' ')window.presentation.selectInflame(2)">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                <span class="mono-tag fill-green">CAUSE 03</span>
+                <span style="font-size:22px;">🥤</span>
+              </div>
+              <h3 style="margin-bottom:4px;font-size:22px;">3. อาหาร &amp; ดื้ออินซูลิน</h3>
+              <p style="font-size:17px;">น้ำตาล ฟรุกโตส น้ำมันทอดซ้ำ อาหารแปรรูปจัด (UPF)</p>
+            </div>
+            <div class="cause-card" role="button" tabindex="0" data-cause="3" onclick="window.presentation.selectInflame(3)" onkeydown="if(event.key==='Enter'||event.key===' ')window.presentation.selectInflame(3)">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                <span class="mono-tag fill-pink">CAUSE 04</span>
+                <span style="font-size:22px;">🔥</span>
+              </div>
+              <h3 style="margin-bottom:4px;font-size:22px;">4. ความเครียดเรื้อรัง</h3>
+              <p style="font-size:17px;">Cortisol + Adrenaline สูงค้าง ทำลายสมดุลหลอดเลือด</p>
+            </div>
+            <div class="cause-card" role="button" tabindex="0" data-cause="4" onclick="window.presentation.selectInflame(4)" onkeydown="if(event.key==='Enter'||event.key===' ')window.presentation.selectInflame(4)">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                <span class="mono-tag fill-cream">CAUSE 05</span>
+                <span style="font-size:22px;">🪑</span>
+              </div>
+              <h3 style="margin-bottom:4px;font-size:22px;">5. ไม่ขยับ &amp; ไม่ออกกำลัง</h3>
+              <p style="font-size:17px;">ลด Nitric Oxide (NO) กล้ามเนื้อดื้ออินซูลิน อักเสบแฝง</p>
+            </div>
+            <div class="cause-card" role="button" tabindex="0" data-cause="5" onclick="window.presentation.selectInflame(5)" onkeydown="if(event.key==='Enter'||event.key===' ')window.presentation.selectInflame(5)">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                <span class="mono-tag fill-white">CAUSE 06</span>
+                <span style="font-size:22px;">🦷</span>
+              </div>
+              <h3 style="margin-bottom:4px;font-size:22px;">6. ตัวกระตุ้นแฝงอื่นๆ</h3>
+              <p style="font-size:17px;">นอนกรน (OSA), โรคเหงือก, ลำไส้รั่ว (LPS), ไทรอยด์ต่ำ</p>
+            </div>
+          </div>
+
+          <div class="bf-card fill-white reveal d3 cause-detail-box" id="inflameDetailBox">
+            <div>
+              <span class="mono-tag fill-yellow" id="inflameTag" style="margin-bottom:8px;">CAUSE 01 · HEAVY METALS</span>
+              <h3 id="inflameTitle" style="margin-bottom:8px;">โลหะหนักสะสม: ตะกั่ว (Pb), แคดเมียม (Cd), ปรอท (Hg), สารหนู</h3>
+              <p id="inflameMech" style="font-size:18.5px;">จับหมู่ซัลฟ์ไฮดริล (-SH) ทำลายเอนไซม์ต้านอนุมูลอิสระ (Glutathione) ก่อ Oxidative Stress กระตุ้น Endothelial dysfunction และการเกาะตัวของแคลเซียมในผนังหลอดเลือด</p>
+            </div>
+            <div class="bf-card-sm fill-blue" style="padding:16px 20px;">
+              <span class="mono-tag fill-white" style="margin-bottom:8px;">CLINICAL ACTION / SCREENING</span>
+              <p id="inflameAction" style="font-size:18px;">ซักประวัติแหล่งสัมผัส (ปลาทะเลใหญ่ น้ำดื่ม บุหรี่ อาหารปนเปื้อน อุดฟันอมัลกัม) คัดกรองโลหะหนักในเลือด/ปัสสาวะตามข้อบ่งชี้ เสริมระบบ Detox (NAC, Glutathione, กากใย)</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 06: CAUSES #1-#2 HEAVY METALS & POLLUTION (Green)
+           ========================================================= -->
+      <section class="slide bg-green"
+        data-section="02 · TOXINS &amp; METALS"
+        data-title="ต้นเหตุ #1–#2: โลหะหนักและมลพิษสิ่งแวดล้อมทำลายผนังหลอดเลือด"
+        data-duration="11:30–14:00"
+        data-notes="เจาะลึกสองกลุ่มแรกที่หลายคนนึกไม่ถึงว่าเกี่ยวอะไรกับคอเลสเตอรอล นั่นคือโลหะหนักและมลพิษสิ่งแวดล้อม
+
+โลหะหนักอย่างตะกั่ว แคดเมียม ปรอท และสารหนู ถึงได้รับในปริมาณน้อยแต่สะสมนาน จะเข้าไปแย่งจับและทำลายระบบต้านอนุมูลอิสระของร่างกาย เกิดอนุมูลอิสระ ROS จนเยื่อบุผนังหลอดเลือดสูญเสียความยืดหยุ่น และเปลี่ยนไขมัน LDL ให้กลายเป็น oxLDL
+
+ส่วนมลพิษรอบตัวอย่างฝุ่น PM2.5 สามารถทะลุถุงลมเข้ากระแสเลือดกระตุ้น IL-6 และ hs-CRP ทั่วร่างกาย รวมถึงงานวิจัยยุคใหม่ที่ตรวจพบไมโครพลาสติกในคราบพลัคหลอดเลือดคอซึ่งสัมพันธ์กับความเสี่ยงเหตุการณ์หัวใจและสโตรกที่สูงขึ้น
+
+สูตรการเกิดโรคจึงเริ่มต้นจาก ‘สารพิษสะสม → Oxidative Stress → oxLDL → เซลล์เม็ดเลือดขาวกลืนกินกลายเป็น Foam Cells → คราบพลัค’ ครับ">
+        <div class="star-burst" style="width:86px;height:86px;top:36px;right:72px;transform:rotate(12deg);">
+          <div class="star-burst-inner"></div>
+        </div>
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-yellow">02 · ENVIRONMENTAL DRIVERS</span>
+              <span class="label-pill fill-white">HEAVY METALS &amp; POLLUTANTS</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">ต้นเหตุ #1–#2: โลหะหนักและมลพิษทำลายผนังหลอดเลือด</h1>
+            <p class="slide-lead" style="margin-top:6px;">สารพิษจากอากาศ น้ำ และอาหาร เปลี่ยนไขมันปกติในเลือดให้กลายเป็นตัวกระตุ้นคราบพลัค</p>
+          </div>
+
+          <div class="grid-2 reveal d2">
+            <div class="bf-card fill-white">
+              <div class="feature-deco">Pb/Cd</div>
+              <h3>
+                <span>1. โลหะหนัก (Heavy Metals)</span>
+                <span class="mono-tag fill-pink">ENDOTHELIAL INJURY</span>
+              </h3>
+              <ul>
+                <li><strong>ตะกั่ว (Pb) &amp; แคดเมียม (Cd):</strong> เป็นปัจจัยเสี่ยงหลอดเลือดอิสระ แม้ในระดับต่ำที่เคยคิดว่ารับได้</li>
+                <li><strong>ทำลายระบบ Glutathione:</strong> เกิดอนุมูลอิสระ (ROS) พุ่งสูง ลดความสามารถซ่อมแซมผนังหลอดเลือด</li>
+                <li><strong>ปรอท (Hg) &amp; สารหนู (As):</strong> ยับยั้งการสร้าง Nitric Oxide (NO) ทำให้หลอดเลือดหดตัว ความดันสูง และเร่งหินปูนเกาะผนัง</li>
+                <li><strong>แหล่งพบบ่อย:</strong> ควันบุหรี่ (แคดเมียมสูง), ปลาทะเลขนาดใหญ่, น้ำปนเปื้อน, ฝุ่นอุตสาหกรรม</li>
+              </ul>
+            </div>
+
+            <div class="bf-card fill-white">
+              <div class="feature-deco fill-blue">PM</div>
+              <h3>
+                <span>2. มลพิษ &amp; สารเคมีรอบตัว</span>
+                <span class="mono-tag fill-blue">SYSTEMIC FIRE</span>
+              </h3>
+              <ul>
+                <li><strong>ฝุ่น PM2.5:</strong> อนุภาคเล็กกว่า 2.5 ไมครอนซึมเข้าเลือด กระตุ้นไซโตไคน์ (IL-6, TNF-α) และทำให้ <strong>hs-CRP พุ่ง</strong></li>
+                <li><strong>ไมโครพลาสติก &amp; พาทาเลต:</strong> ตรวจพบจริงในคราบพลัคหลอดเลือด และรบกวนฮอร์โมน+เยื่อบุหลอดเลือด</li>
+                <li><strong>ควันบุหรี่ &amp; มือสอง:</strong> ก่อบาดแผลโดยตรงบนผิว Endothelium และเพิ่มโอกาสที่คราบพลัคจะปริแตก</li>
+                <li><strong>สารเคมีปนเปื้อนอาหาร:</strong> ยาฆ่าแมลง สารจากภาชนะโดนความร้อน เพิ่มภาระตับและ Oxidative Stress</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="bf-card-sm fill-cream reveal d3" style="padding:16px 26px;">
+            <p style="font-size:19.5px;text-align:center;">
+              <strong>Toxic Cascade:</strong>&nbsp; สารพิษ &amp; โลหะหนัก &nbsp;→&nbsp; <strong>Oxidative Stress (ROS)</strong> &nbsp;→&nbsp; <span class="code-chip">oxLDL</span> &nbsp;→&nbsp; เม็ดเลือดขาวเก็บกิน (<strong>Foam Cells</strong>) &nbsp;→&nbsp; คราบพลัคในหลอดเลือด
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 07: CAUSE #3 DIET & INSULIN RESISTANCE (Offwhite)
+           ========================================================= -->
+      <section class="slide bg-offwhite has-dots"
+        data-section="02 · DIET &amp; METABOLISM"
+        data-title="ต้นเหตุ #3: อาหารการกิน น้ำตาล และภาวะดื้ออินซูลิน"
+        data-duration="14:00–16:30"
+        data-notes="ต้นเหตุที่สามซึ่งใกล้ตัวที่สุดก็คือ ‘อาหารการกินและภาวะดื้ออินซูลิน’ ครับ
+
+คนจำนวนมากเข้าใจผิดว่าอาหารที่ทำให้หลอดเลือดตีบมีแค่ไข่แดงหรือหมูสามชั้น แต่ในทางชีวเคมี ตัวเร่งที่รุนแรงกว่าคือ ‘น้ำตาล น้ำหวาน และฟรุกโตส’ ที่ก่อให้เกิดสาร AGEs ไปทำให้ผนังหลอดเลือดแข็งและอักเสบ ตามด้วยภาวะอินซูลินสูงเรื้อรัง ซึ่งบังคับให้ตับสร้าง VLDL มากขึ้น และเปลี่ยน LDL ตัวใหญ่ให้กลายเป็น ‘Small Dense LDL (sdLDL)’ เม็ดเล็ก แข็ง แทรกเข้าผนังหลอดเลือดง่ายมาก
+
+นอกจากนี้น้ำมันทอดซ้ำ ไขมันทรานส์ และอาหารแปรรูปจัดยังมีอนุมูลอิสระพร้อมก่อ Lipid Peroxidation ในตัว สัญญาณเตือนล่วงหน้าก่อนน้ำตาลอดอาหารจะขึ้นให้ดูที่ด้านขวาครับ: อัตราส่วน Triglyceride หารด้วย HDL ควรน้อยกว่า 1.5–2.0 และ Fasting Insulin ควรต่ำกว่า 5–7 ครับ">
+        <div class="deco-rect fill-yellow" style="width:76px;height:76px;top:38px;right:74px;transform:rotate(-7deg);"></div>
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-pink">02 · METABOLIC ROOT</span>
+              <span class="label-pill fill-white">SUGAR · GLYCATION · SMALL DENSE LDL</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">ต้นเหตุ #3: อาหารการกิน น้ำตาล และภาวะดื้ออินซูลิน</h1>
+            <p class="slide-lead" style="margin-top:6px;">เมื่ออินซูลินสูงเรื้อรัง ไขมันในเลือดจะเปลี่ยนคุณภาพเป็นอนุภาคขนาดเล็กที่แทรกผนังหลอดเลือดได้ง่าย</p>
+          </div>
+
+          <div class="grid-2-wide reveal d2">
+            <div class="bf-card fill-white">
+              <h3>
+                <span>4 กลไกอาหารทำร้ายผนังหลอดเลือด</span>
+                <span class="mono-tag fill-yellow">DIET PATHWAY</span>
+              </h3>
+              <div class="stack-gap" style="gap:16px;">
+                <div class="list-row">
+                  <div class="list-num">01</div>
+                  <p><strong>น้ำตาล &amp; ฟรุกโตส → AGEs:</strong> เกิดปฏิกิริยา Glycation สร้างสารเร่งแก่ ทำให้ผนังหลอดเลือดแข็ง บาดเจ็บ และอักเสบง่าย</p>
+                </div>
+                <div class="list-row">
+                  <div class="list-num">02</div>
+                  <p><strong>อินซูลินสูง → Small Dense LDL:</strong> กระตุ้นเอนไซม์ CETP/Lipase เปลี่ยน LDL ปกติให้เล็กลง อยู่ในเลือดนาน และมุดเข้าผนังหลอดเลือดเก่ง</p>
+                </div>
+                <div class="list-row">
+                  <div class="list-num">03</div>
+                  <p><strong>น้ำมันทอดซ้ำ &amp; อาหารแปรรูป (UPF):</strong> เต็มไปด้วยไขมันถูกออกซิไดซ์ เพิ่มภาระ Lipid Peroxidation โดยตรง</p>
+                </div>
+                <div class="list-row">
+                  <div class="list-num">04</div>
+                  <p><strong>ไตรกลีเซอไรด์สูง + HDL ต่ำ:</strong> คือลายนิ้วมือของภาวะดื้ออินซูลินที่เกิดล่วงหน้าก่อนระดับน้ำตาลอดอาหาร (FBS) จะผิดปกติ</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="bf-card fill-blue">
+              <div class="stat-deco-dot fill-pink"></div>
+              <h3>
+                <span>4 เป้าหมายเมแทบอลิซึมที่ควรเช็ก</span>
+                <span class="mono-tag fill-white">OPT-RANGE</span>
+              </h3>
+              <div class="stack-gap" style="gap:14px;">
+                <div class="bf-card-sm fill-white" style="padding:14px 18px;">
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <strong>TG / HDL Ratio</strong>
+                    <span class="code-chip">&lt; 1.5–2.0</span>
+                  </div>
+                  <p style="font-size:17px;margin-top:4px;">ถ้าสูง (&gt; 3.0) มักมี sdLDL และ ApoB สูงแฝงอยู่</p>
+                </div>
+                <div class="bf-card-sm fill-white" style="padding:14px 18px;">
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <strong>Fasting Insulin</strong>
+                    <span class="code-chip">&lt; 5–7 µIU/mL</span>
+                  </div>
+                  <p style="font-size:17px;margin-top:4px;">ตรวจจับภาวะดื้ออินซูลินได้เร็วกว่าการดู FBS 5–10 ปี</p>
+                </div>
+                <div class="bf-card-sm fill-white" style="padding:14px 18px;">
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <strong>HbA1c (น้ำตาลสะสม 3 เดือน)</strong>
+                    <span class="code-chip">&lt; 5.4%</span>
+                  </div>
+                  <p style="font-size:17px;margin-top:4px;">ยิ่งต่ำอย่างปลอดภัย ภาระ Glycation ต่อหลอดเลือดยิ่งน้อย</p>
+                </div>
+                <div class="bf-card-sm fill-yellow" style="padding:14px 18px;">
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <strong>hs-CRP (การอักเสบ)</strong>
+                    <span class="code-chip fill-white">&lt; 1.0 mg/L</span>
+                  </div>
+                  <p style="font-size:17px;margin-top:4px;">เป้าหมายอุดมคติ &lt; 0.5–1.0 mg/L (ตรวจซ้ำเมื่อไม่เป็นหวัด/ติดเชื้อ)</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 08: CAUSES #4-#6 STRESS, INACTIVITY, HIDDEN (Cream)
+           ========================================================= -->
+      <section class="slide bg-cream"
+        data-section="02 · LIFESTYLE &amp; HIDDEN"
+        data-title="ต้นเหตุ #4–#6: ความเครียด การไม่ขยับตัว และตัวกระตุ้นแฝง"
+        data-duration="16:30–19:00"
+        data-notes="ต่อมาก็คือสาเหตุด้านพฤติกรรมและตัวกระตุ้นแฝงครับ หลายคนกินดีมาก แต่ยังอักเสบอยู่เพราะ 3 เรื่องนี้
+
+เรื่องแรกคือ ‘ความเครียดเรื้อรัง’ ครับ เมื่อคอร์ติซอลและอะดรีนาลีนค้างสูง หลอดเลือดจะหดเกร็ง ความดันแกว่ง น้ำตาลในเลือดพุ่งขึ้นเองแม้ไม่ได้กินหวาน
+
+เรื่องที่สองคือ ‘การไม่ขยับและไม่ออกกำลังกาย’ การนั่งติดเก้าอี้เกิน 8 ชั่วโมงทำให้แรงเฉือนของเลือด (Shear Stress) ที่กระตุ้นผนังหลอดเลือดสร้างสาร Nitric Oxide ลดลง หลอดเลือดจึงแข็งและไวต่อการอักเสบ แม้จะเข้าฟิตเนสตอนเย็นแค่ 30 นาทีก็ตาม
+
+และเรื่องที่สามคือ ‘ตัวกระตุ้นแฝง’ อย่างการนอนน้อยหรือกรนหยุดหายใจขณะหลับ เหงือกอักเสบเรื้อรัง ลำไส้รั่ว และที่ต้องเช็กเสมอคือ ‘ภาวะไทรอยด์ต่ำ’ เพราะถ้าร่างกายขาดไทรอยด์ ตัวรับ LDL ที่ตับจะทำงานลดลง ทำให้ LDL สูงเทียมได้ครับ แล้วเราควรเจาะเลือดตัวไหนเพิ่มบ้าง? ไปดู Act 3 กันเลยครับ">
+        <div class="deco-stripe" style="width:155px;height:56px;top:36px;right:72px;transform:rotate(5deg);"></div>
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-white">02 · STRESS · SEDENTARY · HIDDEN TRIGGERS</span>
+              <span class="label-pill fill-pink">NON-LIPID VASCULAR DRIVERS</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">ต้นเหตุ #4–#6: ความเครียด การไม่ขยับ และตัวกระตุ้นแฝง</h1>
+            <p class="slide-lead" style="margin-top:6px;">ต่อให้คุมอาหารดี แต่ถ้าระบบประสาทค้าง กล้ามเนื้อไม่ขยับ หรือมีจุดอักเสบแฝง หลอดเลือดก็ยังติดไฟได้</p>
+          </div>
+
+          <div class="grid-3 reveal d2">
+            <div class="bf-card fill-pink">
+              <div class="feature-deco fill-white">04</div>
+              <h3><span>ความเครียดเรื้อรัง</span></h3>
+              <span class="mono-tag fill-white" style="margin-bottom:12px;">HPA-AXIS OVERDRIVE</span>
+              <ul>
+                <li><strong>Cortisol &amp; Adrenaline ค้างสูง:</strong> กระตุ้นระบบประสาทซิมพาเทติก หลอดเลือดหดเกร็ง</li>
+                <li><strong>น้ำตาลพุ่งแม้ไม่กินหวาน:</strong> ตับปล่อยกลูโคสฉุกเฉิน เพิ่มความต้องการอินซูลิน</li>
+                <li><strong>รบกวนการนอนลึก:</strong> ลดเวลาซ่อมแซมผนังหลอดเลือดช่วงกลางคืน</li>
+              </ul>
+            </div>
+
+            <div class="bf-card fill-blue">
+              <div class="feature-deco fill-yellow">05</div>
+              <h3><span>ไม่ขยับ &amp; ไม่ออกกำลัง</span></h3>
+              <span class="mono-tag fill-white" style="margin-bottom:12px;">LOW SHEAR STRESS</span>
+              <ul>
+                <li><strong>ขาดแรงสร้าง Nitric Oxide (NO):</strong> เลือดไหลเอื่อย ทำให้ผนังหลอดเลือดสูญเสียตัวปกป้อง</li>
+                <li><strong>Sitting Disease:</strong> นั่งต่อเนื่อง &gt;8 ชม./วัน เพิ่มความเสี่ยงอักเสบแม้เข้าฟิตเนสตอนเย็น</li>
+                <li><strong>กล้ามเนื้อน้อย:</strong> ถังเก็บน้ำตาลเล็กลง กระตุ้นไตรกลีเซอไรด์และ sdLDL</li>
+              </ul>
+            </div>
+
+            <div class="bf-card fill-green">
+              <div class="feature-deco fill-white">06</div>
+              <h3><span>ตัวกระตุ้นแฝงในร่างกาย</span></h3>
+              <span class="mono-tag fill-white" style="margin-bottom:12px;">SILENT INFECTIONS &amp; THYROID</span>
+              <ul>
+                <li><strong>นอนกรน / หยุดหายใจ (OSA):</strong> ออกซิเจนตกซ้ำๆ กลางดึก ทำลาย Endothelium รุนแรง</li>
+                <li><strong>โรคเหงือก &amp; ลำไส้รั่ว (LPS):</strong> แบคทีเรียและ Endotoxin เข้ากระแสเลือดกระตุ้นพลัค</li>
+                <li><strong>ไทรอยด์ต่ำ (Hypothyroid):</strong> ลด LDL Receptor ที่ตับ → <strong>LDL สูงเทียม!</strong></li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="bf-card-flat fill-white reveal d3" style="padding:15px 26px;">
+            <p style="font-size:19px;"><strong>คำถามคลินิกที่ต้องถามเสมอก่อนสั่งยาลดไขมัน:</strong> "ไทรอยด์ปกติหรือยัง? นอนกรนไหม? เหงือกอักเสบหรือเปล่า? วันนี้นั่งติดโต๊ะกี่ชั่วโมง และความเครียดค้างมานานแค่ไหน?"</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 09: FUNCTIONAL LAB PANEL BEYOND LDL (Blue + Dots)
+           ========================================================= -->
+      <section class="slide bg-blue has-dots"
+        data-section="03 · FUNCTIONAL LABS"
+        data-title="เจาะเลือดแบบ Functional: ตรวจอะไรเพิ่มนอกจาก LDL-C?"
+        data-duration="19:00–21:30"
+        data-notes="พอเราเข้าใจต้นเหตุแล้ว คำถามต่อไปคือ ถ้าจะตัดสินใจอย่างมั่นใจว่าจะกินยาหรือไม่กินยา เราควรเจาะเลือดอะไรเพิ่มบ้างนอกจาก Lipid Panel พื้นฐาน?
+
+หนึ่ง คือ ApoB เพื่อดู ‘จำนวนอนุภาคไขมันก่อพลัคตัวจริง’ ทั้งหมด ไม่ใช่แค่น้ำหนักคอเลสเตอรอล
+สอง คือ Lipoprotein(a) หรือ Lp(a) เป็นไขมันพันธุกรรมที่ควรตรวจอย่างน้อย 1 ครั้งในชีวิต เพราะถ้าสูงมาก เกณฑ์การตัดสินใจจะเข้มข้นขึ้นมาก
+สาม คือ hs-CRP เพื่อวัดไฟอักเสบซ่อนเร้น
+สี่ คือ Fasting Insulin และอัตราส่วน TG/HDL เพื่อเช็กความดื้ออินซูลินตั้งแต่เนิ่นๆ
+ห้า คือ Homocysteine ซึ่งสะท้อนการบาดเจ็บของผนังหลอดเลือดและภาวะขาดวิตามิน B6, B9, B12 รวมถึง oxLDL ถ้าทำได้
+และหก อย่าลืม TSH / Free T4 เพื่อตัดภาวะไทรอยด์ต่ำ และคัดกรองโลหะหนักในรายที่มีประวัติเสี่ยงครับ">
+        <div class="deco-rect fill-yellow" style="width:74px;height:74px;top:36px;right:72px;transform:rotate(8deg);"></div>
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-yellow">03 · ADVANCED DIAGNOSTICS</span>
+              <span class="label-pill fill-white">FUNCTIONAL BLOOD PANEL</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">เจาะเลือดแบบ <span class="en-caps">FUNCTIONAL</span>: ตรวจอะไรเพิ่มนอกจาก <span class="en-caps">LDL-C</span>?</h1>
+            <p class="slide-lead" style="margin-top:6px;">เปลี่ยนจากการเดาจาก "ตัวเลขเดียว" มาเป็นแผนที่ชีวภาพ 6 มิติของอนุภาค การอักเสบ และเมแทบอลิซึม</p>
+          </div>
+
+          <div class="bf-table-frame reveal d2">
+            <table class="bf-table bf-table-compact">
+              <thead>
+                <tr class="fill-yellow">
+                  <th style="width:24%;">Biomarker</th>
+                  <th style="width:52%;">บอกอะไรที่ LDL-C บอกไม่ได้</th>
+                  <th style="width:24%;">เป้าหมายเชิงป้องกัน</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>ApoB</strong> <span class="mono-tag fill-pink">PRIORITY</span></td>
+                  <td>นับจำนวนอนุภาคไขมันก่อพลัคทั้งหมด (LDL + VLDL + Lp(a)) แบบ 1:1 แก้ปัญหา Discordance</td>
+                  <td><span class="code-chip">&lt; 90 mg/dL</span> (เสี่ยงสูง &lt; 70)</td>
+                </tr>
+                <tr>
+                  <td><strong>Lp(a)</strong> <span class="mono-tag fill-blue">1×/LIFE</span></td>
+                  <td>ความเสี่ยงจากพันธุกรรมที่เหนียวและกระตุ้นลิ่มเลือดได้ (อาหารและ Statin มักลดไม่ลง)</td>
+                  <td><span class="code-chip">&lt; 30 mg/dL</span> (&lt; 75 nmol/L)</td>
+                </tr>
+                <tr>
+                  <td><strong>hs-CRP</strong></td>
+                  <td>ดัชนีวัดไฟอักเสบซ่อนเร้นของระบบและผนังหลอดเลือด ทำนายความเสี่ยงได้สูงแม้ LDL ต่ำ</td>
+                  <td><span class="code-chip fill-green">&lt; 1.0 mg/L</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Fasting Insulin &amp; TG/HDL</strong></td>
+                  <td>จับภาวะดื้ออินซูลินต้นเหตุของ sdLDL และ AGEs ได้เร็วกว่าค่าน้ำตาลอดอาหารหลายปี</td>
+                  <td><span class="code-chip">Insulin &lt; 5–7</span> · TG/HDL &lt; 2</td>
+                </tr>
+                <tr>
+                  <td><strong>Homocysteine / oxLDL</strong></td>
+                  <td>สะท้อนการบาดเจ็บผนังหลอดเลือด ขาดวิตามิน B6/B9/B12 และระดับไขมันที่ถูกออกซิไดซ์</td>
+                  <td><span class="code-chip">Hcy &lt; 9–10 µmol/L</span></td>
+                </tr>
+                <tr>
+                  <td><strong>TSH, Free T4 &amp; Heavy Metals</strong></td>
+                  <td>คัดแยกภาวะไทรอยด์ต่ำ (ทำ LDL สูงเทียม) และตรวจหาโลหะหนัก (Pb, Cd, Hg) ในกลุ่มเสี่ยง</td>
+                  <td><strong>แปลผลร่วมกับอาการ &amp; ประวัติ</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 10: VASCULAR IMAGING TOOLS (Offwhite)
+           ========================================================= -->
+      <section class="slide bg-offwhite"
+        data-section="03 · VASCULAR IMAGING"
+        data-title="เห็นหลอดเลือดจริง ไม่ต้องเดา: 3 เครื่องมือ Vascular Imaging"
+        data-duration="21:30–24:00"
+        data-notes="ผลเลือดบอกแนวโน้มในกระแสเลือด แต่ถ้าอยากรู้แบบ ‘ฟันธง’ ว่าหลอดเลือดของเรามีคราบพลัคเกิดขึ้นแล้วหรือยัง ในมุม Functional Medicine เราแนะนำให้ดูหลอดเลือดจริงด้วย Imaging ครับ เพราะค่าใช้จ่ายปัจจุบันจับต้องได้มากเทียบกับการกินยาหรือความเสี่ยงในอนาคต
+
+เครื่องมือแรกคือ ‘Carotid Ultrasound’ ดูหลอดเลือดแดงใหญ่ที่คอ ข้อดีคือไม่มีรังสี ทำซ้ำเพื่อติดตามได้ เห็นทั้งความหนาผนัง (CIMT) และคราบพลัคนิ่มตั้งแต่ระยะแรก
+เครื่องมือที่สองคือ ‘CAC Score’ เป็นการทำ CT หัวใจแบบไม่ฉีดสี รังสีต่ำ ใช้เวลา 5–10 นาที เพื่อนับคะแนนหินปูนในหลอดเลือดหัวใจโดยตรง
+และเครื่องมือที่สามคือ ‘CCTA’ หรือ CT ฉีดสีหลอดเลือดหัวใจ ซึ่งละเอียดที่สุด เห็นทั้งองศาการตีบและ Soft Plaque แต่มีรังสีและการฉีดสารทึบรังสี จึงเก็บไว้ใช้ในรายที่มีข้อบ่งชี้หรือสงสัย Soft Plaque ครับ">
+        <div class="deco-stripe" style="width:150px;height:52px;top:36px;right:72px;transform:rotate(-4deg);"></div>
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-green">03 · SEE THE ACTUAL PLAQUE</span>
+              <span class="label-pill fill-white">DIRECT VASCULAR IMAGING</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">เห็นหลอดเลือดจริง ไม่ต้องเดา: 3 เครื่องมือ <span class="en-caps">VASCULAR IMAGING</span></h1>
+            <p class="slide-lead" style="margin-top:6px;">แทนที่จะคาดคะเนจากสถิติอย่างเดียว การส่องดูผนังหลอดเลือดโดยตรงช่วยแยก "คนมีพลัคจริง" ออกจาก "คนที่ยังสะอาด"</p>
+          </div>
+
+          <div class="grid-3 reveal d2">
+            <div class="bf-card fill-blue">
+              <div class="feature-deco fill-white">US</div>
+              <h3><span>1. Carotid Ultrasound</span></h3>
+              <span class="mono-tag fill-white" style="margin-bottom:12px;">NO RADIATION · FOLLOW-UP</span>
+              <ul>
+                <li><strong>ดูอะไร:</strong> ความหนาผนังหลอดเลือดคอ (<span class="en-caps">CIMT</span>) และคราบพลัคทั้งแบบนิ่ม (<strong>Soft Plaque</strong>) &amp; หินปูน</li>
+                <li><strong>จุดเด่น:</strong> ไม่เจ็บ ไม่มีรังสี ใช้เป็น "หน้าต่างสะท้อน" สุขภาพหลอดเลือดและติดตามผลปรับพฤติกรรมได้ดี</li>
+                <li><strong>ข้อจำกัด:</strong> เป็นภาพหลอดเลือดคอ ไม่ใช่หลอดเลือดหัวใจโดยตรง ต้องทำคู่กับการประเมินความเสี่ยงหัวใจ</li>
+              </ul>
+            </div>
+
+            <div class="bf-card fill-yellow">
+              <div class="feature-deco fill-white">CAC</div>
+              <h3><span>2. CAC Score (CT หัวใจ)</span></h3>
+              <span class="mono-tag fill-white" style="margin-bottom:12px;">GUIDELINE DECISION TOOL</span>
+              <ul>
+                <li><strong>ดูอะไร:</strong> ปริมาณ<strong>หินปูนในหลอดเลือดหัวใจ</strong> (Agatston Score) — หินปูนคือรอยแผลของพลัคที่สะสมมานาน</li>
+                <li><strong>จุดเด่น:</strong> ไม่ฉีดสี รังสีต่ำ รวดเร็ว 5–10 นาที มีข้อมูลงานวิจัยขนาดใหญ่อย่าง <strong>MESA Study</strong> รองรับ</li>
+                <li><strong>บทบาทคลินิก:</strong> แนวทาง AHA/ACC ใช้ช่วยตัดสินใจเรื่อง Statin ในกลุ่มความเสี่ยงปานกลาง</li>
+              </ul>
+            </div>
+
+            <div class="bf-card fill-pink">
+              <div class="feature-deco fill-white">CT</div>
+              <h3><span>3. CCTA (CT ฉีดสีหัวใจ)</span></h3>
+              <span class="mono-tag fill-white" style="margin-bottom:12px;">FULL ANATOMY + SOFT PLAQUE</span>
+              <ul>
+                <li><strong>ดูอะไร:</strong> ทั้งองศาการตีบแคบ (% Stenosis) หินปูน และ <strong>Low-Attenuation Soft Plaque</strong> ที่ยังไม่ตกหินปูน</li>
+                <li><strong>จุดเด่น:</strong> แม่นยำสูงสุด เห็นโครงสร้างคราบพลัคและลักษณะเสี่ยงแตก (Vulnerable Plaque)</li>
+                <li><strong>ข้อจำกัด:</strong> ต้องฉีดสารทึบรังสี เช็กค่าไต (eGFR) ก่อนทำ ใช้ในรายที่มีข้อบ่งชี้ทางการแพทย์</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="bf-card-flat fill-white reveal d3" style="padding:15px 26px;">
+            <p style="font-size:19px;"><strong>กลยุทธ์ปฏิบัติจริง:</strong> เริ่มจาก <strong>Carotid Ultrasound</strong> (ดู Soft plaque &amp; CIMT แบบไร้รังสี) + <strong>CAC Score</strong> (ในวัย 40–45 ปีขึ้นไปหรือเสี่ยงปานกลาง) ส่วน <strong>CCTA</strong> พิจารณาเมื่อมีอาการหรือสงสัยพลัคนิ่ม</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 11: CAC SCORE & POWER OF ZERO (Yellow + Dots)
+           ========================================================= -->
+      <section class="slide bg-yellow has-dots"
+        data-section="03 · POWER OF ZERO"
+        data-title="เจาะลึก CAC Score & 'Power of Zero' (MESA & AHA/ACC)"
+        data-duration="24:00–26:30"
+        data-notes="มาลงลึกเรื่อง CAC Score หรือคะแนนหินปูนหลอดเลือดหัวใจกันครับ จากการศึกษา MESA Study ในอเมริกา พบความจริงที่น่าทึ่งคือ ในกลุ่มคนที่ถูกคำนวณความเสี่ยงปานกลาง (10-year ASCVD risk 7.5% ถึง 20%) เกือบครึ่งหนึ่งคือ 40–50% มีคะแนน CAC = 0!
+
+แนวทางของ AHA/ACC เรียกสิ่งนี้ว่า ‘Power of Zero’ ครับ หมายความว่าถ้าคุณไม่ได้เป็นเบาหวาน ไม่สูบบุหรี่ และไม่มีประวัติคนในครอบครัวเป็นโรคหัวใจตั้งแต่อายุน้อย ผล CAC = 0 ให้ความมั่นใจได้นานราว 5–10 ปี ทำให้แพทย์และคนไข้สามารถ ‘ชะลอการเริ่มยา Statin’ ออกไปได้อย่างมีหลักฐาน แล้วใช้เวลาช่วงนี้คุมอาหาร ลดการอักเสบ และแก้ความเสี่ยงอื่นแทน
+
+แต่ต้องระวังด้านขวาด้วยนะครับ CAC = 0 ไม่ได้แปลว่าปลอดภัย 100% ตลอดไป เพราะในคนอายุน้อยอาจเริ่มมี Soft Plaque ที่ยังไม่ตกเป็นหินปูน หรือถ้าคุณมีเบาหวาน สูบบุหรี่ หรือพันธุกรรม FH ที่ LDL ทะลุ 190 แพทย์ก็ยังอาจพิจารณายาแม้ CAC = 0 ครับ">
+        <div class="deco-rect fill-blue" style="width:82px;height:82px;top:36px;right:72px;transform:rotate(12deg);"></div>
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-white">03 · RISK RECLASSIFICATION</span>
+              <span class="label-pill fill-green">MESA STUDY &amp; AHA/ACC GUIDELINES</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">เจาะลึก <span class="en-caps">CAC SCORE</span> &amp; "<span class="en-caps">POWER OF ZERO</span>"</h1>
+            <p class="slide-lead" style="margin-top:6px;">ใน MESA Study กว่า 40–50% ของผู้ที่เสี่ยงปานกลางตามสูตรคำนวณ มีค่า CAC = 0 — ช่วยเลี่ยงการกินยาโดยไม่จำเป็นได้จริง</p>
+          </div>
+
+          <div class="grid-2-wide reveal d2">
+            <div class="bf-card fill-white">
+              <h3>
+                <span>การแปลผลคะแนน CAC (Agatston Score)</span>
+                <span class="mono-tag fill-blue">WARRANTY VS ACTION</span>
+              </h3>
+              <div class="stack-gap" style="gap:12px;">
+                <div class="bf-card-sm fill-green" style="padding:14px 18px;">
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <strong>CAC = 0 (Power of Zero)</strong>
+                    <span class="code-chip fill-white">ชะลอ STATIN ได้*</span>
+                  </div>
+                  <p style="font-size:17.5px;margin-top:4px;">ไม่พบพลัคหินปูนในวันตรวจ มี "Warranty period" ความเสี่ยงต่ำราว <strong>5–10 ปี</strong> โฟกัสไลฟ์สไตล์และลดอักเสบ (ตรวจซ้ำใน 5 ปี)</p>
+                </div>
+                <div class="bf-card-sm fill-yellow" style="padding:14px 18px;">
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <strong>CAC 1–99 (Mild Plaque)</strong>
+                    <span class="code-chip fill-white">พบพลัคเริ่มต้น</span>
+                  </div>
+                  <p style="font-size:17.5px;margin-top:4px;">มีคราบพลัคเกิดขึ้นแล้ว คุมไลฟ์สไตล์เข้ม + ลด ApoB/hs-CRP และปรึกษาแพทย์เรื่องเริ่มยา</p>
+                </div>
+                <div class="bf-card-sm fill-cream" style="padding:14px 18px;">
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <strong>CAC 100–299 (Moderate)</strong>
+                    <span class="code-chip fill-white">แนะนำ STATIN</span>
+                  </div>
+                  <p style="font-size:17.5px;margin-top:4px;">ความเสี่ยงชัดเจน (~เทียบเท่าคนเคยมีเหตุการณ์) แนวทางมาตรฐานแนะนำยาลดไขมัน</p>
+                </div>
+                <div class="bf-card-sm fill-pink" style="padding:14px 18px;">
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <strong>CAC ≥ 300 (Extensive Plaque)</strong>
+                    <span class="code-chip fill-white">เสี่ยงสูงมาก</span>
+                  </div>
+                  <p style="font-size:17.5px;margin-top:4px;">ควรรักษาด้วยยาเข้มข้น + ดูแลครบทุกปัจจัยอักเสบภายใต้การติดตามของแพทย์</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="bf-card fill-offwhite">
+              <div class="feature-deco fill-pink">!</div>
+              <h3>
+                <span>ข้อจำกัด &amp; ข้อยกเว้นของ CAC = 0</span>
+                <span class="mono-tag fill-pink">CRITICAL CAVEATS</span>
+              </h3>
+              <ul>
+                <li><strong>มองไม่เห็น Soft Plaque:</strong> หินปูนใช้เวลาสะสมหลายปี — ในคนอายุน้อย (&lt;45 ปี) อาจมีคราบพลัคนิ่มก่อนหินปูนขึ้น</li>
+                <li><strong>ไม่เท่ากับความเสี่ยงศูนย์:</strong> หากไลฟ์สไตล์แย่หรืออักเสบสูง ต่อให้วันนี้ 0 อีก 3–5 ปีข้างหน้าก็เริ่มเกาะได้</li>
+              </ul>
+              <div class="bf-card-sm fill-white" style="margin-top:16px;padding:16px 20px;">
+                <span class="mono-tag fill-yellow" style="margin-bottom:8px;">*3 ข้อยกเว้นที่ยังพิจารณายาแม้ CAC = 0 (AHA/ACC)</span>
+                <ul style="gap:8px;">
+                  <li style="font-size:18px;"><strong>1. เบาหวาน (Diabetes Mellitus)</strong></li>
+                  <li style="font-size:18px;"><strong>2. สูบบุหรี่ปัจจุบัน</strong></li>
+                  <li style="font-size:18px;"><strong>3. ประวัติครอบครัวโรคหัวใจก่อนวัย</strong> (หรือ LDL ≥ 190 / พันธุกรรม FH)</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 12: 4-QUADRANT DECISION MATRIX (Green)
+           ========================================================= -->
+      <section class="slide bg-green"
+        data-section="03 · DECISION MATRIX"
+        data-title="กรอบตัดสินใจ 4 ช่อง (Functional Medicine Decision Matrix)"
+        data-duration="26:30–29:30"
+        data-notes="ผมรวบรวมทุกอย่างที่พูดมาตั้งแต่สไลด์แรก ลงในตารางตัดสินใจ 4 ช่องนี้ครับ ลองดูว่าตัวคุณหรือคนใกล้ตัวอยู่ในช่องไหน
+
+ช่องที่ 1 (ซ้ายบน): LDL สูง แต่อักเสบต่ำ (hs-CRP &lt; 1) อินซูลินดี และ Imaging ปกติ (CAC = 0 / ไม่มีพลัค) — นี่คือกลุ่มที่สามารถชะลอยาได้มั่นใจที่สุด ใช้การปรับอาหาร ออกกำลังกาย และสารธรรมชาติลด ApoB แล้วติดตามผลสม่ำเสมอ
+
+ช่องที่ 2 (ขวาบน): LDL สูง + มีการอักเสบหรือดื้ออินซูลิน แต่ยังไม่พบพลัค — ต้องเร่ง ‘ดับไฟต้นเหตุ’ 3–6 เดือนทันที ลดน้ำตาล คุมอินซูลิน เช็กโลหะหนักและคุณภาพการนอน แล้วค่อยตรวจซ้ำ
+
+ช่องที่ 3 (ซ้ายล่าง): คือ ‘กับดักหลอกตา’ ครับ LDL ต่ำหรือดูปกติ แต่อักเสบสูงหรือเจอพลัค! ห้ามคิดว่าตัวเองปลอดภัย ต้องรีบหาต้นเหตุอักเสบและคุยกับแพทย์เรื่องการป้องกันเชิงรุก
+
+และช่องที่ 4 (ขวาล่าง): พบพลัคชัดเจนแล้ว (เช่น CAC เกิน 100, หลอดเลือดตีบ, เคยหัวใจขาดเลือด) — ช่องนี้ขอให้มองยา Statin เป็น ‘เข็มขัดนิรภัย’ ที่ใช้ร่วมกับการดูแลแบบ Functional Medicine ครับ">
+        <div class="star-burst" style="width:84px;height:84px;top:36px;right:72px;transform:rotate(-8deg);">
+          <div class="star-burst-inner"></div>
+        </div>
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-white">03 · CLINICAL SYNTHESIS</span>
+              <span class="label-pill fill-yellow">4-QUADRANT STATIN DECISION MATRIX</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">กรอบตัดสินใจ 4 ช่อง (<span class="en-caps">DECISION MATRIX</span>)</h1>
+            <p class="slide-lead" style="margin-top:6px;">จับคู่ระหว่าง "ระดับ LDL / ApoB" กับ "การอักเสบ &amp; สภาพหลอดเลือดจริง (Imaging)" เพื่อเลือกกลยุทธ์ที่แม่นยำ</p>
+          </div>
+
+          <div class="grid-2 reveal d2">
+            <div class="bf-card fill-white" style="padding:22px 26px;">
+              <h3>
+                <span>ช่อง 1: LDL สูง + ไม่อักเสบ + CAC = 0</span>
+                <span class="mono-tag fill-green">SAFE TO DEFER</span>
+              </h3>
+              <ul style="gap:8px;">
+                <li><strong>โปรไฟล์:</strong> hs-CRP &lt; 1, อินซูลินไว, ไม่มีพลัคบน Ultrasound/CAC</li>
+                <li><strong>กลยุทธ์:</strong> ชะลอ Statin (ยกเว้นมีข้อยกเว้น FH/เบาหวาน/บุหรี่)</li>
+                <li><strong>แผนติดตาม:</strong> ไลฟ์สไตล์ + สารลด ApoB + เจาะเลือด 3–6 ด. / Imaging 3–5 ปี</li>
+              </ul>
+            </div>
+
+            <div class="bf-card fill-yellow" style="padding:22px 26px;">
+              <h3>
+                <span>ช่อง 2: LDL สูง + อักเสบ/ดื้ออินซูลิน</span>
+                <span class="mono-tag fill-white">EXTINGUISH FIRE</span>
+              </h3>
+              <ul style="gap:8px;">
+                <li><strong>โปรไฟล์:</strong> hs-CRP สูง, TG/HDL &gt; 2, เครียด/นอนแย่ (ยังไม่พบพลัคชัด)</li>
+                <li><strong>กลยุทธ์:</strong> <strong>ดับไฟต้นเหตุเร่งด่วน 3–6 เดือน</strong> พร้อมเช็ก Imaging ยืนยัน</li>
+                <li><strong>แผนติดตาม:</strong> ถ้าไฟดับไม่ได้หรือมีแนวโน้มพลัคขึ้น ค่อยพิจารณายาร่วม</li>
+              </ul>
+            </div>
+
+            <div class="bf-card fill-pink" style="padding:22px 26px;">
+              <h3>
+                <span>ช่อง 3: LDL ดี/ต่ำ + แต่อักเสบสูง/เจอพลัค!</span>
+                <span class="mono-tag fill-white">SILENT TRAP</span>
+              </h3>
+              <ul style="gap:8px;">
+                <li><strong>โปรไฟล์:</strong> กับดักหลอกตา — LDL สวย แต่ hs-CRP สูงหรือพบ Soft/Calcified plaque</li>
+                <li><strong>กลยุทธ์:</strong> <strong>ห้ามชะล่าใจเด็ดขาด</strong> หาสาเหตุอักเสบ (สารพิษ/OSA/เหงือก/น้ำตาล)</li>
+                <li><strong>แผนติดตาม:</strong> ประเมินความเสี่ยงหัวใจเชิงรุกร่วมกับแพทย์</li>
+              </ul>
+            </div>
+
+            <div class="bf-card fill-cream" style="padding:22px 26px;">
+              <h3>
+                <span>ช่อง 4: พบคราบพลัคชัดเจน / มีโรคแล้ว</span>
+                <span class="mono-tag fill-white">SEATBELT + FM</span>
+              </h3>
+              <ul style="gap:8px;">
+                <li><strong>โปรไฟล์:</strong> CAC ≥ 100, หลอดเลือดตีบมีนัยสำคัญ, เคยหัวใจขาดเลือด/สโตรก</li>
+                <li><strong>กลยุทธ์:</strong> <strong>ใช้ยาเป็น "เข็มขัดนิรภัย"</strong> ทำให้พลัคเสถียรและหดตัว</li>
+                <li><strong>แผนติดตาม:</strong> ควบคู่โภชนาการ CoQ10 ดับไฟอักเสบ และลดสารพิษ</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 13: 4 PILLARS OF LIFESTYLE (Offwhite + Dots)
+           ========================================================= -->
+      <section class="slide bg-offwhite has-dots"
+        data-section="04 · NATURAL FOUNDATION"
+        data-title="4 เสาหลัก Lifestyle ก่อนพึ่งอาหารเสริมหรือยา"
+        data-duration="29:30–31:30"
+        data-notes="สำหรับคนที่อยู่ในช่อง 1 หรือช่อง 2 และอยากดูแลตัวเองแบบไม่ใช้ยาก่อน หัวใจสำคัญอันดับแรกยังไม่ใช่เม็ดอาหารเสริมครับ แต่คือ 4 เสาหลักของไลฟ์สไตล์ที่จะช่วยทั้งลด ApoB และดับการอักเสบพร้อมกัน
+
+เสาแรก ‘โภชนาการ’: ตัดน้ำตาล เครื่องดื่มหวาน และแป้งขัดสี เพิ่มใยอาหารละลายน้ำเพื่อจับน้ำดีในลำไส้ เลือกไขมันดีอย่างน้ำมันมะกอกบริสุทธิ์ (EVOO) อะโวคาโด และปลาทะเลตัวเล็ก
+เสาสอง ‘การเคลื่อนไหว’: ทำคาร์ดิโอโซน 2 ให้ได้ 150 นาที/สัปดาห์ เพื่อกระตุ้น Nitric Oxide ฝึกกล้ามเนื้อ 2–3 วัน/สัปดาห์ และลุกเดินทุก 45 นาที
+เสาสาม ‘นอนและเครียด’: นอน 7–8 ชั่วโมง คัดกรองภาวะหยุดหายใจขณะหลับถ้ากรน และฝึกหายใจลดคอร์ติซอล
+เสาสี่ ‘ลดมลพิษ’: ใช้เครื่องกรอง PM2.5 เลี่ยงภาชนะพลาสติกโดนร้อน และงดบุหรี่
+
+เมื่อฐาน 4 เสานี้แน่นแล้ว ค่อยมาเลือกสารธรรมชาติเสริมอย่างแม่นยำในสไลด์ถัดไปครับ">
+        <div class="deco-rect fill-green" style="width:78px;height:78px;top:38px;right:72px;transform:rotate(-9deg);"></div>
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-green">04 · LIFESTYLE MEDICINE</span>
+              <span class="label-pill fill-white">4 PILLARS BEFORE SUPPLEMENTS</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">4 เสาหลัก <span class="en-caps">LIFESTYLE</span> ก่อนพึ่งอาหารเสริมหรือยา</h1>
+            <p class="slide-lead" style="margin-top:6px;">รากฐานที่ลดได้ทั้งอนุภาค ApoB, อินซูลิน และการอักเสบของผนังหลอดเลือดโดยไม่มีผลข้างเคียง</p>
+          </div>
+
+          <div class="grid-4 reveal d2">
+            <div class="bf-card fill-blue">
+              <div class="feature-deco fill-white">01</div>
+              <h3><span>NUTRITION</span></h3>
+              <span class="mono-tag fill-white" style="margin-bottom:12px;">ลดดื้ออินซูลิน &amp; sdLDL</span>
+              <ul>
+                <li>ตัดน้ำตาล น้ำหวาน ฟรุกโตส และอาหารแปรรูปจัด</li>
+                <li>เพิ่ม<strong>ใยอาหารละลายน้ำ</strong> 25–35 กรัม/วัน จับน้ำดีลด ApoB</li>
+                <li>เน้น <strong>EVOO</strong>, อะโวคาโด, ถั่วเปลือกแข็ง, ปลาตัวเล็ก</li>
+              </ul>
+            </div>
+
+            <div class="bf-card fill-green">
+              <div class="feature-deco fill-yellow">02</div>
+              <h3><span>MOVEMENT</span></h3>
+              <span class="mono-tag fill-white" style="margin-bottom:12px;">NITRIC OXIDE BOOST</span>
+              <ul>
+                <li><strong>Zone 2</strong> 150 นาที/สัปดาห์ เพิ่มตัวกระตุ้น NO และความไวอินซูลิน</li>
+                <li><strong>เวทเทรนนิ่ง</strong> 2–3 วัน/สัปดาห์ เพิ่มมวลกล้ามเนื้อ</li>
+                <li>ลุกเดิน/ขยับตัว 2–3 นาที ทุก 45–60 นาทีที่นั่งทำงาน</li>
+              </ul>
+            </div>
+
+            <div class="bf-card fill-yellow">
+              <div class="feature-deco fill-white">03</div>
+              <h3><span>SLEEP &amp; STRESS</span></h3>
+              <span class="mono-tag fill-white" style="margin-bottom:12px;">REPAIR ENDOTHELIUM</span>
+              <ul>
+                <li>นอนหลับลึก <strong>7–8 ชั่วโมง</strong> เพื่อฟื้นฟูเยื่อบุหลอดเลือด</li>
+                <li>คัดกรอง <strong>OSA</strong> ทันทีหากนอนกรน/ง่วงกลางวัน</li>
+                <li>ฝึกหายใจช้า เดินรับแดดเช้า ลด Cortisol ค้างสะสม</li>
+              </ul>
+            </div>
+
+            <div class="bf-card fill-pink">
+              <div class="feature-deco fill-white">04</div>
+              <h3><span>CLEAN LIVING</span></h3>
+              <span class="mono-tag fill-white" style="margin-bottom:12px;">LOWER TOXIC LOAD</span>
+              <ul>
+                <li>ใช้เครื่องกรองอากาศ HEPA ช่วงค่า <strong>PM2.5 สูง</strong></li>
+                <li>เลี่ยงพลาสติกโดนร้อน ลดไมโครพลาสติก/พาทาเลต</li>
+                <li>เลือกปลาปรอทต่ำ งดบุหรี่/ควันบุหรี่มือสองเด็ดขาด</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="bf-card-flat fill-white reveal d3" style="padding:15px 26px;">
+            <p style="font-size:19px;"><strong>หลักปฏิบัติ:</strong> อาหารเสริมไม่สามารถชดเชย "น้ำตาลที่กินเกิน ความเครียดที่ค้าง และการนั่งทั้งวัน" ได้ — ใช้ไลฟ์สไตล์เป็นตัวขับเคลื่อนหลักและใช้สารธรรมชาติเป็นตัวเสริมเฉพาะจุด</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 14: NATURAL APOB & LDL LOWERERS (Blue + Bar Chart)
+           ========================================================= -->
+      <section class="slide bg-blue"
+        data-section="04 · NATURAL APOB LOWERERS"
+        data-title="สารธรรมชาติลดอนุภาค ApoB & LDL-C (หลักฐาน Meta-Analysis)"
+        data-duration="31:30–34:30"
+        data-notes="ทีนี้มาดูคำถามยอดฮิตครับ: ‘แล้วสารจากธรรมชาติตัวไหนบ้างที่มีงานวิจัย Meta-Analysis ว่าช่วยลดอนุภาค ApoB และ LDL-C ได้จริง?’
+
+ตัวเด่นตัวแรกคือ ‘Citrus Bergamot (โพลีฟีนอลจากมะกรูดอิตาลี)’ ช่วยลด LDL-C และ ApoB ได้ราว 20–30% ออกฤทธิ์ผ่านทั้ง AMPK และลดการสร้างคอเลสเตอรอลที่ตับอย่างอ่อนโยน
+ตัวที่สองคือ ‘Berberine’ ลด LDL-C ได้ราว 15–25% จุดแข็งคือช่วยลด PCSK9 ทำให้ตับดึง LDL กลับได้ดีขึ้น แถมยังลดดื้ออินซูลินและ HbA1c ได้ด้วย
+ตัวที่สามคือ ‘Plant Sterols’ ประมาณวันละ 2 กรัม และ ‘Psyllium / ใยอาหารละลายน้ำ’ ซึ่งช่วยขัดขวางการดูดซึมคอเลสเตอรอลในลำไส้ ลดได้ราว 6–10% โดยไม่กดการทำงานของตับ
+
+ข้อควรระวังสำคัญด้านขวาครับ: ‘Red Yeast Rice (ข้าวยีสต์แดง)’ มีสาร Monacolin K ซึ่งโครงสร้างเดียวกับยา Lovastatin จึงต้องระวังผลข้างเคียงและสารปนเปื้อน Citrinin ส่วน Berberine อาจตีกับยาอื่นผ่านเอนไซม์ CYP3A4 ดังนั้นทุกสูตรควรเลือกตามผลเลือดและตรวจติดตามทุก 8–12 สัปดาห์ครับ">
+        <div class="deco-stripe" style="width:155px;height:56px;top:36px;right:72px;transform:rotate(4deg);"></div>
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-yellow">04 · EVIDENCE-BASED NUTRACEUTICALS</span>
+              <span class="label-pill fill-white">APOB &amp; LDL-C REDUCTION</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">สารธรรมชาติลดอนุภาค <span class="en-caps">APOB &amp; LDL-C</span></h1>
+            <p class="slide-lead" style="margin-top:6px;">ข้อมูลเฉลี่ยจาก Meta-Analysis — เลือกกลไกให้ตรงกับปัญหาเมแทบอลิซึมของแต่ละคน และติดตามผลเลือด</p>
+          </div>
+
+          <div class="grid-2-chart reveal d2">
+            <div class="bf-card fill-white">
+              <h3>
+                <span>ค่าเฉลี่ยการลด LDL-C / ApoB (%)</span>
+                <span class="mono-tag fill-green">MAX BAR = 35%</span>
+              </h3>
+              <div class="chart-row">
+                <div class="chart-label">Citrus Bergamot (BPF)</div>
+                <div class="chart-track"><div class="chart-bar fill-pink" style="width:85.7%;"></div></div>
+                <div class="chart-val">20–30%</div>
+              </div>
+              <div class="chart-row">
+                <div class="chart-label">Berberine (500 mg × 2–3)</div>
+                <div class="chart-track"><div class="chart-bar fill-yellow" style="width:71.4%;"></div></div>
+                <div class="chart-val">15–25%</div>
+              </div>
+              <div class="chart-row">
+                <div class="chart-label">Red Yeast Rice* (Monacolin K)</div>
+                <div class="chart-track"><div class="chart-bar fill-cream" style="width:71.4%;"></div></div>
+                <div class="chart-val">15–25%</div>
+              </div>
+              <div class="chart-row">
+                <div class="chart-label">Plant Sterols (~2 g/วัน)</div>
+                <div class="chart-track"><div class="chart-bar fill-blue" style="width:28.6%;"></div></div>
+                <div class="chart-val">8–10%</div>
+              </div>
+              <div class="chart-row">
+                <div class="chart-label">Psyllium / ใยอาหารละลายน้ำ</div>
+                <div class="chart-track"><div class="chart-bar fill-green" style="width:28.6%;"></div></div>
+                <div class="chart-val">6–10%</div>
+              </div>
+              <div class="bf-card-sm fill-yellow" style="margin-top:14px;padding:12px 16px;">
+                <p style="font-size:17.5px;"><strong>Synergistic Stacking:</strong> การจับคู่หลายกลไก (เช่น ลดสร้าง + ลด PCSK9 + บล็อกดูดซึม) ในงานวิจัยรวมลดได้ถึง <strong>30–40%</strong></p>
+              </div>
+            </div>
+
+            <div class="bf-card fill-offwhite">
+              <h3>
+                <span>กลไกออกฤทธิ์ &amp; ข้อควรระวังทางคลินิก</span>
+                <span class="mono-tag fill-pink">SAFETY FIRST</span>
+              </h3>
+              <ul>
+                <li><strong>Citrus Bergamot (โพลีฟีนอล):</strong> ยับยั้ง HMG-CoA อย่างอ่อนโยน กระตุ้น AMPK ปรับขนาด LDL ให้ใหญ่ขึ้นและลด ApoB</li>
+                <li><strong>Berberine:</strong> ลด <strong>PCSK9</strong> ทำให้ตับเพิ่ม LDL Receptor + ลดน้ำตาล/อินซูลินดีเยี่ยม <em>(ระวังตีกับยาผ่าน CYP3A4 / P-gp)</em></li>
+                <li><strong>Plant Sterols &amp; Soluble Fiber:</strong> แย่งจับคอเลสเตอรอลในไมเซลล์และดักน้ำดีทิ้งทางอุจจาระ</li>
+                <li><strong>*หมายเหตุ Red Yeast Rice:</strong> มีสาร <strong>Monacolin K</strong> (= Lovastatin ธรรมชาติ) ต้องระวังปวดกล้ามเนื้อ เอนไซม์ตับ และสารพิษ <strong>Citrinin</strong> หากแบรนด์ไม่ผ่านตรวจ</li>
+              </ul>
+              <div class="bf-card-sm fill-white" style="margin-top:14px;padding:12px 16px;">
+                <p style="font-size:17.5px;"><strong>ติดตามผล:</strong> เจาะ ApoB, Lipid, ตับ (ALT/AST) หลังเริ่มใช้ <strong>8–12 สัปดาห์</strong> เสมอ</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 15: ADAPTOGENS & NATURAL ANTI-INFLAMMATORY (Pink + Dots)
+           ========================================================= -->
+      <section class="slide bg-pink has-dots"
+        data-section="04 · ADAPTOGENS &amp; CALM FIRE"
+        data-title="Adaptogens & สารธรรมชาติลดการอักเสบหลอดเลือด"
+        data-duration="34:30–37:00"
+        data-notes="นอกจากลดจำนวนอนุภาค ApoB แล้ว เสาที่สำคัญไม่แพ้กันคือ ‘สารธรรมชาติและ Adaptogens สำหรับดับไฟอักเสบและคุมคอร์ติซอล’ ครับ
+
+ฝั่งซ้ายคือกลุ่มลดการอักเสบและปกป้องเยื่อบุหลอดเลือด:
+- Omega-3 EPA/DHA ช่วยลดไตรกลีเซอไรด์ ลด hs-CRP และสร้างสารดับไฟอักเสบ SPMs
+- Curcumin ช่วยปิดสวิตช์ NF-κB ต้นทางการอักเสบ
+- Aged Garlic Extract (กระเทียมสกัดบ่ม) มีงานวิจัย RCT ของ Dr. Matthew Budoff ที่ชี้ว่าช่วยลดการลุกลามของ Low-Attenuation Non-Calcified Plaque หรือคราบพลัคนิ่มอันตราย และชะลอ CAC ได้
+- Astaxanthin และ Polyphenols ช่วยกันไม่ให้ LDL ถูกออกซิไดซ์
+
+ส่วนฝั่งขวาคือกลุ่ม ‘Adaptogens’ สำหรับคนไข้ที่ไฟอักเสบมาจากความเครียดเรื้อรังและนอนไม่พอ:
+- Ashwagandha ช่วยลดระดับ Cortisol ค้างและส่งเสริมการหลับลึก
+- Rhodiola Rosea ปรับสมดุลระบบประสาทอัตโนมัติและต้านความล้า
+- กะเพรา/Holy Basil (Tulsi) ช่วยลด Oxidative & Metabolic Stress ร่วมกับ Magnesium Glycinate ครับ">
+        <div class="deco-rect fill-yellow" style="width:76px;height:76px;top:36px;right:72px;transform:rotate(10deg);"></div>
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-white">04 · VASCULAR SHIELD &amp; ADAPTOGENS</span>
+              <span class="label-pill fill-yellow">CALMING INFLAMMATION &amp; HPA-AXIS</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title"><span class="en-caps">ADAPTOGENS</span> &amp; สารธรรมชาติลดการอักเสบหลอดเลือด</h1>
+            <p class="slide-lead" style="margin-top:6px;">จับคู่ระหว่าง "ตัวดับไฟผนังหลอดเลือด &amp; oxLDL" กับ "Adaptogens ปรับสมดุลฮอร์โมนความเครียด"</p>
+          </div>
+
+          <div class="grid-2 reveal d2">
+            <div class="bf-card fill-white">
+              <div class="feature-deco fill-green">ANTI</div>
+              <h3>
+                <span>ลดอักเสบ &amp; ปกป้องผนังหลอดเลือด</span>
+                <span class="mono-tag fill-green">OXLDL &amp; HS-CRP</span>
+              </h3>
+              <ul>
+                <li><strong>Omega-3 (EPA/DHA):</strong> ลดไตรกลีเซอไรด์ ลด hs-CRP และสร้างสาร <strong>SPMs</strong> ยุติการอักเสบ <em>(เช็กความเสี่ยง AF เมื่อใช้โดสสูง)</em></li>
+                <li><strong>Aged Garlic Extract (AGE):</strong> ลดการออกซิไดซ์ LDL และงานวิจัย RCT (Budoff 2016) พบว่าช่วยลดการลุกลามของ <strong>Low-Attenuation Soft Plaque</strong></li>
+                <li><strong>Curcumin (ดูดซึมสูง):</strong> ยับยั้งวิถีอักเสบหลัก <strong>NF-κB</strong> และลดไซโตไคน์ทำลายหลอดเลือด</li>
+                <li><strong>Astaxanthin &amp; EVOO Polyphenols:</strong> เกราะต้านอนุมูลอิสระที่ละลายในไขมัน ป้องกัน LDL กลายเป็น oxLDL</li>
+              </ul>
+            </div>
+
+            <div class="bf-card fill-white">
+              <div class="feature-deco fill-blue">HPA</div>
+              <h3>
+                <span>Adaptogens &amp; สมดุลความเครียด</span>
+                <span class="mono-tag fill-blue">CORTISOL CONTROL</span>
+              </h3>
+              <ul>
+                <li><strong>Ashwagandha (Withania somnifera):</strong> ลดระดับ <strong>Cortisol</strong> เรื้อรัง ผ่อนคลายความกังวล และปรับปรุงคุณภาพการหลับลึก</li>
+                <li><strong>Rhodiola Rosea:</strong> ปรับสมดุลระบบประสาทอัตโนมัติ (Autonomic tone) ต้านความล้าทั้งสมองและร่างกาย</li>
+                <li><strong>Holy Basil / กะเพรา (Tulsi):</strong> Adaptogen ที่ช่วยลด Metabolic &amp; Oxidative Stress อย่างอ่อนโยน</li>
+                <li><strong>Magnesium Glycinate + L-Theanine:</strong> ช่วยคลายกล้ามเนื้อเรียบหลอดเลือด ลดหัวใจเต้นเร็วจากความเครียด</li>
+              </ul>
+              <div class="bf-card-sm fill-yellow" style="margin-top:14px;padding:12px 16px;">
+                <p style="font-size:17.5px;"><strong>ข้อควรระวัง:</strong> Adaptogen ไม่เหมาะในหญิงตั้งครรภ์ หรือบางภาวะ เช่น ไทรอยด์เป็นพิษ (Ashwagandha) — ปรึกษาแพทย์ก่อนใช้</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 16: PLAQUE REGRESSION OVERVIEW (Cream)
+           ========================================================= -->
+      <section class="slide bg-cream"
+        data-section="05 · PLAQUE REGRESSION"
+        data-title="เมื่อมี 'คราบพลัค' แล้ว: ลดขนาดได้จริงไหม?"
+        data-duration="37:00–39:00"
+        data-notes="มาถึงคำถามใหญ่สุดท้ายที่หลายคนรอคอยครับ: ‘ถ้าตรวจเจอคราบพลัคในหลอดเลือดแล้ว เรายังทำให้มันหดเล็กลงได้ไหม?’
+
+คำตอบทางวิทยาศาสตร์คือ ‘ได้ครับ’ โดยการดูแลคราบพลัคมี 2 เป้าหมายคู่กัน:
+หนึ่ง คือ Plaque Stabilization ทำให้คราบพลัคนิ่มๆ ที่มีไขมันเหลวอยู่ข้างในแข็งแรงขึ้น เปลือกหนาขึ้น ไม่ปริแตกมากลายเป็นลิ่มเลือดหัวใจวายฉับพลัน
+สอง คือ Plaque Regression หรือการทำให้ปริมาตรรวมของคราบพลัคยุบตัวลงจริง
+
+ในเวชศาสตร์ปัจจุบันและเวชศาสตร์ชะลอวัย มี 2 แนวทางที่ถูกศึกษาวิจัยเรื่องการลดขนาดพลัคอย่างกว้างขวาง: แนวทางแรกคือการใช้ยา ‘Statin’ ขนาดสูงซึ่งมีหลักฐานการอัลตราซาวด์ในหลอดเลือดชัดเจน ส่วนอีกแนวทางที่มีงานวิจัยศึกษาคู่ขนานกันคือ ‘EDTA Chelation Therapy’ ที่อาศัยสมมติฐานการลดแคลเซียมและการขับโลหะหนัก เรามาเทียบหลักฐานจริงของทั้งสองเรื่องอย่างตรงไปตรงมาใน 2 สไลด์ถัดไปครับ">
+        <div class="deco-stripe" style="width:155px;height:56px;top:36px;right:72px;transform:rotate(-5deg);"></div>
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-white">05 · PLAQUE REGRESSION EVIDENCE</span>
+              <span class="label-pill fill-pink">STABILIZATION VS SHRINKAGE</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">เมื่อมี "คราบพลัค" แล้ว: ลดขนาดได้จริงไหม?</h1>
+            <p class="slide-lead" style="margin-top:6px;">เป้าหมายไม่ได้มีแค่การลดเลขไขมัน แต่คือการ "ทำให้พลัคไม่แตก" และ "ลดปริมาตรคราบพลัคจริง"</p>
+          </div>
+
+          <div class="bf-card-flat fill-white reveal d2" style="padding:20px 28px;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:center;">
+              <div>
+                <span class="mono-tag fill-green" style="margin-bottom:8px;">GOAL A · PLAQUE STABILIZATION</span>
+                <p style="font-size:19px;">เปลี่ยน <strong>Soft/Vulnerable Plaque</strong> ที่เปลือกบางเสี่ยงแตก ให้ดึงไขมันออกและสร้าง <strong>Fibrous Cap</strong> ที่หนาและมั่นคง</p>
+              </div>
+              <div style="border-left:3px solid var(--black);padding-left:28px;">
+                <span class="mono-tag fill-yellow" style="margin-bottom:8px;">GOAL B · PLAQUE REGRESSION</span>
+                <p style="font-size:19px;">ลดปริมาตรไขมันและแกนกลางเนื้อตายในผนังหลอดเลือดอย่างวัดผลได้บนภาพ <strong>IVUS / CCTA</strong></p>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid-2 reveal d3">
+            <div class="bf-card fill-blue">
+              <div style="display:flex;align-items:center;gap:14px;margin-bottom:12px;">
+                <div class="icon-square fill-white">01</div>
+                <h3 style="margin:0;"><span>แนวทางที่ 1: ยา STATIN (Intensive)</span></h3>
+              </div>
+              <p style="margin-bottom:12px;">กด LDL-C &amp; ApoB ลงต่ำมากๆ ร่วมกับฤทธิ์ต้านอักเสบ (Pleiotropic effect) จนเกิดการไหลกลับของไขมันออกจากคราบพลัค</p>
+              <span class="mono-tag fill-white">IVUS TRIALS: ASTEROID · SATURN</span>
+            </div>
+
+            <div class="bf-card fill-yellow">
+              <div style="display:flex;align-items:center;gap:14px;margin-bottom:12px;">
+                <div class="icon-square fill-white">02</div>
+                <h3 style="margin:0;"><span>แนวทางที่ 2: EDTA CHELATION</span></h3>
+              </div>
+              <p style="margin-bottom:12px;">สมมติฐานการจับแคลเซียมในเลือดชั่วคราว (กระตุ้น PTH) และกลไกหลักที่พิสูจน์แล้วคือการขับโลหะหนัก (Pb, Cd) ลด Oxidative Stress</p>
+              <span class="mono-tag fill-white">NIH TRIALS: TACT (2013) · TACT2 (2024)</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 17: PATHWAY 1 — STATIN & PLAQUE REGRESSION (Blue + Dots)
+           ========================================================= -->
+      <section class="slide bg-blue has-dots"
+        data-section="05 · PATHWAY 1 · STATIN"
+        data-title="แนวทางที่ 1: Statin กับการลดขนาดคราบพลัค (ASTEROID & SATURN)"
+        data-duration="39:00–41:30"
+        data-notes="มาดูแนวทางแรกที่มีหลักฐานชัดเจนที่สุดกันก่อนครับ: การใช้ Statin เพื่อลดขนาดคราบพลัค
+
+งานวิจัยระดับ Landmark สองเรื่องที่ใช้เครื่องอัลตราซาวด์สอดเข้าไปวัดขนาดคราบพลัคในหลอดเลือดหัวใจโดยตรง (IVUS) คือ ASTEROID และ SATURN:
+- ใน ASTEROID (2006) ให้ Rosuvastatin 40 mg กด LDL-C ลง 53.2% มาอยู่ที่เฉลี่ย 60.8 mg/dL ผลคือ 63.6% ของผู้ป่วยมีปริมาตรคราบพลัคหดตัวจริง (PAV ลดลงเฉลี่ย 0.98%, ปริมาตรรวมลด 6.8%)
+- ใน SATURN (2011) ติดตาม 24 เดือน พบว่า Rosuvastatin 40 mg ทำให้ 68.5% ของผู้ป่วยคราบพลัคหดตัว และ Atorvastatin 80 mg ทำให้ 63.2% คราบพลัคหดตัว
+
+ดังนั้นเมื่อคนไข้มีพลัคเยอะหรือความเสี่ยงสูงแล้ว เราไม่ได้ให้ยาแค่ลดเลขเล่นๆ แต่มันหดพลัคและลดโอกาสพลัคแตกได้จริง ส่วนในแนวทาง Functional Medicine ถ้าจำเป็นต้องใช้ยา เราก็มีวิธีปรับให้ปลอดภัยขึ้น เช่น ใช้ขนาดต่ำร่วมกับ Ezetimibe เสริม CoQ10 และติดตามค่าน้ำตาล/ตับ/กล้ามเนื้ออยู่เสมอครับ">
+        <div class="deco-rect fill-pink" style="width:76px;height:76px;top:36px;right:72px;transform:rotate(10deg);"></div>
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-yellow">05 · PATHWAY 01</span>
+              <span class="label-pill fill-white">INTENSIVE LIPID LOWERING · IVUS DATA</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">แนวทางที่ 1: <span class="en-caps">STATIN</span> กับการลดขนาดคราบพลัค</h1>
+            <p class="slide-lead" style="margin-top:6px;">เมื่อกด LDL-C ลงถึงระดับ ~60–65 mg/dL ควบคู่กับลดอักเสบ งานวิจัย IVUS ยืนยันว่าพลัคหดตัวลงได้ใน 63–69% ของผู้ป่วย</p>
+          </div>
+
+          <div class="grid-2 reveal d2">
+            <div class="bf-card fill-white">
+              <h3>
+                <span>2 งานวิจัย Landmark บน IVUS</span>
+                <span class="mono-tag fill-green">PROVEN REGRESSION</span>
+              </h3>
+              <div class="stack-gap" style="gap:14px;">
+                <div class="bf-card-sm fill-yellow" style="padding:16px 20px;">
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <strong>ASTEROID Trial (2006)</strong>
+                    <span class="code-chip fill-white">63.6% REGRESSED</span>
+                  </div>
+                  <p style="font-size:18px;margin-top:6px;">Rosuvastatin 40 mg/วัน ลด LDL-C <strong>-53.2%</strong> (เหลือ 60.8 mg/dL)<br />→ ปริมาตรพลัค (<span class="en-caps">PAV</span>) ลดลงเฉลี่ย <strong>-0.98%</strong>, <span class="en-caps">TAV</span> ลดลง <strong>-6.8%</strong> (<em>p</em> &lt; 0.001)</p>
+                </div>
+                <div class="bf-card-sm fill-pink" style="padding:16px 20px;">
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <strong>SATURN Trial (2011 · 24 เดือน)</strong>
+                    <span class="code-chip fill-white">63.2% – 68.5%</span>
+                  </div>
+                  <p style="font-size:18px;margin-top:6px;">Rosuvastatin 40 mg: <span class="en-caps">PAV</span> <strong>-1.22%</strong> (<strong>68.5%</strong> หดตัว)<br />Atorvastatin 80 mg: <span class="en-caps">PAV</span> <strong>-0.99%</strong> (<strong>63.2%</strong> หดตัว)</p>
+                </div>
+                <div class="bf-card-sm fill-offwhite" style="padding:14px 18px;">
+                  <p style="font-size:17.5px;"><strong>กลไกเสริม:</strong> PCSK9 Inhibitors (+ Statin) สามารถกด LDL-C &lt; 40–50 mg/dL และเพิ่มอัตราการยุบตัวของพลัคได้ยิ่งขึ้นในผู้ป่วยเสี่ยงสูงมาก</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="bf-card fill-offwhite">
+              <div class="feature-deco fill-yellow">FM</div>
+              <h3>
+                <span>เทคนิคใช้ Statin แบบ Functional Medicine</span>
+                <span class="mono-tag fill-blue">SMART DOSING</span>
+              </h3>
+              <ul>
+                <li><strong>Low-Dose Statin + Ezetimibe:</strong> ลดขนาด Statin เพื่อลดผลข้างเคียงต่อกล้ามเนื้อและน้ำตาล แต่ยังกด ApoB ลงได้เท่าขนาดสูง</li>
+                <li><strong>เสริม CoQ10 (Ubiquinol):</strong> ชดเชย CoQ10 ที่ลดลงจากวิถี Mevalonate เพื่อปกป้องไมโทคอนเดรียและกล้ามเนื้อ</li>
+                <li><strong>เลือกโมเลกุลที่เหมาะกับผู้ป่วย:</strong> ประเมินชนิดละลายน้ำ vs ละลายไขมัน (เช่น Rosuvastatin/Pravastatin vs Atorvastatin)</li>
+                <li><strong>ตรวจติดตามอย่างครบถ้วน:</strong> เช็ก <strong>HbA1c, Fasting Insulin, ALT, CK</strong> พร้อมดับไฟอักเสบจากอาหาร-สารพิษควบคู่กันเสมอ</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 18: PATHWAY 2 — CHELATION THERAPY & TACT/TACT2 (Yellow)
+           ========================================================= -->
+      <section class="slide bg-yellow"
+        data-section="05 · PATHWAY 2 · CHELATION"
+        data-title="แนวทางที่ 2: EDTA Chelation — กลไกแคลเซียม โลหะหนัก & หลักฐาน TACT/TACT2"
+        data-duration="41:30–44:00"
+        data-notes="ทีนี้มาดูแนวทางที่สองที่มีการพูดถึงในวงการ Functional Medicine และการศึกษาวิจัยขนาดใหญ่ของสถาบันสุขภาพแห่งชาติสหรัฐฯ (NIH): นั่นคือ ‘EDTA Chelation Therapy’ ครับ
+
+กลไกที่ถูกนำมาอธิบายมี 2 เรื่อง: เรื่องแรกเป็นสมมติฐานดั้งเดิมเรื่อง Calcium Shift คือการให้ EDTA เข้าไปจับแคลเซียมไอออนในกระแสเลือดให้ต่ำลงชั่วคราว เพื่อกระตุ้นฮอร์โมนพาราไทรอยด์ (PTH) และหวังดึงแคลเซียมส่วนเกินที่เกาะในคราบพลัคออกมา ส่วนกลไกที่สองซึ่งพิสูจน์แล้วชัดเจนกว่ามาก คือ ‘การจับขับโลหะหนัก’ อย่างตะกั่ว (Pb) และแคดเมียม (Cd) ออกทางปัสสาวะ เพื่อลด Oxidative Stress ต่อผนังหลอดเลือด
+
+มาดูหลักฐานจริงจากวารสาร JAMA ครับ: งานวิจัย TACT ปี 2013 เคยพบการลดเหตุการณ์หัวใจรวม 18% โดยเฉพาะในกลุ่มเบาหวาน แต่เมื่องานวิจัยภาคต่อที่ใหญ่และรัดกุมมากอย่าง TACT2 ตีพิมพ์ใน JAMA ปี 2024 ผลออกมาชัดเจนมากว่า แม้ EDTA จะล้างตะกั่วในเลือดลดลงได้มากกว่า 60% จริง แต่ ‘ไม่ได้ลดอัตราการเกิดเหตุการณ์หัวใจรวม’ ในผู้ป่วยเบาหวานหลังกล้ามเนื้อหัวใจตาย (45.8% vs 46.5%)
+
+ดังนั้นผมขอสื่อสารอย่างซื่อสัตย์บนหลักฐานครับ: ปัจจุบัน Chelation ยังไม่ใช่ยารักษาโรคหัวใจแทน Statin และแนวทางมาตรฐานยังไม่รับรอง แต่ถ้าจะใช้เพื่อช่วยลดภาระโลหะหนัก ควรเป็นเพียงส่วนเสริมภายใต้การดูแลของแพทย์และเช็กค่าไตอย่างใกล้ชิดครับ">
+        <div class="star-burst" style="width:82px;height:82px;top:36px;right:72px;transform:rotate(8deg);">
+          <div class="star-burst-inner"></div>
+        </div>
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-white">05 · PATHWAY 02</span>
+              <span class="label-pill fill-pink">HONEST SCIENCE · TACT &amp; TACT2 (JAMA)</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">แนวทางที่ 2: <span class="en-caps">EDTA CHELATION</span> &amp; หลักฐานคลินิก</h1>
+            <p class="slide-lead" style="margin-top:6px;">เข้าใจสมมติฐานการลดแคลเซียมในเลือด กลไกขับโลหะหนัก และผลเปรียบเทียบจากงานวิจัยระดับ JAMA 2013 vs 2024</p>
+          </div>
+
+          <div class="grid-2 reveal d2">
+            <div class="bf-card fill-white">
+              <h3>
+                <span>2 กลไกที่ถูกนำมาศึกษาในหลอดเลือด</span>
+                <span class="mono-tag fill-blue">PROPOSED MECHANISMS</span>
+              </h3>
+              <div class="stack-gap" style="gap:16px;">
+                <div class="bf-card-sm fill-offwhite" style="padding:16px 20px;">
+                  <span class="mono-tag fill-yellow" style="margin-bottom:8px;">01 · CALCIUM SHIFT HYPOTHESIS</span>
+                  <p style="font-size:18px;">EDTA จับแคลเซียมไอออนในเลือดให้ลดต่ำลงชั่วคราว → กระตุ้นฮอร์โมน <strong>PTH</strong> เพื่อดึงแคลเซียมเข้าสมดุล โดยมีสมมติฐานว่าช่วยชะลอหรือลดการสะสมแคลเซียมในพลัค <em>(วงการโรคหัวใจเห็นว่า EDTA ไม่ได้ละลายหินปูนในพลัคแบบจำเพาะเจาะจง)</em></p>
+                </div>
+                <div class="bf-card-sm fill-green" style="padding:16px 20px;">
+                  <span class="mono-tag fill-white" style="margin-bottom:8px;">02 · HEAVY METAL CHELATION (PROVEN)</span>
+                  <p style="font-size:18px;">EDTA จับโลหะหนักที่ก่อพิษต่อหลอดเลือดอย่าง <strong>ตะกั่ว (Pb) &amp; แคดเมียม (Cd)</strong> ขับออกทางปัสสาวะ ลด Oxidative Stress และความเสื่อมของผนัง Endothelium</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="bf-card fill-offwhite">
+              <h3>
+                <span>ผลวิจัย JAMA: TACT (2013) VS TACT2 (2024)</span>
+                <span class="mono-tag fill-pink">EVIDENCE UPDATE</span>
+              </h3>
+              <ul>
+                <li><strong>TACT (<em>JAMA</em>, 2013 | n=1,708):</strong> ฉีด EDTA 40 ครั้ง → ลดเหตุการณ์หัวใจรวม <strong>18%</strong> (สัญญาณบวกเด่นในกลุ่มเบาหวาน) แต่ถูกตั้งข้อสังเกตเรื่อง dropout</li>
+                <li><strong>TACT2 (<em>JAMA</em>, ก.ย. 2024 | n=959 เบาหวานหลัง MI):</strong> ทำซ้ำอย่างรัดกุม → <strong>ลดตะกั่วในเลือดได้ &gt;60%</strong> จริง แต่เหตุการณ์หัวใจรวม 5 ปี <strong>ไม่ต่างกัน</strong> (<strong>45.8%</strong> vs <strong>46.5%</strong>)</li>
+                <li><strong>จุดยืนทางการแพทย์ปัจจุบัน:</strong> ACC/AHA <strong>ไม่แนะนำใช้ Chelation แทนยาโรคหัวใจ</strong> — หากพิจารณาใช้เพื่อดีท็อกซ์โลหะหนัก ต้องทำร่วมกับมาตรฐานหลัก และตรวจ <strong>ค่าไต (eGFR) + แคลเซียม/สังกะสี</strong> เคร่งครัด</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 19: 5-STEP ACTION PLAN BEFORE DECIDING (Green + Dots)
+           ========================================================= -->
+      <section class="slide bg-green has-dots"
+        data-section="05 · ACTION PLAN"
+        data-title="Action Plan 5 ขั้นตอน: ก่อนตัดสินใจว่าจะกินยาหรือไม่"
+        data-duration="44:00–46:30"
+        data-notes="ตอนนี้ทุกท่านเห็นภาพครบทั้งระบบแล้ว ผมสรุปเป็น ‘Action Plan 5 ขั้นตอน’ ที่นำไปใช้คุยกับแพทย์ได้เลยครับ:
+
+ขั้นที่ 1: เช็กความเสี่ยงฐานก่อนและห้ามหยุดยาเอง โดยเฉพาะกลุ่มเคยเป็นโรคหัวใจ สโตรก หรือเบาหวาน
+ขั้นที่ 2: เจาะเลือดให้ครบชุด Beyond LDL ได้แก่ ApoB, Lp(a), hs-CRP, Fasting Insulin, TG/HDL, Homocysteine และเช็กไทรอยด์
+ขั้นที่ 3: ส่องผนังหลอดเลือดจริงด้วย Carotid Ultrasound และ/หรือ CAC Score เพื่อรู้ว่ามีคราบพลัคแล้วหรือยัง
+ขั้นที่ 4: ลงมือดับไฟอักเสบ 3–6 เดือนเต็มที่ ทั้งอาหาร ขยับตัว นอน ลดเครียด ลดสารพิษ ใช้ Adaptogens และสารธรรมชาติลด ApoB อย่างมีเป้าหมาย
+ขั้นที่ 5: เจาะเลือดซ้ำและตัดสินใจร่วมกับแพทย์ (Shared Decision-Making) ว่าผลเลือดและความเสี่ยงจริงเข้าสู่เกณฑ์ปลอดภัยแล้วหรือควรใช้ยาช่วย
+
+เพราะหัวใจสำคัญไม่ใช่ ‘เกลียดยา’ หรือ ‘รักยา’ แต่คือ ‘ปกป้องหลอดเลือดของคุณให้ปลอดภัยที่สุด’ ครับ">
+        <div class="deco-rect fill-yellow" style="width:76px;height:76px;top:36px;right:72px;transform:rotate(-8deg);"></div>
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-white">05 · PRACTICAL ROADMAP</span>
+              <span class="label-pill fill-yellow">SHARED DECISION-MAKING</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title"><span class="en-caps">ACTION PLAN</span> 5 ขั้นตอน: ก่อนตัดสินใจว่าจะกินยาหรือไม่</h1>
+            <p class="slide-lead" style="margin-top:6px;">เปลี่ยนความกังวลให้เป็นข้อมูลที่วัดได้ เพื่อวางแผนร่วมกับแพทย์อย่างปลอดภัยและมีหลักฐานรองรับ</p>
+          </div>
+
+          <div class="grid-2 reveal d2">
+            <div class="stack-gap" style="gap:16px;">
+              <div class="bf-card-sm fill-white">
+                <div class="list-row">
+                  <div class="list-num">01</div>
+                  <div>
+                    <strong style="font-size:21px;">ประเมินความเสี่ยงฐาน &amp; ห้ามหยุดยาเอง</strong>
+                    <p style="font-size:18px;margin-top:4px;">เช็กประวัติโรคหัวใจเดิม สโตรก เบาหวาน สูบบุหรี่ และประวัติครอบครัวโรคหัวใจก่อนวัยอันควร</p>
+                  </div>
+                </div>
+              </div>
+              <div class="bf-card-sm fill-white">
+                <div class="list-row">
+                  <div class="list-num">02</div>
+                  <div>
+                    <strong style="font-size:21px;">เจาะเลือดให้ครบชุด Beyond LDL</strong>
+                    <p style="font-size:18px;margin-top:4px;">ApoB, Lp(a), hs-CRP, Fasting Insulin, TG/HDL, Homocysteine และไทรอยด์ (TSH/Free T4)</p>
+                  </div>
+                </div>
+              </div>
+              <div class="bf-card-sm fill-white">
+                <div class="list-row">
+                  <div class="list-num">03</div>
+                  <div>
+                    <strong style="font-size:21px;">ส่องดูหลอดเลือดจริงด้วย Imaging</strong>
+                    <p style="font-size:18px;margin-top:4px;">Carotid Ultrasound (ดูผนังและ Soft plaque) และ/หรือ CAC Score / CCTA ตามช่วงวัยและข้อบ่งชี้</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="stack-gap" style="gap:16px;">
+              <div class="bf-card-sm fill-white">
+                <div class="list-row">
+                  <div class="list-num">04</div>
+                  <div>
+                    <strong style="font-size:21px;">ดับไฟอักเสบเข้มข้น 3–6 เดือน</strong>
+                    <p style="font-size:18px;margin-top:4px;">ปรับอาหาร Zone 2 + เวท จัดการนอน-เครียด ลด PM2.5/โลหะหนัก + เสริม Adaptogens &amp; สารลด ApoB</p>
+                  </div>
+                </div>
+              </div>
+              <div class="bf-card-sm fill-white">
+                <div class="list-row">
+                  <div class="list-num">05</div>
+                  <div>
+                    <strong style="font-size:21px;">วัดผลซ้ำ &amp; Shared Decision-Making</strong>
+                    <p style="font-size:18px;margin-top:4px;">ดูการเปลี่ยนแปลงของ ApoB, hs-CRP, อินซูลิน และหลอดเลือด เพื่อตัดสินใจร่วมกับแพทย์อย่างมั่นใจ</p>
+                  </div>
+                </div>
+              </div>
+              <div class="bf-card-sm fill-yellow" style="padding:16px 22px;">
+                <span class="mono-tag fill-white" style="margin-bottom:6px;">DOCTOR'S CLINICAL REMINDER</span>
+                <p style="font-size:18px;">การ "ไม่กินยา" จะปลอดภัยก็ต่อเมื่อ <strong>ตัวเลขการอักเสบต่ำ, เมแทบอลิซึมดี และหลอดเลือดจริงสะอาด</strong> — ไม่ใช่การปล่อยผ่านโดยไม่ตรวจ</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 20: SUMMARY / INVERTED BLACK CLOSE FRAME
+           ========================================================= -->
+      <section class="slide bg-black"
+        data-section="SUMMARY"
+        data-title="บทสรุป: ตัดสินใจเรื่องยาลดไขมันอย่างรู้เท่าทัน"
+        data-duration="46:30–48:30"
+        data-notes="ขอฝาก 3 ข้อคิดสุดท้ายสำหรับทุกท่านครับ:
+หนึ่ง Beyond LDL — อย่าตัดสินใจจาก LDL เพียงตัวเดียว ต้องดูทั้ง ApoB การอักเสบ (hs-CRP) อินซูลิน และมลพิษโลหะหนักรอบตัว
+สอง See the Vessel — ใช้ Ultrasound หรือ CAC Score เพื่อเห็นสภาพหลอดเลือดจริง ผล CAC = 0 ช่วยให้ชะลอยาได้ในกลุ่มเสี่ยงปานกลาง แต่ต้องไม่ประมาทเรื่อง Soft Plaque และปัจจัยเสี่ยงอื่น
+สาม Smart Integration — ลงมือดับไฟอักเสบด้วยไลฟ์สไตล์และสารธรรมชาติก่อนเสมอ และพร้อมใช้ Statin เป็นเข็มขัดนิรภัยอย่างชาญฉลาดเมื่อมีคราบพลัคหรือความเสี่ยงชัดเจน
+
+ขอบคุณทุกท่านที่ตั้งใจฟังครับ เปิดโอกาสให้ซักถามได้เลยครับ">
+        <div class="star-burst" style="width:104px;height:104px;top:38px;right:74px;background:var(--white);transform:rotate(10deg);">
+          <div class="star-burst-inner" style="background:var(--pink);"></div>
+        </div>
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-yellow">SUMMARY · KEY TAKEAWAYS</span>
+              <span class="label-pill fill-pink">PRECISION CARDIOVASCULAR PREVENTION</span>
+            </div>
+          </div>
+
+          <div class="close-frame reveal d2">
+            <h1 class="close-title">บทสรุป: ตัดสินใจเรื่องยาลดไขมันอย่างรู้เท่าทัน</h1>
+            <p style="font-family:var(--font-label);font-size:20px;color:var(--cream);margin:10px 0 24px 0;">
+              3 หลักปฏิบัติจากเวชศาสตร์ชะลอวัย &amp; Functional Medicine เพื่อปกป้องหลอดเลือดหัวใจอย่างยั่งยืน
+            </p>
+
+            <div class="grid-3">
+              <div class="bf-card-sm fill-blue" style="color:var(--black);">
+                <span class="mono-tag fill-white" style="margin-bottom:10px;">01 · BEYOND LDL</span>
+                <h3><span>มองไกลกว่าตัวเลข LDL</span></h3>
+                <p style="font-size:18.5px;">ประเมิน <strong>ApoB + hs-CRP + อินซูลิน + สารพิษ/โลหะหนัก</strong> เพราะแม้ LDL ดี แต่ถ้าไฟอักเสบติด ก็ยังเสี่ยงเกิดคราบพลัคได้</p>
+              </div>
+              <div class="bf-card-sm fill-green" style="color:var(--black);">
+                <span class="mono-tag fill-white" style="margin-bottom:10px;">02 · SEE THE VESSEL</span>
+                <h3><span>ส่องหลอดเลือดจริงก่อนตัดสิน</span></h3>
+                <p style="font-size:18.5px;">ใช้ <strong>Carotid Ultrasound / CAC Score</strong> แยกความเสี่ยงแท้ — CAC = 0 ช่วยชะลอ Statin ในกลุ่มเสี่ยงปานกลาง (ระวัง Soft plaque &amp; เบาหวาน/บุหรี่)</p>
+              </div>
+              <div class="bf-card-sm fill-cream" style="color:var(--black);">
+                <span class="mono-tag fill-white" style="margin-bottom:10px;">03 · SMART INTEGRATION</span>
+                <h3><span>ผสานธรรมชาติ &amp; หลักฐานวิจัย</span></h3>
+                <p style="font-size:18.5px;">แก้ที่ไลฟ์สไตล์ + <strong>Adaptogens / Bergamot / Berberine</strong> และเข้าใจหลักฐานลดพลัคของ <strong>Statin (ASTEROID/SATURN) vs Chelation (TACT2)</strong></p>
+              </div>
+            </div>
+
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:26px;flex-wrap:wrap;gap:16px;">
+              <p style="font-size:20px;font-weight:700;color:var(--white);">
+                “เป้าหมายไม่ใช่การหลีกเลี่ยงยาอย่างมืดบอด หรือกินยาตามตัวเลขเดียว — แต่คือหลอดเลือดที่สะอาดและยืนยาว”
+              </p>
+              <button class="close-btn" type="button" onclick="window.presentation.goToSlide(0)">↺ START OVER</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- =========================================================
+       OUTSIDE-STAGE PRESENTATION CHROME
+       ========================================================= -->
+  <div class="bf-counter-pill" id="slideCounter">01 / 20</div>
+
+  <div class="deck-controls" aria-label="Presentation utilities">
+    <button class="bf-btn" id="timerBtn" type="button" title="จับเวลาบรรยาย">⏱ <span id="timerText">00:00</span></button>
+    <button class="bf-btn" id="notesBtn" type="button" onclick="window.presentation.toggleNotes()" title="สคริปต์ผู้พูด (N)">🎤 SCRIPT (N)</button>
+    <button class="bf-btn" id="indexBtn" type="button" onclick="window.presentation.toggleOverview()" title="สารบัญสไลด์ (M)">📑 INDEX (M)</button>
+    <button class="bf-btn edit-save-btn" id="saveBtn" type="button" onclick="window.editor.exportHtml()" title="ดาวน์โหลดไฟล์ HTML ที่แก้ไขแล้ว (Ctrl+S)">💾 SAVE HTML</button>
+    <a class="bf-btn" href="/" title="กลับหน้าแรก">← HOME</a>
+    <button class="bf-btn" type="button" onclick="window.presentation.toggleFullscreen()" title="เต็มจอ (F)">⛶</button>
+  </div>
+
+  <div class="bf-nav-cluster" aria-label="Slide navigation">
+    <button class="nav-btn" id="prevBtn" type="button" onclick="window.presentation.prev()" title="สไลด์ก่อนหน้า (←)">←</button>
+    <button class="nav-btn" id="nextBtn" type="button" onclick="window.presentation.next()" title="สไลด์ถัดไป (→ / Space)">→</button>
+  </div>
+
+  <!-- Upgraded Speaker Script Drawer -->
+  <aside class="notes-drawer" id="notesDrawer" aria-live="polite">
+    <div class="notes-header">
+      <span id="notesMeta">SPEAKER SCRIPT · SLIDE 01/20 · 00:00–02:00</span>
+      <button class="bf-btn" style="height:28px;padding:0 10px;font-size:12px;" type="button" onclick="window.presentation.toggleNotes()">✕ CLOSE</button>
+    </div>
+    <p id="notesContent"></p>
+  </aside>
+
+  <!-- Slide Overview Index Modal -->
+  <div class="modal-backdrop" id="overviewModal" onclick="if(event.target===this)window.presentation.toggleOverview()">
+    <div class="modal-sheet">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
+        <h2 style="font-family:var(--font-display);font-weight:900;font-size:26px;">สารบัญสไลด์ทั้งหมด (20 SLIDES · BLOCKFRAME)</h2>
+        <button class="bf-btn" type="button" onclick="window.presentation.toggleOverview()">✕ CLOSE</button>
+      </div>
+      <div class="index-grid" id="overviewGrid"></div>
+    </div>
+  </div>
+
+  <script>
+    const INFLAME_CAUSES = [
+      {
+        tag: 'CAUSE 01 · HEAVY METALS',
+        title: 'โลหะหนักสะสม: ตะกั่ว (Pb), แคดเมียม (Cd), ปรอท (Hg), สารหนู',
+        mech: 'จับหมู่ซัลฟ์ไฮดริล (-SH) ทำลายเอนไซม์ต้านอนุมูลอิสระ (Glutathione) ก่อ Oxidative Stress กระตุ้น Endothelial dysfunction และการเกาะตัวของแคลเซียมในผนังหลอดเลือด',
+        action: 'ซักประวัติแหล่งสัมผัส (ปลาทะเลใหญ่ น้ำดื่ม บุหรี่ อาหารปนเปื้อน อุดฟันอมัลกัม) คัดกรองโลหะหนักในเลือด/ปัสสาวะตามข้อบ่งชี้ เสริมระบบ Detox (NAC, Glutathione, กากใย)'
+      },
+      {
+        tag: 'CAUSE 02 · POLLUTANTS & MICROPLASTICS',
+        title: 'มลพิษ & สารเคมี: PM2.5, ไมโครพลาสติก, ควันบุหรี่, พาทาเลต',
+        mech: 'ฝุ่นละเอียด PM2.5 ทะลุถุงลมเข้าสู่กระแสเลือดกระตุ้น IL-6 / hs-CRP ส่วนไมโครพลาสติกและพาทาเลตตรวจพบในคราบพลัคหลอดเลือด เพิ่มการอักเสบและความเสี่ยงเหตุการณ์หัวใจ',
+        action: 'ใช้เครื่องฟอกอากาศ HEPA เมื่อ PM2.5 สูง หลีกเลี่ยงภาชนะพลาสติกโดนความร้อน งดบุหรี่และควันบุหรี่มือสอง เพิ่มผักตระกูลกะหล่ำกระตุ้น Nrf2'
+      },
+      {
+        tag: 'CAUSE 03 · DIET & INSULIN RESISTANCE',
+        title: 'อาหารการกิน: น้ำตาล ฟรุกโตส น้ำมันทอดซ้ำ และภาวะดื้ออินซูลิน',
+        mech: 'น้ำตาลก่อสาร AGEs ทำให้ผนังหลอดเลือดแข็งและบาดเจ็บ ขณะที่อินซูลินสูงเรื้อรังเปลี่ยน LDL ปกติเป็น Small Dense LDL (sdLDL) ที่แทรกผนังหลอดเลือดและถูกออกซิไดซ์ง่าย',
+        action: 'ตรวจ Fasting Insulin (< 5–7 µIU/mL), HbA1c และอัตราส่วน TG/HDL (< 1.5–2.0) ตัดเครื่องดื่มหวาน อาหารแปรรูปจัด (UPF) เพิ่มใยอาหารละลายน้ำและ EVOO'
+      },
+      {
+        tag: 'CAUSE 04 · CHRONIC STRESS & HPA-AXIS',
+        title: 'ความเครียดเรื้อรัง: Cortisol และ Adrenaline สูงต่อเนื่อง',
+        mech: 'กระตุ้นระบบประสาทซิมพาเทติกให้หลอดเลือดหดเกร็ง ความดันโลหิตแกว่ง กระตุ้นตับปล่อยน้ำตาลฉุกเฉิน เพิ่มความดื้ออินซูลิน และขัดขวางช่วงซ่อมแซมผนังหลอดเลือดขณะหลับ',
+        action: 'ประเมินรูปแบบความเครียดและการนอน ฝึกหายใจช้า/เดินรับแดดเช้า ลดคาเฟอีนช่วงบ่าย พิจารณา Adaptogens (Ashwagandha, Rhodiola) + Magnesium Glycinate'
+      },
+      {
+        tag: 'CAUSE 05 · SEDENTARY & LOW NITRIC OXIDE',
+        title: 'การไม่ขยับ & ไม่ออกกำลังกาย: ขาด Shear Stress กระตุ้นหลอดเลือด',
+        mech: 'การนั่งติดโต๊ะเกิน 8 ชั่วโมง/วัน ลดแรงไหลเวียนเลือดที่กระตุ้นเอนไซม์ eNOS ทำให้การสร้าง Nitric Oxide (NO) ขยายหลอดเลือดลดลง และทำให้กล้ามเนื้อรับน้ำตาลแย่ลง',
+        action: 'เดิน/คาร์ดิโอ Zone 2 ให้ได้ 150 นาที/สัปดาห์ + เวทเทรนนิ่ง 2–3 วัน/สัปดาห์ และตั้งเตือนลุกขยับเดิน 2–3 นาทีทุกๆ 45–60 นาทีที่นั่งทำงาน'
+      },
+      {
+        tag: 'CAUSE 06 · SILENT HIDDEN TRIGGERS',
+        title: 'ตัวกระตุ้นแฝง: หยุดหายใจขณะหลับ (OSA), โรคเหงือก, ลำไส้รั่ว, ไทรอยด์ต่ำ',
+        mech: 'ออกซิเจนตกซ้ำๆ กลางดึกใน OSA, แบคทีเรียจากโรคเหงือกและ Endotoxin (LPS) จากลำไส้ล้วนจุดไฟอักเสบทั่วร่าง ส่วนไทรอยด์ต่ำทำให้ LDL Receptor ลดลงจน LDL สูงเทียม',
+        action: 'ทำ Sleep test หากนอนกรน/ง่วงกลางวัน ตรวจสุขภาพช่องปากกับทันตแพทย์ทุก 6 เดือน แก้สมดุลลำไส้ และตรวจ TSH + Free T4 ก่อนสรุปว่าเป็นไขมันสูงจากกรรมพันธุ์'
+      }
+    ];
+
+    /* ===========================================
+       SLIDE PRESENTATION CONTROLLER (FIXED 1920x1080)
+       =========================================== */
+    class SlidePresentation {
+      constructor() {
+        this.slides = Array.from(document.querySelectorAll('.slide'));
+        this.stage = document.getElementById('deckStage');
+        this.currentSlide = 0;
+        this.wheelLock = false;
+        this.touchStartX = null;
+        this.timerSeconds = 0;
+        this.timerInterval = null;
+
+        this.setupStageScale();
+        this.setupKeyboardNav();
+        this.setupTouchNav();
+        this.setupWheelNav();
+        this.setupTimer();
+        this.loadInitialHash();
+      }
+
+      setupStageScale() {
+        const viewport = document.querySelector('.deck-viewport');
+        const scale = () => {
+          const vw = viewport && viewport.clientWidth ? Math.min(viewport.clientWidth, window.innerWidth) : window.innerWidth;
+          const vh = viewport && viewport.clientHeight ? Math.min(viewport.clientHeight, window.innerHeight) : window.innerHeight;
+          const factor = Math.min(vw / 1920, vh / 1080);
+          const x = (vw - 1920 * factor) / 2;
+          const y = (vh - 1080 * factor) / 2;
+          this.stage.style.transform = `translate(${x}px, ${y}px) scale(${factor})`;
+        };
+        scale();
+        window.addEventListener('resize', scale);
+        if (window.ResizeObserver && viewport) {
+          new ResizeObserver(scale).observe(viewport);
+        }
+      }
+
+      loadInitialHash() {
+        const m = window.location.hash.match(/^#slide-(\d+)$/);
+        const startIdx = m ? Math.max(0, Math.min(this.slides.length - 1, parseInt(m[1], 10) - 1)) : 0;
+        this.goToSlide(startIdx, false);
+      }
+
+      goToSlide(index, updateHash = true) {
+        this.currentSlide = Math.max(0, Math.min(index, this.slides.length - 1));
+        this.slides.forEach((slide, i) => {
+          const active = i === this.currentSlide;
+          slide.classList.toggle('active', active);
+          slide.classList.toggle('visible', active);
+        });
+
+        const currentEl = this.slides[this.currentSlide];
+        const numStr = String(this.currentSlide + 1).padStart(2, '0');
+        const totalStr = String(this.slides.length);
+        const duration = currentEl.dataset.duration || '';
+
+        document.getElementById('slideCounter').textContent = `${numStr} / ${totalStr}`;
+        document.getElementById('notesMeta').textContent =
+          `SPEAKER SCRIPT · SLIDE ${numStr}/${totalStr}${duration ? ' · ' + duration : ''}`;
+        document.getElementById('notesContent').textContent = currentEl.dataset.notes || '';
+        document.getElementById('prevBtn').disabled = this.currentSlide === 0;
+        document.getElementById('nextBtn').disabled = this.currentSlide === this.slides.length - 1;
+        document.getElementById('overviewModal').classList.remove('open');
+
+        if (updateHash) {
+          history.replaceState(null, '', `#slide-${this.currentSlide + 1}`);
+        }
+      }
+
+      selectInflame(idx) {
+        const item = INFLAME_CAUSES[idx];
+        if (!item) return;
+        document.querySelectorAll('.cause-card').forEach((card, i) => {
+          card.classList.toggle('selected', i === idx);
+        });
+        document.getElementById('inflameTag').textContent = item.tag;
+        document.getElementById('inflameTitle').textContent = item.title;
+        document.getElementById('inflameMech').textContent = item.mech;
+        document.getElementById('inflameAction').textContent = item.action;
+      }
+
+      next() {
+        if (this.currentSlide < this.slides.length - 1) {
+          this.goToSlide(this.currentSlide + 1);
+        }
+      }
+
+      prev() {
+        if (this.currentSlide > 0) {
+          this.goToSlide(this.currentSlide - 1);
+        }
+      }
+
+      toggleNotes() {
+        const drawer = document.getElementById('notesDrawer');
+        const btn = document.getElementById('notesBtn');
+        const isOpen = drawer.classList.toggle('open');
+        btn.classList.toggle('is-on', isOpen);
+      }
+
+      toggleOverview() {
+        const modal = document.getElementById('overviewModal');
+        const grid = document.getElementById('overviewGrid');
+        if (!modal.classList.contains('open')) {
+          grid.innerHTML = this.slides.map((s, i) => `
+            <div class="index-item ${i === this.currentSlide ? 'active' : ''}" onclick="window.presentation.goToSlide(${i})">
+              <div style="font-family:var(--font-label);font-size:12px;font-weight:700;letter-spacing:0.06em;">SLIDE ${String(i + 1).padStart(2, '0')} · ${s.dataset.duration || s.dataset.section || ''}</div>
+              <div style="font-size:15px;font-weight:800;margin-top:6px;">${s.dataset.title || ''}</div>
+            </div>
+          `).join('');
+        }
+        modal.classList.toggle('open');
+      }
+
+      toggleFullscreen() {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(() => {});
+        } else {
+          document.exitFullscreen().catch(() => {});
+        }
+      }
+
+      setupTimer() {
+        const timerBtn = document.getElementById('timerBtn');
+        timerBtn.addEventListener('click', () => {
+          if (this.timerInterval) {
+            clearInterval(this.timerInterval);
+            this.timerInterval = null;
+            timerBtn.classList.remove('is-on');
+          } else {
+            timerBtn.classList.add('is-on');
+            this.timerInterval = setInterval(() => {
+              this.timerSeconds++;
+              const m = String(Math.floor(this.timerSeconds / 60)).padStart(2, '0');
+              const s = String(this.timerSeconds % 60).padStart(2, '0');
+              document.getElementById('timerText').textContent = `${m}:${s}`;
+            }, 1000);
+          }
+        });
+      }
+
+      setupKeyboardNav() {
+        window.addEventListener('keydown', (e) => {
+          const isEditing = e.target && (
+            e.target.isContentEditable ||
+            e.target.tagName === 'INPUT' ||
+            e.target.tagName === 'TEXTAREA'
+          );
+
+          if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') {
+            if (document.body.classList.contains('editing')) {
+              e.preventDefault();
+              window.editor.exportHtml();
+            }
+            return;
+          }
+
+          if (isEditing) return;
+
+          if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+            e.preventDefault();
+            this.next();
+          } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+            e.preventDefault();
+            this.prev();
+          } else if (e.key === 'Home') {
+            e.preventDefault();
+            this.goToSlide(0);
+          } else if (e.key === 'End') {
+            e.preventDefault();
+            this.goToSlide(this.slides.length - 1);
+          } else if (e.key === 'n' || e.key === 'N') {
+            this.toggleNotes();
+          } else if (e.key === 'm' || e.key === 'M') {
+            this.toggleOverview();
+          } else if (e.key === 'f' || e.key === 'F') {
+            this.toggleFullscreen();
+          } else if (e.key === 'Escape') {
+            document.getElementById('overviewModal').classList.remove('open');
+            document.getElementById('notesDrawer').classList.remove('open');
+            document.getElementById('notesBtn').classList.remove('is-on');
+          }
+        });
+
+        window.addEventListener('hashchange', () => this.loadInitialHash());
+      }
+
+      setupTouchNav() {
+        window.addEventListener('touchstart', (e) => {
+          if (e.touches.length === 1) {
+            this.touchStartX = e.touches[0].clientX;
+          }
+        }, { passive: true });
+
+        window.addEventListener('touchend', (e) => {
+          if (this.touchStartX === null || e.changedTouches.length === 0) return;
+          const dx = e.changedTouches[0].clientX - this.touchStartX;
+          this.touchStartX = null;
+          if (Math.abs(dx) > 50) {
+            if (dx < 0) this.next();
+            else this.prev();
+          }
+        }, { passive: true });
+      }
+
+      setupWheelNav() {
+        window.addEventListener('wheel', (e) => {
+          if (document.getElementById('overviewModal').classList.contains('open')) return;
+          if (this.wheelLock || Math.abs(e.deltaY) < 28) return;
+          this.wheelLock = true;
+          if (e.deltaY > 0) this.next();
+          else this.prev();
+          setTimeout(() => { this.wheelLock = false; }, 380);
+        }, { passive: true });
+      }
+    }
+
+    /* ===========================================
+       INLINE TEXT EDITOR (HOVER HOTZONE + E KEY)
+       =========================================== */
+    class InlineEditor {
+      constructor() {
+        this.isActive = false;
+        this.storageKey = 'blockframe_statin_decision_v1';
+        this.hotzone = document.querySelector('.edit-hotzone');
+        this.editToggle = document.getElementById('editToggle');
+        this.hideTimeout = null;
+
+        this.restoreSaved();
+        this.bindControls();
+      }
+
+      restoreSaved() {
+        try {
+          const saved = localStorage.getItem(this.storageKey);
+          if (saved) {
+            const data = JSON.parse(saved);
+            document.querySelectorAll('.slide').forEach((slide, idx) => {
+              if (typeof data[idx] === 'string') {
+                slide.innerHTML = data[idx];
+              }
+            });
+          }
+        } catch (_) {}
+      }
+
+      persist() {
+        try {
+          const snapshot = Array.from(document.querySelectorAll('.slide')).map((s) => s.innerHTML);
+          localStorage.setItem(this.storageKey, JSON.stringify(snapshot));
+        } catch (_) {}
+      }
+
+      toggleEditMode() {
+        this.isActive = !this.isActive;
+        document.body.classList.toggle('editing', this.isActive);
+        this.editToggle.classList.toggle('active', this.isActive);
+        this.editToggle.textContent = this.isActive ? '✅ DONE EDITING (E)' : '✏️ EDIT MODE (E)';
+
+        document.querySelectorAll('.slide h1, .slide h3, .slide p, .slide li, .slide td, .slide th, .slide .stat-number, .slide .chart-label, .slide .chart-val').forEach((el) => {
+          if (this.isActive) {
+            el.setAttribute('contenteditable', 'true');
+          } else {
+            el.removeAttribute('contenteditable');
+          }
+        });
+
+        if (!this.isActive) {
+          this.persist();
+        }
+      }
+
+      exportHtml() {
+        const wasEditing = this.isActive;
+        if (wasEditing) this.toggleEditMode();
+        const blob = new Blob(['<!DOCTYPE html>\n' + document.documentElement.outerHTML], { type: 'text/html;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'statin-decision-slides.html';
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+
+      bindControls() {
+        this.editToggle.addEventListener('click', () => this.toggleEditMode());
+        this.hotzone.addEventListener('click', () => this.toggleEditMode());
+
+        this.hotzone.addEventListener('mouseenter', () => {
+          clearTimeout(this.hideTimeout);
+          this.editToggle.classList.add('show');
+        });
+        this.hotzone.addEventListener('mouseleave', () => {
+          this.hideTimeout = setTimeout(() => {
+            if (!this.isActive) this.editToggle.classList.remove('show');
+          }, 400);
+        });
+        this.editToggle.addEventListener('mouseenter', () => {
+          clearTimeout(this.hideTimeout);
+        });
+        this.editToggle.addEventListener('mouseleave', () => {
+          this.hideTimeout = setTimeout(() => {
+            if (!this.isActive) this.editToggle.classList.remove('show');
+          }, 400);
+        });
+
+        document.addEventListener('keydown', (e) => {
+          if ((e.key === 'e' || e.key === 'E') && !(e.target && e.target.getAttribute && e.target.getAttribute('contenteditable'))) {
+            this.toggleEditMode();
+          }
+        });
+
+        document.getElementById('deckStage').addEventListener('input', () => {
+          if (this.isActive) this.persist();
+        });
+      }
+    }
+
+    window.presentation = new SlidePresentation();
+    window.editor = new InlineEditor();
+  </script>
+</body>
+</html>

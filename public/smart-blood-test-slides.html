@@ -1,0 +1,3086 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ห้องเรียนวงใน: ตรวจเลือดอย่างฉลาด — BlockFrame Presentation</title>
+
+  <!-- Fonts: Inter + Space Grotesk + Noto Sans Thai (Weights 400-900) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+Thai:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ===========================================
+       CSS CUSTOM PROPERTIES (BLOCKFRAME TOKENS)
+       =========================================== */
+    :root {
+      --black: #000000;
+      --white: #FFFFFF;
+      --offwhite: #FFFDF5;
+      --pink: #FE90E8;
+      --blue: #C0F7FE;
+      --green: #99E885;
+      --yellow: #F7CB46;
+      --cream: #FFDC8B;
+
+      --border-primary: 4px solid var(--black);
+      --border-thin: 3px solid var(--black);
+      --border-atomic: 2px solid var(--black);
+
+      --shadow-default: 8px 8px 0px var(--black);
+      --shadow-small: 4px 4px 0px var(--black);
+      --shadow-hover: 6px 6px 0px var(--black);
+      --shadow-press: 2px 2px 0px var(--black);
+      --shadow-close-yellow: 12px 12px 0px var(--yellow);
+      --shadow-close-white: 6px 6px 0px var(--white);
+
+      --font-display: 'Inter', 'Noto Sans Thai', sans-serif;
+      --font-body: 'Inter', 'Noto Sans Thai', sans-serif;
+      --font-label: 'Space Grotesk', 'Noto Sans Thai', monospace;
+
+      --stage-bg: #000000;
+      --slide-bg: var(--offwhite);
+      --ease-snap: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* ===========================================
+       VIEWPORT BASE (MANDATORY FIXED 1920x1080 STAGE)
+       =========================================== */
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: var(--stage-bg, #000);
+      font-family: var(--font-body);
+      color: var(--black);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .deck-viewport {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      background: var(--stage-bg, #000);
+    }
+
+    .deck-stage {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      transform-origin: 0 0;
+      background: var(--slide-bg, #fff);
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      display: block;
+      visibility: hidden;
+      opacity: 0;
+      pointer-events: none;
+      background: var(--slide-bg, #fff);
+    }
+
+    .slide.active,
+    .slide.visible {
+      visibility: visible;
+      opacity: 1;
+      pointer-events: auto;
+      z-index: 1;
+    }
+
+    img,
+    video,
+    canvas,
+    svg {
+      max-width: 100%;
+      max-height: 100%;
+    }
+
+    .deck-controls {
+      position: fixed;
+      left: 50%;
+      bottom: 22px;
+      transform: translateX(-50%);
+      z-index: 1000;
+    }
+
+    @media print {
+      html,
+      body {
+        width: 1920px;
+        height: auto;
+        overflow: visible;
+        background: #fff;
+      }
+
+      .deck-viewport {
+        position: static;
+        overflow: visible;
+        background: #fff;
+      }
+
+      .deck-stage {
+        position: static;
+        width: auto;
+        height: auto;
+        transform: none !important;
+        background: none;
+      }
+
+      .slide {
+        position: relative;
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        width: 1920px;
+        height: 1080px;
+        break-after: page;
+        page-break-after: always;
+      }
+
+      .slide:last-child {
+        break-after: auto;
+        page-break-after: auto;
+      }
+
+      .deck-controls,
+      .bf-counter-pill,
+      .bf-nav-cluster,
+      .edit-hotzone,
+      .edit-toggle,
+      .notes-drawer,
+      .modal-backdrop {
+        display: none !important;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.2s !important;
+      }
+    }
+
+    /* ===========================================
+       SURFACE GROUNDS & TEXTURES
+       =========================================== */
+    .has-dots::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle, var(--black) 1.5px, transparent 1.5px);
+      background-size: 28px 28px;
+      opacity: 0.22;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .slide-inner {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      height: 100%;
+      padding: 48px 68px 100px 68px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    /* ===========================================
+       TYPOGRAPHY HIERARCHY (BLOCKFRAME + THAI)
+       =========================================== */
+    .label-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .label-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .label-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: var(--border-thin);
+      box-shadow: var(--shadow-small);
+      padding: 7px 16px;
+      font-family: var(--font-label);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      background: var(--white);
+      color: var(--black);
+      line-height: 1.15;
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 68px;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      color: var(--black);
+    }
+
+    .slide-title {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 42px;
+      line-height: 1.16;
+      letter-spacing: -0.008em;
+      color: var(--black);
+    }
+
+    .slide-lead {
+      font-family: var(--font-label);
+      font-weight: 600;
+      font-size: 20px;
+      line-height: 1.42;
+      color: var(--black);
+      max-width: 1580px;
+    }
+
+    .en-caps {
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+    }
+
+    .mono-tag {
+      display: inline-block;
+      font-family: var(--font-label);
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      border: var(--border-atomic);
+      padding: 4px 10px;
+      background: var(--yellow);
+      color: var(--black);
+      line-height: 1.2;
+      vertical-align: middle;
+    }
+
+    /* ===========================================
+       BLOCKFRAME CARDS & CONTAINERS (0PX RADIUS)
+       =========================================== */
+    .bf-card {
+      background: var(--white);
+      border: var(--border-primary);
+      box-shadow: var(--shadow-default);
+      padding: 24px 28px;
+      position: relative;
+    }
+
+    .bf-card-sm {
+      background: var(--white);
+      border: var(--border-thin);
+      box-shadow: var(--shadow-small);
+      padding: 18px 22px;
+      position: relative;
+    }
+
+    .bf-card-flat {
+      background: var(--white);
+      border: var(--border-primary);
+      padding: 16px 24px;
+      position: relative;
+    }
+
+    .bf-card h3,
+    .bf-card-sm h3,
+    .bf-card-flat h3 {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 23px;
+      line-height: 1.24;
+      color: var(--black);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .bf-card p,
+    .bf-card-sm p,
+    .bf-card-flat p {
+      font-size: 18.5px;
+      line-height: 1.5;
+      font-weight: 500;
+      color: var(--black);
+    }
+
+    .bf-card ul,
+    .bf-card-sm ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    .bf-card li,
+    .bf-card-sm li {
+      position: relative;
+      padding-left: 22px;
+      font-size: 18px;
+      line-height: 1.46;
+      font-weight: 500;
+      color: var(--black);
+    }
+
+    .bf-card li::before,
+    .bf-card-sm li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 8px;
+      width: 10px;
+      height: 10px;
+      background: var(--yellow);
+      border: var(--border-atomic);
+    }
+
+    /* ===========================================
+       BLOCKFRAME EXTERNAL PHOTO CONTAINERS
+       =========================================== */
+    .bf-photo-frame {
+      border: var(--border-primary);
+      box-shadow: var(--shadow-default);
+      background: var(--offwhite);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .bf-photo-frame img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .bf-photo-caption {
+      position: absolute;
+      left: 14px;
+      bottom: 14px;
+      background: var(--yellow);
+      border: var(--border-atomic);
+      box-shadow: var(--shadow-press);
+      padding: 4px 12px;
+      font-family: var(--font-label);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--black);
+      z-index: 2;
+    }
+
+    /* ===========================================
+       GRIDS & LAYOUT HELPERS
+       =========================================== */
+    .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+    .grid-2-wide { display: grid; grid-template-columns: 1.22fr 0.78fr; gap: 24px; }
+    .grid-2-chart { display: grid; grid-template-columns: 0.88fr 1.12fr; gap: 24px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; }
+    .stack-gap { display: flex; flex-direction: column; gap: 14px; }
+
+    /* ===========================================
+       SIGNATURE DECORATIONS & STRUCTURAL PRIMITIVES
+       =========================================== */
+    .tilt-neg { transform: rotate(-2deg); }
+    .tilt-pos { transform: rotate(2deg); }
+
+    .deco-stripe {
+      position: absolute;
+      border: var(--border-thin);
+      background: repeating-linear-gradient(
+        45deg,
+        var(--black),
+        var(--black) 6px,
+        var(--green) 6px,
+        var(--green) 16px
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .deco-rect {
+      position: absolute;
+      border: var(--border-thin);
+      box-shadow: var(--shadow-small);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .star-burst {
+      position: absolute;
+      background: var(--black);
+      clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+      pointer-events: none;
+      z-index: 4;
+    }
+
+    .star-burst-inner {
+      position: absolute;
+      inset: 5px;
+      background: var(--pink);
+      clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    }
+
+    .feature-deco {
+      width: 48px;
+      height: 44px;
+      border: var(--border-thin);
+      background: var(--yellow);
+      position: absolute;
+      top: -16px;
+      right: 24px;
+      display: grid;
+      place-items: center;
+      font-family: var(--font-label);
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--black);
+      z-index: 3;
+    }
+
+    .bf-card:has(.feature-deco) > h3,
+    .bf-card-sm:has(.feature-deco) > h3 {
+      padding-right: 60px;
+    }
+
+    .corner-tl,
+    .corner-br {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      pointer-events: none;
+    }
+
+    .corner-tl {
+      top: 12px;
+      left: 12px;
+      border-top: var(--border-thin);
+      border-left: var(--border-thin);
+    }
+
+    .corner-br {
+      bottom: 12px;
+      right: 12px;
+      border-bottom: var(--border-thin);
+      border-right: var(--border-thin);
+    }
+
+    .list-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+
+    .list-num {
+      width: 36px;
+      height: 36px;
+      border: var(--border-thin);
+      background: var(--yellow);
+      font-family: var(--font-label);
+      font-weight: 700;
+      font-size: 15px;
+      display: grid;
+      place-items: center;
+      color: var(--black);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    /* The only circular element permitted in BlockFrame */
+    .stat-deco-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: var(--border-atomic);
+      position: absolute;
+      top: 16px;
+      right: 16px;
+    }
+
+    .stat-number {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 52px;
+      line-height: 1.05;
+      color: var(--black);
+    }
+
+    /* ===========================================
+       SPECIALIZED BLOCKFRAME MODULES
+       =========================================== */
+    .hero-frame {
+      background: var(--white);
+      border: var(--border-primary);
+      box-shadow: var(--shadow-default);
+      padding: 36px 40px;
+      position: relative;
+    }
+
+    .hero-tab {
+      position: absolute;
+      top: -22px;
+      right: 40px;
+      background: var(--yellow);
+      border: var(--border-thin);
+      box-shadow: var(--shadow-small);
+      padding: 8px 20px;
+      font-family: var(--font-label);
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transform: rotate(-3deg);
+      color: var(--black);
+    }
+
+    .bf-table-frame {
+      background: var(--white);
+      border: var(--border-primary);
+      box-shadow: var(--shadow-default);
+      overflow: hidden;
+      align-self: start;
+    }
+
+    .bf-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 18px;
+    }
+
+    .bf-table th,
+    .bf-table td {
+      padding: 12px 18px;
+      border-bottom: var(--border-thin);
+      border-right: var(--border-thin);
+      text-align: left;
+      vertical-align: top;
+      line-height: 1.4;
+    }
+
+    .bf-table th:last-child,
+    .bf-table td:last-child {
+      border-right: none;
+    }
+
+    .bf-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .bf-table th {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 18.5px;
+      letter-spacing: 0.02em;
+    }
+
+    .bf-table-sm th,
+    .bf-table-sm td {
+      padding: 10px 16px;
+      font-size: 17px;
+      line-height: 1.38;
+    }
+
+    .bf-table-xs th,
+    .bf-table-xs td {
+      padding: 8px 14px;
+      font-size: 15.5px;
+      line-height: 1.34;
+    }
+
+    .code-chip {
+      font-family: var(--font-label);
+      font-weight: 700;
+      background: var(--yellow);
+      border: var(--border-atomic);
+      padding: 2px 8px;
+      font-size: 16px;
+      display: inline-block;
+    }
+
+    /* Horizontal Bar Chart */
+    .chart-row {
+      display: grid;
+      grid-template-columns: 165px 1fr 92px;
+      align-items: center;
+      gap: 14px;
+      padding: 9px 0;
+    }
+
+    .chart-label {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--black);
+    }
+
+    .chart-track {
+      height: 28px;
+      background: var(--offwhite);
+      border: var(--border-thin);
+      display: flex;
+      align-items: stretch;
+    }
+
+    .chart-bar {
+      height: 100%;
+      border-right: var(--border-thin);
+    }
+
+    .chart-val {
+      font-family: var(--font-label);
+      font-weight: 800;
+      font-size: 19px;
+      text-align: right;
+    }
+
+    .bar-full { border-right: none; }
+
+    /* Interactive Lab Calculator (Slide 19) */
+    .calc-panel {
+      background: var(--white);
+      border: var(--border-primary);
+      box-shadow: var(--shadow-default);
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .calc-stats {
+      display: grid;
+      grid-template-columns: 1fr 0.8fr 1.05fr 1.15fr;
+      gap: 12px;
+      align-items: stretch;
+    }
+
+    .calc-stat-box {
+      border: var(--border-thin);
+      padding: 10px 14px;
+      background: var(--offwhite);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .calc-input {
+      width: 100%;
+      margin-top: 4px;
+      border: var(--border-atomic);
+      background: var(--white);
+      padding: 5px 10px;
+      font-family: var(--font-label);
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--black);
+    }
+
+    .calc-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .calc-preset-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .calc-preset-btn {
+      border: var(--border-atomic);
+      background: var(--white);
+      box-shadow: var(--shadow-press);
+      padding: 6px 12px;
+      font-family: var(--font-label);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--black);
+      cursor: pointer;
+    }
+
+    .calc-preset-btn.active {
+      background: var(--yellow);
+    }
+
+    .calc-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .lab-chip {
+      border: var(--border-atomic);
+      background: var(--offwhite);
+      padding: 7px 10px;
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--black);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      text-align: left;
+      transition: transform 0.1s ease, background 0.1s ease;
+    }
+
+    .lab-chip:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: var(--shadow-press);
+    }
+
+    .lab-chip.checked {
+      background: var(--green);
+      font-weight: 800;
+      box-shadow: var(--shadow-press);
+    }
+
+    .lab-chip-price {
+      font-family: var(--font-label);
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    /* Inverted Close Frame (Slide 20) */
+    .close-frame {
+      background: var(--black);
+      border: 4px solid var(--white);
+      box-shadow: var(--shadow-close-yellow);
+      padding: 34px 40px;
+      position: relative;
+      color: var(--white);
+    }
+
+    .close-frame .bf-card-sm {
+      border: 3px solid var(--white);
+      box-shadow: var(--shadow-close-white);
+      padding: 18px 22px;
+    }
+
+    .close-title {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 46px;
+      line-height: 1.14;
+      color: var(--white);
+      letter-spacing: -0.015em;
+    }
+
+    .close-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 3px solid var(--black);
+      background: var(--yellow);
+      color: var(--black);
+      padding: 12px 24px;
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 17px;
+      text-transform: uppercase;
+      box-shadow: var(--shadow-close-white);
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .close-btn:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 8px 8px 0px var(--white);
+    }
+
+    /* Surface & Fill Palette Utilities (MUST trail all base component styles) */
+    .bg-offwhite { background: var(--offwhite); }
+    .bg-cream    { background: var(--cream); }
+    .bg-blue     { background: var(--blue); }
+    .bg-pink     { background: var(--pink); }
+    .bg-green    { background: var(--green); }
+    .bg-yellow   { background: var(--yellow); }
+    .bg-black    { background: var(--black); color: var(--white); }
+
+    .fill-white    { background: var(--white); }
+    .fill-offwhite { background: var(--offwhite); }
+    .fill-pink     { background: var(--pink); }
+    .fill-blue     { background: var(--blue); }
+    .fill-green    { background: var(--green); }
+    .fill-yellow   { background: var(--yellow); }
+    .fill-cream    { background: var(--cream); }
+
+    /* ===========================================
+       STAGGERED REVEAL ANIMATIONS
+       =========================================== */
+    .reveal {
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity 0.42s var(--ease-snap), transform 0.42s var(--ease-snap);
+    }
+
+    .slide.visible .reveal {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .slide.visible .tilt-neg.reveal { transform: rotate(-2deg); }
+    .slide.visible .tilt-pos.reveal { transform: rotate(2deg); }
+
+    .reveal.d1 { transition-delay: 0.04s; }
+    .reveal.d2 { transition-delay: 0.10s; }
+    .reveal.d3 { transition-delay: 0.16s; }
+    .reveal.d4 { transition-delay: 0.22s; }
+
+    /* ===========================================
+       PERSISTENT CHROME (OUTSIDE SLIDE STAGE)
+       =========================================== */
+    .bf-counter-pill {
+      position: fixed;
+      left: 24px;
+      bottom: 20px;
+      z-index: 1000;
+      border: var(--border-thin);
+      background: var(--white);
+      box-shadow: var(--shadow-small);
+      padding: 10px 18px;
+      font-family: var(--font-label);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--black);
+    }
+
+    .deck-controls {
+      bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .bf-btn {
+      height: 44px;
+      padding: 0 13px;
+      border: var(--border-thin);
+      background: var(--white);
+      box-shadow: var(--shadow-small);
+      font-family: var(--font-label);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      color: var(--black);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+    }
+
+    .bf-btn:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: var(--shadow-hover);
+      background: var(--yellow);
+    }
+
+    .bf-btn:active {
+      transform: translate(2px, 2px);
+      box-shadow: var(--shadow-press);
+    }
+
+    .bf-btn.is-on {
+      background: var(--yellow);
+    }
+
+    .bf-nav-cluster {
+      position: fixed;
+      right: 24px;
+      bottom: 20px;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-btn {
+      width: 48px;
+      height: 48px;
+      border: var(--border-thin);
+      background: var(--white);
+      box-shadow: var(--shadow-small);
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 20px;
+      color: var(--black);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+    }
+
+    .nav-btn:hover:not(:disabled) {
+      transform: translate(-2px, -2px);
+      box-shadow: var(--shadow-hover);
+      background: var(--yellow);
+    }
+
+    .nav-btn:active:not(:disabled) {
+      transform: translate(2px, 2px);
+      box-shadow: var(--shadow-press);
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    /* Inline Editing Controls (JS-triggered hotzone with 400ms grace period) */
+    .edit-hotzone {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 96px;
+      height: 96px;
+      z-index: 10000;
+      cursor: pointer;
+    }
+
+    .edit-toggle {
+      position: fixed;
+      top: 18px;
+      left: 18px;
+      height: 44px;
+      padding: 0 16px;
+      border: var(--border-thin);
+      background: var(--yellow);
+      box-shadow: var(--shadow-small);
+      font-family: var(--font-label);
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--black);
+      cursor: pointer;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+      z-index: 10001;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .edit-toggle.show,
+    .edit-toggle.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .edit-save-btn {
+      display: none;
+    }
+
+    body.editing .edit-save-btn {
+      display: inline-flex;
+    }
+
+    body.editing [contenteditable="true"] {
+      outline: 2px dashed var(--black);
+      outline-offset: 2px;
+    }
+
+    /* Speaker Script Drawer & Modals */
+    .notes-drawer {
+      position: fixed;
+      right: 24px;
+      bottom: 84px;
+      width: 560px;
+      max-width: calc(100vw - 48px);
+      max-height: 62vh;
+      overflow-y: auto;
+      background: var(--white);
+      border: var(--border-primary);
+      box-shadow: var(--shadow-default);
+      padding: 20px 24px;
+      z-index: 1100;
+      display: none;
+    }
+
+    .notes-drawer.open {
+      display: block;
+    }
+
+    .notes-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: var(--border-thin);
+      font-family: var(--font-label);
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .notes-drawer p {
+      font-size: 15.5px;
+      line-height: 1.65;
+      font-weight: 500;
+      color: var(--black);
+      white-space: pre-line;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.72);
+      z-index: 1200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-sheet {
+      width: 100%;
+      max-width: 1140px;
+      max-height: 84vh;
+      overflow-y: auto;
+      background: var(--offwhite);
+      border: var(--border-primary);
+      box-shadow: var(--shadow-close-yellow);
+      padding: 28px;
+    }
+
+    .index-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 20px;
+    }
+
+    .index-item {
+      border: var(--border-thin);
+      background: var(--white);
+      box-shadow: var(--shadow-small);
+      padding: 14px 16px;
+      cursor: pointer;
+      transition: transform 0.12s ease, background 0.12s ease;
+    }
+
+    .index-item:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: var(--shadow-hover);
+      background: var(--blue);
+    }
+
+    .index-item.active {
+      background: var(--yellow);
+    }
+
+    @media (max-width: 760px) {
+      .index-grid {
+        grid-template-columns: 1fr;
+      }
+      .deck-controls {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Inline Editor Hotzone (top-left) -->
+  <div class="edit-hotzone" title="ชี้หรือคลิกเพื่อแก้ไขข้อความบนสไลด์ (E)"></div>
+  <button class="edit-toggle" id="editToggle" type="button">✏️ EDIT MODE (E)</button>
+
+  <!-- Fixed 1920x1080 Viewport Stage -->
+  <div class="deck-viewport">
+    <main class="deck-stage" id="deckStage">
+
+      <!-- =========================================================
+           SLIDE 01: COVER & VALUE-BASED HEALTH SCREENING (Cream)
+           ========================================================= -->
+      <section class="slide bg-cream has-dots active visible"
+        data-section="01 · VALUE-BASED SCREENING"
+        data-title="ตรวจสุขภาพหลักหมื่น จำเป็นจริงหรือ?"
+        data-duration="Slide 01 / 20"
+        data-notes="วันนี้ผมจะพาทุกคนมาเรียนรู้เรื่องที่อาจช่วยประหยัดค่าใช้จ่ายด้านสุขภาพได้หลายพันถึงหลายหมื่นบาทต่อปี
+
+หลายคนเข้าใจว่าการตรวจสุขภาพราคาแพง ตรวจเลือดหลายสิบรายการ หมายความว่าเราจะรู้จักสุขภาพของตัวเองได้ดีกว่าคนที่ตรวจเพียงไม่กี่รายการ แต่ในทางการแพทย์ไม่ได้เป็นเช่นนั้นเสมอไป
+
+บางคนจ่ายเงิน 20,000 บาท แต่กลับไม่ได้ตรวจสิ่งที่จำเป็นกับตัวเองจริง ๆ ในขณะที่บางคนใช้เงินไม่ถึง 1,000 บาท ก็อาจได้รับข้อมูลที่เพียงพอสำหรับการประเมินความเสี่ยงเบื้องต้น
+
+วันนี้เราจะเรียนรู้ว่าอะไรควรตรวจ อะไรไม่ควรตรวจ อะไรควรตรวจเพียงครั้งเดียวในชีวิต และอะไรที่ควรติดตามเป็นประจำ เป้าหมายของเราไม่ใช่การตรวจให้ถูกที่สุด แต่คือการใช้เงินทุกบาทให้เกิดประโยชน์ต่อสุขภาพมากที่สุด">
+        <div class="deco-stripe" style="width:170px;height:62px;top:36px;right:70px;transform:rotate(4deg);"></div>
+        <div class="star-burst" style="width:92px;height:92px;bottom:94px;left:34px;transform:rotate(-10deg);">
+          <div class="star-burst-inner"></div>
+        </div>
+        <div class="slide-inner">
+          <div class="grid-2-wide reveal d1" style="align-items:stretch;">
+            <div class="hero-frame">
+              <div class="corner-tl"></div>
+              <div class="corner-br"></div>
+              <div class="hero-tab">VALUE-BASED SCREENING · 20 SLIDES</div>
+              <div class="label-group" style="margin-bottom:18px;">
+                <span class="label-pill fill-pink">ห้องเรียนวงใน</span>
+                <span class="label-pill fill-blue">EBM · PREVENTIVE · FUNCTIONAL</span>
+              </div>
+              <h1 class="hero-title">ตรวจเลือดอย่างฉลาด</h1>
+              <p class="slide-lead" style="margin-top:14px;font-size:24px;">
+                ตรวจสุขภาพหลักหมื่น จำเป็นจริงหรือ? — ตรวจให้คุ้มค่า แม่นยำ ประหยัดเงิน และไม่ตกเป็นเหยื่อการตลาดสุขภาพ
+              </p>
+              <div class="bf-card-sm fill-yellow" style="margin-top:26px;">
+                <p style="font-size:18.5px;"><strong>แนวคิดหลัก (Value-Based Health Screening):</strong> ผสมผสาน <strong>Evidence-Based, Preventive &amp; Functional Medicine</strong> โดยให้ความสำคัญกับการตรวจที่นำไปสู่การตัดสินใจดูแลสุขภาพได้จริง มากกว่าการตรวจให้ครบทุกตัวชี้วัด</p>
+              </div>
+              <div class="bf-card-flat fill-offwhite" style="margin-top:16px;padding:14px 20px;">
+                <p style="font-size:16.5px;"><strong>หมายเหตุข้อมูลราคา:</strong> ราคาที่นำมาเปรียบเทียบเป็นราคาที่สถานพยาบาลเผยแพร่จริงบนเว็บไซต์ (สืบค้น ณ วันที่ <strong>26 พฤศจิกายน 2569</strong>) ทั้งนี้ ราคาตรวจเฉพาะทางห้องปฏิบัติการกับแพ็กเกจโรงพยาบาลอาจรวมบริการต่างกัน</p>
+              </div>
+            </div>
+
+            <div class="stack-gap" style="justify-content:space-between;">
+              <div class="bf-photo-frame" style="height:490px;">
+                <img src="https://images.unsplash.com/photo-1606206591513-adbfbdd7a177?auto=format&fit=crop&w=1000&q=80" alt="หลอดเก็บตัวอย่างเลือดในห้องปฏิบัติการทางการแพทย์" referrerpolicy="no-referrer" />
+                <div class="bf-photo-caption">LABORATORY DIAGNOSTICS</div>
+              </div>
+              <div class="bf-card-sm fill-blue">
+                <h3 style="margin-bottom:6px;font-size:21px;">หลักพัน VS หลักหมื่น</h3>
+                <p style="font-size:17.5px;"><strong>฿20,000</strong> อาจขาดตัวชี้วัดที่จำเป็นสำหรับคุณ ขณะที่ <strong>&lt; ฿1,000</strong> หากเลือกถูกตัว ก็ประเมินความเสี่ยงเบื้องต้นได้อย่างแม่นยำ</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 02: PUBLISHED CHECKUP PRICES IN THAILAND (Blue)
+           ========================================================= -->
+      <section class="slide bg-blue"
+        data-section="02 · REAL MARKET PRICES"
+        data-title="เปิดราคาตรวจสุขภาพจริงในประเทศไทย"
+        data-duration="Slide 02 / 20"
+        data-notes="เราจะเห็นว่าตลาดตรวจสุขภาพมีราคาตั้งแต่หลักร้อยไปจนถึงเกือบแสนบาท
+
+แน่นอนว่าแต่ละโปรแกรมไม่ได้ให้บริการเหมือนกัน บางแห่งมีค่าปรึกษาแพทย์ การตรวจร่างกาย การตรวจด้วยเครื่องมือพิเศษ และบริการอื่น ๆ รวมอยู่ด้วย
+
+ราคาแพงไม่ได้หมายความว่าไม่ดี และราคาถูกไม่ได้หมายความว่าคุณภาพต่ำ แต่ก่อนซื้อโปรแกรมใด ๆ เราต้องแยกให้ออกระหว่างสิ่งที่จำเป็นทางการแพทย์กับสิ่งที่เราได้รับเพิ่มเติมจากการซื้อแพ็กเกจ">
+        <div class="deco-rect fill-pink" style="width:80px;height:80px;top:36px;right:70px;transform:rotate(10deg);"></div>
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-yellow">02 · MARKET BENCHMARK</span>
+              <span class="label-pill fill-white">THAILAND PUBLISHED PRICES (26 พ.ย. 2569)</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">เปิดราคาตรวจสุขภาพจริงในประเทศไทย</h1>
+            <p class="slide-lead" style="margin-top:4px;">ราคาที่สถานพยาบาลเผยแพร่จริงบนเว็บไซต์ มีตั้งแต่หลักร้อยไปจนถึงเกือบแสนบาท</p>
+          </div>
+
+          <div class="grid-2-wide reveal d2">
+            <div class="bf-table-frame">
+              <table class="bf-table bf-table-xs">
+                <thead>
+                  <tr class="fill-yellow">
+                    <th style="width:72%;">สถานพยาบาล / โปรแกรม</th>
+                    <th style="width:28%;">ราคาที่ประกาศ</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>คณะสหเวชศาสตร์ จุฬาฯ — ประเมินความเสี่ยงเบาหวาน</td><td><strong>590 บาท</strong></td></tr>
+                  <tr><td>คณะสหเวชศาสตร์ จุฬาฯ — ตรวจสุขภาพทั่วไป</td><td><strong>1,320 บาท</strong></td></tr>
+                  <tr><td>สมิติเวช — ตรวจสมดุลระบบเผาผลาญ</td><td><strong>5,399 บาท</strong></td></tr>
+                  <tr><td>คณะสหเวชศาสตร์ จุฬาฯ — โปรแกรมนักกีฬาสร้างกล้ามเนื้อ</td><td><strong>7,220 บาท</strong></td></tr>
+                  <tr><td>รพ.กรุงเทพ — Vita Beauty</td><td><strong>9,500 บาท</strong></td></tr>
+                  <tr><td>รพ.กรุงเทพ — Mineral</td><td><strong>13,800 บาท</strong></td></tr>
+                  <tr><td>รพ.กรุงเทพ — Tune Your Health Male Plus</td><td><strong>15,500 บาท</strong></td></tr>
+                  <tr><td>รพ.กรุงเทพ — Tune Your Health Female Plus</td><td><strong>20,500 บาท</strong></td></tr>
+                  <tr><td>รพ.กรุงเทพ — Tune Your Cancer Female Plus</td><td><strong>23,500 บาท</strong></td></tr>
+                  <tr class="fill-pink"><td><strong>รพ.กรุงเทพ — ชุดตรวจคัดกรองมะเร็งบางโปรแกรม</strong></td><td><strong>46,200–82,800 บาท</strong></td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="stack-gap">
+              <div class="bf-photo-frame" style="height:260px;">
+                <img src="https://images.unsplash.com/photo-1666886573516-69191667b004?auto=format&fit=crop&w=900&q=80" alt="แพทย์และอุปกรณ์ตรวจสุขภาพในคลินิก" referrerpolicy="no-referrer" />
+                <div class="bf-photo-caption">CLINICAL CONSULTATION</div>
+              </div>
+              <div class="bf-card fill-white" style="padding:20px 24px;">
+                <h3 style="margin-bottom:8px;">อ่านราคาให้เป็น</h3>
+                <ul>
+                  <li><strong>บริการรวมต่างกัน:</strong> บางแห่งรวมค่าปรึกษาแพทย์ ตรวจร่างกาย เครื่องมือพิเศษ และบริการโรงพยาบาล</li>
+                  <li><strong>แยกให้ออกก่อนซื้อ:</strong> ระหว่าง <em>"สิ่งที่จำเป็นทางการแพทย์"</em> กับ <em>"บริการเพิ่มเติมจากแพ็กเกจ"</em></li>
+                  <li><strong>แหล่งราคา:</strong> คณะสหเวชศาสตร์ จุฬาฯ, รพ.สมิติเวช, รพ.กรุงเทพ</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 03: DIAGNOSTIC CASCADE / STATISTICAL MODEL (Offwhite)
+           ========================================================= -->
+      <section class="slide bg-offwhite has-dots"
+        data-section="03 · DIAGNOSTIC CASCADE"
+        data-title="ยิ่งตรวจเยอะ ยิ่งมีโอกาสพบความผิดปกติที่ไม่ใช่โรค"
+        data-duration="Slide 03 / 20"
+        data-notes="นี่คือสิ่งที่หลายคนไม่เคยได้รับการอธิบายก่อนตรวจสุขภาพ ค่าเลือดที่ขึ้นตัวแดงไม่ได้แปลว่าเราป่วยเสมอไป เพราะช่วงค่าอ้างอิงของผลเลือดหลายชนิดถูกสร้างขึ้นจากการกระจายของข้อมูลในประชากรสุขภาพดี
+
+เมื่อเราตรวจมากขึ้น โอกาสพบค่าที่อยู่นอกช่วงอ้างอิงโดยบังเอิญก็เพิ่มขึ้น หลังจากนั้นเราอาจต้องเสียเงินตรวจซ้ำ ตรวจภาพถ่ายทางการแพทย์ หรือบางครั้งต้องทำหัตถการเพิ่มเติม ทั้งที่ไม่ได้เป็นโรคตั้งแต่แรก
+
+นี่คือสิ่งที่เรียกว่า Diagnostic Cascade ซึ่งนอกจากทำให้เสียเงิน ยังสร้างความวิตกกังวลและอาจนำไปสู่การรักษาที่ไม่จำเป็น">
+        <div class="deco-rect fill-yellow" style="width:76px;height:76px;top:36px;right:70px;transform:rotate(-8deg);"></div>
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-pink">03 · STATISTICAL REALITY</span>
+              <span class="label-pill fill-white">95% REFERENCE RANGE MODEL</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">ยิ่งตรวจเยอะ ยิ่งมีโอกาสพบความผิดปกติที่ไม่ใช่โรค</h1>
+            <p class="slide-lead" style="margin-top:4px;">สมมติตรวจคนสุขภาพดี โดยแต่ละรายการมีช่วงค่าอ้างอิงครอบคลุม 95% และผลแต่ละรายการเป็นอิสระต่อกัน</p>
+          </div>
+
+          <div class="grid-2-wide reveal d2">
+            <div class="bf-card fill-white">
+              <h3>
+                <span>โอกาสพบผลนอกช่วงอ้างอิงอย่างน้อย 1 รายการ</span>
+                <span class="mono-tag fill-green">PROBABILITY</span>
+              </h3>
+              <div class="chart-row">
+                <div class="chart-label">1 รายการ</div>
+                <div class="chart-track"><div class="chart-bar fill-blue" style="width:5%;"></div></div>
+                <div class="chart-val">5.0%</div>
+              </div>
+              <div class="chart-row">
+                <div class="chart-label">5 รายการ</div>
+                <div class="chart-track"><div class="chart-bar fill-green" style="width:22.6%;"></div></div>
+                <div class="chart-val">22.6%</div>
+              </div>
+              <div class="chart-row">
+                <div class="chart-label">10 รายการ</div>
+                <div class="chart-track"><div class="chart-bar fill-yellow" style="width:40.1%;"></div></div>
+                <div class="chart-val">40.1%</div>
+              </div>
+              <div class="chart-row">
+                <div class="chart-label">20 รายการ</div>
+                <div class="chart-track"><div class="chart-bar fill-cream" style="width:64.2%;"></div></div>
+                <div class="chart-val">64.2%</div>
+              </div>
+              <div class="chart-row">
+                <div class="chart-label">30 รายการ</div>
+                <div class="chart-track"><div class="chart-bar fill-pink" style="width:78.5%;"></div></div>
+                <div class="chart-val">78.5%</div>
+              </div>
+              <div class="chart-row">
+                <div class="chart-label">50 รายการ</div>
+                <div class="chart-track"><div class="chart-bar fill-pink" style="width:92.3%;"></div></div>
+                <div class="chart-val">92.3%</div>
+              </div>
+              <div class="bf-card-sm fill-offwhite" style="margin-top:12px;padding:10px 16px;">
+                <p style="font-size:15.5px;"><strong>หมายเหตุแบบจำลอง:</strong> เป็นแบบจำลองทางสถิติประกอบการสอน ไม่ใช่อัตราผลบวกลวงจริงของแพ็กเกจตรวจสุขภาพ เนื่องจากผลตรวจแต่ละชนิดอาจสัมพันธ์กัน</p>
+              </div>
+            </div>
+
+            <div class="stack-gap">
+              <div class="bf-photo-frame" style="height:240px;">
+                <img src="https://images.unsplash.com/photo-1579154341184-22069e4614d2?auto=format&fit=crop&w=900&q=80" alt="ตัวอย่างหลอดเลือดในห้องปฏิบัติการ" referrerpolicy="no-referrer" />
+                <div class="bf-photo-caption">FALSE POSITIVE CASCADE</div>
+              </div>
+              <div class="bf-card fill-pink" style="padding:20px 24px;">
+                <h3 style="margin-bottom:8px;">วงจร Diagnostic Cascade</h3>
+                <ul>
+                  <li><strong>ค่าเลือดขึ้นตัวแดง ≠ ป่วยเสมอไป:</strong> อาจเป็นเพียงปลายขอบการกระจายตัวของคนสุขภาพดี 5%</li>
+                  <li><strong>ผลกระทบต่อเนื่อง:</strong> ตรวจซ้ำ → ตรวจภาพถ่ายการแพทย์ → หัตถการเกินจำเป็น</li>
+                  <li><strong>ต้นทุนที่มองไม่เห็น:</strong> เสียเงินเพิ่ม สร้างความวิตกกังวล และเสี่ยงต่อการรักษาที่ไม่จำเป็น</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 04: 5 RULES BEFORE PAYING FOR BLOOD TESTS (Pink)
+           ========================================================= -->
+      <section class="slide bg-pink"
+        data-section="04 · 5 GOLDEN QUESTIONS"
+        data-title="กฎ 5 ข้อ ก่อนยอมจ่ายเงินตรวจเลือด"
+        data-duration="Slide 04 / 20"
+        data-notes="ข้อที่สำคัญที่สุดสำหรับผมคือข้อสี่ สมมติว่าเรากำลังจะเสียเงิน 3,000 บาท เพื่อตรวจสารตัวหนึ่งในเลือด ผมอยากให้ถามก่อนว่าถ้าผลออกมาสูงจะทำอะไร และถ้าผลออกมาต่ำจะทำอะไร
+
+ถ้าผลทั้งสองแบบนำไปสู่คำแนะนำเหมือนกันทั้งหมด เช่น ให้ออกกำลังกาย นอนหลับให้เพียงพอ และลดอาหารแปรรูป การตรวจนั้นอาจไม่ได้เพิ่มคุณค่ามากพอสำหรับเงินที่เราต้องจ่าย
+
+ในทางกลับกัน การตรวจราคาเพียง 40 บาท อาจช่วยค้นพบโรคที่เปลี่ยนแปลงชีวิตของเราได้ นี่คือหลักการ Clinical Utility หรือประโยชน์ของการตรวจต่อการตัดสินใจทางการแพทย์">
+        <div class="deco-stripe" style="width:155px;height:54px;top:36px;right:70px;transform:rotate(-3deg);"></div>
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-yellow">04 · CLINICAL UTILITY FILTER</span>
+              <span class="label-pill fill-white">ASK BEFORE YOU PAY</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">กฎ 5 ข้อ ก่อนยอมจ่ายเงินตรวจเลือด</h1>
+            <p class="slide-lead" style="margin-top:4px;">ก่อนตรวจเลือดทุกครั้ง ให้ถาม 5 คำถามนี้ เพื่อแยกการตรวจที่ได้ใช้ประโยชน์จริงออกจากการตรวจตามกระแส</p>
+          </div>
+
+          <div class="grid-2-wide reveal d2">
+            <div class="stack-gap" style="gap:12px;">
+              <div class="bf-card-sm fill-white" style="padding:14px 20px;">
+                <div class="list-row"><div class="list-num">01</div><p style="font-size:19px;"><strong>ตรวจเพื่อค้นหาโรคหรือความผิดปกติอะไร?</strong></p></div>
+              </div>
+              <div class="bf-card-sm fill-white" style="padding:14px 20px;">
+                <div class="list-row"><div class="list-num">02</div><p style="font-size:19px;"><strong>ตัวเรามีความเสี่ยงต่อโรคนั้นจริงหรือไม่?</strong></p></div>
+              </div>
+              <div class="bf-card-sm fill-white" style="padding:14px 20px;">
+                <div class="list-row"><div class="list-num">03</div><p style="font-size:19px;"><strong>การตรวจนี้แม่นยำเพียงพอสำหรับการคัดกรองหรือไม่?</strong></p></div>
+              </div>
+              <div class="bf-card-sm fill-yellow" style="padding:14px 20px;border:var(--border-primary);">
+                <div class="list-row"><div class="list-num fill-white">04</div><p style="font-size:19px;"><strong>ถ้าผลผิดปกติ เราจะเปลี่ยนวิธีรักษาหรือดูแลตัวเองอย่างไร?</strong> <span class="mono-tag fill-white">KEY RULE</span></p></div>
+              </div>
+              <div class="bf-card-sm fill-white" style="padding:14px 20px;">
+                <div class="list-row"><div class="list-num">05</div><p style="font-size:19px;"><strong>มีวิธีตรวจอื่นที่ถูกกว่าและให้ประโยชน์ใกล้เคียงกันหรือไม่?</strong></p></div>
+              </div>
+            </div>
+
+            <div class="stack-gap">
+              <div class="bf-photo-frame" style="height:290px;">
+                <img src="https://images.unsplash.com/photo-1758691462954-e6fa5005474b?auto=format&fit=crop&w=900&q=80" alt="แพทย์พูดคุยและให้คำปรึกษาผู้ป่วย" referrerpolicy="no-referrer" />
+                <div class="bf-photo-caption">CLINICAL UTILITY</div>
+              </div>
+              <div class="bf-card fill-white" style="padding:18px 22px;">
+                <p style="font-size:18px;"><strong>฿3,000 VS ฿40:</strong> หากผลสูงหรือต่ำก็นำไปสู่คำแนะนำเดิม (ออกกำลังกาย นอนพอ ลดแปรรูป) อาจไม่คุ้มค่า — แต่การตรวจเพียง <strong>40 บาท</strong> (เช่น น้ำตาล/ไต) อาจพบโรคที่เปลี่ยนชีวิตได้</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 05: FREE CHECKUP RIGHTS IN THAILAND (Yellow + Dots)
+           ========================================================= -->
+      <section class="slide bg-yellow has-dots"
+        data-section="05 · USE FREE RIGHTS FIRST"
+        data-title="ตรวจสุขภาพฟรีก่อนเสียเงิน: สิทธิที่คนไทยมักลืมใช้"
+        data-duration="Slide 05 / 20"
+        data-notes="ก่อนที่ทุกคนจะซื้อแพ็กเกจตรวจสุขภาพ ผมอยากให้ตรวจสอบสิทธิของตัวเองก่อน ไม่ว่าจะเป็นประกันสังคม บัตรทอง สิทธิข้าราชการ หรือประกันสุขภาพส่วนบุคคล เพราะเราอาจมีสิทธิตรวจหลายรายการโดยไม่ต้องจ่ายเงินเอง
+
+วิธีที่ฉลาดที่สุดคือใช้สิทธิตรวจพื้นฐานก่อน จากนั้นค่อยนำเงินของตัวเองไปตรวจเพิ่มเติมในรายการที่จำเป็นแต่ไม่ครอบคลุมในสิทธิ
+
+สามารถสอบถามสิทธิและหน่วยบริการได้ที่ สปสช. 1330 หรือประกันสังคม 1506 อย่าซื้อสิ่งที่เรามีสิทธิได้รับอยู่แล้ว">
+        <div class="deco-rect fill-blue" style="width:76px;height:76px;top:36px;right:70px;transform:rotate(11deg);"></div>
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-white">05 · NATIONAL HEALTH BENEFITS</span>
+              <span class="label-pill fill-pink">CHECK RIGHTS BEFORE SPENDING</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">ตรวจสุขภาพฟรีก่อนเสียเงิน: สิทธิที่คนไทยมักลืมใช้</h1>
+            <p class="slide-lead" style="margin-top:4px;">ใช้สิทธิพื้นฐานที่มีอยู่ให้ครบก่อน แล้วจึงนำเงินส่วนตัวไปต่อยอดในรายการที่จำเป็นแต่ไม่ครอบคลุม</p>
+          </div>
+
+          <div class="grid-2 reveal d2">
+            <div class="stack-gap">
+              <div class="bf-card fill-white">
+                <div class="feature-deco fill-blue">33/39</div>
+                <h3>
+                  <span>สิทธิประกันสังคม (ม.33 และ ม.39)</span>
+                  <span class="mono-tag fill-blue">SOCIAL SECURITY</span>
+                </h3>
+                <ul>
+                  <li>มีสิทธิตรวจสุขภาพฟรีตามเกณฑ์อายุและความถี่ที่กำหนด</li>
+                  <li>รายการสำคัญ เช่น <strong>CBC, FBS, Creatinine, Cholesterol, HDL</strong> และการคัดกรองมะเร็งบางชนิด</li>
+                </ul>
+              </div>
+              <div class="bf-card fill-white">
+                <div class="feature-deco fill-pink">B/C</div>
+                <h3>
+                  <span>คัดกรองไวรัสตับอักเสบ บี &amp; ซี ฟรี</span>
+                  <span class="mono-tag fill-pink">THAI PBS NEWS</span>
+                </h3>
+                <ul>
+                  <li>คนไทยที่เกิด<strong>ก่อน พ.ศ. 2535</strong> มีสิทธิคัดกรองไวรัสตับอักเสบบีและซีฟรี 1 ครั้งในชีวิตตามเงื่อนไขโครงการ</li>
+                  <li>กลุ่มเสี่ยงบางกลุ่มสามารถตรวจไวรัสตับอักเสบซีซ้ำได้ทุกปี</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="stack-gap">
+              <div class="bf-photo-frame" style="height:245px;">
+                <img src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=900&q=80" alt="บริการตรวจคัดกรองสุขภาพในโรงพยาบาล" referrerpolicy="no-referrer" />
+                <div class="bf-photo-caption">UNIVERSAL COVERAGE</div>
+              </div>
+              <div class="bf-card fill-green" style="padding:20px 24px;">
+                <h3 style="margin-bottom:8px;">กลยุทธ์ 2 ขั้นตอน + ช่องทางเช็กสิทธิ</h3>
+                <p style="font-size:18px;margin-bottom:10px;"><strong>1) ใช้สิทธิฟรีพื้นฐานก่อน</strong> (ประกันสังคม / บัตรทอง / ข้าราชการ / ประกันส่วนตัว) → <strong>2) ซื้อเพิ่มเฉพาะรายการที่จำเป็น</strong>และไม่ครอบคลุม</p>
+                <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                  <span class="code-chip fill-white">สปสช. สายด่วน 1330</span>
+                  <span class="code-chip fill-white">ประกันสังคม 1506</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 06: ITEMIZED LAB PRICES — CHULA VS PSU (Green)
+           ========================================================= -->
+      <section class="slide bg-green"
+        data-section="06 · ITEMIZED LAB PRICING"
+        data-title="เปิดราคาตรวจเลือดรายตัว: ตรวจเองประหยัดแค่ไหน?"
+        data-duration="Slide 06 / 20"
+        data-notes="หลายคนอาจไม่ทราบว่าเราสามารถเลือกตรวจเลือดเป็นรายตัวได้ ไม่จำเป็นต้องซื้อแพ็กเกจเสมอไป แล็บของมหาวิทยาลัย คลินิกเทคนิคการแพทย์ และโรงพยาบาลหลายแห่งมีบริการลักษณะนี้
+
+จะเห็นว่าการตรวจน้ำตาลราคา 40 บาท การตรวจ Creatinine ราคา 40 บาท หรือการตรวจไขมันครบสี่ค่าราคา 370 บาท ก็สามารถให้ข้อมูลทางการแพทย์ที่สำคัญได้แล้ว
+
+อย่างไรก็ตาม อย่าเลือกจากราคาเพียงอย่างเดียว ต้องพิจารณามาตรฐานห้องปฏิบัติการ การควบคุมคุณภาพ และการมีผู้เชี่ยวชาญช่วยแปลผลด้วย">
+        <div class="star-burst" style="width:82px;height:82px;top:36px;right:70px;transform:rotate(12deg);">
+          <div class="star-burst-inner"></div>
+        </div>
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-yellow">06 · A LA CARTE LAB MENU</span>
+              <span class="label-pill fill-white">CHULA AHS VS PSU MEDTECH (THB)</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">เปิดราคาตรวจเลือดรายตัว: ตรวจเองประหยัดแค่ไหน?</h1>
+            <p class="slide-lead" style="margin-top:4px;">เปรียบเทียบราคาประชาชนทั่วไป: คลินิกบริการสุขภาพ คณะสหเวชฯ จุฬาฯ และคลินิกเทคนิคการแพทย์ชุมชน ม.อ.</p>
+          </div>
+
+          <div class="grid-2 reveal d2">
+            <div class="bf-table-frame">
+              <table class="bf-table bf-table-xs">
+                <thead>
+                  <tr class="fill-yellow">
+                    <th style="width:54%;">รายการตรวจ (1–10)</th>
+                    <th style="width:23%;">จุฬาฯ</th>
+                    <th style="width:23%;">ม.อ.</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>CBC</td><td><strong>90</strong></td><td>250</td></tr>
+                  <tr><td>Fasting glucose / Glucose</td><td><strong>40</strong></td><td>55</td></tr>
+                  <tr><td>HbA1c</td><td><strong>200</strong></td><td>330</td></tr>
+                  <tr><td>Cholesterol</td><td><strong>60</strong></td><td>70</td></tr>
+                  <tr><td>Triglyceride</td><td><strong>60</strong></td><td>70</td></tr>
+                  <tr><td>HDL-C</td><td><strong>100</strong></td><td>130</td></tr>
+                  <tr><td>LDL-C</td><td><strong>150</strong></td><td>150</td></tr>
+                  <tr><td>ไขมันครบ 4 ค่า</td><td><strong>370</strong></td><td>420</td></tr>
+                  <tr><td>BUN + Creatinine</td><td><strong>80</strong></td><td>120</td></tr>
+                  <tr><td>AST</td><td><strong>40</strong></td><td>70</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="bf-table-frame">
+              <table class="bf-table bf-table-xs">
+                <thead>
+                  <tr class="fill-yellow">
+                    <th style="width:54%;">รายการตรวจ (11–19)</th>
+                    <th style="width:23%;">จุฬาฯ</th>
+                    <th style="width:23%;">ม.อ.</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>ALT</td><td><strong>40</strong></td><td>70</td></tr>
+                  <tr><td>Uric acid</td><td><strong>60</strong></td><td>65</td></tr>
+                  <tr><td>Urinalysis</td><td>60</td><td><strong>50</strong></td></tr>
+                  <tr><td>HBsAg</td><td>150</td><td><strong>100</strong></td></tr>
+                  <tr><td>Anti-HBs</td><td>200</td><td><strong>150</strong></td></tr>
+                  <tr><td>PSA</td><td><strong>400</strong></td><td>700</td></tr>
+                  <tr><td>AFP</td><td><strong>300</strong></td><td>400</td></tr>
+                  <tr><td>CA-125</td><td><strong>600</strong></td><td>700</td></tr>
+                  <tr><td>CA 15-3</td><td><strong>600</strong></td><td>700</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="bf-card-sm fill-cream reveal d3" style="padding:14px 22px;">
+            <p style="font-size:17.5px;"><strong>ข้อควรจำ:</strong> หน่วย: บาท (ใช้ราคาประชาชนทั่วไป ไม่ใช่ราคาบุคลากรของมหาวิทยาลัย) — อย่าดูแค่ราคา ต้องพิจารณามาตรฐานห้องปฏิบัติการ (เช่น LA / ISO 15189) และผู้เชี่ยวชาญช่วยแปลผลด้วย</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 07: PACKAGE VS A LA CARTE COMPARISON (Offwhite)
+           ========================================================= -->
+      <section class="slide bg-offwhite has-dots"
+        data-section="07 · PACKAGE VS LAB ONLY"
+        data-title="เปรียบเทียบแพ็กเกจ 5,399 บาท กับการเลือกตรวจเอง"
+        data-duration="Slide 07 / 20"
+        data-notes="นี่คือตัวอย่างที่ผมอยากให้ทุกคนเห็นอย่างเป็นรูปธรรม หากเราต้องการเฉพาะข้อมูลผลเลือด เราอาจสามารถเลือกตรวจแยกในราคาที่ต่ำกว่าการซื้อแพ็กเกจได้มาก
+
+แต่ต้องเปรียบเทียบอย่างเป็นธรรม เพราะแพ็กเกจของโรงพยาบาลนี้ยังรวมการตรวจร่างกายและการวิเคราะห์องค์ประกอบร่างกายด้วย ซึ่งไม่ได้รวมอยู่ในราคา 1,020 บาท
+
+ดังนั้น หากเรามีแพทย์ประจำตัวหรือมีช่องทางแปลผลที่เหมาะสมอยู่แล้ว การเลือกตรวจเฉพาะรายการอาจเป็นทางเลือกที่ประหยัดกว่า">
+        <div class="deco-rect fill-pink" style="width:76px;height:76px;top:36px;right:70px;transform:rotate(-9deg);"></div>
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-blue">07 · REAL COST BREAKDOWN</span>
+              <span class="label-pill fill-white">SAMITIVEJ 5,399 VS CHULA LAB 1,020</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">เปรียบเทียบแพ็กเกจ 5,399 บาท กับการเลือกตรวจเอง</h1>
+            <p class="slide-lead" style="margin-top:4px;">ตัวอย่างโปรแกรมตรวจสมดุลระบบเผาผลาญและภาวะน้ำหนักเกิน รพ.สมิติเวช (โปรโมชั่น 5,399 บ. จากปกติ 7,600 บ. ถึง 31 ธ.ค. 2569)</p>
+          </div>
+
+          <div class="grid-2-wide reveal d2">
+            <div class="bf-table-frame">
+              <table class="bf-table bf-table-sm">
+                <thead>
+                  <tr class="fill-blue">
+                    <th style="width:68%;">รายการตรวจเลือดในโปรแกรม (เทียบราคาสหเวชฯ จุฬาฯ)</th>
+                    <th style="width:32%;">ราคาตรวจรายตัว</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>CBC</td><td>90 บาท</td></tr>
+                  <tr><td>FBS</td><td>40 บาท</td></tr>
+                  <tr><td>HbA1c</td><td>200 บาท</td></tr>
+                  <tr><td>Lipid profile 4 ค่า</td><td>370 บาท</td></tr>
+                  <tr><td>AST</td><td>40 บาท</td></tr>
+                  <tr><td>ALT</td><td>40 บาท</td></tr>
+                  <tr><td>Creatinine + eGFR</td><td>40 บาท</td></tr>
+                  <tr><td>TSH</td><td>200 บาท</td></tr>
+                  <tr class="fill-yellow"><td><strong>รวมเฉพาะค่า Lab 8 รายการ</strong></td><td><strong>1,020 บาท</strong></td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="stack-gap">
+              <div class="grid-2" style="gap:16px;">
+                <div class="bf-card-sm fill-pink tilt-neg" style="padding:16px 18px;">
+                  <div class="stat-deco-dot fill-white"></div>
+                  <span class="mono-tag fill-white" style="margin-bottom:6px;">แพ็กเกจ รพ.</span>
+                  <div class="stat-number" style="font-size:44px;">฿5,399</div>
+                </div>
+                <div class="bf-card-sm fill-green tilt-pos" style="padding:16px 18px;">
+                  <div class="stat-deco-dot fill-white"></div>
+                  <span class="mono-tag fill-white" style="margin-bottom:6px;">เฉพาะ LAB</span>
+                  <div class="stat-number" style="font-size:44px;">฿1,020</div>
+                </div>
+              </div>
+              <div class="bf-card fill-yellow" style="padding:20px 24px;">
+                <span class="mono-tag fill-white" style="margin-bottom:6px;">COST DIFFERENCE</span>
+                <div class="stat-number" style="font-size:46px;">ส่วนต่าง ฿4,379 (~81%)</div>
+                <p style="font-size:17px;margin-top:6px;">โดยยังไม่รวมค่าบริการอื่นของการตรวจแยก</p>
+              </div>
+              <div class="bf-card-flat fill-white" style="padding:16px 20px;">
+                <p style="font-size:17.5px;"><strong>เปรียบเทียบอย่างเป็นธรรม:</strong> แพ็กเกจ รพ. รวมการตรวจร่างกายและการวิเคราะห์องค์ประกอบร่างกาย (ไม่ได้รวมใน 1,020 บ.) — แต่ถ้ามีแพทย์ประจำตัวหรือช่องทางแปลผลอยู่แล้ว การตรวจแยกประหยัดกว่ามาก</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 08: AGE-STRATIFIED SCREENING + ADA 2026 (Cream)
+           ========================================================= -->
+      <section class="slide bg-cream"
+        data-section="08 · SCREENING BY AGE"
+        data-title="ตรวจสุขภาพอะไรบ้างในแต่ละช่วงอายุ?"
+        data-duration="Slide 08 / 20"
+        data-notes="การตรวจสุขภาพที่ดีต้องออกแบบตามอายุ ประวัติครอบครัว พฤติกรรม โรคประจำตัว ยาที่รับประทาน และผลตรวจในอดีต คนอายุ 25 ปีที่แข็งแรง ไม่สูบบุหรี่ ไม่มีประวัติเสี่ยง ย่อมไม่จำเป็นต้องตรวจเหมือนคนอายุ 55 ปีที่เป็นเบาหวานและความดันสูง
+
+แนวทางของ ADA ปี 2026 แนะนำให้เริ่มคัดกรองเบาหวานในคนทั่วไปตั้งแต่อายุ 35 ปี และเริ่มเร็วกว่านั้นในผู้มีน้ำหนักเกินร่วมกับปัจจัยเสี่ยง ส่วนคนเอเชียใช้ BMI ตั้งแต่ 23 เป็นเกณฑ์หนึ่งในการประเมิน
+
+หากผลปกติและความเสี่ยงไม่เปลี่ยนแปลง การคัดกรองเบาหวานซ้ำประมาณทุกสามปีอาจเพียงพอ ไม่จำเป็นต้องตรวจทุกสามเดือนเหมือนผู้ป่วยเบาหวาน">
+        <div class="deco-stripe" style="width:155px;height:52px;top:36px;right:70px;transform:rotate(5deg);"></div>
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-white">08 · LIFE-STAGE SCREENING</span>
+              <span class="label-pill fill-blue">ADA STANDARDS OF CARE 2026</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">ตรวจสุขภาพอะไรบ้างในแต่ละช่วงอายุ?</h1>
+            <p class="slide-lead" style="margin-top:4px;">ออกแบบตามอายุ ประวัติครอบครัว พฤติกรรม ยา และผลในอดีต — ไม่ใช่ทุกคนต้องตรวจทุกรายการทุกปี</p>
+          </div>
+
+          <div class="grid-2-wide reveal d2">
+            <div class="bf-table-frame">
+              <table class="bf-table bf-table-sm">
+                <thead>
+                  <tr class="fill-blue">
+                    <th style="width:24%;">กลุ่มอายุ</th>
+                    <th style="width:76%;">สิ่งที่ควรให้ความสำคัญ</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><strong>18–34 ปี</strong></td><td>ความดัน รอบเอว ไขมันตามอายุและความเสี่ยง น้ำตาลเมื่อมีปัจจัยเสี่ยง</td></tr>
+                  <tr><td><strong>35–39 ปี</strong></td><td>เพิ่มการคัดกรองเบาหวานและประเมินความเสี่ยงเมแทบอลิก</td></tr>
+                  <tr><td><strong>40–49 ปี</strong></td><td>น้ำตาล ไขมัน ความเสี่ยงหัวใจ ไตและตับตามปัจจัยเสี่ยง</td></tr>
+                  <tr><td><strong>50–59 ปี</strong></td><td>เพิ่มความสำคัญของการคัดกรองมะเร็งตามวัย</td></tr>
+                  <tr class="fill-yellow"><td><strong>60 ปีขึ้นไป</strong></td><td>โรคเรื้อรัง ไต ภาวะซีด โภชนาการ การใช้ยา มวลกล้ามเนื้อ และสุขภาพกระดูก</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="stack-gap">
+              <div class="bf-photo-frame" style="height:240px;">
+                <img src="https://images.unsplash.com/photo-1459411621453-7b03977f4bfc?auto=format&fit=crop&w=900&q=80" alt="โภชนาการและผักสีเขียวสำหรับดูแลสุขภาพ" referrerpolicy="no-referrer" />
+                <div class="bf-photo-caption">TAILORED BY AGE &amp; RISK</div>
+              </div>
+              <div class="bf-card fill-white" style="padding:18px 22px;">
+                <h3 style="margin-bottom:8px;">เกณฑ์ ADA 2026 (Diabetes Screening)</h3>
+                <ul>
+                  <li>คนทั่วไปเริ่มคัดกรองเบาหวานตั้งแต่อายุ <strong>35 ปี</strong></li>
+                  <li>เริ่มเร็วกว่านั้นหากน้ำหนักเกิน + ปัจจัยเสี่ยง (คนเอเชียใช้ <strong>BMI ≥ 23</strong> เป็นเกณฑ์ประเมิน)</li>
+                  <li>หากผลปกติและความเสี่ยงไม่เปลี่ยน ตรวจซ้ำทุก <strong>~3 ปี</strong> เพียงพอ</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 09: SMART DIABETES SCREENING (Blue + Dots)
+           ========================================================= -->
+      <section class="slide bg-blue has-dots"
+        data-section="09 · DIABETES &amp; METABOLISM"
+        data-title="ตรวจเบาหวานอย่างฉลาด: FBS, HbA1c, Insulin หรือ C-peptide?"
+        data-duration="Slide 09 / 20"
+        data-notes="ในคนทั่วไปที่ยังไม่ได้เป็นเบาหวาน เราไม่จำเป็นต้องเริ่มต้นด้วยการตรวจฮอร์โมนทุกตัว Fasting glucose หรือ HbA1c เป็นเครื่องมือคัดกรองมาตรฐานที่มีหลักฐานรองรับ
+
+ในมุม Functional Medicine ผมอาจสนใจภาวะดื้ออินซูลินก่อนที่น้ำตาลจะสูง แต่ต้องยอมรับว่า Fasting insulin และ HOMA-IR ยังมีข้อจำกัดเรื่องมาตรฐานและจุดตัด จึงไม่ใช่การตรวจที่ทุกคนจำเป็นต้องทำ ส่วน C-peptide มีประโยชน์เมื่อเราต้องการประเมินการสร้างอินซูลินภายในร่างกาย โดยเฉพาะเมื่อชนิดของเบาหวานไม่ชัดเจนหรือมีข้อสงสัยทางคลินิก ไม่ใช่การตรวจประจำปีที่ทุกคนต้องทำ
+
+อีกเรื่องที่ต้องระวังคือ HbA1c อาจคลาดเคลื่อนในผู้ที่มีภาวะซีด ธาลัสซีเมียบางชนิด มีการเสียเลือด หรือได้รับเลือดเมื่อไม่นานมานี้ ดังนั้น การตรวจที่เหมาะสมจึงสำคัญกว่าการตรวจที่แพงที่สุด">
+        <div class="deco-rect fill-yellow" style="width:74px;height:74px;top:36px;right:70px;transform:rotate(8deg);"></div>
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-yellow">09 · GLYCEMIC TESTING</span>
+              <span class="label-pill fill-white">FBS · HBA1C · INSULIN · C-PEPTIDE</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">ตรวจเบาหวานอย่างฉลาด: FBS, HbA1c, Insulin หรือ C-peptide?</h1>
+            <p class="slide-lead" style="margin-top:4px;">การตรวจที่เหมาะสมกับคำถามคลินิก สำคัญกว่าการตรวจราคาแพงที่สุด</p>
+          </div>
+
+          <div class="grid-2-chart reveal d2">
+            <div class="stack-gap">
+              <div class="bf-table-frame">
+                <table class="bf-table bf-table-xs">
+                  <thead>
+                    <tr class="fill-yellow">
+                      <th>รายการ (ราคาจุฬาฯ)</th>
+                      <th>ราคา</th>
+                      <th>ประโยชน์</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td><strong>FBS</strong></td><td>40 บาท</td><td>ระดับน้ำตาลขณะอดอาหาร</td></tr>
+                    <tr><td><strong>HbA1c</strong></td><td>200 บาท</td><td>ระดับน้ำตาลเฉลี่ยย้อนหลัง</td></tr>
+                    <tr><td><strong>Fasting insulin</strong></td><td>350 บาท</td><td>ข้อมูลเสริมการตอบสนองอินซูลิน</td></tr>
+                    <tr class="fill-green"><td><strong>ตรวจทั้ง 3 รายการ</strong></td><td><strong>590 บาท</strong></td><td>ประเมินเมแทบอลิซึมรายเหมาะสม</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="bf-card fill-yellow" style="padding:16px 20px;">
+                <h3 style="margin-bottom:6px;font-size:20px;">ข้อจำกัดที่ต้องระวัง</h3>
+                <ul>
+                  <li style="font-size:16.5px;"><strong>HbA1c อาจคลาดเคลื่อน:</strong> ในภาวะซีด ธาลัสซีเมียบางชนิด เสียเลือด หรือได้รับเลือดเมื่อไม่นาน</li>
+                  <li style="font-size:16.5px;"><strong>Fasting insulin / HOMA-IR:</strong> ยังมีข้อจำกัดเรื่องมาตรฐาน &amp; จุดตัด ไม่จำเป็นต้องตรวจทุกคน</li>
+                  <li style="font-size:16.5px;"><strong>C-peptide:</strong> ใช้ประเมินการสร้างอินซูลินเมื่อชนิดเบาหวานไม่ชัดเจน ไม่ใช่ตรวจประจำปี</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="bf-table-frame">
+              <table class="bf-table bf-table-xs">
+                <thead>
+                  <tr class="fill-pink">
+                    <th style="width:42%;">ลักษณะบุคคล ("ใครควรตรวจเพิ่มเติม?")</th>
+                    <th style="width:58%;">แนวทางเลือกตรวจ</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><strong>คนทั่วไปถึงวัยคัดกรอง</strong></td><td>FBS หรือ HbA1c</td></tr>
+                  <tr><td><strong>อ้วนลงพุง มีประวัติครอบครัว</strong></td><td>FBS หรือ HbA1c พิจารณาตรวจเพิ่มเติมตามความเสี่ยง</td></tr>
+                  <tr><td><strong>Prediabetes</strong></td><td>ติดตามน้ำตาลอย่างน้อยปีละครั้ง</td></tr>
+                  <tr><td><strong>ผู้ป่วยเบาหวาน</strong></td><td>HbA1c ตามระดับการควบคุมโรค</td></tr>
+                  <tr><td><strong>สงสัยภาวะดื้ออินซูลิน</strong></td><td>พิจารณา Fasting insulin ในบางกรณี</td></tr>
+                  <tr><td><strong>เบาหวานผอม สงสัยสร้างอินซูลินไม่พอ</strong></td><td>C-peptide และ/หรือ islet autoantibodies ตามข้อบ่งชี้</td></tr>
+                  <tr><td><strong>ผลน้ำตาลกับ HbA1c ไม่สอดคล้องกัน</strong></td><td>พิจารณาสาเหตุรบกวนผลตรวจ หรือ OGTT</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 10: SMART LIPID SCREENING (Offwhite)
+           ========================================================= -->
+      <section class="slide bg-offwhite"
+        data-section="10 · LIPID OPTIMIZATION"
+        data-title="ตรวจไขมันให้คุ้มที่สุด: LDL อย่างเดียวไม่พอ แต่ไม่ต้องตรวจทุกอย่าง"
+        data-duration="Slide 10 / 20"
+        data-notes="การตรวจไขมันพื้นฐานประกอบด้วย Total cholesterol, Triglyceride, HDL และ LDL เราสามารถนำค่าที่มีอยู่แล้วมาคำนวณ Non-HDL cholesterol และ TG/HDL ratio ได้โดยไม่ต้องเสียเงินเพิ่ม
+
+แต่ถ้าผู้ป่วยมีเบาหวาน ไตรกลีเซอไรด์สูง หรือสงสัยว่าจำนวนอนุภาคไขมันที่ก่อหลอดเลือดไม่สอดคล้องกับค่า LDL การตรวจ ApoB อาจให้ข้อมูลที่มีประโยชน์เพิ่มเติม ที่น่าสนใจมากคือแนวทาง ACC/AHA ปี 2026 แนะนำการตรวจ Lp(a) อย่างน้อยหนึ่งครั้งในวัยผู้ใหญ่ เนื่องจากค่านี้ได้รับอิทธิพลจากพันธุกรรมเป็นหลักและค่อนข้างคงที่ในคนส่วนใหญ่
+
+เราไม่จำเป็นต้องจ่ายเงินตรวจ Lp(a) ทุกปีโดยไม่มีเหตุผลเฉพาะ หากตรวจปีละครั้งเป็นเวลา 10 ปี ที่ราคาครั้งละ 1,500 บาท เราจะจ่าย 15,000 บาท ทั้งที่สำหรับคนส่วนใหญ่ การตรวจหนึ่งครั้งอาจเพียงพอต่อการประเมินความเสี่ยงนี้แล้ว และหากเลือกตรวจที่ราคา 600 บาท แทน 1,500 บาท ก็สามารถลดค่าใช้จ่ายลงได้อีก 900 บาท">
+        <div class="deco-stripe" style="width:150px;height:52px;top:36px;right:70px;transform:rotate(-4deg);"></div>
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-green">10 · LIPID &amp; GENETIC RISK</span>
+              <span class="label-pill fill-white">ACC/AHA DYSLIPIDEMIA GUIDELINE 2026</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">ตรวจไขมันให้คุ้มที่สุด: LDL อย่างเดียวไม่พอ แต่ไม่ต้องตรวจทุกอย่าง</h1>
+            <p class="slide-lead" style="margin-top:4px;">ใช้ค่าคำนวณฟรีให้คุ้ม เสริม ApoB เมื่อมีข้อบ่งชี้ และตรวจ Lp(a) ครั้งเดียวอย่างชาญฉลาด</p>
+          </div>
+
+          <div class="grid-2-wide reveal d2">
+            <div class="bf-table-frame">
+              <table class="bf-table bf-table-sm">
+                <thead>
+                  <tr class="fill-yellow">
+                    <th style="width:34%;">รายการ</th>
+                    <th style="width:32%;">ราคาที่ประกาศ</th>
+                    <th style="width:34%;">ความจำเป็น</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><strong>Lipid profile</strong></td><td>370 บาท — จุฬาฯ</td><td>พื้นฐาน (TC, TG, HDL, LDL)</td></tr>
+                  <tr class="fill-green"><td><strong>Non-HDL cholesterol</strong></td><td><strong>คำนวณฟรี</strong></td><td>ประเมินไขมันที่ก่อหลอดเลือด</td></tr>
+                  <tr class="fill-green"><td><strong>TG/HDL ratio</strong></td><td><strong>คำนวณฟรี</strong></td><td>ข้อมูลเสริมด้านเมแทบอลิซึม</td></tr>
+                  <tr><td><strong>ApoB</strong></td><td>500 บาท — รพ.สุไหงโก-ลก</td><td>พิจารณาเฉพาะราย (เบาหวาน/TG สูง)</td></tr>
+                  <tr><td><strong>Lp(a)</strong></td><td>600 บาท — รพ.สุไหงโก-ลก</td><td>ควรพิจารณาอย่างน้อย 1× ในวัยผู้ใหญ่</td></tr>
+                  <tr><td><strong>Lp(a)</strong></td><td>1,500 บาท — รพ.นวเวช</td><td>การตรวจชนิดเดียวกัน ต่างสถานพยาบาล</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="stack-gap">
+              <div class="bf-photo-frame" style="height:215px;">
+                <img src="https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?auto=format&fit=crop&w=900&q=80" alt="ห้องปฏิบัติการวิเคราะห์ชีวเคมีและไขมัน" referrerpolicy="no-referrer" />
+                <div class="bf-photo-caption">APOB &amp; LP(A) STRATEGY</div>
+              </div>
+              <div class="bf-card fill-yellow" style="padding:18px 22px;">
+                <h3 style="margin-bottom:8px;">ประหยัดจากพันธุกรรม Lp(a)</h3>
+                <p style="font-size:17.5px;"><strong>ACC/AHA 2026:</strong> ค่า Lp(a) คุมด้วยพันธุกรรมและค่อนข้างคงที่ ตรวจเพียง <strong>1 ครั้งในวัยผู้ใหญ่</strong> แทนที่จะตรวจซ้ำ 10 ปี × 1,500 บ. (= <strong>฿15,000</strong>) และเลือกที่ราคา <strong>฿600</strong> แทน ฿1,500 ประหยัดทันที <strong>฿900</strong>!</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 11: KIDNEY SCREENING + UACR (Yellow + Dots)
+           ========================================================= -->
+      <section class="slide bg-yellow has-dots"
+        data-section="11 · KIDNEY PROTECTION"
+        data-title="ตรวจไตอย่างไร ไม่ต้องรอให้ไตเสื่อม"
+        data-duration="Slide 11 / 20"
+        data-notes="ความผิดพลาดที่ผมพบได้บ่อยคือ ผู้ป่วยเบาหวานตรวจค่า Creatinine ทุกปี แล้วเข้าใจว่าไตยังปกติ เพราะตัวเลขยังไม่สูง
+
+แต่ในระยะเริ่มต้นของโรคไต ผู้ป่วยอาจมีโปรตีนอัลบูมินรั่วออกมาทางปัสสาวะ ทั้งที่ค่า Creatinine และ eGFR ยังดูปกติ สำหรับผู้ป่วยเบาหวาน การเพิ่ม UACR จึงอาจมีความคุ้มค่ามากกว่าการนำเงินไปตรวจวิตามินหรือฮอร์โมนที่ไม่มีข้อบ่งชี้
+
+ADA ปี 2026 ยังคงแนะนำให้ตรวจทั้ง eGFR และ UACR อย่างน้อยปีละครั้งในผู้ป่วยเบาหวานชนิดที่ 2 ทุกคน นี่คือตัวอย่างของการประหยัดอย่างถูกวิธี คือไม่ตัดสิ่งที่จำเป็น แต่ย้ายงบประมาณจากสิ่งที่มีประโยชน์น้อยไปสู่สิ่งที่สามารถป้องกันภาวะแทรกซ้อนได้จริง">
+        <div class="deco-rect fill-green" style="width:76px;height:76px;top:36px;right:70px;transform:rotate(10deg);"></div>
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-white">11 · RENAL MONITORING</span>
+              <span class="label-pill fill-green">EGFR + UACR · ADA 2026</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">ตรวจไตอย่างไร ไม่ต้องรอให้ไตเสื่อม</h1>
+            <p class="slide-lead" style="margin-top:4px;">อย่าดูแค่ Creatinine ในเลือด เพราะโปรตีนอัลบูมินรั่วในปัสสาวะ (UACR) เตือนภัยได้ก่อนที่ eGFR จะตก</p>
+          </div>
+
+          <div class="grid-2-chart reveal d2">
+            <div class="stack-gap">
+              <div class="bf-table-frame">
+                <table class="bf-table bf-table-xs">
+                  <thead>
+                    <tr class="fill-blue">
+                      <th>รายการ (จุฬาฯ)</th>
+                      <th>ราคา</th>
+                      <th>ความจำเป็น</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td><strong>BUN</strong></td><td>40 บาท</td><td>ตรวจตามข้อบ่งชี้</td></tr>
+                    <tr><td><strong>Creatinine</strong></td><td>40 บาท</td><td>ประเมินการทำงานของไต</td></tr>
+                    <tr class="fill-green"><td><strong>eGFR</strong></td><td><strong>คำนวณฟรี</strong></td><td>ประเมินอัตราการกรองของไต</td></tr>
+                    <tr><td><strong>Urine microalbumin</strong></td><td>350 บาท</td><td>ตรวจการรั่วของอัลบูมิน</td></tr>
+                    <tr><td><strong>Urine creatinine</strong></td><td>100 บาท</td><td>ใช้คำนวณ UACR</td></tr>
+                    <tr class="fill-cream"><td><strong>รวมโปรแกรมไต</strong></td><td><strong>530 บาท</strong></td><td>เหมาะกับกลุ่มเสี่ยงบางกลุ่ม</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="bf-card fill-green" style="padding:16px 20px;">
+                <p style="font-size:17px;"><strong>ประหยัดอย่างถูกวิธี (ADA 2026):</strong> ย้ายงบจากวิตามินที่ไม่มีข้อบ่งชี้ มาตรวจ <strong>eGFR + UACR</strong> ปีละครั้งในผู้ป่วยเบาหวาน เพื่อกันภาวะแทรกซ้อนไตระยะต้น</p>
+              </div>
+            </div>
+
+            <div class="bf-table-frame">
+              <table class="bf-table bf-table-xs">
+                <thead>
+                  <tr class="fill-pink">
+                    <th style="width:45%;">กลุ่มบุคคล ("ใครควรตรวจ?")</th>
+                    <th style="width:55%;">รายการที่ควรพิจารณา</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><strong>คนทั่วไปที่ไม่มีปัจจัยเสี่ยง</strong></td><td>Creatinine / eGFR ตามความเหมาะสม</td></tr>
+                  <tr><td><strong>ผู้ป่วยเบาหวานชนิดที่ 2</strong></td><td><strong>eGFR + UACR อย่างน้อยปีละครั้ง</strong></td></tr>
+                  <tr><td><strong>เบาหวานชนิดที่ 1 ตั้งแต่ 5 ปีขึ้นไป</strong></td><td><strong>eGFR + UACR อย่างน้อยปีละครั้ง</strong></td></tr>
+                  <tr><td><strong>ความดันโลหิตสูง</strong></td><td>eGFR + UACR</td></tr>
+                  <tr><td><strong>ใช้ยาที่มีผลต่อไตหรือเกลือแร่</strong></td><td>Creatinine และ Electrolytes ตามชนิดยา</td></tr>
+                  <tr><td><strong>มวลกล้ามเนื้อสูงหรือต่ำผิดปกติ</strong></td><td>พิจารณา Cystatin C</td></tr>
+                  <tr><td><strong>มีโรคไตเรื้อรัง</strong></td><td>ตรวจตามระยะของโรค</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 12: LIVER SCREENING < 200 THB & FIB-4 (Green)
+           ========================================================= -->
+      <section class="slide bg-green"
+        data-section="12 · LIVER &amp; FIB-4 SCORE"
+        data-title="ตรวจตับราคาไม่ถึง 200 บาท ก็ได้ข้อมูลมากกว่าที่คิด"
+        data-duration="Slide 12 / 20"
+        data-notes="เรามักเข้าใจว่าถ้าค่า AST และ ALT ปกติ แปลว่าตับแข็งแรง แต่ในความเป็นจริง ผู้ที่มีไขมันพอกตับหรือพังผืดในตับอาจมีเอนไซม์ตับปกติได้
+
+สิ่งที่น่าสนใจคือ เราสามารถนำอายุ ค่า AST, ALT และจำนวนเกล็ดเลือดมาคำนวณคะแนน FIB-4 เพื่อประเมินความเสี่ยงของพังผืดในตับ โดยไม่ต้องเสียเงินตรวจสารพิเศษเพิ่มเติม การตรวจ CBC, AST และ ALT ตามราคาตัวอย่างรวมเพียง 170 บาท
+
+ในผู้ป่วยกลุ่มเสี่ยงที่อายุประมาณ 35–65 ปี หาก FIB-4 ตั้งแต่ 1.3 ขึ้นไป อาจพิจารณาตรวจประเมินพังผืดเพิ่มเติม เช่น FibroScan ส่วนผู้สูงอายุมากกว่า 65 ปีจะใช้เกณฑ์ที่ต่างออกไป และสูตรนี้มีข้อจำกัดในคนอายุน้อยกว่า 35 ปีหรือผู้ที่กำลังเจ็บป่วยเฉียบพลัน เราไม่จำเป็นต้องเริ่มต้นด้วยการตรวจราคาแพงที่สุด แต่ควรเริ่มจากการคัดกรอง แล้วค่อยเพิ่มระดับการตรวจเมื่อมีเหตุผลรองรับ">
+        <div class="star-burst" style="width:82px;height:82px;top:36px;right:70px;transform:rotate(-8deg);">
+          <div class="star-burst-inner"></div>
+        </div>
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-white">12 · LIVER SCREENING &amp; FIB-4</span>
+              <span class="label-pill fill-yellow">AASLD · BUDGET ฿170</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">ตรวจตับราคาไม่ถึง 200 บาท ก็ได้ข้อมูลมากกว่าที่คิด</h1>
+            <p class="slide-lead" style="margin-top:4px;">เอนไซม์ตับปกติไม่ได้แปลว่าไม่มีพังผืด — ใช้ CBC + AST + ALT (รวม 170 บ.) คำนวณคะแนน FIB-4 ฟรี!</p>
+          </div>
+
+          <div class="grid-2-wide reveal d2">
+            <div class="stack-gap">
+              <div class="bf-table-frame">
+                <table class="bf-table bf-table-xs">
+                  <thead>
+                    <tr class="fill-yellow">
+                      <th>รายการ (จุฬาฯ)</th>
+                      <th>ราคา</th>
+                      <th>ประโยชน์</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td><strong>AST</strong></td><td>40 บาท</td><td>การบาดเจ็บของเซลล์ตับและเนื้อเยื่ออื่น</td></tr>
+                    <tr><td><strong>ALT</strong></td><td>40 บาท</td><td>การบาดเจ็บของเซลล์ตับ</td></tr>
+                    <tr><td><strong>ALP</strong></td><td>40 บาท</td><td>ประเมินความผิดปกติทางเดินน้ำดีและกระดูก</td></tr>
+                    <tr><td><strong>GGT</strong></td><td>150 บาท</td><td>ข้อมูลเสริมเกี่ยวกับตับและทางเดินน้ำดี</td></tr>
+                    <tr><td><strong>CBC</strong></td><td>90 บาท</td><td>รวมจำนวนเกล็ดเลือดสำหรับคำนวณ FIB-4</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="bf-card fill-yellow" style="padding:16px 22px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+                  <div style="font-family:var(--font-label);font-size:20px;font-weight:800;">
+                    FIB-4 = (Age × AST) ÷ (Platelet × √ALT)
+                  </div>
+                  <span class="code-chip fill-white">CBC+AST+ALT = ฿170</span>
+                </div>
+                <p style="font-size:16.5px;margin-top:8px;">อายุ 35–65 ปี หาก <strong>FIB-4 ≥ 1.3</strong> พิจารณาตรวจเพิ่ม (เช่น FibroScan) · อายุ &gt;65 ปีใช้เกณฑ์ต่างออกไป · ข้อจำกัดใน &lt;35 ปีหรือเจ็บป่วยเฉียบพลัน</p>
+              </div>
+            </div>
+
+            <div class="stack-gap">
+              <div class="bf-photo-frame" style="height:215px;">
+                <img src="https://images.unsplash.com/photo-1579154341184-22069e4614d2?auto=format&fit=crop&w=900&q=80" alt="หลอดตัวอย่างเลือดสำหรับตรวจการทำงานตับ" referrerpolicy="no-referrer" />
+                <div class="bf-photo-caption">FREE FIB-4 CALCULATION</div>
+              </div>
+              <div class="bf-card fill-white" style="padding:18px 22px;">
+                <h3 style="margin-bottom:8px;">ใครควรตรวจเพิ่มเติม?</h3>
+                <ul>
+                  <li>คนอ้วนลงพุง เป็นเบาหวาน หรือมีภาวะ Metabolic syndrome</li>
+                  <li>ผู้ที่ดื่มแอลกอฮอล์เป็นประจำ</li>
+                  <li>ผู้ที่รับประทานยาหรืออาหารเสริมที่อาจมีผลต่อตับ</li>
+                  <li>ผู้ติดเชื้อไวรัสตับอักเสบ / ผู้เคยตรวจพบไขมันพอกตับ</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 13: INFLAMMATORY MARKERS (Pink + Dots)
+           ========================================================= -->
+      <section class="slide bg-pink has-dots"
+        data-section="13 · INFLAMMATORY MARKERS"
+        data-title="ตรวจภาวะอักเสบ: อย่าเสียเงินตรวจทุก Inflammatory Marker"
+        data-duration="Slide 13 / 20"
+        data-notes="ในมุม Functional Medicine การอักเสบเรื้อรังเป็นปัจจัยที่ผมให้ความสำคัญมาก เพราะเกี่ยวข้องกับโรคเรื้อรังหลายชนิด แต่เราไม่จำเป็นต้องตรวจสารอักเสบทุกตัว
+
+hs-CRP อาจมีประโยชน์ในการประเมินความเสี่ยงโรคหัวใจเพิ่มเติมบางกรณี แต่ไม่สามารถบอกได้โดยตรงว่าหลอดเลือดตีบตรงไหน หรือการอักเสบนั้นเกิดจากสารพิษ อาหาร หรือการติดเชื้อ หากพบค่าสูง เราต้องพิจารณาสาเหตุและบริบท ไม่ใช่รีบสรุปว่าร่างกายมีสารพิษสะสมและต้องซื้อโปรแกรม Detox
+
+ส่วน D-Dimer เป็นการตรวจที่มีประโยชน์ในผู้ที่สงสัยลิ่มเลือดอุดตัน แต่การนำมาตรวจคนสุขภาพดีโดยไม่มีข้อบ่งชี้อาจสร้างปัญหาจากผลบวกลวงได้ การเข้าใจกลไกของโรค ไม่ได้หมายความว่าเราต้องตรวจสารทุกตัวที่เกี่ยวข้องกับกลไกนั้น">
+        <div class="deco-rect fill-yellow" style="width:74px;height:74px;top:36px;right:70px;transform:rotate(9deg);"></div>
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-white">13 · TARGETED INFLAMMATION CHECK</span>
+              <span class="label-pill fill-yellow">AVOID UNNECESSARY PANELS</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">ตรวจภาวะอักเสบ: อย่าเสียเงินตรวจทุก Inflammatory Marker</h1>
+            <p class="slide-lead" style="margin-top:4px;">การเข้าใจกลไกการอักเสบไม่ได้แปลว่าต้องเจาะทุกตัว — ต้องรู้ข้อจำกัดและการนำไปใช้จริง</p>
+          </div>
+
+          <div class="grid-2-chart reveal d2">
+            <div class="stack-gap">
+              <div class="bf-table-frame">
+                <table class="bf-table bf-table-xs">
+                  <thead>
+                    <tr class="fill-blue">
+                      <th>รายการ (ตัวอย่างจุฬาฯ)</th>
+                      <th>ราคา</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td><strong>hs-CRP</strong></td><td>400 บาท</td></tr>
+                    <tr><td><strong>Homocysteine</strong></td><td>600 บาท</td></tr>
+                    <tr><td><strong>CPK</strong></td><td>100 บาท</td></tr>
+                    <tr><td><strong>D-Dimer</strong></td><td>840 บาท</td></tr>
+                    <tr class="fill-green"><td><strong>โปรแกรมประเมินความเสี่ยงหัวใจ 3 รายการ</strong></td><td><strong>1,100 บาท</strong></td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="bf-card fill-yellow" style="padding:18px 22px;">
+                <h3 style="margin-bottom:8px;font-size:20px;">ข้อควรระวังในการแปลผล</h3>
+                <ul>
+                  <li style="font-size:17px;"><strong>hs-CRP สูง</strong> ไม่ได้ระบุจุดตีบและไม่ได้แปลว่าร่างกายสะสมสารพิษจนต้องรีบซื้อโปรแกรม Detox</li>
+                  <li style="font-size:17px;"><strong>D-Dimer</strong> ตรวจในคนสุขภาพดีที่ไม่มีอาการอาจเกิดผลบวกลวงให้กังวลเกินเหตุ</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="bf-table-frame">
+              <table class="bf-table bf-table-sm">
+                <thead>
+                  <tr class="fill-yellow">
+                    <th style="width:20%;">การตรวจ</th>
+                    <th style="width:40%;">ควรใช้เมื่อ</th>
+                    <th style="width:40%;">ไม่ควรตรวจเมื่อ</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><strong>hs-CRP</strong></td><td>ต้องการข้อมูลเสริมประเมินความเสี่ยงหัวใจบางราย</td><td>ตรวจทุกเดือนโดยไม่มีแผนเปลี่ยนการรักษา</td></tr>
+                  <tr><td><strong>ESR / CRP</strong></td><td>สงสัยการติดเชื้อหรือโรคอักเสบ</td><td>ไม่มีอาการและไม่มีข้อบ่งชี้</td></tr>
+                  <tr><td><strong>Homocysteine</strong></td><td>สงสัยความผิดปกติเฉพาะด้าน เช่น ขาดวิตามินบางชนิด</td><td>คัดกรองโรคหัวใจในทุกคน</td></tr>
+                  <tr><td><strong>D-Dimer</strong></td><td>สงสัยภาวะลิ่มเลือดอุดตันตามประเมินคลินิก</td><td>ตรวจสุขภาพประจำปีทั่วไป</td></tr>
+                  <tr><td><strong>IL-6, TNF-α</strong></td><td>ข้อบ่งชี้เฉพาะทางหรืองานวิจัย</td><td>ตรวจทั่วไปเพื่อจัดโปรแกรมอาหารเสริม</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 14: VITAMINS & MINERALS WORTHINESS (Cream)
+           ========================================================= -->
+      <section class="slide bg-cream"
+        data-section="14 · MICRONUTRIENT TESTING"
+        data-title="ตรวจวิตามินและแร่ธาตุหลักหมื่น คุ้มค่าจริงหรือ?"
+        data-duration="Slide 14 / 20"
+        data-notes="ตลาดตรวจสุขภาพเชิงชะลอวัยมักนำเสนอโปรแกรมตรวจวิตามินและแร่ธาตุหลายสิบรายการพร้อมกัน คำถามคือ ผลตรวจทั้งหมดนั้นจำเป็นต่อเราจริงหรือไม่?
+
+ยกตัวอย่าง Vitamin D แนวทางของ Endocrine Society ปี 2024 ไม่แนะนำการตรวจระดับ Vitamin D เป็นกิจวัตรในคนสุขภาพดีที่ไม่มีข้อบ่งชี้เฉพาะ
+
+ในทางกลับกัน ถ้าคุณรับประทาน Metformin มานานและเริ่มมีอาการชาปลายมือปลายเท้า การตรวจ Vitamin B12 อาจมีความสำคัญมากกว่าการตรวจวิตามินสิบชนิดพร้อมกัน การตรวจสารอาหารที่ดีจึงควรเริ่มจากประวัติอาหาร อาการ ยาที่ใช้ และปัจจัยเสี่ยง แล้วเลือกตรวจให้ตรงจุด">
+        <div class="deco-stripe" style="width:150px;height:52px;top:36px;right:70px;transform:rotate(4deg);"></div>
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-white">14 · VITAMINS &amp; MINERALS</span>
+              <span class="label-pill fill-green">ENDOCRINE SOCIETY 2024</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">ตรวจวิตามินและแร่ธาตุหลักหมื่น คุ้มค่าจริงหรือ?</h1>
+            <p class="slide-lead" style="margin-top:4px;">เริ่มจากประวัติอาหาร อาการ ยาที่ใช้ และปัจจัยเสี่ยง แทนการเหมาตรวจทีละสิบชนิด</p>
+          </div>
+
+          <div class="grid-2-chart reveal d2">
+            <div class="stack-gap">
+              <div class="bf-table-frame">
+                <table class="bf-table bf-table-xs">
+                  <thead>
+                    <tr class="fill-pink">
+                      <th>โปรแกรม / รายการ</th>
+                      <th>สถานพยาบาล</th>
+                      <th>ราคา</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td><strong>Vitamin D total</strong></td><td>สหเวชฯ จุฬาฯ</td><td>2,200 บ.</td></tr>
+                    <tr><td><strong>Vita Beauty</strong></td><td>รพ.กรุงเทพ</td><td>9,500 บ.</td></tr>
+                    <tr><td><strong>Mineral</strong></td><td>รพ.กรุงเทพ</td><td>13,800 บ.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="bf-photo-frame" style="height:190px;">
+                <img src="https://images.unsplash.com/photo-1615485500704-8e990f9900f7?auto=format&fit=crop&w=900&q=80" alt="สารอาหารและแร่ธาตุธรรมชาติ" referrerpolicy="no-referrer" />
+                <div class="bf-photo-caption">TARGETED NUTRIENTS</div>
+              </div>
+
+              <div class="bf-card fill-yellow" style="padding:14px 18px;">
+                <p style="font-size:16.5px;"><strong>Endocrine Society 2024:</strong> ไม่แนะนำตรวจ Vitamin D เป็นกิจวัตรในคนสุขภาพดีที่ไม่มีข้อบ่งชี้เฉพาะ — ต่างจากผู้ใช้ <strong>Metformin ระยะยาวมีอาการชา</strong> ที่ควรเน้น <strong>Vitamin B12</strong></p>
+              </div>
+            </div>
+
+            <div class="bf-table-frame">
+              <table class="bf-table bf-table-xs">
+                <thead>
+                  <tr class="fill-blue">
+                    <th style="width:24%;">สารอาหาร</th>
+                    <th style="width:76%;">กลุ่มที่ควรพิจารณาตรวจ</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><strong>Vitamin D</strong></td><td>สงสัยกระดูกอ่อน แคลเซียมต่ำ การดูดซึมผิดปกติ หรือดูแลกระดูกในบางกรณี</td></tr>
+                  <tr><td><strong>Vitamin B12</strong></td><td>ผู้กินวีแกน ผู้ใช้ Metformin ระยะยาว ผู้มีภาวะซีดหรืออาการทางระบบประสาท</td></tr>
+                  <tr><td><strong>Folate</strong></td><td>มีภาวะเม็ดเลือดแดงโต สงสัยขาดสารอาหารหรือการดูดซึมผิดปกติ</td></tr>
+                  <tr><td><strong>Ferritin</strong></td><td>สงสัยขาดธาตุเหล็ก มีประจำเดือนมาก หรือภาวะซีด</td></tr>
+                  <tr><td><strong>Magnesium</strong></td><td>มีเกลือแร่ผิดปกติ ท้องเสียเรื้อรัง หรือใช้ยาบางชนิด</td></tr>
+                  <tr><td><strong>Zinc</strong></td><td>ขาดสารอาหาร การดูดซึมผิดปกติ หรือมีอาการเข้าได้กับภาวะขาดสังกะสี</td></tr>
+                  <tr><td><strong>Copper</strong></td><td>หลังผ่าตัดลดน้ำหนัก ใช้ Zinc ขนาดสูง หรือสงสัยภาวะขาดทองแดง</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 15: ANTI-AGING HORMONES (Blue + Dots)
+           ========================================================= -->
+      <section class="slide bg-blue has-dots"
+        data-section="15 · HORMONES &amp; MARKETING"
+        data-title="ตรวจฮอร์โมน Anti-aging: จำเป็นหรือเป็นการตลาด?"
+        data-duration="Slide 15 / 20"
+        data-notes="ฮอร์โมนเป็นสารที่เปลี่ยนแปลงตามเวลา การนอนหลับ ความเครียด อายุ รอบเดือน และโรคที่เป็นอยู่ การตรวจโดยไม่คำนึงถึงปัจจัยเหล่านี้อาจนำไปสู่การตีความผิด และบางคนอาจได้รับฮอร์โมนทดแทนทั้งที่ไม่มีความจำเป็น
+
+ตัวอย่างเช่น การตรวจ Testosterone ไม่ได้แนะนำให้ทำเป็นกิจวัตรในผู้ชายทุกคน แต่ควรตรวจเมื่อมีอาการที่เข้าได้ และต้องยืนยันด้วยผลตรวจช่วงเช้าอย่างเหมาะสม ส่วนผู้หญิงอายุตั้งแต่ 45 ปีที่เข้าสู่วัยหมดประจำเดือนโดยมีอาการตามแบบปกติ มักไม่จำเป็นต้องตรวจ FSH หรือ Estradiol เพื่อยืนยันภาวะวัยทอง
+
+สำหรับไทรอยด์ การคัดกรองประชากรทั่วไปที่ไม่มีอาการยังมีหลักฐานไม่เพียงพอที่จะสรุปว่าควรตรวจทุกคน ถ้าเรามีข้อบ่งชี้ที่จะตรวจไทรอยด์และไม่มีข้อสงสัยโรคต่อมใต้สมอง การเริ่มต้นด้วย TSH ราคา 200 บาท แทนการตรวจไทรอยด์ครบชุดราคา 600 บาท ก็อาจช่วยประหยัดได้ 400 บาท">
+        <div class="deco-rect fill-pink" style="width:74px;height:74px;top:36px;right:70px;transform:rotate(10deg);"></div>
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-yellow">15 · ENDOCRINOLOGY EVIDENCE</span>
+              <span class="label-pill fill-white">ENDOCRINE SOCIETY · NICE · USPSTF</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">ตรวจฮอร์โมน Anti-aging: จำเป็นหรือเป็นการตลาด?</h1>
+            <p class="slide-lead" style="margin-top:4px;">ฮอร์โมนแกว่งตามเวลา นอน เครียด และรอบเดือน — การตรวจแบบหว่านอาจทำให้ได้ฮอร์โมนทดแทนเกินจำเป็น</p>
+          </div>
+
+          <div class="grid-2 reveal d2">
+            <div class="stack-gap">
+              <div class="bf-card fill-white" style="padding:18px 22px;">
+                <h3 style="margin-bottom:10px;font-size:21px;">
+                  <span>ตัวอย่างราคาฮอร์โมน (คณะสหเวชฯ จุฬาฯ)</span>
+                  <span class="mono-tag fill-green">THB</span>
+                </h3>
+                <div class="grid-2" style="gap:10px;">
+                  <div style="font-size:15.5px;line-height:1.55;">
+                    • <strong>TSH:</strong> 200 บ.<br />
+                    • <strong>FT3:</strong> 200 บ.<br />
+                    • <strong>FT4:</strong> 200 บ.<br />
+                    • <strong>Testosterone:</strong> 300 บ.<br />
+                    • <strong>Free testosterone:</strong> 1,660 บ.<br />
+                    • <strong>Estradiol:</strong> 300 บ.
+                  </div>
+                  <div style="font-size:15.5px;line-height:1.55;">
+                    • <strong>FSH:</strong> 200 บ.<br />
+                    • <strong>DHEA-S:</strong> 700 บ.<br />
+                    • <strong>Cortisol:</strong> 350 บ.<br />
+                    • <strong>Growth hormone:</strong> 600 บ.<br />
+                    • <strong>โปรแกรมชาย:</strong> 1,800 บ.<br />
+                    • <strong>โปรแกรมหญิง:</strong> 2,890 บ.
+                  </div>
+                </div>
+              </div>
+
+              <div class="bf-card fill-yellow" style="padding:16px 20px;">
+                <p style="font-size:17px;"><strong>เทคนิคประหยัดค่าตรวจไทรอยด์:</strong> หากมีข้อบ่งชี้ (ไม่มีข้อสงสัยโรคต่อมใต้สมอง) เริ่มด้วย <strong>TSH ฿200</strong> แทนครบชุด ฿600 → ประหยัดได้ทันที <strong>฿400</strong></p>
+              </div>
+            </div>
+
+            <div class="bf-table-frame">
+              <table class="bf-table bf-table-xs">
+                <thead>
+                  <tr class="fill-pink">
+                    <th style="width:40%;">สถานการณ์</th>
+                    <th style="width:60%;">วิธีตรวจอย่างประหยัด &amp; อิงหลักฐาน</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><strong>สงสัยไทรอยด์ผิดปกติ</strong></td><td>เริ่มจาก TSH ในกรณีทั่วไป แล้วเพิ่ม FT4/FT3 ตามผล (USPSTF: ไม่มีอาการยังไม่มีหลักฐานให้ตรวจทุกคน)</td></tr>
+                  <tr><td><strong>ผู้ชายสงสัย Testosterone ต่ำ</strong></td><td>Endocrine Society: ตรวจเมื่อมีอาการเข้าได้ ใช้ Total T ช่วงเช้าและยืนยันซ้ำ</td></tr>
+                  <tr><td><strong>หญิงวัยทองอายุ ≥ 45 ปี อาการชัด</strong></td><td>NICE: วินิจฉัยจากประวัติได้ ไม่ต้องตรวจ FSH / Estradiol ยืนยัน</td></tr>
+                  <tr><td><strong>ประจำเดือนผิดปกติ / มีบุตรยาก</strong></td><td>เลือกฮอร์โมนตามอาการและช่วงรอบเดือน</td></tr>
+                  <tr><td><strong>สงสัยโรคต่อมหมวกไต</strong></td><td>เลือกวิธีตรวจ Cortisol ให้เหมาะกับโรคที่สงสัย</td></tr>
+                  <tr><td><strong>ต้องการประเมินอายุชีวภาพ</strong></td><td>ไม่ควรใช้ DHEA-S หรือ GH เพียงตัวเดียวสรุปความชรา</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 16: TUMOR MARKERS MISCONCEPTION (Offwhite)
+           ========================================================= -->
+      <section class="slide bg-offwhite"
+        data-section="16 · TUMOR MARKER MYTHS"
+        data-title="ตรวจเลือดหามะเร็ง: เรื่องที่คนไทยเข้าใจผิดมากที่สุด"
+        data-duration="Slide 16 / 20"
+        data-notes="นี่เป็นหนึ่งในเรื่องที่ผมอยากให้ทุกคนกลับไปทบทวนแพ็กเกจตรวจสุขภาพของตัวเอง หลายคนเข้าใจว่าการตรวจ CEA คือการตรวจคัดกรองมะเร็งลำไส้ การตรวจ CA 19-9 คือการตรวจคัดกรองมะเร็งตับอ่อน และ CA 125 คือการตรวจคัดกรองมะเร็งรังไข่
+
+แต่ความจริงแล้ว Tumor markers ส่วนใหญ่ไม่ได้มีความแม่นยำเพียงพอสำหรับการนำมาคัดกรองมะเร็งในประชากรทั่วไปที่ไม่มีอาการ สารเหล่านี้สามารถสูงขึ้นได้จากโรคที่ไม่ใช่มะเร็ง และในผู้ที่เป็นมะเร็งระยะแรก ค่าก็อาจยังปกติได้ ตัวอย่างเช่น CEA อาจสูงจากการสูบบุหรี่ CA 125 อาจสูงจากเยื่อบุโพรงมดลูกเจริญผิดที่ และ CA 19-9 อาจสูงจากการอุดตันของทางเดินน้ำดี
+
+National Cancer Institute ระบุว่าการศึกษาสารบ่งชี้มะเร็งในเลือดส่วนใหญ่พบข้อจำกัดเมื่อนำมาใช้เพื่อการคัดกรอง ข้อยกเว้นที่สำคัญคือ AFP ร่วมกับอัลตราซาวด์ตับทุกประมาณ 6 เดือน ในผู้ป่วยตับแข็งและผู้ติดเชื้อไวรัสตับอักเสบบีบางกลุ่มที่มีความเสี่ยงสูง ส่วน PSA ต้องตัดสินใจร่วมกับแพทย์ โดย USPSTF แนะนำให้พิจารณาประโยชน์และผลเสียในผู้ชายอายุ 55–69 ปี และไม่แนะนำการคัดกรองเป็นกิจวัตรตั้งแต่อายุ 70 ปีขึ้นไป ผล Tumor marker ปกติ ไม่ได้เป็นใบรับรองว่าเราไม่มีมะเร็ง">
+        <div class="deco-stripe" style="width:150px;height:52px;top:36px;right:70px;transform:rotate(-5deg);"></div>
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-pink">16 · CANCER SCREENING MYTH</span>
+              <span class="label-pill fill-white">NCI · USPSTF · CHULA DATA</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">ตรวจเลือดหามะเร็ง: เรื่องที่คนไทยเข้าใจผิดมากที่สุด</h1>
+            <p class="slide-lead" style="margin-top:4px;">Tumor markers ส่วนใหญ่ไม่ได้แม่นยำพอสำหรับคัดกรองมะเร็งในคนทั่วไปที่ไม่มีอาการ</p>
+          </div>
+
+          <div class="grid-2-wide reveal d2">
+            <div class="bf-table-frame">
+              <table class="bf-table bf-table-xs">
+                <thead>
+                  <tr class="fill-yellow">
+                    <th style="width:22%;">Marker</th>
+                    <th style="width:18%;">ราคา (จุฬาฯ)</th>
+                    <th style="width:60%;">เหมาะคัดกรองคนทั่วไปหรือไม่?</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><strong>CEA</strong></td><td>300 บ.</td><td><span class="mono-tag fill-pink">ไม่แนะนำ</span> อาจสูงจากการสูบบุหรี่</td></tr>
+                  <tr><td><strong>AFP</strong></td><td>300 บ.</td><td><span class="mono-tag fill-green">เฉพาะกลุ่มเสี่ยง</span> มะเร็งตับร่วมกับ Ultrasound</td></tr>
+                  <tr><td><strong>CA 19-9</strong></td><td>600 บ.</td><td><span class="mono-tag fill-pink">ไม่แนะนำ</span> อาจสูงจากท่อน้ำดีอุดตัน</td></tr>
+                  <tr><td><strong>CA 125</strong></td><td>600 บ.</td><td><span class="mono-tag fill-pink">ไม่แนะนำ</span> อาจสูงจากเยื่อบุโพรงมดลูกเจริญผิดที่</td></tr>
+                  <tr><td><strong>CA 15-3</strong></td><td>600 บ.</td><td><span class="mono-tag fill-pink">ไม่แนะนำ</span> ไม่ใช้คัดกรองมะเร็งเต้านม</td></tr>
+                  <tr><td><strong>PSA</strong></td><td>400 บ.</td><td><span class="mono-tag fill-yellow">ตามอายุ/เสี่ยง</span> ชาย 55–69 ปี ปรึกษาแพทย์; ≥70 ไม่แนะนำกิจวัตร</td></tr>
+                  <tr class="fill-offwhite"><td colspan="3"><strong>ราคาโปรแกรมสารบ่งชี้มะเร็ง จุฬาฯ:</strong> ผู้ชาย <strong>1,600 บาท</strong> · ผู้หญิง <strong>2,400 บาท</strong></td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="stack-gap">
+              <div class="bf-card fill-white" style="padding:18px 22px;">
+                <h3 style="margin-bottom:8px;">หลักฐาน NCI &amp; ข้อยกเว้น</h3>
+                <ul>
+                  <li><strong>NCI:</strong> การศึกษาสารบ่งชี้มะเร็งในเลือดส่วนใหญ่พบข้อจำกัดเมื่อนำมาใช้เพื่อการคัดกรอง</li>
+                  <li><strong>ข้อยกเว้นสำคัญ:</strong> <strong>AFP + อัลตราซาวด์ตับทุก 6 เดือน</strong> ในผู้ป่วยตับแข็งและไวรัสตับอักเสบบีเสี่ยงสูง</li>
+                  <li><strong>2 กับดักอันตราย:</strong> สูงจากโรคไม่ใช่มะเร็ง (ผลบวกลวง) และมะเร็งระยะแรกอาจค่าปกติได้</li>
+                </ul>
+              </div>
+              <div class="bf-card fill-pink" style="padding:18px 22px;">
+                <p style="font-size:19px;"><strong>คำเตือนสำคัญ:</strong> ผล Tumor marker ปกติ <strong>ไม่ได้เป็นใบรับรองว่าเราไม่มีมะเร็ง</strong> และไม่ทดแทนการคัดกรองมาตรฐาน</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 17: EVIDENCE-BASED CANCER SCREENING (Yellow + Dots)
+           ========================================================= -->
+      <section class="slide bg-yellow has-dots"
+        data-section="17 · EVIDENCE-BASED CANCER SCREENING"
+        data-title="ถ้าไม่ตรวจ Tumor Marker แล้วควรตรวจมะเร็งอย่างไร?"
+        data-duration="Slide 17 / 20"
+        data-notes="ผมไม่ได้กำลังบอกว่าเราไม่ควรตรวจคัดกรองมะเร็ง แต่กำลังบอกว่าเราควรเลือกวิธีตรวจที่มีหลักฐานว่าช่วยลดการเสียชีวิตหรือมีประโยชน์ทางคลินิกจริง
+
+ตัวอย่างเช่น แนวทาง USPSTF แนะนำการคัดกรองมะเร็งลำไส้ใหญ่ตั้งแต่อายุ 45–75 ปี ในประชากรความเสี่ยงทั่วไป และแนะนำ Mammogram ทุกสองปีในผู้หญิงอายุ 40–74 ปี สำหรับผู้ที่มีประวัติครอบครัวเป็นมะเร็งตั้งแต่อายุน้อย อาจจำเป็นต้องเริ่มตรวจเร็วขึ้นหรือใช้วิธีตรวจที่แตกต่างจากประชากรทั่วไป
+
+สมมติว่าคุณมีงบประมาณ 2,400 บาท และต้องเลือกระหว่างตรวจ Tumor markers ห้าชนิด กับนำเงินไปใช้คัดกรองมะเร็งตามข้อบ่งชี้ ผมจะให้ความสำคัญกับทางเลือกหลัง นอกจากนี้ การตรวจคัดกรองหลายรายการสามารถใช้สิทธิสุขภาพของรัฐได้ตามเงื่อนไข จึงควรตรวจสอบสิทธิก่อนจ่ายเงิน">
+        <div class="deco-rect fill-blue" style="width:76px;height:76px;top:36px;right:70px;transform:rotate(11deg);"></div>
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-white">17 · STANDARD SCREENING GUIDELINES</span>
+              <span class="label-pill fill-green">MORTALITY-REDUCING EVIDENCE</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">ถ้าไม่ตรวจ Tumor Marker แล้วควรตรวจมะเร็งอย่างไร?</h1>
+            <p class="slide-lead" style="margin-top:4px;">เลือกวิธีคัดกรองที่มีหลักฐานว่าลดการเสียชีวิตจริง — คุ้มกว่าและแม่นยำกว่าการเจาะ Tumor Marker เหมาชุด</p>
+          </div>
+
+          <div class="grid-2-wide reveal d2">
+            <div class="bf-table-frame">
+              <table class="bf-table bf-table-xs">
+                <thead>
+                  <tr class="fill-blue">
+                    <th style="width:22%;">ชนิดมะเร็ง</th>
+                    <th style="width:24%;">สิ่งที่ไม่ควรใช้คัดกรองทั่วไป</th>
+                    <th style="width:54%;">วิธีคัดกรองที่เหมาะสมกว่า</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><strong>ลำไส้ใหญ่</strong></td><td>CEA</td><td><strong>FIT หรือ Colonoscopy</strong></td></tr>
+                  <tr><td><strong>เต้านม</strong></td><td>CA 15-3</td><td><strong>Mammogram</strong> ตามวัยและความเสี่ยง</td></tr>
+                  <tr><td><strong>ปากมดลูก</strong></td><td>Tumor marker</td><td><strong>HPV DNA test / Pap smear</strong></td></tr>
+                  <tr><td><strong>ตับ</strong></td><td>AFP เพียงอย่างเดียว</td><td><strong>Ultrasound ร่วมกับ AFP</strong> ในกลุ่มเสี่ยง</td></tr>
+                  <tr><td><strong>ปอด</strong></td><td>CYFRA 21-1, NSE</td><td><strong>Low-dose CT</strong> ในกลุ่มเสี่ยงตามเกณฑ์</td></tr>
+                  <tr><td><strong>รังไข่</strong></td><td>CA 125</td><td>ไม่แนะนำคัดกรองทั่วไปในผู้ไม่มีอาการ/เสี่ยงเฉลี่ย</td></tr>
+                  <tr><td><strong>ตับอ่อน</strong></td><td>CA 19-9</td><td>ไม่แนะนำคัดกรองทั่วไป ยกเว้นเสี่ยงสูงเฉพาะทาง</td></tr>
+                  <tr><td><strong>ต่อมลูกหมาก</strong></td><td>ตรวจ PSA ทุกคน</td><td>พิจารณา PSA ตามวัย ความเสี่ยง และความต้องการผู้ป่วย</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="stack-gap">
+              <div class="bf-photo-frame" style="height:230px;">
+                <img src="https://images.unsplash.com/photo-1530497610245-94d3c16cda28?auto=format&fit=crop&w=900&q=80" alt="การตรวจคัดกรองด้วยภาพถ่ายทางการแพทย์" referrerpolicy="no-referrer" />
+                <div class="bf-photo-caption">STANDARD SCREENING</div>
+              </div>
+              <div class="bf-card fill-white" style="padding:18px 22px;">
+                <h3 style="margin-bottom:8px;">เกณฑ์ USPSTF &amp; การจัดงบ</h3>
+                <ul>
+                  <li><strong>ลำไส้ใหญ่:</strong> เริ่มคัดกรองอายุ <strong>45–75 ปี</strong> (ความเสี่ยงทั่วไป)</li>
+                  <li><strong>มะเร็งเต้านม:</strong> Mammogram ทุก <strong>2 ปี</strong> ในหญิงอายุ <strong>40–74 ปี</strong></li>
+                  <li><strong>งบ ฿2,400:</strong> ใช้คัดกรองมาตรฐานคุ้มกว่า Tumor markers 5 ชนิด (หลายรายการใช้สิทธิรัฐได้!)</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 18: EXPENSIVE WELLNESS TESTS TO RECONSIDER (Pink)
+           ========================================================= -->
+      <section class="slide bg-pink"
+        data-section="18 · CRITICAL APPRAISAL"
+        data-title="การตรวจสุขภาพราคาแพงที่ต้องคิดให้ดีก่อนซื้อ"
+        data-duration="Slide 18 / 20"
+        data-notes="ในฐานะที่ผมสนใจการแพทย์เชิงป้องกันและ Functional Medicine ผมไม่ได้ปฏิเสธเทคโนโลยีการตรวจสุขภาพใหม่ ๆ แต่เราต้องแยกให้ออกระหว่างสามเรื่อง คือ การตรวจวัดได้จริง การมีความสัมพันธ์กับโรค และการนำผลตรวจไปใช้แล้วทำให้สุขภาพของผู้ป่วยดีขึ้นจริง สามเรื่องนี้ไม่เหมือนกัน
+
+ตัวอย่างเช่น การตรวจสารพิษหรือโลหะหนัก ผมสนับสนุนอย่างมากในผู้ที่มีประวัติสัมผัสหรืออาศัยอยู่ในพื้นที่ที่มีความเสี่ยง แต่เราต้องเลือกวิธีตรวจให้ตรงกับชนิดสาร หากสงสัยสารตะกั่ว การตรวจเลือดอาจเหมาะสม แต่หากสงสัยการสัมผัสสารหนูเมื่อไม่นานมานี้ การตรวจปัสสาวะที่สามารถแยกชนิดสารหนูได้อาจให้ข้อมูลที่เหมาะสมกว่า
+
+เราไม่ควรใช้ชุดตรวจสารพิษแบบเดียวกับทุกคน หรือใช้ผลตรวจที่ไม่ได้มาตรฐานมาเป็นเหตุผลให้ซื้อโปรแกรมขับสารพิษราคาแพง เทคโนโลยีที่น่าสนใจ ไม่ได้หมายความว่าเป็นการตรวจที่จำเป็นสำหรับทุกคน">
+        <div class="star-burst" style="width:82px;height:82px;top:36px;right:70px;transform:rotate(10deg);">
+          <div class="star-burst-inner" style="background:var(--yellow);"></div>
+        </div>
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-yellow">18 · HIGH-COST TEST AUDIT</span>
+              <span class="label-pill fill-white">SEPARATE MEASURABLE VS CLINICAL BENEFIT</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">การตรวจสุขภาพราคาแพงที่ต้องคิดให้ดีก่อนซื้อ</h1>
+            <p class="slide-lead" style="margin-top:4px;">แยกให้ออก: (1) วัดได้จริง ≠ (2) สัมพันธ์กับโรค ≠ (3) นำผลไปใช้แล้วทำให้สุขภาพผู้ป่วยดีขึ้นจริง</p>
+          </div>
+
+          <div class="grid-2 reveal d2">
+            <div class="bf-table-frame">
+              <table class="bf-table bf-table-xs">
+                <thead>
+                  <tr class="fill-yellow">
+                    <th style="width:28%;">การตรวจ (1–5)</th>
+                    <th style="width:38%;">สิ่งที่ต้องระวัง</th>
+                    <th style="width:34%;">ใครอาจได้ประโยชน์</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><strong>Food IgG intolerance</strong></td><td>ไม่ใช่การวินิจฉัยแพ้อาหารที่ผ่านการยืนยัน</td><td>ไม่แนะนำใช้วินิจฉัยภาวะแพ้อาหาร</td></tr>
+                  <tr><td><strong>Heavy metal panel</strong></td><td>ต้องเลือกชนิดสาร &amp; สิ่งส่งตรวจตามการสัมผัส</td><td>ผู้มีประวัติสัมผัสอาชีพ/สิ่งแวดล้อม/อาการเข้าได้</td></tr>
+                  <tr><td><strong>Hair mineral analysis</strong></td><td>ปนเปื้อนภายนอก &amp; ข้อจำกัดแปลผล</td><td>ข้อบ่งชี้ทางพิษวิทยาเฉพาะกรณี</td></tr>
+                  <tr><td><strong>Genetic wellness</strong></td><td>สัมพันธ์พันธุกรรมไม่ได้แปลว่าจะเกิดโรค</td><td>มีประวัติครอบครัว/ข้อบ่งชี้พันธุศาสตร์</td></tr>
+                  <tr><td><strong>Biological age test</strong></td><td>ยังไม่มีมาตรฐานเดียวกำหนดการรักษา</td><td>งานวิจัยหรือติดตามเชิงสำรวจ</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="bf-table-frame">
+              <table class="bf-table bf-table-xs">
+                <thead>
+                  <tr class="fill-yellow">
+                    <th style="width:28%;">การตรวจ (6–10)</th>
+                    <th style="width:38%;">สิ่งที่ต้องระวัง</th>
+                    <th style="width:34%;">ใครอาจได้ประโยชน์</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><strong>Organic acids test</strong></td><td>การแปลผล Wellness หลายประเด็นยังยืนยันไม่พอ</td><td>โรคเมแทบอลิกบางชนิดตามข้อบ่งชี้</td></tr>
+                  <tr><td><strong>Gut microbiome test</strong></td><td>ข้อจำกัดในการกำหนดรักษาเฉพาะบุคคล</td><td>บริบทเฉพาะทางหรืองานวิจัย</td></tr>
+                  <tr><td><strong>Oxidative stress</strong></td><td>มาตรฐานและผลลัพธ์สุขภาพยังจำกัด</td><td>งานวิจัยหรือข้อบ่งชี้เฉพาะ</td></tr>
+                  <tr><td><strong>Multi-cancer blood</strong></td><td>ผลบวกลวง/ลบลวง &amp; หลักฐานผลลัพธ์</td><td>เฉพาะราย (ไม่แทนคัดกรองมาตรฐาน)</td></tr>
+                  <tr><td><strong>ANA &amp; Autoimmune</strong></td><td>พบผลบวกในคนไม่มีโรคภูมิคุ้มกันได้</td><td>ผู้มีอาการ/ผลตรวจร่างกายสงสัยโรค</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="bf-card-flat fill-white reveal d3" style="padding:14px 22px;">
+            <p style="font-size:17.5px;"><strong>หลักคิดการตรวจโลหะหนัก:</strong> ตะกั่วใช้เลือด · สารหนูเพิ่งสัมผัสใช้ปัสสาวะแยกชนิด — อย่าใช้ชุดตรวจเดียวเหมาทุกคนหรือซื้อ Detox ราคาแพงจากผลที่ไม่ได้มาตรฐาน</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 19: TIERED LEVELS + LIVE LAB BUDGET CALCULATOR (Green)
+           ========================================================= -->
+      <section class="slide bg-green has-dots"
+        data-section="19 · BUILD YOUR LAB PLAN"
+        data-title="ออกแบบโปรแกรมตรวจเลือดของตัวเองตามงบประมาณ"
+        data-duration="Slide 19 / 20"
+        data-notes="นี่คือวิธีคิดที่ผมอยากให้ทุกคนสามารถนำกลับไปใช้ได้ เราไม่ต้องเริ่มต้นจากแพ็กเกจตรวจสุขภาพ แต่เริ่มต้นจากความเสี่ยงของตัวเอง แล้วจึงออกแบบรายการตรวจ
+
+ยิ่งมีปัจจัยเสี่ยงมากขึ้น เราก็สามารถเพิ่มการตรวจที่มีประโยชน์เข้ามาเป็นลำดับ โดยไม่จำเป็นต้องเพิ่มทุกอย่าง หากต้องการข้อมูลเชิงลึกด้านหลอดเลือด เราอาจเลือก ApoB หรือ Lp(a) หากต้องการประเมินการสร้างอินซูลิน เราอาจเลือก C-peptide และหากสงสัยการขาดสารอาหาร เราจึงเพิ่มการตรวจสารอาหารที่ตรงกับความเสี่ยง
+
+แต่ต้องจำไว้ว่าคนที่มีความเสี่ยงสูงไม่ได้หมายความว่าต้องตรวจ Level 4 ทุกตัว และคนที่มีความเสี่ยงต่ำก็ไม่ได้หมายความว่าไม่มีข้อบ่งชี้ตรวจรายการอื่น">
+        <div class="deco-rect fill-yellow" style="width:74px;height:74px;top:36px;right:70px;transform:rotate(-8deg);"></div>
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-white">19 · MODULAR BUDGET DESIGN</span>
+              <span class="label-pill fill-yellow">INTERACTIVE LAB CALCULATOR</span>
+            </div>
+          </div>
+          <div class="reveal d1">
+            <h1 class="slide-title">ออกแบบโปรแกรมตรวจเลือดของตัวเองตามงบประมาณ</h1>
+            <p class="slide-lead" style="margin-top:2px;">แบบจำลองสอนจัดสรรงบจากราคาประกาศจุฬาฯ + สุไหงโก-ลก (ไม่ใช่แพ็กเกจสำเร็จรูป; ไม่รวมค่าบริการเพิ่มเติมและอาจไม่ได้ตรวจครบทุกตัวในที่เดียว)</p>
+          </div>
+
+          <div class="grid-2-chart reveal d2" style="grid-template-columns:0.78fr 1.22fr;gap:20px;">
+            <div class="stack-gap" style="gap:10px;">
+              <div class="bf-card-sm fill-white" style="padding:12px 16px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <strong>Level 1 — Basic Screening</strong>
+                  <span class="code-chip fill-blue">฿410</span>
+                </div>
+                <p style="font-size:15.5px;margin-top:4px;">เกณฑ์คัดกรองน้ำตาล &amp; ไขมัน: FBS (40) + Lipid profile (370)</p>
+              </div>
+              <div class="bf-card-sm fill-yellow" style="padding:12px 16px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <strong>Level 2 — Metabolic Screening</strong>
+                  <span class="code-chip fill-white">฿820</span>
+                </div>
+                <p style="font-size:15.5px;margin-top:4px;">เสี่ยงเบาหวาน/ไขมันพอกตับ: CBC (90) + FBS (40) + HbA1c (200) + Lipid (370) + AST/ALT (80) + Cr/eGFR (40)</p>
+              </div>
+              <div class="bf-card-sm fill-white" style="padding:12px 16px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <strong>Level 3 — Diabetes &amp; Kidney</strong>
+                  <span class="code-chip fill-pink">฿1,270</span>
+                </div>
+                <p style="font-size:15.5px;margin-top:4px;">ผู้ป่วยเบาหวาน: Level 2 (820) + Urine microalbumin (350) + Urine creatinine (100)</p>
+              </div>
+              <div class="bf-card-sm fill-cream" style="padding:12px 16px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <strong>Level 4 — Advanced Cardiometabolic</strong>
+                  <span class="code-chip fill-white">฿3,120</span>
+                </div>
+                <p style="font-size:15.5px;margin-top:4px;">เสี่ยงสูงมีข้อบ่งชี้: Level 3 (1,270) + Insulin (350) + hs-CRP (400) + ApoB (500*) + Lp(a) (600*)</p>
+              </div>
+            </div>
+
+            <!-- Interactive Lab Budget Calculator -->
+            <div class="calc-panel" id="budgetCalc">
+              <div class="calc-stats">
+                <div class="calc-stat-box fill-blue">
+                  <span style="font-size:13px;font-weight:700;">ค่า LAB ที่เลือก</span>
+                  <strong id="calcTotal" style="font-family:var(--font-display);font-size:30px;">฿820</strong>
+                </div>
+                <div class="calc-stat-box fill-white">
+                  <span style="font-size:13px;font-weight:700;">จำนวนที่เลือก</span>
+                  <strong id="calcCount" style="font-family:var(--font-display);font-size:24px;">6 กลุ่มรายการ</strong>
+                </div>
+                <div class="calc-stat-box fill-yellow">
+                  <span style="font-size:13px;font-weight:700;">ส่วนต่างจากงบเดิม</span>
+                  <strong id="calcDiff" style="font-family:var(--font-display);font-size:28px;">฿9,180</strong>
+                </div>
+                <div class="calc-stat-box fill-offwhite">
+                  <label for="calcBudget" style="font-size:12.5px;font-weight:700;">งบ/แพ็กเกจเดิม (บาท)</label>
+                  <input class="calc-input" id="calcBudget" type="number" value="10000" min="0" step="100" oninput="window.presentation.renderCalculator()" />
+                </div>
+              </div>
+
+              <div class="calc-toolbar">
+                <div class="calc-preset-group">
+                  <button class="calc-preset-btn" type="button" data-preset="basic" onclick="window.presentation.applyPreset('basic')">Basic</button>
+                  <button class="calc-preset-btn active" type="button" data-preset="metabolic" onclick="window.presentation.applyPreset('metabolic')">Metabolic</button>
+                  <button class="calc-preset-btn" type="button" data-preset="diabetes" onclick="window.presentation.applyPreset('diabetes')">Diabetes</button>
+                  <button class="calc-preset-btn" type="button" data-preset="advanced" onclick="window.presentation.applyPreset('advanced')">Advanced</button>
+                  <button class="calc-preset-btn" type="button" data-preset="clear" onclick="window.presentation.applyPreset('clear')">ล้างทั้งหมด</button>
+                </div>
+                <button class="calc-preset-btn fill-pink" id="copyLabsBtn" type="button" onclick="window.presentation.copySelectedLabs()">📋 คัดลอกรายการตรวจ</button>
+              </div>
+
+              <div class="calc-grid" id="calcGrid"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           SLIDE 20: 10 GOLDEN RULES / INVERTED BLACK CLOSE FRAME
+           ========================================================= -->
+      <section class="slide bg-black"
+        data-section="20 · 10 GOLDEN RULES"
+        data-title="สรุป: 10 กฎเหล็กของการตรวจสุขภาพอย่างฉลาด"
+        data-duration="Slide 20 / 20"
+        data-notes="ผมอยากให้ทุกคนเปลี่ยนมุมมองจากการเป็นผู้ซื้อแพ็กเกจตรวจสุขภาพ มาเป็นผู้จัดการสุขภาพของตัวเอง เราไม่จำเป็นต้องตรวจทุกอย่างเพื่อให้รู้ทุกอย่าง และเราไม่จำเป็นต้องเสียเงินมากที่สุดเพื่อให้มีสุขภาพดีที่สุด
+
+บางครั้งสิ่งที่มีประโยชน์มากกว่าผลเลือด 50 รายการ คือการมีผลเลือดที่จำเป็นเพียง 10 รายการ แต่เรามีข้อมูลย้อนหลังอย่างต่อเนื่อง และเข้าใจว่าแต่ละค่ากำลังเปลี่ยนแปลงไปในทิศทางใด
+
+นี่เป็นเหตุผลหนึ่งที่ผมอยากให้ทุกคนเริ่มบันทึกผลเลือดของตัวเองไว้ใน FITKUB เพื่อให้เราสามารถติดตามสุขภาพร่วมกับพฤติกรรมการกิน การออกกำลังกาย น้ำหนัก และการนอนหลับได้อย่างต่อเนื่อง แทนที่จะตรวจสุขภาพปีละครั้งแล้วเก็บเอกสารไว้ในลิ้นชัก เราควรนำข้อมูลเหล่านั้นกลับมาใช้ในการตัดสินใจดูแลสุขภาพทุกวัน เงินที่เราประหยัดได้สามารถนำไปซื้ออาหารคุณภาพ ออกกำลังกาย ดูแลช่องปาก หรือเข้ารับการตรวจที่มีประโยชน์จริง ๆ การตรวจสุขภาพที่ดีที่สุด คือการตรวจถูกคน ถูกเรื่อง ถูกเวลา และนำผลตรวจไปใช้ได้จริง">
+        <div class="star-burst" style="width:100px;height:100px;top:36px;right:70px;background:var(--white);transform:rotate(10deg);">
+          <div class="star-burst-inner" style="background:var(--pink);"></div>
+        </div>
+        <div class="slide-inner">
+          <div class="label-row reveal d1">
+            <div class="label-group">
+              <span class="label-pill fill-yellow">20 · SUMMARY · 10 GOLDEN RULES</span>
+              <span class="label-pill fill-pink">HEALTH MANAGER MINDSET · FITKUB</span>
+            </div>
+          </div>
+
+          <div class="close-frame reveal d2">
+            <h1 class="close-title">สรุป: 10 กฎเหล็กของการตรวจสุขภาพอย่างฉลาด</h1>
+            <p style="font-family:var(--font-label);font-size:19px;color:var(--cream);margin:8px 0 20px 0;">
+              “การตรวจสุขภาพที่ดีที่สุด ไม่ใช่การตรวจมากที่สุดหรือแพงที่สุด แต่คือการตรวจถูกคน ถูกเรื่อง ถูกเวลา และนำผลตรวจไปใช้ได้จริง”
+            </p>
+
+            <div class="grid-2" style="gap:20px;">
+              <div class="bf-card-sm fill-blue" style="color:var(--black);">
+                <span class="mono-tag fill-white" style="margin-bottom:10px;">RULES 01–05 · FILTER BEFORE PAYING</span>
+                <ul style="gap:7px;">
+                  <li style="font-size:17px;"><strong>1. ใช้สิทธิสุขภาพฟรีก่อนจ่ายเงินเอง</strong> (สปสช. / ประกันสังคม)</li>
+                  <li style="font-size:17px;"><strong>2. เริ่มจากการประเมินความเสี่ยง</strong> ไม่ใช่เริ่มจากแพ็กเกจ</li>
+                  <li style="font-size:17px;"><strong>3. ตรวจเฉพาะสิ่งที่จะเปลี่ยนการดูแลรักษา</strong> (Clinical Utility)</li>
+                  <li style="font-size:17px;"><strong>4. เลือกห้องปฏิบัติการที่ได้มาตรฐาน</strong> เช่น LA หรือ ISO 15189 ตามขอบข่าย</li>
+                  <li style="font-size:17px;"><strong>5. เปรียบเทียบราคารายตัว</strong> และราคาที่รวมค่าบริการทั้งหมด</li>
+                </ul>
+              </div>
+              <div class="bf-card-sm fill-green" style="color:var(--black);">
+                <span class="mono-tag fill-white" style="margin-bottom:10px;">RULES 06–10 · SMART FOLLOW-UP</span>
+                <ul style="gap:7px;">
+                  <li style="font-size:17px;"><strong>6. ใช้ประโยชน์จากค่าที่คำนวณได้ฟรี</strong> เช่น Non-HDL, eGFR และ FIB-4</li>
+                  <li style="font-size:17px;"><strong>7. อย่าตรวจซ้ำโดยไม่มีเหตุผล</strong> โดยเฉพาะค่าที่เปลี่ยนแปลงน้อย</li>
+                  <li style="font-size:17px;"><strong>8. อย่าใช้ Tumor markers</strong> เป็นเครื่องมือคัดกรองมะเร็งทุกชนิด</li>
+                  <li style="font-size:17px;"><strong>9. อย่าซื้อการรักษา/อาหารเสริมทันที</strong> จากผลผิดปกติเพียงครั้งเดียว</li>
+                  <li style="font-size:17px;"><strong>10. เก็บประวัติผลตรวจทุกครั้ง</strong> ใน <strong>FITKUB</strong> เพื่อดูแนวโน้มและลดตรวจซ้ำซ้อน</li>
+                </ul>
+              </div>
+            </div>
+
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:22px;flex-wrap:wrap;gap:14px;">
+              <p style="font-size:18.5px;font-weight:700;color:var(--white);">
+                เปลี่ยนจากผู้ซื้อแพ็กเกจ มาเป็นผู้จัดการสุขภาพของตัวเองในทุกๆ วัน
+              </p>
+              <div style="display:flex;gap:12px;align-items:center;">
+                <button class="close-btn fill-blue" type="button" onclick="window.presentation.toggleRefs()">📚 แหล่งอ้างอิง &amp; หมายเหตุ (R)</button>
+                <button class="close-btn" type="button" onclick="window.presentation.goToSlide(0)">↺ START OVER</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- =========================================================
+       OUTSIDE-STAGE PRESENTATION CHROME
+       ========================================================= -->
+  <div class="bf-counter-pill" id="slideCounter">01 / 20</div>
+
+  <div class="deck-controls" aria-label="Presentation utilities">
+    <button class="bf-btn" id="timerBtn" type="button" title="จับเวลาบรรยาย">⏱ <span id="timerText">00:00</span></button>
+    <button class="bf-btn" id="notesBtn" type="button" onclick="window.presentation.toggleNotes()" title="สคริปต์ผู้พูด (N)">🎤 SCRIPT (N)</button>
+    <button class="bf-btn" id="indexBtn" type="button" onclick="window.presentation.toggleOverview()" title="สารบัญสไลด์ (M)">📑 INDEX (M)</button>
+    <button class="bf-btn" id="refBtn" type="button" onclick="window.presentation.toggleRefs()" title="แหล่งอ้างอิงและหมายเหตุ (R)">📚 REF (R)</button>
+    <button class="bf-btn edit-save-btn" id="saveBtn" type="button" onclick="window.editor.exportHtml()" title="ดาวน์โหลดไฟล์ HTML ที่แก้ไขแล้ว (Ctrl+S)">💾 SAVE HTML</button>
+    <a class="bf-btn" href="/" title="กลับหน้าแรก">← HOME</a>
+    <button class="bf-btn" type="button" onclick="window.presentation.toggleFullscreen()" title="เต็มจอ (F)">⛶</button>
+  </div>
+
+  <div class="bf-nav-cluster" aria-label="Slide navigation">
+    <button class="nav-btn" id="prevBtn" type="button" onclick="window.presentation.prev()" title="สไลด์ก่อนหน้า (←)">←</button>
+    <button class="nav-btn" id="nextBtn" type="button" onclick="window.presentation.next()" title="สไลด์ถัดไป (→ / Space)">→</button>
+  </div>
+
+  <!-- Speaker Script Drawer -->
+  <aside class="notes-drawer" id="notesDrawer" aria-live="polite">
+    <div class="notes-header">
+      <span id="notesMeta">SPEAKER SCRIPT · SLIDE 01/20</span>
+      <button class="bf-btn" style="height:28px;padding:0 10px;font-size:12px;" type="button" onclick="window.presentation.toggleNotes()">✕ CLOSE</button>
+    </div>
+    <p id="notesContent"></p>
+  </aside>
+
+  <!-- Slide Overview Index Modal -->
+  <div class="modal-backdrop" id="overviewModal" onclick="if(event.target===this)window.presentation.toggleOverview()">
+    <div class="modal-sheet">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
+        <h2 style="font-family:var(--font-display);font-weight:900;font-size:26px;">สารบัญสไลด์ทั้งหมด (20 SLIDES · BLOCKFRAME)</h2>
+        <button class="bf-btn" type="button" onclick="window.presentation.toggleOverview()">✕ CLOSE</button>
+      </div>
+      <div class="index-grid" id="overviewGrid"></div>
+    </div>
+  </div>
+
+  <!-- References & Presenter Disclaimer Modal -->
+  <div class="modal-backdrop" id="refModal" onclick="if(event.target===this)window.presentation.toggleRefs()">
+    <div class="modal-sheet">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px;">
+        <h2 style="font-family:var(--font-display);font-weight:900;font-size:26px;">แหล่งข้อมูลอ้างอิง &amp; หมายเหตุสำหรับผู้บรรยาย</h2>
+        <button class="bf-btn" type="button" onclick="window.presentation.toggleRefs()">✕ CLOSE</button>
+      </div>
+      <div class="stack-gap" style="gap:16px;">
+        <div class="bf-card-sm fill-yellow">
+          <h3 style="margin-bottom:8px;font-size:20px;">หมายเหตุสำหรับผู้บรรยาย</h3>
+          <ul style="gap:6px;">
+            <li style="font-size:16px;">สคริปต์นี้เน้นการคัดกรองในผู้ใหญ่และการติดตามโรคเมแทบอลิกเป็นหลัก ไม่ครอบคลุมการตรวจเฉพาะทางทั้งหมด เช่น การฝากครรภ์ โรคทางพันธุกรรมในเด็ก หรือการวินิจฉัยผู้ป่วยที่มีอาการ ซึ่งมีข้อบ่งชี้แตกต่างกัน</li>
+            <li style="font-size:16px;">ราคาที่ใช้เป็นราคาประกาศสาธารณะที่สืบค้นได้ (ณ วันที่ 26 พ.ย. 2569) ไม่ได้ผ่านการโทรยืนยันกับสถานพยาบาลแต่ละแห่ง และบางหน้าไม่ได้ระบุวันที่ปรับราคา จึงควรตรวจสอบอีกครั้งก่อนนำเสนอราคาในเชิงรับรอง ส่วนการเปรียบเทียบแพ็กเกจมีวัตถุประสงค์เพื่อสอนการเลือกบริการ ไม่ใช่การกล่าวหาว่าสถานพยาบาลใดคิดราคาเกินจริง</li>
+          </ul>
+        </div>
+        <div class="bf-table-frame">
+          <table class="bf-table bf-table-xs">
+            <thead>
+              <tr class="fill-blue">
+                <th>แหล่งข้อมูลราคาจริง</th>
+                <th>เว็บไซต์อ้างอิง</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>คลินิกบริการสุขภาพ คณะสหเวชศาสตร์ จุฬาฯ</strong></td><td><a href="https://www.ahs.chula.ac.th/services/health-sciences-service-clinic/services/health-check-up-program/" target="_blank" rel="noopener noreferrer">รายการตรวจและราคา</a></td></tr>
+              <tr><td><strong>คลินิกเทคนิคการแพทย์ชุมชน ม.อ.</strong></td><td><a href="https://medtech.psu.ac.th/clinic/" target="_blank" rel="noopener noreferrer">รายการตรวจและราคา</a></td></tr>
+              <tr><td><strong>โรงพยาบาลสมิติเวช</strong></td><td><a href="https://www.samitivejhospitals.com/th/program/detail/metabolic-screening-program" target="_blank" rel="noopener noreferrer">Metabolic Screening Program</a></td></tr>
+              <tr><td><strong>โรงพยาบาลกรุงเทพ</strong></td><td><a href="https://www.bangkokhospital.com/th/bangkok/package/health-check-up-packages" target="_blank" rel="noopener noreferrer">Health Check-up Packages 2569</a></td></tr>
+              <tr><td><strong>โรงพยาบาลสุไหงโก-ลก</strong></td><td><a href="https://thainews.prd.go.th/regionnews/news/view/2402043/?bid=1" target="_blank" rel="noopener noreferrer">ราคา ApoB และ Lp(a)</a></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="bf-card-sm fill-white">
+          <h3 style="margin-bottom:6px;font-size:19px;">แนวทางวิชาการหลัก</h3>
+          <p style="font-size:16px;">กรมการแพทย์ เรื่องการตรวจสุขภาพที่จำเป็นและเหมาะสม ฉบับปี 2565 · ADA Standards of Care 2026 · ACC/AHA Dyslipidemia Guideline 2026 · USPSTF Screening Recommendations · Endocrine Society Vitamin D Guideline 2024 · AASLD · NICE · National Cancer Institute (NCI)</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const LAB_CATALOG = [
+      { id: 'cbc', name: 'CBC', price: 90 },
+      { id: 'fbs', name: 'FBS', price: 40 },
+      { id: 'hba1c', name: 'HbA1c', price: 200 },
+      { id: 'lipid', name: 'Lipid profile', price: 370 },
+      { id: 'cr', name: 'Creatinine + eGFR', price: 40 },
+      { id: 'liver', name: 'AST + ALT', price: 80 },
+      { id: 'bun', name: 'BUN', price: 40 },
+      { id: 'uacr', name: 'UACR (2 รายการ)', price: 450 },
+      { id: 'insulin', name: 'Fasting insulin', price: 350 },
+      { id: 'hscrp', name: 'hs-CRP', price: 400 },
+      { id: 'apob', name: 'ApoB', price: 500 },
+      { id: 'lpa', name: 'Lp(a)', price: 600 },
+      { id: 'tsh', name: 'TSH', price: 200 },
+      { id: 'ft4', name: 'FT4', price: 200 },
+      { id: 'ft3', name: 'FT3', price: 200 },
+      { id: 'vitd', name: 'Vitamin D', price: 2200 },
+      { id: 'testo', name: 'Total testosterone', price: 300 },
+      { id: 'uric', name: 'Uric acid', price: 60 },
+      { id: 'cea', name: 'CEA', price: 300 },
+      { id: 'afp', name: 'AFP', price: 300 },
+      { id: 'ca199', name: 'CA 19-9', price: 600 },
+      { id: 'ca125', name: 'CA 125', price: 600 },
+      { id: 'ca153', name: 'CA 15-3', price: 600 },
+      { id: 'psa', name: 'PSA', price: 400 }
+    ];
+
+    const LAB_PRESETS = {
+      basic: ['fbs', 'lipid'],
+      metabolic: ['cbc', 'fbs', 'hba1c', 'lipid', 'cr', 'liver'],
+      diabetes: ['cbc', 'fbs', 'hba1c', 'lipid', 'cr', 'liver', 'uacr'],
+      advanced: ['cbc', 'fbs', 'hba1c', 'lipid', 'cr', 'liver', 'uacr', 'insulin', 'hscrp', 'apob', 'lpa'],
+      clear: []
+    };
+
+    /* ===========================================
+       SLIDE PRESENTATION CONTROLLER (FIXED 1920x1080)
+       =========================================== */
+    class SlidePresentation {
+      constructor() {
+        this.slides = Array.from(document.querySelectorAll('.slide'));
+        this.stage = document.getElementById('deckStage');
+        this.currentSlide = 0;
+        this.wheelLock = false;
+        this.touchStartX = null;
+        this.timerSeconds = 0;
+        this.timerInterval = null;
+        this.selectedLabs = new Set(LAB_PRESETS.metabolic);
+        this.activePreset = 'metabolic';
+
+        this.setupStageScale();
+        this.renderCalculator();
+        this.setupKeyboardNav();
+        this.setupTouchNav();
+        this.setupWheelNav();
+        this.setupTimer();
+        this.loadInitialHash();
+      }
+
+      setupStageScale() {
+        const viewport = document.querySelector('.deck-viewport');
+        const scale = () => {
+          const vw = viewport && viewport.clientWidth ? Math.min(viewport.clientWidth, window.innerWidth) : window.innerWidth;
+          const vh = viewport && viewport.clientHeight ? Math.min(viewport.clientHeight, window.innerHeight) : window.innerHeight;
+          const factor = Math.min(vw / 1920, vh / 1080);
+          const x = (vw - 1920 * factor) / 2;
+          const y = (vh - 1080 * factor) / 2;
+          this.stage.style.transform = `translate(${x}px, ${y}px) scale(${factor})`;
+        };
+        scale();
+        window.addEventListener('resize', scale);
+        if (window.ResizeObserver && viewport) {
+          new ResizeObserver(scale).observe(viewport);
+        }
+      }
+
+      loadInitialHash() {
+        const m = window.location.hash.match(/^#slide-(\d+)$/);
+        const startIdx = m ? Math.max(0, Math.min(this.slides.length - 1, parseInt(m[1], 10) - 1)) : 0;
+        this.goToSlide(startIdx, false);
+      }
+
+      goToSlide(index, updateHash = true) {
+        this.currentSlide = Math.max(0, Math.min(index, this.slides.length - 1));
+        this.slides.forEach((slide, i) => {
+          const active = i === this.currentSlide;
+          slide.classList.toggle('active', active);
+          slide.classList.toggle('visible', active);
+        });
+
+        const currentEl = this.slides[this.currentSlide];
+        const numStr = String(this.currentSlide + 1).padStart(2, '0');
+        const totalStr = String(this.slides.length);
+
+        document.getElementById('slideCounter').textContent = `${numStr} / ${totalStr}`;
+        document.getElementById('notesMeta').textContent = `SPEAKER SCRIPT · SLIDE ${numStr}/${totalStr}`;
+        document.getElementById('notesContent').textContent = currentEl.dataset.notes || '';
+        document.getElementById('prevBtn').disabled = this.currentSlide === 0;
+        document.getElementById('nextBtn').disabled = this.currentSlide === this.slides.length - 1;
+        document.getElementById('overviewModal').classList.remove('open');
+        document.getElementById('refModal').classList.remove('open');
+
+        if (updateHash) {
+          history.replaceState(null, '', `#slide-${this.currentSlide + 1}`);
+        }
+      }
+
+      applyPreset(name) {
+        this.activePreset = name;
+        this.selectedLabs = new Set(LAB_PRESETS[name] || []);
+        this.renderCalculator();
+      }
+
+      toggleLabItem(id) {
+        this.activePreset = '';
+        if (this.selectedLabs.has(id)) {
+          this.selectedLabs.delete(id);
+        } else {
+          this.selectedLabs.add(id);
+        }
+        this.renderCalculator();
+      }
+
+      renderCalculator() {
+        const grid = document.getElementById('calcGrid');
+        if (!grid) return;
+
+        grid.innerHTML = LAB_CATALOG.map((item) => {
+          const checked = this.selectedLabs.has(item.id);
+          return `<button type="button" class="lab-chip ${checked ? 'checked' : ''}" onclick="window.presentation.toggleLabItem('${item.id}')">
+            <span>${item.name}</span>
+            <span class="lab-chip-price">${item.price.toLocaleString()} บ.</span>
+          </button>`;
+        }).join('');
+
+        document.querySelectorAll('.calc-preset-btn[data-preset]').forEach((btn) => {
+          btn.classList.toggle('active', btn.dataset.preset === this.activePreset);
+        });
+
+        let total = 0;
+        LAB_CATALOG.forEach((item) => {
+          if (this.selectedLabs.has(item.id)) total += item.price;
+        });
+
+        const budgetEl = document.getElementById('calcBudget');
+        const budget = Math.max(0, Number(budgetEl ? budgetEl.value : 10000) || 0);
+        const diff = budget - total;
+
+        document.getElementById('calcTotal').textContent = `฿${total.toLocaleString()}`;
+        document.getElementById('calcCount').textContent = `${this.selectedLabs.size} กลุ่มรายการ`;
+        document.getElementById('calcDiff').textContent = diff >= 0 ? `฿${diff.toLocaleString()}` : `-฿${Math.abs(diff).toLocaleString()}`;
+      }
+
+      copySelectedLabs() {
+        const picked = LAB_CATALOG.filter((i) => this.selectedLabs.has(i.id));
+        const total = picked.reduce((acc, i) => acc + i.price, 0);
+        const text = picked.length
+          ? `รายการตรวจเลือด (${picked.length} กลุ่มรายการ · รวม ฿${total.toLocaleString()}):\n` +
+            picked.map((i) => `- ${i.name}: ${i.price.toLocaleString()} บาท`).join('\n')
+          : 'ยังไม่ได้เลือกรายการตรวจ';
+
+        const btn = document.getElementById('copyLabsBtn');
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).catch(() => {});
+        }
+        if (btn) {
+          btn.textContent = '✅ คัดลอกแล้ว!';
+          setTimeout(() => { btn.textContent = '📋 คัดลอกรายการตรวจ'; }, 1600);
+        }
+      }
+
+      next() {
+        if (this.currentSlide < this.slides.length - 1) {
+          this.goToSlide(this.currentSlide + 1);
+        }
+      }
+
+      prev() {
+        if (this.currentSlide > 0) {
+          this.goToSlide(this.currentSlide - 1);
+        }
+      }
+
+      toggleNotes() {
+        const drawer = document.getElementById('notesDrawer');
+        const btn = document.getElementById('notesBtn');
+        const isOpen = drawer.classList.toggle('open');
+        btn.classList.toggle('is-on', isOpen);
+      }
+
+      toggleOverview() {
+        const modal = document.getElementById('overviewModal');
+        const grid = document.getElementById('overviewGrid');
+        document.getElementById('refModal').classList.remove('open');
+        if (!modal.classList.contains('open')) {
+          grid.innerHTML = this.slides.map((s, i) => `
+            <div class="index-item ${i === this.currentSlide ? 'active' : ''}" onclick="window.presentation.goToSlide(${i})">
+              <div style="font-family:var(--font-label);font-size:12px;font-weight:700;letter-spacing:0.06em;">SLIDE ${String(i + 1).padStart(2, '0')} · ${s.dataset.section || ''}</div>
+              <div style="font-size:15px;font-weight:800;margin-top:6px;">${s.dataset.title || ''}</div>
+            </div>
+          `).join('');
+        }
+        modal.classList.toggle('open');
+      }
+
+      toggleRefs() {
+        document.getElementById('overviewModal').classList.remove('open');
+        document.getElementById('refModal').classList.toggle('open');
+      }
+
+      toggleFullscreen() {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(() => {});
+        } else {
+          document.exitFullscreen().catch(() => {});
+        }
+      }
+
+      setupTimer() {
+        const timerBtn = document.getElementById('timerBtn');
+        timerBtn.addEventListener('click', () => {
+          if (this.timerInterval) {
+            clearInterval(this.timerInterval);
+            this.timerInterval = null;
+            timerBtn.classList.remove('is-on');
+          } else {
+            timerBtn.classList.add('is-on');
+            this.timerInterval = setInterval(() => {
+              this.timerSeconds++;
+              const m = String(Math.floor(this.timerSeconds / 60)).padStart(2, '0');
+              const s = String(this.timerSeconds % 60).padStart(2, '0');
+              document.getElementById('timerText').textContent = `${m}:${s}`;
+            }, 1000);
+          }
+        });
+      }
+
+      setupKeyboardNav() {
+        window.addEventListener('keydown', (e) => {
+          const isEditing = e.target && (
+            e.target.isContentEditable ||
+            e.target.tagName === 'INPUT' ||
+            e.target.tagName === 'TEXTAREA'
+          );
+
+          if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') {
+            if (document.body.classList.contains('editing')) {
+              e.preventDefault();
+              window.editor.exportHtml();
+            }
+            return;
+          }
+
+          if (isEditing) return;
+
+          if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+            e.preventDefault();
+            this.next();
+          } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+            e.preventDefault();
+            this.prev();
+          } else if (e.key === 'Home') {
+            e.preventDefault();
+            this.goToSlide(0);
+          } else if (e.key === 'End') {
+            e.preventDefault();
+            this.goToSlide(this.slides.length - 1);
+          } else if (e.key === 'n' || e.key === 'N') {
+            this.toggleNotes();
+          } else if (e.key === 'm' || e.key === 'M') {
+            this.toggleOverview();
+          } else if (e.key === 'r' || e.key === 'R') {
+            this.toggleRefs();
+          } else if (e.key === 'f' || e.key === 'F') {
+            this.toggleFullscreen();
+          } else if (e.key === 'Escape') {
+            document.getElementById('overviewModal').classList.remove('open');
+            document.getElementById('refModal').classList.remove('open');
+            document.getElementById('notesDrawer').classList.remove('open');
+            document.getElementById('notesBtn').classList.remove('is-on');
+          }
+        });
+
+        window.addEventListener('hashchange', () => this.loadInitialHash());
+      }
+
+      setupTouchNav() {
+        window.addEventListener('touchstart', (e) => {
+          if (e.touches.length === 1) {
+            this.touchStartX = e.touches[0].clientX;
+          }
+        }, { passive: true });
+
+        window.addEventListener('touchend', (e) => {
+          if (this.touchStartX === null || e.changedTouches.length === 0) return;
+          const dx = e.changedTouches[0].clientX - this.touchStartX;
+          this.touchStartX = null;
+          if (Math.abs(dx) > 50) {
+            if (dx < 0) this.next();
+            else this.prev();
+          }
+        }, { passive: true });
+      }
+
+      setupWheelNav() {
+        window.addEventListener('wheel', (e) => {
+          if (document.getElementById('overviewModal').classList.contains('open') ||
+              document.getElementById('refModal').classList.contains('open')) return;
+          if (this.wheelLock || Math.abs(e.deltaY) < 28) return;
+          this.wheelLock = true;
+          if (e.deltaY > 0) this.next();
+          else this.prev();
+          setTimeout(() => { this.wheelLock = false; }, 380);
+        }, { passive: true });
+      }
+    }
+
+    /* ===========================================
+       INLINE TEXT EDITOR (HOVER HOTZONE + E KEY)
+       =========================================== */
+    class InlineEditor {
+      constructor() {
+        this.isActive = false;
+        this.storageKey = 'blockframe_smart_blood_test_v1';
+        this.hotzone = document.querySelector('.edit-hotzone');
+        this.editToggle = document.getElementById('editToggle');
+        this.hideTimeout = null;
+
+        this.restoreSaved();
+        this.bindControls();
+      }
+
+      restoreSaved() {
+        try {
+          const saved = localStorage.getItem(this.storageKey);
+          if (saved) {
+            const data = JSON.parse(saved);
+            document.querySelectorAll('.slide').forEach((slide, idx) => {
+              if (typeof data[idx] === 'string') {
+                slide.innerHTML = data[idx];
+              }
+            });
+          }
+        } catch (_) {}
+      }
+
+      persist() {
+        try {
+          const snapshot = Array.from(document.querySelectorAll('.slide')).map((s) => s.innerHTML);
+          localStorage.setItem(this.storageKey, JSON.stringify(snapshot));
+        } catch (_) {}
+      }
+
+      toggleEditMode() {
+        this.isActive = !this.isActive;
+        document.body.classList.toggle('editing', this.isActive);
+        this.editToggle.classList.toggle('active', this.isActive);
+        this.editToggle.textContent = this.isActive ? '✅ DONE EDITING (E)' : '✏️ EDIT MODE (E)';
+
+        document.querySelectorAll('.slide h1, .slide h3, .slide p, .slide li, .slide td, .slide th, .slide .stat-number, .slide .chart-label, .slide .chart-val').forEach((el) => {
+          if (this.isActive) {
+            el.setAttribute('contenteditable', 'true');
+          } else {
+            el.removeAttribute('contenteditable');
+          }
+        });
+
+        if (!this.isActive) {
+          this.persist();
+        }
+      }
+
+      exportHtml() {
+        const wasEditing = this.isActive;
+        if (wasEditing) this.toggleEditMode();
+        const blob = new Blob(['<!DOCTYPE html>\n' + document.documentElement.outerHTML], { type: 'text/html;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'smart-blood-test-slides.html';
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+
+      bindControls() {
+        this.editToggle.addEventListener('click', () => this.toggleEditMode());
+        this.hotzone.addEventListener('click', () => this.toggleEditMode());
+
+        this.hotzone.addEventListener('mouseenter', () => {
+          clearTimeout(this.hideTimeout);
+          this.editToggle.classList.add('show');
+        });
+        this.hotzone.addEventListener('mouseleave', () => {
+          this.hideTimeout = setTimeout(() => {
+            if (!this.isActive) this.editToggle.classList.remove('show');
+          }, 400);
+        });
+        this.editToggle.addEventListener('mouseenter', () => {
+          clearTimeout(this.hideTimeout);
+        });
+        this.editToggle.addEventListener('mouseleave', () => {
+          this.hideTimeout = setTimeout(() => {
+            if (!this.isActive) this.editToggle.classList.remove('show');
+          }, 400);
+        });
+
+        document.addEventListener('keydown', (e) => {
+          if ((e.key === 'e' || e.key === 'E') && !(e.target && e.target.getAttribute && e.target.getAttribute('contenteditable'))) {
+            this.toggleEditMode();
+          }
+        });
+
+        document.getElementById('deckStage').addEventListener('input', () => {
+          if (this.isActive) this.persist();
+        });
+      }
+    }
+
+    window.presentation = new SlidePresentation();
+    window.editor = new InlineEditor();
+  </script>
+</body>
+</html>
